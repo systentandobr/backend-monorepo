@@ -14,17 +14,16 @@ import (
 	"github.com/systentandobr/life-tracker/internal/adapter/repository"
 	"github.com/systentandobr/life-tracker/internal/adapter/service"
 	"github.com/systentandobr/life-tracker/internal/usecase/financial"
+	"github.com/systentandobr/life-tracker/internal/usecase/goals"
 	"github.com/systentandobr/life-tracker/pkg/mongodb"
-	"github.com/systentandobr/life-tracker/pkg/logger"
 )
 
 func main() {
-	logger.InitLogger()
-	log := logger.GetLogger()
-
+	// Setup context with cancellation
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	// Setup signal handling
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)
 	go func() {
@@ -33,24 +32,38 @@ func main() {
 		cancel()
 	}()
 
+	// Initialize MongoDB connection
 	mongoClient, err := mongodb.NewClient(os.Getenv("MONGODB_URI"))
 	if err != nil {
 		log.Fatalf("Failed to connect to MongoDB: %v", err)
 	}
-	db := mongoClient.Database("investtracker")
+	db := mongoClient.Database("lifetracker")
 
+	// Initialize event bus
 	eventBus := eventbus.NewInMemoryEventBus()
 
-	investmentRepo := repository.NewMongoInvestmentRepository(db)
-	financialService := service.NewFinancialServiceAdapter()
-	investmentUseCase := financial.NewInvestmentTrackingUseCase(investmentRepo, financialService, eventBus)
-	investmentController := controller.NewInvestmentController(investmentUseCase)
+	// Initialize repositories
+	assetRepo := repository.NewMongoAssetRepository(db)
+	goalRepo := repository.NewMongoGoalRepository(db)
 
+	// Initialize external services
+	financialService := service.NewFinancialServiceAdapter()
+
+	// Initialize use cases
+	assetUseCase := financial.NewAssetMonitoringUseCase(assetRepo, financialService, eventBus)
+	goalUseCase := goals.NewGoalManagementUseCase(goalRepo, eventBus)
+
+	// Initialize controllers
+	assetController := controller.NewAssetController(assetUseCase)
+	goalController := controller.NewGoalController(goalUseCase)
+
+	// Set up HTTP server
 	server := &http.Server{
 		Addr:    ":8080",
-		Handler: setupRouter(investmentController),
+		Handler: setupRouter(assetController, goalController),
 	}
 
+	// Start server
 	go func() {
 		log.Println("Server starting on :8080")
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -58,8 +71,10 @@ func main() {
 		}
 	}()
 
+	// Wait for context cancellation
 	<-ctx.Done()
 
+	// Graceful shutdown
 	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer shutdownCancel()
 
@@ -69,9 +84,14 @@ func main() {
 	log.Println("Server stopped gracefully")
 }
 
-func setupRouter(investmentController *controller.InvestmentController) http.Handler {
+func setupRouter(assetController *controller.AssetController, goalController *controller.GoalController) http.Handler {
 	mux := http.NewServeMux()
-	mux.HandleFunc("POST /api/investments", investmentController.AddInvestment)
-	mux.HandleFunc("GET /api/investments", investmentController.GetInvestments)
+	
+	// Register routes
+	mux.HandleFunc("POST /api/assets", assetController.AddAsset)
+	mux.HandleFunc("GET /api/assets", assetController.GetAssets)
+	mux.HandleFunc("POST /api/goals", goalController.CreateGoal)
+	mux.HandleFunc("PATCH /api/goals", goalController.UpdateGoalProgress)
+	
 	return mux
 }

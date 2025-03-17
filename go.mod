@@ -1,4 +1,4 @@
-module github.com/systentandobr
+module github.com/systentandobr/life-tracker
 
 go 1.18
 

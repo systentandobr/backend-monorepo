@@ -1,0 +1,65 @@
+
+
+# Styleguide
+
+## Usando o styleguide definido para criar components de menu que possam interagir com usuário a fim de criar um questionário rápido para conhecer sobre os principais objetivos e metas que ele deseja, para construirmos um guia adequado encaixado as prioridades do momento, por isso precisamos construir esse questionário de modo a aprender com o fluxo de dados compatível com: 
+
+### Um marketplace de ideias, onde o usuário avalia tendências e oportunidades de mercado ou financeiras
+
+### Análise de viabilidade usando dados financeiros e mercado.
+
+### Sistema de rankings de oportunidades baseado em custo/benefício.
+
+
+### Watchers e Scrapers coletam dados da API da B3 e API da Binance e outras fontes externas.
+
+### No dashboard, o usuário pode visualizar insights, simular cenários e receber alertas personalizados.
+
+### Automação por IA aprende com os hábitos do usuário e ajusta notificações e recomendações.
+
+``` Usar como modelo para apresentar o PAGE principal da aplicação com todas as rotas envolvidas
+
+🔹 Módulos Funcionais
+Cada módulo é projetado para atuar de forma independente, mas integrado ao ecossistema, criando um sistema modular e escalável.
+
+1️⃣ Módulo de Monitoramento Financeiro
+📌 Objetivo: Monitorar ativos financeiros (ações, criptomoedas, fundos imobiliários).
+🔹 Principais Funcionalidades:
+
+Conectar-se às APIs da B3 e Binance para coletar preços e variações do mercado.
+Criar carteiras personalizadas com ativos favoritos.
+Implementar um sistema de alertas para oportunidades de compra/venda.
+Análises preditivas usando Machine Learning para prever tendências de mercado.
+2️⃣ Módulo de Simulações de Investimento
+📌 Objetivo: Simular estratégias de investimento para otimizar decisões financeiras.
+🔹 Principais Funcionalidades:
+
+Criar um sandbox onde o usuário pode testar diferentes estratégias.
+Implementar modelos matemáticos para prever possíveis cenários.
+Gerar insights automáticos sobre tendências futuras.
+3️⃣ Módulo de Planejamento Pessoal e Metas
+📌 Objetivo: Organizar rotinas e metas pessoais para balancear vida profissional e saúde mental.
+🔹 Principais Funcionalidades:
+
+Criar um sistema de objetivos baseado na metodologia SMART (Específico, Mensurável, Alcançável, Relevante e Temporal).
+Sincronizar metas com hábitos financeiros, exercícios físicos e aprendizado contínuo.
+Interface de acompanhamento para progresso e ajustes contínuos.
+4️⃣ Módulo de Automação e IA para Assistência
+📌 Objetivo: Criar mecanismos autônomos para facilitar a tomada de decisões.
+🔹 Principais Funcionalidades:
+
+Implementar IA para ajustar recomendações com base nos hábitos do usuário.
+Criar um sistema de notificações inteligentes para lembrar ações críticas.
+Automatizar processos de coleta e análise de dados.
+5️⃣ Módulo de Bem-Estar e Produtividade
+📌 Objetivo: Monitorar hábitos diários, desempenho pessoal e qualidade de vida.
+🔹 Principais Funcionalidades:
+
+Criar um diário de bem-estar onde o usuário registra atividades diárias.
+Integração com Google Fit / Apple Health para monitoramento físico.
+Alertas de sobrecarga de trabalho, recomendando pausas e exercícios.
+6️⃣ Módulo de Oportunidades de Negócio
+📌 Objetivo: Criar e validar ideias de negócios com base em dados.
+🔹 Principais Funcionalidades:
+
+```

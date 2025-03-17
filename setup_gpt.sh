@@ -1,3 +1,28 @@
+#!/bin/bash
+# Script to set up the Invest Tracker project structure
+
+# Colors for pretty output
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Function to create directories
+create_directories() {
+    echo -e "${BLUE}Creating Invest Tracker project structure...${NC}"
+    mkdir -p cmd/server
+    mkdir -p internal/{domain,usecase,port,adapter}
+    mkdir -p pkg/{http,mongodb,supabase,external,eventbus,logger}
+    mkdir -p web/{react,react-native}
+    mkdir -p internal/domain/entity/{financial,investment,user}
+    mkdir -p internal/domain/valueobject
+    mkdir -p internal/usecase/{financial,investment,ai}
+    mkdir -p internal/port/{input,output}
+    mkdir -p internal/adapter/{controller,presenter,repository,service,eventbus}
+}
+
+# Function to create main.go with improved logging and modular setup
+create_main_go() {
+    cat > cmd/server/main.go << 'EOF'
 package main
 
 import (
@@ -75,3 +100,12 @@ func setupRouter(investmentController *controller.InvestmentController) http.Han
 	mux.HandleFunc("GET /api/investments", investmentController.GetInvestments)
 	return mux
 }
+EOF
+}
+
+# Run setup functions
+create_directories
+create_main_go
+
+# Output success message
+echo -e "${GREEN}Invest Tracker project structure created successfully!${NC}"
