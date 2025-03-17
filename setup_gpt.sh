@@ -15,7 +15,7 @@ create_directories() {
     mkdir -p web/{react,react-native}
     mkdir -p internal/domain/entity/{financial,investment,user}
     mkdir -p internal/domain/valueobject
-    mkdir -p internal/usecase/{financial,investment,ai}
+    mkdir -p internal/usecase/{financial,investment,ai,goals}
     mkdir -p internal/port/{input,output}
     mkdir -p internal/adapter/{controller,presenter,repository,service,eventbus}
 }
@@ -39,6 +39,7 @@ import (
 	"github.com/systentandobr/life-tracker/internal/adapter/repository"
 	"github.com/systentandobr/life-tracker/internal/adapter/service"
 	"github.com/systentandobr/life-tracker/internal/usecase/financial"
+	"github.com/systentandobr/life-tracker/internal/usecase/goals"
 	"github.com/systentandobr/life-tracker/pkg/mongodb"
 	"github.com/systentandobr/life-tracker/pkg/logger"
 )
@@ -68,6 +69,7 @@ func main() {
 
 	investmentRepo := repository.NewMongoInvestmentRepository(db)
 	financialService := service.NewFinancialServiceAdapter()
+	goalsUseCase := goals.NewGoalsUseCase()
 	investmentUseCase := financial.NewInvestmentTrackingUseCase(investmentRepo, financialService, eventBus)
 	investmentController := controller.NewInvestmentController(investmentUseCase)
 
@@ -103,9 +105,48 @@ func setupRouter(investmentController *controller.InvestmentController) http.Han
 EOF
 }
 
+# Function to create placeholder files for missing dependencies
+create_placeholder_files() {
+    echo -e "${BLUE}Creating placeholder files for missing dependencies...${NC}"
+    touch internal/adapter/eventbus/eventbus.go
+    touch internal/adapter/service/financial_service.go
+    touch internal/usecase/goals/goals_usecase.go
+    
+    cat > internal/adapter/eventbus/eventbus.go << 'EOF'
+package eventbus
+
+type InMemoryEventBus struct {}
+
+func NewInMemoryEventBus() *InMemoryEventBus {
+    return &InMemoryEventBus{}
+}
+EOF
+
+    cat > internal/adapter/service/financial_service.go << 'EOF'
+package service
+
+type FinancialServiceAdapter struct {}
+
+func NewFinancialServiceAdapter() *FinancialServiceAdapter {
+    return &FinancialServiceAdapter{}
+}
+EOF
+
+    cat > internal/usecase/goals/goals_usecase.go << 'EOF'
+package goals
+
+type GoalsUseCase struct {}
+
+func NewGoalsUseCase() *GoalsUseCase {
+    return &GoalsUseCase{}
+}
+EOF
+}
+
 # Run setup functions
 create_directories
 create_main_go
+create_placeholder_files
 
 # Output success message
 echo -e "${GREEN}Invest Tracker project structure created successfully!${NC}"

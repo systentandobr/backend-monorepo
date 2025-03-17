@@ -14,6 +14,7 @@ import (
 	"github.com/systentandobr/life-tracker/internal/adapter/repository"
 	"github.com/systentandobr/life-tracker/internal/adapter/service"
 	"github.com/systentandobr/life-tracker/internal/usecase/financial"
+	"github.com/systentandobr/life-tracker/internal/usecase/goals"
 	"github.com/systentandobr/life-tracker/pkg/mongodb"
 	"github.com/systentandobr/life-tracker/pkg/logger"
 )
@@ -43,6 +44,7 @@ func main() {
 
 	investmentRepo := repository.NewMongoInvestmentRepository(db)
 	financialService := service.NewFinancialServiceAdapter()
+	goalsUseCase := goals.NewGoalsUseCase()
 	investmentUseCase := financial.NewInvestmentTrackingUseCase(investmentRepo, financialService, eventBus)
 	investmentController := controller.NewInvestmentController(investmentUseCase)
 
