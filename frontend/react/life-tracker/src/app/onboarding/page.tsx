@@ -1,286 +1,223 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { useOnboarding } from '@/hooks/useOnboarding';
+import { questionConfig } from '@/config/onboarding/questionConfig';
+import { animations } from '@/utils/animations';
+
+// Componentes necessários para renderizar as perguntas
 import QuestionCard from '@/components/onboarding/QuestionCard';
 import TimePicker from '@/components/onboarding/TimePicker';
-import { Button } from '@/components/ui/button';
+import SliderQuestion from '@/components/onboarding/SliderQuestion';
+import MultiSelectCard from '@/components/onboarding/MultiSelectCard';
+import ProfileGeneration from '@/components/onboarding/ProfileGeneration';
 
-// Define o tipo para as respostas do usuário
-interface UserAnswers {
-  concentration: string;
-  lifestyle: string;
-  energy: string;
-  wakeupTime: string;
-  financialGoals: string;
-  riskTolerance: string;
-  investmentHorizon: string;
-}
-
-// Constantes para os IDs das perguntas
-const QUESTIONS = {
-  CONCENTRATION: 'concentration',
-  LIFESTYLE: 'lifestyle',
-  ENERGY: 'energy',
-  WAKEUP_TIME: 'wakeupTime',
-  FINANCIAL_GOALS: 'financialGoals',
-  RISK_TOLERANCE: 'riskTolerance',
-  INVESTMENT_HORIZON: 'investmentHorizon',
-};
-
-// Componente principal da página de onboarding
-export default function OnboardingPage() {
+const OnboardingPage: React.FC = () => {
   const router = useRouter();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [answers, setAnswers] = useState<UserAnswers>({
-    concentration: '',
-    lifestyle: '',
-    energy: '',
-    wakeupTime: '05:30',
-    financialGoals: '',
-    riskTolerance: '',
-    investmentHorizon: '',
-  });
-  const [isLoading, setIsLoading] = useState(false);
+  const {
+    currentQuestionId,
+    questionSequence,
+    stepHistory,
+    answers,
+    isGeneratingProfile,
+    userProfile,
+    calculateProgress,
+    goToNextQuestion,
+    goToPreviousQuestion,
+    setAnswers,
+    completeOnboarding
+  } = useOnboarding();
 
-  // Total de passos no onboarding
-  const totalSteps = 7;
-
-  // Progresso do onboarding (0-100%)
-  const progress = Math.round((currentStep / totalSteps) * 100);
-
-  // Função para salvar uma resposta e avançar para o próximo passo
-  const saveAnswer = (question: keyof UserAnswers, answer: string) => {
-    setAnswers(prev => ({ ...prev, [question]: answer }));
+  // Renderização da pergunta atual baseada na configuração
+  const renderQuestionContent = () => {
+    const questionDef = questionConfig[currentQuestionId];
+    if (!questionDef) return null;
     
-    if (currentStep < totalSteps) {
-      setCurrentStep(prev => prev + 1);
-    } else {
-      completeOnboarding();
-    }
-  };
-
-  // Finaliza o onboarding e redireciona para o dashboard
-  const completeOnboarding = async () => {
-    setIsLoading(true);
+    const IconComponent = questionDef.icon;
     
-    try {
-      // Aqui você poderia salvar os dados no backend/local storage
-      // await api.saveOnboardingData(answers);
-      
-      // Simulando um tempo de processamento
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Redireciona para o dashboard após o processamento
-      router.push('/dashboard');
-    } catch (error) {
-      console.error('Erro ao finalizar onboarding:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Variantes para animações
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { 
-        delayChildren: 0.3,
-        staggerChildren: 0.2 
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { 
-      y: 0,
-      opacity: 1,
-      transition: { duration: 0.5 }
-    }
-  };
-
-  // Conteúdo baseado no passo atual
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case 0:
+    switch (questionDef.type) {
+      case 'profile':
         return (
-          <QuestionCard
-            question="Você acha difícil se concentrar?"
-            options={[
-              { 
-                id: 'high-focus', 
-                text: 'Não, eu me concentro quando necessário',
-                visualIndicator: 'triangle'
-              },
-              { 
-                id: 'medium-focus', 
-                text: 'Às vezes eu perco meu foco',
-              },
-              { 
-                id: 'low-focus', 
-                text: 'Sim, eu me distraio facilmente',
-              }
-            ]}
-            selectedOptionId={answers.concentration}
-            onSelect={(optionId) => saveAnswer(QUESTIONS.CONCENTRATION, optionId)}
-          />
+          <motion.div
+            className="text-center"
+            variants={animations.containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <motion.h2 
+              className="text-2xl font-bold text-white mb-6"
+              variants={animations.itemVariants}
+            >
+              {questionDef.data.title}
+            </motion.h2>
+            
+            {isGeneratingProfile ? (
+              <motion.div 
+                className="w-24 h-24 mx-auto mb-8"
+                variants={animations.itemVariants}
+              >
+                <div className="flex space-x-2">
+                  <div className="w-6 h-6 bg-primary rounded-full animate-bounce"></div>
+                  <div className="w-6 h-6 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  <div className="w-6 h-6 bg-green-500 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                </div>
+              </motion.div>
+            ) : userProfile ? (
+              <motion.div variants={animations.itemVariants}>
+                <ProfileGeneration 
+                  profile={userProfile} 
+                  onContinue={() => router.push('/dashboard')} 
+                />
+              </motion.div>
+            ) : (
+              <motion.div variants={animations.itemVariants}>
+                <Button 
+                  onClick={completeOnboarding}
+                  className="bg-primary hover:bg-primary-dark text-white px-8 py-2 rounded-full"
+                >
+                  Gerar Meu Perfil
+                </Button>
+              </motion.div>
+            )}
+            
+            <motion.p 
+              className="text-gray-400 mt-4"
+              variants={animations.itemVariants}
+            >
+              {questionDef.data.description}
+            </motion.p>
+          </motion.div>
         );
         
-      case 1:
+      case 'sliders':
         return (
-          <QuestionCard
-            question="Quão satisfeito você está com seu estilo de vida atual?"
-            options={[
-              { 
-                id: 'very-satisfied', 
-                text: 'Completamente — me sinto muito ativo e com energia',
-                visualIndicator: 'triangle'
-              },
-              { 
-                id: 'somewhat-satisfied', 
-                text: 'Um pouco — eu gostaria de ver alguma melhoria',
-              },
-              { 
-                id: 'not-satisfied', 
-                text: 'Nem um pouco — sou sedentário e gostaria de ver uma grande mudança',
-              }
-            ]}
-            selectedOptionId={answers.lifestyle}
-            onSelect={(optionId) => saveAnswer(QUESTIONS.LIFESTYLE, optionId)}
-          />
-        );
-        
-      case 2:
-        return (
-          <QuestionCard
-            question="Qual é o seu nível de energia ao longo do dia?"
-            options={[
-              { 
-                id: 'high-energy', 
-                text: 'Alto — tenho energia ao longo do dia',
-                visualIndicator: 'triangle'
-              },
-              { 
-                id: 'medium-energy', 
-                text: 'Médio — tenho explosões de energia',
-              },
-              { 
-                id: 'low-energy', 
-                text: 'Baixo — minha energia diminui ao longo do dia',
-              }
-            ]}
-            selectedOptionId={answers.energy}
-            onSelect={(optionId) => saveAnswer(QUESTIONS.ENERGY, optionId)}
-          />
-        );
-        
-      case 3:
-        return (
-          <TimePicker
-            question="Que horas você costuma acordar?"
-            onTimeSelected={(time) => saveAnswer(QUESTIONS.WAKEUP_TIME, time)}
-            defaultTime={answers.wakeupTime}
-          />
-        );
-        
-      case 4:
-        return (
-          <QuestionCard
-            question="Quais são seus principais objetivos financeiros?"
-            options={[
-              { 
-                id: 'wealth-building', 
-                text: 'Acumular patrimônio a longo prazo',
-                description: 'Foco em crescimento sustentável com estratégia de longo prazo'
-              },
-              { 
-                id: 'passive-income', 
-                text: 'Gerar renda passiva',
-                description: 'Criar fluxos de receita recorrentes com investimentos'
-              },
-              { 
-                id: 'specific-goal', 
-                text: 'Economizar para um objetivo específico',
-                description: 'Como comprar um imóvel, aposentadoria ou educação'
-              },
-              { 
-                id: 'business-opportunity', 
-                text: 'Identificar oportunidades de negócio',
-                description: 'Encontrar e explorar novos empreendimentos rentáveis'
-              }
-            ]}
-            selectedOptionId={answers.financialGoals}
-            onSelect={(optionId) => saveAnswer(QUESTIONS.FINANCIAL_GOALS, optionId)}
-          />
-        );
-        
-      case 5:
-        return (
-          <QuestionCard
-            question="Qual é sua tolerância a risco em investimentos?"
-            options={[
-              { 
-                id: 'conservative', 
-                text: 'Conservador',
-                description: 'Prefiro segurança mesmo com retornos menores'
-              },
-              { 
-                id: 'moderate', 
-                text: 'Moderado',
-                description: 'Equilíbrio entre segurança e oportunidades de crescimento'
-              },
-              { 
-                id: 'aggressive', 
-                text: 'Agressivo',
-                description: 'Aceito volatilidade em busca de retornos maiores'
-              }
-            ]}
-            selectedOptionId={answers.riskTolerance}
-            onSelect={(optionId) => saveAnswer(QUESTIONS.RISK_TOLERANCE, optionId)}
-          />
-        );
-        
-      case 6:
-        return (
-          <QuestionCard
-            question="Qual é seu horizonte de investimento?"
-            options={[
-              { 
-                id: 'short-term', 
-                text: 'Curto prazo (até 2 anos)',
-                description: 'Necessito de liquidez e acesso rápido aos recursos'
-              },
-              { 
-                id: 'medium-term', 
-                text: 'Médio prazo (2-5 anos)',
-                description: 'Posso esperar alguns anos para resultados melhores'
-              },
-              { 
-                id: 'long-term', 
-                text: 'Longo prazo (mais de 5 anos)',
-                description: 'Foco em crescimento consistente ao longo do tempo'
-              }
-            ]}
-            selectedOptionId={answers.investmentHorizon}
-            onSelect={(optionId) => saveAnswer(QUESTIONS.INVESTMENT_HORIZON, optionId)}
-          />
-        );
-        
-      case 7:
-        // Tela de processamento/finalização
-        return (
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-white mb-6">Criando seu programa personalizado...</h2>
-            <div className="w-24 h-24 mx-auto mb-8 flex space-x-2">
-              <div className="w-6 h-6 bg-yellow-400 rounded-full animate-bounce"></div>
-              <div className="w-6 h-6 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-              <div className="w-6 h-6 bg-green-500 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+          <div className="bg-dark-card p-6 rounded-xl max-w-md w-full">
+            <div className="flex items-center mb-6">
+              <div className="w-10 h-10 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mr-4">
+                <IconComponent className="text-primary" size={20} />
+              </div>
+              <h2 className="text-xl font-semibold">{questionDef.data.title}</h2>
             </div>
-            <p className="text-gray-400">Analisando suas preferências e montando recomendações...</p>
+            
+            {questionDef.data.description && (
+              <p className="text-gray-400 mb-6">{questionDef.data.description}</p>
+            )}
+            
+            {questionDef.data.sliders?.map((slider, index) => (
+              <div key={index} className="mb-6">
+                <label className="block text-gray-400 mb-2">{slider.label}</label>
+                <SliderQuestion
+                  min={slider.min}
+                  max={slider.max}
+                  step={slider.step}
+                  value={answers[slider.key] || slider.defaultValue}
+                  onChange={(value) => setAnswers(prev => ({ ...prev, [slider.key]: value }))}
+                  formatLabel={slider.formatLabel}
+                />
+              </div>
+            ))}
+            
+            <Button 
+              onClick={goToNextQuestion}
+              className="w-full bg-primary hover:bg-primary-dark"
+            >
+              Continuar
+            </Button>
           </div>
+        );
+        
+      case 'timeRange':
+        return (
+          <div className="bg-dark-card p-6 rounded-xl max-w-md w-full">
+            <div className="flex items-center mb-6">
+              <div className="w-10 h-10 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mr-4">
+                <IconComponent className="text-primary" size={20} />
+              </div>
+              <h2 className="text-xl font-semibold">{questionDef.data.title}</h2>
+            </div>
+            
+            {questionDef.data.timePickers?.map((picker, index) => (
+              <div key={index} className="mb-6">
+                <TimePicker
+                  label={picker.label}
+                  onTimeSelected={(time) => setAnswers(prev => ({ ...prev, [picker.key]: time }))}
+                  defaultTime={answers[picker.key] || picker.defaultValue}
+                />
+              </div>
+            ))}
+            
+            <Button 
+              onClick={goToNextQuestion}
+              className="w-full bg-primary hover:bg-primary-dark"
+            >
+              Continuar
+            </Button>
+          </div>
+        );
+        
+      case 'welcome':
+        return (
+          <motion.div 
+            className="text-center max-w-lg"
+            variants={animations.containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <motion.div variants={animations.itemVariants}>
+              <div className="w-24 h-24 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <IconComponent size={40} className="text-primary" />
+              </div>
+            </motion.div>
+            
+            <motion.h1 variants={animations.itemVariants} className="text-3xl font-bold mb-4">
+              {questionDef.data.title}
+            </motion.h1>
+            
+            <motion.p variants={animations.itemVariants} className="text-gray-400 mb-8">
+              {questionDef.data.description}
+            </motion.p>
+            
+            <motion.div variants={animations.itemVariants}>
+              <Button 
+                onClick={goToNextQuestion}
+                className="bg-primary hover:bg-primary-dark text-white px-8 py-2 rounded-full"
+              >
+                Começar Jornada
+              </Button>
+            </motion.div>
+          </motion.div>
+        );
+        
+      case 'single':
+        return (
+          <QuestionCard
+            icon={<IconComponent className="text-primary" size={28} />}
+            question={questionDef.data.question || ''}
+            options={questionDef.data.options || []}
+            selectedOptionId={answers[questionDef.answerKey as string]}
+            onSelect={(optionId) => {
+              setAnswers(prev => ({ ...prev, [questionDef.answerKey as string]: optionId }));
+              goToNextQuestion();
+            }}
+          />
+        );
+        
+      case 'multiselect':
+        return (
+          <MultiSelectCard
+            icon={<IconComponent className="text-primary" size={28} />}
+            question={questionDef.data.question || ''}
+            options={questionDef.data.options || []}
+            selectedOptions={answers[questionDef.answerKey as string] || []}
+            minSelections={questionDef.data.minSelections || 1}
+            onComplete={(selected) => {
+              setAnswers(prev => ({ ...prev, [questionDef.answerKey as string]: selected }));
+              goToNextQuestion();
+            }}
+          />
         );
         
       default:
@@ -294,20 +231,21 @@ export default function OnboardingPage() {
       <div className="fixed top-0 left-0 right-0 h-1 bg-gray-800">
         <div 
           className="h-full bg-primary transition-all duration-500 ease-in-out"
-          style={{ width: `${progress}%` }}
+          style={{ width: `${calculateProgress()}%` }}
         />
       </div>
       
-      {/* Status do app */}
+      {/* Cabeçalho */}
       <div className="pt-8 px-6 flex items-center justify-between">
         <div className="text-sm text-gray-400">
-          {currentStep < totalSteps ? `${currentStep + 1}/${totalSteps}` : ''}
+          {currentQuestionId !== 'welcome' && currentQuestionId !== 'profileGeneration' ? 
+            `${questionSequence.indexOf(currentQuestionId) + 1}/${questionSequence.length}` : ''}
         </div>
         
-        {currentStep > 0 && currentStep < totalSteps && (
+        {currentQuestionId !== 'welcome' && (
           <Button 
             variant="ghost" 
-            onClick={() => setCurrentStep(prev => prev - 1)}
+            onClick={goToPreviousQuestion}
             className="text-gray-400"
           >
             Voltar
@@ -318,16 +256,18 @@ export default function OnboardingPage() {
       {/* Conteúdo principal */}
       <AnimatePresence mode="wait">
         <motion.div 
-          key={currentStep}
+          key={currentQuestionId}
           className="flex-1 flex items-center justify-center p-6"
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -20 }}
           transition={{ duration: 0.3 }}
         >
-          {renderStepContent()}
+          {renderQuestionContent()}
         </motion.div>
       </AnimatePresence>
     </main>
   );
-}
+};
+
+export default OnboardingPage;

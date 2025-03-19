@@ -1,117 +1,82 @@
-'use client';
-
 import React from 'react';
 import { motion } from 'framer-motion';
-import { cn } from '@/utils/cn';
-
-export interface OptionProps {
-  id: string;
-  text: string;
-  description?: string;
-  icon?: React.ReactNode;
-  color?: string;
-  isSelected?: boolean;
-  visualIndicator?: 'triangle' | 'circle' | 'none';
-}
+import { Option } from '@/config/onboarding/questionConfig';
+import { animations } from '@/utils/animations';
 
 interface QuestionCardProps {
+  icon: React.ReactNode;
   question: string;
-  description?: string;
-  options: OptionProps[];
-  onSelect: (optionId: string) => void;
+  options: Option[];
   selectedOptionId?: string;
-  className?: string;
+  onSelect: (optionId: string) => void;
 }
 
-export const QuestionCard: React.FC<QuestionCardProps> = ({
+const QuestionCard: React.FC<QuestionCardProps> = ({
+  icon,
   question,
-  description,
   options,
-  onSelect,
   selectedOptionId,
-  className,
+  onSelect
 }) => {
   return (
-    <div className={cn("w-full max-w-md mx-auto", className)}>
-      <h2 className="text-2xl font-bold text-white text-center mb-2">{question}</h2>
-      {description && (
-        <p className="text-gray-400 text-center mb-8">{description}</p>
-      )}
+    <motion.div 
+      className="bg-dark-card p-6 rounded-xl shadow-lg max-w-md w-full"
+      variants={animations.containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <motion.div 
+        className="flex items-center mb-6"
+        variants={animations.itemVariants}
+      >
+        <div className="w-10 h-10 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mr-4">
+          {icon}
+        </div>
+        <h2 className="text-xl font-semibold">{question}</h2>
+      </motion.div>
       
-      <div className="space-y-3">
+      <div className="space-y-4">
         {options.map((option) => (
-          <OptionCard
+          <motion.div
             key={option.id}
-            option={option}
-            isSelected={option.id === selectedOptionId}
+            className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-300 ${
+              selectedOptionId === option.id 
+                ? 'border-primary bg-primary bg-opacity-10' 
+                : 'border-gray-700 hover:border-gray-500'
+            }`}
             onClick={() => onSelect(option.id)}
-          />
+            variants={animations.itemVariants}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-medium">{option.text}</h3>
+                {option.description && (
+                  <p className="text-sm text-gray-400 mt-1">{option.description}</p>
+                )}
+              </div>
+              
+              {option.visualIndicator === 'triangle' && (
+                <div className="w-0 h-0 border-left-8 border-right-8 border-bottom-16 border-transparent border-b-primary ml-2" />
+              )}
+              
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${
+                selectedOptionId === option.id 
+                  ? 'bg-primary' 
+                  : 'bg-gray-700'
+              }`}>
+                {selectedOptionId === option.id && (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                )}
+              </div>
+            </div>
+          </motion.div>
         ))}
       </div>
-    </div>
-  );
-};
-
-interface OptionCardProps {
-  option: OptionProps;
-  isSelected?: boolean;
-  onClick: () => void;
-}
-
-export const OptionCard: React.FC<OptionCardProps> = ({
-  option,
-  isSelected = false,
-  onClick,
-}) => {
-  const {
-    text,
-    description,
-    icon,
-    visualIndicator = 'triangle'
-  } = option;
-
-  return (
-    <motion.button
-      whileTap={{ scale: 0.98 }}
-      onClick={onClick}
-      className={cn(
-        "w-full text-left p-4 rounded-lg transition-colors relative overflow-hidden",
-        "bg-dark-card hover:bg-gray-800",
-        isSelected && "ring-1 ring-primary"
-      )}
-    >
-      <div className="relative z-10 flex justify-between items-center">
-        <div>
-          <p className="text-white font-medium">{text}</p>
-          {description && (
-            <p className="text-gray-400 text-sm mt-1">{description}</p>
-          )}
-        </div>
-        
-        {isSelected && visualIndicator === 'triangle' && (
-          <div className="text-red-500 mr-2">◀</div>
-        )}
-        
-        {isSelected && visualIndicator === 'circle' && (
-          <div className="w-4 h-4 rounded-full bg-yellow-500 flex items-center justify-center">
-            <span className="text-xs text-black">✓</span>
-          </div>
-        )}
-      </div>
-      
-      {/* Decorative elements */}
-      <div className="absolute right-0 bottom-0">
-        {isSelected ? (
-          <div className="right-0 bottom-0 w-24 h-24">
-            <div className="absolute right-0 bottom-0 w-12 h-12 bg-teal-600 rounded-full opacity-20 transform translate-x-6 translate-y-6" />
-            <div className="absolute right-4 bottom-8 w-6 h-6 bg-teal-500 rounded-full opacity-30" />
-            <div className="absolute right-10 bottom-2 w-8 h-8 bg-teal-700 rounded-full opacity-20" />
-          </div>
-        ) : (
-          <div className="h-12 w-12 rounded-full bg-gray-700 opacity-10" />
-        )}
-      </div>
-    </motion.button>
+    </motion.div>
   );
 };
 
