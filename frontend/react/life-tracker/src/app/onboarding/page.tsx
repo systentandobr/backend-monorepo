@@ -69,7 +69,7 @@ const OnboardingPage: React.FC = () => {
               <motion.div variants={animations.itemVariants}>
                 <ProfileGeneration 
                   profile={userProfile} 
-                  onContinue={() => router.push('/dashboard')} 
+                  onContinue={() => router.push('/')} 
                 />
               </motion.div>
             ) : (
