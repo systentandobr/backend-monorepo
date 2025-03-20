@@ -107,7 +107,7 @@ const OnboardingContent: React.FC = () => {
               <p className="text-gray-400 mb-6">{currentQuestion.data.description}</p>
             )}
             
-            {currentQuestion.data.sliders?.map((slider: any, index: number) => (
+            {currentQuestion.data.sliders?.map((slider, index) => (
               <div key={index} className="mb-6">
                 <label className="block text-gray-400 mb-2">{slider.label}</label>
                 <SliderQuestion
@@ -140,7 +140,7 @@ const OnboardingContent: React.FC = () => {
               <h2 className="text-xl font-semibold">{currentQuestion.data.title}</h2>
             </div>
             
-            {currentQuestion.data.timePickers?.map((picker: any, index: number) => (
+            {currentQuestion.data.timePickers?.map((picker, index) => (
               <div key={index} className="mb-6">
                 <TimePicker
                   label={picker.label}
@@ -317,6 +317,135 @@ const OnboardingContent: React.FC = () => {
         </motion.div>
       </AnimatePresence>
     </main>
+  );
+};
+
+// Componentes adicionais que precisamos implementar
+const MindsetScaleCard: React.FC<{
+  icon: React.ReactNode;
+  question: string;
+  description: string;
+  scales: Array<{
+    statement: string;
+    key: string;
+    leftLabel: string;
+    rightLabel: string;
+  }>;
+  values: Record<string, number>;
+  onChange: (key: string, value: number) => void;
+  onComplete: () => void;
+}> = ({ icon, question, description, scales, values, onChange, onComplete }) => {
+  return (
+    <div className="bg-dark-card p-6 rounded-xl max-w-md w-full">
+      <div className="flex items-center mb-4">
+        <div className="w-10 h-10 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mr-4">
+          {icon}
+        </div>
+        <h2 className="text-xl font-semibold">{question}</h2>
+      </div>
+      
+      {description && (
+        <p className="text-gray-400 mb-6">{description}</p>
+      )}
+      
+      {scales.map((scale, index) => (
+        <div key={index} className="mb-6">
+          <p className="text-white mb-3">{scale.statement}</p>
+          <div className="mb-2">
+            <div className="flex justify-between text-xs text-gray-400 mb-1">
+              <span>{scale.leftLabel}</span>
+              <span>{scale.rightLabel}</span>
+            </div>
+            <SliderQuestion
+              min={1}
+              max={10}
+              step={1}
+              value={values[scale.key] || 5}
+              onChange={(value) => onChange(scale.key, value)}
+              formatLabel={(value) => `${value}`}
+            />
+          </div>
+        </div>
+      ))}
+      
+      <Button 
+        onClick={onComplete}
+        className="w-full bg-primary hover:bg-primary-dark mt-4"
+      >
+        Continuar
+      </Button>
+    </div>
+  );
+};
+
+const ActionCommitmentCard: React.FC<{
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  commitmentConfig: {
+    title: string;
+    description: string;
+    actionKey: string;
+    defaultAction: string;
+    timeframeKey: string;
+    defaultTimeframe: string;
+  };
+  values: {
+    action: string;
+    timeframe: string;
+  };
+  onChange: (field: 'action' | 'timeframe', value: string) => void;
+  onComplete: () => void;
+}> = ({ icon, title, description, commitmentConfig, values, onChange, onComplete }) => {
+  return (
+    <div className="bg-dark-card p-6 rounded-xl max-w-md w-full">
+      <div className="flex items-center mb-4">
+        <div className="w-10 h-10 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mr-4">
+          {icon}
+        </div>
+        <h2 className="text-xl font-semibold">{title}</h2>
+      </div>
+      
+      {description && (
+        <p className="text-gray-400 mb-6">{description}</p>
+      )}
+      
+      <div className="mb-6">
+        <label className="block text-white mb-2">{commitmentConfig.title}</label>
+        <p className="text-gray-400 text-sm mb-3">{commitmentConfig.description}</p>
+        <textarea
+          value={values.action}
+          onChange={(e) => onChange('action', e.target.value)}
+          placeholder="Escreva seu compromisso aqui..."
+          className="w-full p-3 bg-dark-background border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary"
+          rows={3}
+        />
+      </div>
+      
+      <div className="mb-6">
+        <label className="block text-white mb-2">Por quanto tempo você se compromete?</label>
+        <select
+          value={values.timeframe}
+          onChange={(e) => onChange('timeframe', e.target.value)}
+          className="w-full p-3 bg-dark-background border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary"
+        >
+          <option value="7 dias">7 dias</option>
+          <option value="30 dias">30 dias</option>
+          <option value="60 dias">60 dias</option>
+          <option value="90 dias">90 dias</option>
+          <option value="6 meses">6 meses</option>
+          <option value="12 meses">12 meses</option>
+        </select>
+      </div>
+      
+      <Button 
+        onClick={onComplete}
+        disabled={!values.action.trim()}
+        className="w-full bg-primary hover:bg-primary-dark"
+      >
+        Continuar
+      </Button>
+    </div>
   );
 };
 

@@ -4,24 +4,8 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { User, Target, BarChart, Briefcase, ArrowRight } from 'lucide-react';
+import { UserProfile } from '@/types/userProfile';
 
-// Interface para o perfil do usuário
-interface UserProfile {
-  personalType: string;
-  financialProfile: string;
-  entrepreneurType: string;
-  recommendedFocus: string[];
-  suggestedHabits: {name: string, category: string, frequency: string}[];
-  suggestedInvestments: {type: string, allocation: number, risk: string}[];
-  suggestedBusinessOpportunities: {name: string, investmentLevel: string, timeRequired: string}[];
-  strengths: string[];
-  weaknesses: string[];
-  recommendations: {
-    personal: string[];
-    financial: string[];
-    career: string[];
-  };
-}
 
 interface ProfileGenerationProps {
   profile: UserProfile;

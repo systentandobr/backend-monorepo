@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Option } from '@/config/onboarding/questionConfig';
+import { Option } from '@/config/onboarding';
 import { animations } from '@/utils/animations';
 
 interface QuestionCardProps {

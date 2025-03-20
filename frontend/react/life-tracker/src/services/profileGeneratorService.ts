@@ -1,4 +1,4 @@
-import { AnswersType } from '@/config/onboarding/questionConfig';
+import { AnswersType } from '@/config/onboarding';
 import { UserProfile } from '@/hooks/useOnboarding';
 
 class ProfileGeneratorService {
