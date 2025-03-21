@@ -1,152 +1,209 @@
 #!/bin/bash
-# Script to set up the Invest Tracker project structure
+# Script para criar a estrutura de diretórios do Investment Tracker
+nome_do_modulo=${1}
 
-# Colors for pretty output
+# Cores para saída formatada
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Function to create directories
-create_directories() {
-    echo -e "${BLUE}Creating Invest Tracker project structure...${NC}"
-    mkdir -p cmd/server
-    mkdir -p internal/{domain,usecase,port,adapter}
-    mkdir -p pkg/{http,mongodb,supabase,external,eventbus,logger}
-    mkdir -p web/{react,react-native}
-    mkdir -p internal/domain/entity/{financial,investment,user}
-    mkdir -p internal/domain/valueobject
-    mkdir -p internal/usecase/{financial,investment,ai,goals}
-    mkdir -p internal/port/{input,output}
-    mkdir -p internal/adapter/{controller,presenter,repository,service,eventbus}
-}
+echo -e "${BLUE}Criando estrutura do projeto Investment Tracker...${NC}"
 
-# Function to create main.go with improved logging and modular setup
-create_main_go() {
-    cat > cmd/server/main.go << 'EOF'
-package main
+# Criar diretório raiz
+mkdir -p ${nome_do_modulo}
+cd ${nome_do_modulo}
 
-import (
-	"context"
-	"log"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
+# Criar estrutura principal
+mkdir -p cmd/{api,jobs,templates}
+mkdir -p pkg/{common/{errors,logger,utils},infrastructure/{database/{mongodb,redis},http,messaging/{kafka,rabbitmq},services/{b3,binance,notifications}}}
+mkdir -p internal/domain/{asset/{entity,repository,service,valueobject},analysis/{entity,repository,service,strategy},simulation/{entity,repository,service},notification/{entity,repository,service},user/{entity,repository,service}}
+mkdir -p internal/{application/{asset,analysis,simulation,notification,user},ports/{input,output},adapter/{controller,presenter,persistence,external}}
+mkdir -p web/{src/{components,pages,hooks,store},public}
+mkdir -p deploy/{docker/{api,job-collector,job-analyzer},kubernetes}
+mkdir -p test docs
 
-	"github.com/systentandobr/life-tracker/internal/adapter/controller"
-	"github.com/systentandobr/life-tracker/internal/adapter/eventbus"
-	"github.com/systentandobr/life-tracker/internal/adapter/repository"
-	"github.com/systentandobr/life-tracker/internal/adapter/service"
-	"github.com/systentandobr/life-tracker/internal/usecase/financial"
-	"github.com/systentandobr/life-tracker/internal/usecase/goals"
-	"github.com/systentandobr/life-tracker/pkg/mongodb"
-	"github.com/systentandobr/life-tracker/pkg/logger"
-)
+# Criar arquivos base
+touch go.mod README.md Makefile .gitignore
 
-func main() {
-	logger.InitLogger()
-	log := logger.GetLogger()
+# Inicializar go.mod
+cat > go.mod << 'EOF'
+module github.com/systentandobr/life-tracker/backend/${nome_do_modulo}
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	signalChan := make(chan os.Signal, 1)
-	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)
-	go func() {
-		<-signalChan
-		log.Println("Shutdown signal received, exiting...")
-		cancel()
-	}()
-
-	mongoClient, err := mongodb.NewClient(os.Getenv("MONGODB_URI"))
-	if err != nil {
-		log.Fatalf("Failed to connect to MongoDB: %v", err)
-	}
-	db := mongoClient.Database("investtracker")
-
-	eventBus := eventbus.NewInMemoryEventBus()
-
-	investmentRepo := repository.NewMongoInvestmentRepository(db)
-	financialService := service.NewFinancialServiceAdapter()
-	goalsUseCase := goals.NewGoalsUseCase()
-	investmentUseCase := financial.NewInvestmentTrackingUseCase(investmentRepo, financialService, eventBus)
-	investmentController := controller.NewInvestmentController(investmentUseCase)
-
-	server := &http.Server{
-		Addr:    ":8080",
-		Handler: setupRouter(investmentController),
-	}
-
-	go func() {
-		log.Println("Server starting on :8080")
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("Failed to start server: %v", err)
-		}
-	}()
-
-	<-ctx.Done()
-
-	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer shutdownCancel()
-
-	if err := server.Shutdown(shutdownCtx); err != nil {
-		log.Fatalf("Server shutdown failed: %v", err)
-	}
-	log.Println("Server stopped gracefully")
-}
-
-func setupRouter(investmentController *controller.InvestmentController) http.Handler {
-	mux := http.NewServeMux()
-	mux.HandleFunc("POST /api/investments", investmentController.AddInvestment)
-	mux.HandleFunc("GET /api/investments", investmentController.GetInvestments)
-	return mux
-}
-EOF
-}
-
-# Function to create placeholder files for missing dependencies
-create_placeholder_files() {
-    echo -e "${BLUE}Creating placeholder files for missing dependencies...${NC}"
-    touch internal/adapter/eventbus/eventbus.go
-    touch internal/adapter/service/financial_service.go
-    touch internal/usecase/goals/goals_usecase.go
-    
-    cat > internal/adapter/eventbus/eventbus.go << 'EOF'
-package eventbus
-
-type InMemoryEventBus struct {}
-
-func NewInMemoryEventBus() *InMemoryEventBus {
-    return &InMemoryEventBus{}
-}
+go 1.21
 EOF
 
-    cat > internal/adapter/service/financial_service.go << 'EOF'
-package service
+# Criar README
+cat > README.md << 'EOF'
+# Sistema Inteligente de Análise e Monitoramento de Investimentos
 
-type FinancialServiceAdapter struct {}
+## Visão Geral
+Sistema composto por microsserviços que capturam, analisam e monitoram dados financeiros de diferentes tipos de ativos (fundos imobiliários, ações e criptomoedas) para construir uma carteira de investimentos inteligente baseada em dados.
 
-func NewFinancialServiceAdapter() *FinancialServiceAdapter {
-    return &FinancialServiceAdapter{}
-}
+## Componentes Principais
+
+1. **Serviço de Coleta de Dados (GoLang)**
+2. **Serviço de Análise (Python)**
+3. **Serviço de Simulação**
+4. **Sistema de Notificações**
+5. **Interface de Usuário**
+
+## Arquitetura
+
+O projeto segue os princípios de Clean Architecture e SOLID:
+
+- **Domain Layer**: Entidades e regras de negócio
+- **Application Layer**: Casos de uso da aplicação
+- **Ports Layer**: Interfaces para comunicação entre camadas
+- **Adapter Layer**: Implementações concretas dos ports
+
+## Microsserviços
+
+Cada componente principal é implementado como um microsserviço independente, facilitando:
+- Escalabilidade horizontal
+- Desenvolvimento em paralelo
+- Implantação e manutenção simplificadas
+
+## Como executar
+
+```bash
+# Construir os containers
+make build
+
+# Executar localmente
+make run
+
+# Executar testes
+make test
+```
+
+## Licença
+Este projeto está licenciado sob a MIT License
 EOF
 
-    cat > internal/usecase/goals/goals_usecase.go << 'EOF'
-package goals
+# Criar Makefile
+cat > Makefile << 'EOF'
+.PHONY: build run test clean generate
 
-type GoalsUseCase struct {}
+# Variáveis
+GO_BUILD_FLAGS=-ldflags="-s -w" -trimpath
+SERVICE_NAMES=api data-collector analyzer simulator notifier
 
-func NewGoalsUseCase() *GoalsUseCase {
-    return &GoalsUseCase{}
-}
+# Comandos principais
+build: clean generate
+	@echo "Building all services..."
+	@for service in $(SERVICE_NAMES); do \
+		echo "Building $$service..."; \
+		go build $(GO_BUILD_FLAGS) -o bin/$$service ./cmd/$$service; \
+	done
+
+run:
+	@echo "Starting services locally..."
+	@docker-compose up -d
+
+test:
+	@echo "Running tests..."
+	@go test -v ./...
+
+clean:
+	@echo "Cleaning up..."
+	@rm -rf bin/
+	@mkdir -p bin/
+
+generate:
+	@echo "Generating code..."
+	@go generate ./...
+
+# Docker commands
+docker-build:
+	@echo "Building Docker images..."
+	@for service in $(SERVICE_NAMES); do \
+		echo "Building image for $$service..."; \
+		docker build -t ${nome_do_modulo}-$$service:latest -f deploy/docker/$$service/Dockerfile .; \
+	done
+
+docker-push:
+	@echo "Pushing Docker images..."
+	@for service in $(SERVICE_NAMES); do \
+		echo "Pushing image for $$service..."; \
+		docker push ${nome_do_modulo}-$$service:latest; \
+	done
+
+# Kubernetes commands
+k8s-deploy:
+	@echo "Deploying to Kubernetes..."
+	@kubectl apply -f deploy/kubernetes/
+
+k8s-delete:
+	@echo "Removing from Kubernetes..."
+	@kubectl delete -f deploy/kubernetes/
+
+# Helper commands
+help:
+	@echo "Available commands:"
+	@echo " - build: Build all services"
+	@echo " - run: Run services locally using docker-compose"
+	@echo " - test: Run all tests"
+	@echo " - clean: Remove build artifacts"
+	@echo " - generate: Generate code"
+	@echo " - docker-build: Build Docker images"
+	@echo " - docker-push: Push Docker images"
+	@echo " - k8s-deploy: Deploy to Kubernetes"
+	@echo " - k8s-delete: Remove from Kubernetes"
 EOF
-}
 
-# Run setup functions
-create_directories
-create_main_go
-create_placeholder_files
+# Criar .gitignore
+cat > .gitignore << 'EOF'
+# Binaries
+/bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
 
-# Output success message
-echo -e "${GREEN}Invest Tracker project structure created successfully!${NC}"
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories
+vendor/
+
+# Go workspace file
+go.work
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# macOS
+.DS_Store
+
+# Node modules
+node_modules/
+
+# Build directories
+/dist/
+/build/
+/web/build/
+
+# Debug files
+__debug_bin
+EOF
+
+echo -e "${GREEN}Estrutura do projeto criada com sucesso!${NC}"
+echo "Próximos passos:"
+echo "1. cd ${nome_do_modulo}"
+echo "2. git init"
+echo "3. go mod tidy"
