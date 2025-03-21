@@ -23,6 +23,8 @@ func NewBusinessIdeaController(useCase *business.BusinessIdeaUseCase) *BusinessI
 func (c *BusinessIdeaController) CreateBusinessIdea(w http.ResponseWriter, r *http.Request) {
 	var request struct {
 		UserID string `json:"userId"`
+		title string `json:"title"`
+		description string `json:"description"`
 	}
 	
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -33,6 +35,8 @@ func (c *BusinessIdeaController) CreateBusinessIdea(w http.ResponseWriter, r *ht
 	entity, err := c.useCase.CreateBusinessIdea(
 		r.Context(), 
 		request.UserID,
+		request.title,
+		request.description
 	)
 	
 	if err != nil {

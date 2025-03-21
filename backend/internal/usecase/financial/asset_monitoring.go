@@ -2,7 +2,6 @@ package financial
 
 import (
 	"context"
-	"time"
 
 	"github.com/systentandobr/life-tracker/internal/domain/entity/financial"
 	"github.com/systentandobr/life-tracker/internal/port/output"

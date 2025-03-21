@@ -17,7 +17,7 @@ Este guia fornece instruções passo a passo para implementar o sistema Life Tra
 
 ```bash
 git clone https://github.com/systentandobr/life-tracker.git
-cd lifetracker
+cd life-tracker
 ```
 
 2. Configure as variáveis de ambiente:

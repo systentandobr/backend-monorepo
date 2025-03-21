@@ -34,8 +34,8 @@ func NewBusinessIdea(userID string, title string, description string) (BusinessI
 		UserID:    userID,
 		Title: title,
 		Description: description,
-		InitialInvestment: initialInvestment,
-		MarketSize: marketSize,
+		// InitialInvestment: initialInvestment,
+		// MarketSize: marketSize,
 		CreatedAt: now,
 		UpdatedAt: now,
 	}, nil

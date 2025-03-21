@@ -27,9 +27,11 @@ func NewBusinessIdeaUseCase(
 func (uc *BusinessIdeaUseCase) CreateBusinessIdea(
 	ctx context.Context, 
 	userID string,
+	title string,
+	description string,
 ) (business.BusinessIdea, error) {
 	// Create entity
-	entity, err := business.NewBusinessIdea(userID)
+	entity, err := business.NewBusinessIdea(userID, title, description)
 	if err != nil {
 		return business.BusinessIdea{}, err
 	}

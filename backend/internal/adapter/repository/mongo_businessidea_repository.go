@@ -6,7 +6,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	
 	"github.com/systentandobr/life-tracker/internal/domain/entity/business"
-	"github.com/systentandobr/life-tracker/internal/port/output"
 )
 
 // MongoBusinessIdeaRepository implements the BusinessIdeaRepository interface
