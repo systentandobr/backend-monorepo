@@ -315,7 +315,7 @@ const OnboardingContent: React.FC = () => {
         >
           {renderQuestionContent()}
         </motion.div>
-      </AnimatePresence>
+      </AnimatePresence>      
     </main>
   );
 };
