@@ -1,44 +1,33 @@
-# Sistema Inteligente de Análise e Monitoramento de Investimentos
+# Investment Tracker
 
-## Visão Geral
-Sistema composto por microsserviços que capturam, analisam e monitoram dados financeiros de diferentes tipos de ativos (fundos imobiliários, ações e criptomoedas) para construir uma carteira de investimentos inteligente baseada em dados.
+A system that monitors, analyzes, and simulates investments across various asset types.
 
-## Componentes Principais
+## Features
 
-1. **Serviço de Coleta de Dados (GoLang)**
-2. **Serviço de Análise (Python)**
-3. **Serviço de Simulação**
-4. **Sistema de Notificações**
-5. **Interface de Usuário**
+- Data collection from financial APIs
+- Asset fundamental analysis
+- Investment opportunity detection
+- Portfolio simulation
+- Real-time notifications
 
-## Arquitetura
+## Architecture
 
-O projeto segue os princípios de Clean Architecture e SOLID:
+This project follows Clean Architecture principles and SOLID design:
 
-- **Domain Layer**: Entidades e regras de negócio
-- **Application Layer**: Casos de uso da aplicação
-- **Ports Layer**: Interfaces para comunicação entre camadas
-- **Adapter Layer**: Implementações concretas dos ports
+- **Domain Layer**: Core business entities and rules
+- **Application Layer**: Use cases and business logic
+- **Adapter Layer**: Implementation of interfaces
+- **Infrastructure Layer**: External services integration
 
-## Microsserviços
-
-Cada componente principal é implementado como um microsserviço independente, facilitando:
-- Escalabilidade horizontal
-- Desenvolvimento em paralelo
-- Implantação e manutenção simplificadas
-
-## Como executar
+## Getting Started
 
 ```bash
-# Construir os containers
+# Build the services
 make build
 
-# Executar localmente
+# Run with Docker
 make run
 
-# Executar testes
+# Run tests
 make test
 ```
-
-## Licença
-Este projeto está licenciado sob a MIT License

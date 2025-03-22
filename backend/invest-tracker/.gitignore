@@ -1,22 +1,18 @@
 # Binaries
 /bin/
 *.exe
-*.exe~
 *.dll
 *.so
 *.dylib
 
-# Test binary, built with `go test -c`
+# Test binary
 *.test
 
-# Output of the go coverage tool
+# Output of go coverage tool
 *.out
 
 # Dependency directories
 vendor/
-
-# Go workspace file
-go.work
 
 # Environment variables
 .env
@@ -32,16 +28,7 @@ go.work
 # Logs
 *.log
 
-# macOS
-.DS_Store
-
-# Node modules
-node_modules/
-
 # Build directories
 /dist/
 /build/
 /web/build/
-
-# Debug files
-__debug_bin
