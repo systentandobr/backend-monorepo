@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math"
 	"strings"
-	"strconv"
 
 	"github.com/systentandobr/life-tracker/backend/invest-tracker/internal/domain/analysis/entity"
 	assetEntity "github.com/systentandobr/life-tracker/backend/invest-tracker/internal/domain/asset/entity"
@@ -176,10 +175,107 @@ func (s *MomentumStrategy) calculateRecentPerformance(priceHistory valueobject.P
 	return ((current - past) / past) * 100
 }
 
-// calculateVolatility calcula a volatilidade
+// calculateVolatility calcula a volatilidade baseada no desvio padrão das mudanças percentuais
 func (s *MomentumStrategy) calculateVolatility(priceHistory valueobject.PriceHistory, days int) float64 {
 	if len(priceHistory.Data) < days {
 		return 0
 	}
 
-	// Calc
+	// Limitar ao número de dias especificado
+	startIdx := len(priceHistory.Data) - days
+	if startIdx < 0 {
+		startIdx = 0
+	}
+
+	// Calcular as mudanças percentuais diárias
+	changes := make([]float64, 0, days-1)
+	for i := startIdx + 1; i < len(priceHistory.Data); i++ {
+		prev := priceHistory.Data[i-1].Close
+		curr := priceHistory.Data[i].Close
+		dailyChange := ((curr - prev) / prev) * 100
+		changes = append(changes, dailyChange)
+	}
+
+	// Calcular a média das mudanças
+	var sum float64
+	for _, change := range changes {
+		sum += change
+	}
+	mean := sum / float64(len(changes))
+
+	// Calcular o desvio padrão
+	var sumSquares float64
+	for _, change := range changes {
+		diff := change - mean
+		sumSquares += diff * diff
+	}
+	variance := sumSquares / float64(len(changes))
+	
+	return math.Sqrt(variance)
+}
+
+// hasRisingVolume verifica se o volume de negociação está aumentando
+func (s *MomentumStrategy) hasRisingVolume(priceHistory valueobject.PriceHistory, days int) bool {
+	if len(priceHistory.Data) < days*2 {
+		return false
+	}
+
+	// Calcular volume médio no período recente vs. período anterior
+	recentVolumeSum := 0.0
+	previousVolumeSum := 0.0
+
+	for i := 0; i < days; i++ {
+		recentIdx := len(priceHistory.Data) - 1 - i
+		previousIdx := recentIdx - days
+
+		if recentIdx >= 0 && previousIdx >= 0 {
+			recentVolumeSum += priceHistory.Data[recentIdx].Volume
+			previousVolumeSum += priceHistory.Data[previousIdx].Volume
+		}
+	}
+
+	recentAvgVolume := recentVolumeSum / float64(days)
+	previousAvgVolume := previousVolumeSum / float64(days)
+
+	// Verificar se o volume recente é pelo menos 20% maior
+	return recentAvgVolume > (previousAvgVolume * 1.2)
+}
+
+// isNearAllTimeHigh verifica se o preço está próximo da máxima histórica
+func (s *MomentumStrategy) isNearAllTimeHigh(priceHistory valueobject.PriceHistory) bool {
+	if len(priceHistory.Data) < 2 {
+		return false
+	}
+
+	// Encontrar o preço máximo no histórico
+	maxPrice := 0.0
+	for _, point := range priceHistory.Data {
+		if point.High > maxPrice {
+			maxPrice = point.High
+		}
+	}
+
+	// Verificar se o preço atual está a pelo menos 90% do máximo histórico
+	currentPrice := priceHistory.Data[len(priceHistory.Data)-1].Close
+	return currentPrice >= (maxPrice * 0.9)
+}
+
+// calculateSMA calcula a média móvel simples
+func (s *MomentumStrategy) calculateSMA(priceHistory valueobject.PriceHistory, period int) ([]float64, error) {
+	if len(priceHistory.Data) < period {
+		return nil, fmt.Errorf("dados insuficientes para calcular SMA de %d períodos", period)
+	}
+
+	sma := make([]float64, 0, len(priceHistory.Data)-period+1)
+	
+	// Calcular SMA para cada janela de tempo
+	for i := period - 1; i < len(priceHistory.Data); i++ {
+		var sum float64
+		for j := 0; j < period; j++ {
+			sum += priceHistory.Data[i-j].Close
+		}
+		sma = append(sma, sum/float64(period))
+	}
+	
+	return sma, nil
+}

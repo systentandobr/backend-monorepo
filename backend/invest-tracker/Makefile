@@ -2,7 +2,7 @@
 
 # Variables
 GO_BUILD_FLAGS=-ldflags="-s -w" -trimpath
-SERVICE_NAMES=api data-collector analyzer simulator notifier
+SERVICE_NAMES=api #data-collector analyzer simulator notifier
 BUILD_DIR=./bin
 DOCKER_REGISTRY=systentando
 PROJECT_NAME=invest-tracker

@@ -5,8 +5,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/yourusername/investment-tracker/internal/domain/asset/entity"
-	"github.com/yourusername/investment-tracker/internal/domain/asset/valueobject"
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/internal/domain/asset/entity"
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/internal/domain/asset/valueobject"
 )
 
 // AssetRepository define as operações para manipulação de ativos
