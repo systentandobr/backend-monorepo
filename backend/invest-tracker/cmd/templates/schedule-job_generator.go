@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/systentandobr/life-tracker/backend/invest-tracker/templates/common"
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/cmd/templates/common"
 
 )
 
@@ -270,8 +270,8 @@ func main() {
 	schedulerPath := filepath.Join(schedulerDir, "scheduler.go")
 	
 	// Create job file
-	if PromptOverwrite(jobPath) {
-		if err := CreateFileFromTemplate(jobTemplate, jobPath, data); err != nil {
+	if common.PromptOverwrite(jobPath) {
+		if err := common.CreateFileFromTemplate(jobTemplate, jobPath, data); err != nil {
 			fmt.Printf("Error creating job file: %v\n", err)
 			os.Exit(1)
 		}
@@ -282,7 +282,7 @@ func main() {
 	
 	// Create scheduler file if it doesn't exist
 	if !CheckFileExists(schedulerPath) {
-		if err := CreateFileFromTemplate(schedulerTemplate, schedulerPath, data); err != nil {
+		if err := common.CreateFileFromTemplate(schedulerTemplate, schedulerPath, data); err != nil {
 			fmt.Printf("Error creating scheduler file: %v\n", err)
 			os.Exit(1)
 		}

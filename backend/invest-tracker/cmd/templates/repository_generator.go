@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/systentandobr/life-tracker/backend/invest-tracker/templates/common"
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/cmd/templates/common"
 
 )
 
@@ -214,8 +214,8 @@ func main() {
 	mongoRepoPath := filepath.Join("invest-tracker", "internal", "adapter", "persistence", "mongodb", strings.ToLower(entityName)+"_repository.go")
 	
 	// Create repository interface
-	if PromptOverwrite(repoInterfacePath) {
-		if err := CreateFileFromTemplate(repositoryInterfaceTemplate, repoInterfacePath, data); err != nil {
+	if common.PromptOverwrite(repoInterfacePath) {
+		if err := common.CreateFileFromTemplate(repositoryInterfaceTemplate, repoInterfacePath, data); err != nil {
 			fmt.Printf("Error creating repository interface: %v\n", err)
 			os.Exit(1)
 		}
@@ -224,8 +224,8 @@ func main() {
 	}
 	
 	// Create MongoDB repository implementation
-	if PromptOverwrite(mongoRepoPath) {
-		if err := CreateFileFromTemplate(mongoRepositoryTemplate, mongoRepoPath, data); err != nil {
+	if common.PromptOverwrite(mongoRepoPath) {
+		if err := common.CreateFileFromTemplate(mongoRepositoryTemplate, mongoRepoPath, data); err != nil {
 			fmt.Printf("Error creating MongoDB repository: %v\n", err)
 			os.Exit(1)
 		}

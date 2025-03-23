@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/systentandobr/life-tracker/backend/invest-tracker/templates/common"
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/cmd/templates/common"
 
 )
 
@@ -249,8 +249,8 @@ func main() {
 	bootstrapPath := filepath.Join(bootstrapDir, "app.go")
 	
 	// Create the factory file
-	if PromptOverwrite(factoryPath) {
-		if err := CreateFileFromTemplate(factoryTemplate, factoryPath, data); err != nil {
+	if common.PromptOverwrite(factoryPath) {
+		if err := common.CreateFileFromTemplate(factoryTemplate, factoryPath, data); err != nil {
 			fmt.Printf("Error creating factory: %v\n", err)
 			os.Exit(1)
 		}
@@ -261,7 +261,7 @@ func main() {
 	
 	// Create the bootstrap file if it doesn't exist
 	if !CheckFileExists(bootstrapPath) {
-		if err := CreateFileFromTemplate(appBootstrapTemplate, bootstrapPath, data); err != nil {
+		if err := common.CreateFileFromTemplate(appBootstrapTemplate, bootstrapPath, data); err != nil {
 			fmt.Printf("Error creating bootstrap file: %v\n", err)
 			os.Exit(1)
 		}
@@ -577,8 +577,8 @@ func main() {
 	bootstrapPath := filepath.Join(bootstrapDir, "app.go")
 	
 	// Create the factory file
-	if PromptOverwrite(factoryPath) {
-		if err := CreateFileFromTemplate(factoryTemplate, factoryPath, data); err != nil {
+	if common.PromptOverwrite(factoryPath) {
+		if err := common.CreateFileFromTemplate(factoryTemplate, factoryPath, data); err != nil {
 			fmt.Printf("Error creating factory: %v\n", err)
 			os.Exit(1)
 		}
@@ -589,7 +589,7 @@ func main() {
 	
 	// Create the bootstrap file if it doesn't exist
 	if !CheckFileExists(bootstrapPath) {
-		if err := CreateFileFromTemplate(appBootstrapTemplate, bootstrapPath, data); err != nil {
+		if err := common.CreateFileFromTemplate(appBootstrapTemplate, bootstrapPath, data); err != nil {
 			fmt.Printf("Error creating bootstrap file: %v\n", err)
 			os.Exit(1)
 		}

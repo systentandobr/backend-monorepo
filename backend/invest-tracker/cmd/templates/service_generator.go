@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/systentandobr/life-tracker/backend/invest-tracker/templates/common"
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/cmd/templates/common"
 
 )
 
@@ -173,8 +173,8 @@ func main() {
 	serviceImplPath := filepath.Join("invest-tracker", "internal", "application", domainName, strings.ToLower(entityName)+"_service.go")
 	
 	// Create service interface
-	if PromptOverwrite(serviceInterfacePath) {
-		if err := CreateFileFromTemplate(serviceInterfaceTemplate, serviceInterfacePath, data); err != nil {
+	if common.PromptOverwrite(serviceInterfacePath) {
+		if err := common.CreateFileFromTemplate(serviceInterfaceTemplate, serviceInterfacePath, data); err != nil {
 			fmt.Printf("Error creating service interface: %v\n", err)
 			os.Exit(1)
 		}
@@ -183,8 +183,8 @@ func main() {
 	}
 	
 	// Create service implementation
-	if PromptOverwrite(serviceImplPath) {
-		if err := CreateFileFromTemplate(serviceImplementationTemplate, serviceImplPath, data); err != nil {
+	if common.PromptOverwrite(serviceImplPath) {
+		if err := common.CreateFileFromTemplate(serviceImplementationTemplate, serviceImplPath, data); err != nil {
 			fmt.Printf("Error creating service implementation: %v\n", err)
 			os.Exit(1)
 		}

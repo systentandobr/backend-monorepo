@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"github.com/systentandobr/life-tracker/backend/invest-tracker/templates/common"
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/cmd/templates/common"
 
 )
 
@@ -142,7 +142,7 @@ func main() {
 	
 	// Create swagger setup file if it doesn't exist
 	if !CheckFileExists(swaggerSetupPath) {
-		if err := CreateFileFromTemplate(swaggerSetupTemplate, swaggerSetupPath, data); err != nil {
+		if err := common.CreateFileFromTemplate(swaggerSetupTemplate, swaggerSetupPath, data); err != nil {
 			fmt.Printf("Error creating swagger setup file: %v\n", err)
 			os.Exit(1)
 		}
@@ -150,8 +150,8 @@ func main() {
 	}
 	
 	// Create entity swagger documentation
-	if PromptOverwrite(entitySwaggerPath) {
-		if err := CreateFileFromTemplate(swaggerEntityTemplate, entitySwaggerPath, data); err != nil {
+	if common.PromptOverwrite(entitySwaggerPath) {
+		if err := common.CreateFileFromTemplate(swaggerEntityTemplate, entitySwaggerPath, data); err != nil {
 			fmt.Printf("Error creating entity swagger file: %v\n", err)
 			os.Exit(1)
 		}

@@ -1,37 +1,215 @@
 version: '3.8'
 
 services:
+  # Application services
   api:
     build:
       context: .
       dockerfile: deploy/docker/api/Dockerfile
     ports:
-      - "8080:8080"
+      - "${API_PORT:-8080}:8080"
     environment:
+      - APP_ENV=${APP_ENV:-development}
       - MONGODB_URI=mongodb://mongodb:27017
       - MONGODB_DATABASE=invest_tracker
+      - KAFKA_BROKERS=kafka:9092
+      - ENABLE_SWAGGER=true
+      - ENABLE_CORS=true
+      - ENABLE_JOBS=true
+      - ENABLE_METRICS=true
+      - ENABLE_TRACING=true
+      - TRACING_ENDPOINT=jaeger:4317
     depends_on:
       - mongodb
+      - kafka
+      - jaeger
+    networks:
+      - invest-tracker-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   data-collector:
     build:
       context: .
       dockerfile: deploy/docker/job-collector/Dockerfile
     environment:
+      - APP_ENV=${APP_ENV:-development}
       - MONGODB_URI=mongodb://mongodb:27017
       - MONGODB_DATABASE=invest_tracker
+      - KAFKA_BROKERS=kafka:9092
+      - ENABLE_METRICS=true
+      - ENABLE_TRACING=true
+      - TRACING_ENDPOINT=jaeger:4317
     depends_on:
       - mongodb
+      - kafka
+      - jaeger
+    networks:
+      - invest-tracker-network
     restart: unless-stopped
 
+  analyzer:
+    build:
+      context: .
+      dockerfile: deploy/docker/job-analyzer/Dockerfile
+    environment:
+      - APP_ENV=${APP_ENV:-development}
+      - MONGODB_URI=mongodb://mongodb:27017
+      - MONGODB_DATABASE=invest_tracker
+      - KAFKA_BROKERS=kafka:9092
+      - ENABLE_METRICS=true
+      - ENABLE_TRACING=true
+      - TRACING_ENDPOINT=jaeger:4317
+    depends_on:
+      - mongodb
+      - kafka
+      - jaeger
+    networks:
+      - invest-tracker-network
+    restart: unless-stopped
+
+  notifier:
+    build:
+      context: .
+      dockerfile: deploy/docker/job-notifier/Dockerfile
+    environment:
+      - APP_ENV=${APP_ENV:-development}
+      - MONGODB_URI=mongodb://mongodb:27017
+      - MONGODB_DATABASE=invest_tracker
+      - KAFKA_BROKERS=kafka:9092
+      - ENABLE_METRICS=true
+      - ENABLE_TRACING=true
+      - TRACING_ENDPOINT=jaeger:4317
+    depends_on:
+      - mongodb
+      - kafka
+      - jaeger
+    networks:
+      - invest-tracker-network
+    restart: unless-stopped
+
+  # Infrastructure services
   mongodb:
     image: mongo:6
     ports:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
+    networks:
+      - invest-tracker-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.0
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - invest-tracker-network
+    restart: unless-stopped
+
+  kafka:
+    image: confluentinc/cp-kafka:7.3.0
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    depends_on:
+      - zookeeper
+    networks:
+      - invest-tracker-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - "8090:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+    depends_on:
+      - kafka
+    networks:
+      - invest-tracker-network
+    restart: unless-stopped
+
+  # Monitoring and telemetry
+  prometheus:
+    image: prom/prometheus:v2.43.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./deploy/prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    networks:
+      - invest-tracker-network
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:9.4.7
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./deploy/grafana/provisioning:/etc/grafana/provisioning
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    depends_on:
+      - prometheus
+    networks:
+      - invest-tracker-network
+    restart: unless-stopped
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.43
+    ports:
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+      - "16686:16686" # UI
+      - "14268:14268" # Jaeger HTTP intake
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    networks:
+      - invest-tracker-network
     restart: unless-stopped
 
 volumes:
   mongodb_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  invest-tracker-network:
+    driver: bridge

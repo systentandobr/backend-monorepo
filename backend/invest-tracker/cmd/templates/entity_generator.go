@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"github.com/systentandobr/life-tracker/backend/invest-tracker/templates/common"
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/cmd/templates/common"
 )
 
 const entityTemplate = `package entity
@@ -74,13 +74,13 @@ func main() {
 	filePath := filepath.Join("invest-tracker", "internal", "domain", domainName, "entity", strings.ToLower(entityName)+".go")
 	
 	// Check if file already exists and prompt for overwrite
-	if !PromptOverwrite(filePath) {
+	if !common.PromptOverwrite(filePath) {
 		fmt.Printf("Skipping file: %s\n", filePath)
 		return
 	}
 	
 	// Create the entity file
-	if err := CreateFileFromTemplate(entityTemplate, filePath, data); err != nil {
+	if err := common.CreateFileFromTemplate(entityTemplate, filePath, data); err != nil {
 		fmt.Printf("Error creating entity: %v\n", err)
 		os.Exit(1)
 	}

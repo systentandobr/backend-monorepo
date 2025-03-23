@@ -17,7 +17,9 @@ import (
 	"github.com/systentandobr/life-tracker/backend/invest-tracker/docs"
 	"github.com/systentandobr/life-tracker/backend/invest-tracker/internal/bootstrap"
 	"github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/common/logger"
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/config"
 	"github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/database/mongodb"
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/telemetry"
 )
 
 // @title Investment Tracker API
@@ -44,17 +46,28 @@ func main() {
 	
 	log.Info("Starting Investment Tracker application")
 	
+	// Load configuration
+	envFile := ".env"
+	if len(os.Args) > 1 {
+		envFile = os.Args[1]
+	}
+	
+	appConfig, err := config.LoadConfig(envFile, log)
+	if err != nil {
+		log.Fatal("Failed to load configuration", logger.Error(err))
+	}
+	
+	// Set Gin mode based on environment
+	if appConfig.Environment == "production" {
+		gin.SetMode(gin.ReleaseMode)
+	}
+	
 	// Initialize MongoDB client
 	mongoConfig := mongodb.DefaultConfig()
-	
-	// Override with environment variables if available
-	if mongoURI := os.Getenv("MONGODB_URI"); mongoURI != "" {
-		mongoConfig.URI = mongoURI
-	}
-	
-	if mongoDBName := os.Getenv("MONGODB_DATABASE"); mongoDBName != "" {
-		mongoConfig.DatabaseName = mongoDBName
-	}
+	mongoConfig.URI = appConfig.Database.URI
+	mongoConfig.DatabaseName = appConfig.Database.Name
+	mongoConfig.ConnectTimeout = time.Duration(appConfig.Database.ConnectTimeout) * time.Second
+	mongoConfig.OperationTimeout = time.Duration(appConfig.Database.OperationTimeout) * time.Second
 	
 	mongoClient, err := mongodb.NewClient(mongoConfig, log)
 	if err != nil {
@@ -62,26 +75,69 @@ func main() {
 	}
 	
 	// Initialize Gin router
-	router := gin.Default()
+	router := gin.New()
 	
-	// Configure CORS
-	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
-	}))
+	// Add middleware
+	router.Use(gin.Recovery())
 	
-	// Setup Swagger documentation
-	setupSwagger(router)
+	// Add logger middleware
+	router.Use(func(c *gin.Context) {
+		// Start timer
+		start := time.Now()
+		path := c.Request.URL.Path
+		
+		// Process request
+		c.Next()
+		
+		// Log request
+		latency := time.Since(start)
+		statusCode := c.Writer.Status()
+		clientIP := c.ClientIP()
+		method := c.Request.Method
+		
+		log.Info("HTTP Request",
+			logger.String("method", method),
+			logger.String("path", path),
+			logger.Int("status", statusCode),
+			logger.String("ip", clientIP),
+			logger.String("latency", latency.String()))
+			
+		// Record metrics if enabled
+		if appConfig.EnableMetrics {
+			// This would use the telemetry client in a real implementation
+		}
+	})
+	
+	// Configure CORS if enabled
+	if appConfig.EnableCORS {
+		router.Use(cors.New(cors.Config{
+			AllowOrigins:     []string{"*"},
+			AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+			AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+			ExposeHeaders:    []string{"Content-Length"},
+			AllowCredentials: true,
+			MaxAge:           12 * time.Hour,
+		}))
+	}
+	
+	// Setup Swagger documentation if enabled
+	if appConfig.EnableSwagger {
+		setupSwagger(router)
+	}
 	
 	// Create application bootstrap
-	app := bootstrap.NewAppBootstrap(log, mongoClient, router)
+	bootstrapper := bootstrap.NewAppBootstrap(log, mongoClient, router, &bootstrap.AppConfig{
+		Environment:   appConfig.Environment,
+		APIPort:       appConfig.APIPort,
+		EnableSwagger: appConfig.EnableSwagger,
+		EnableCORS:    appConfig.EnableCORS,
+		EnableJobs:    appConfig.EnableJobs,
+		EnableMetrics: appConfig.EnableMetrics,
+		EnableTracing: appConfig.EnableTracing,
+	})
 	
 	// Bootstrap application components
-	if err := app.Bootstrap(context.Background()); err != nil {
+	if err := bootstrapper.Bootstrap(context.Background()); err != nil {
 		log.Fatal("Failed to bootstrap application", logger.Error(err))
 	}
 	
@@ -90,24 +146,24 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{
 			"status": "up",
 			"time":   time.Now().Format(time.RFC3339),
+			"env":    appConfig.Environment,
 		})
 	})
 	
 	// Set up HTTP server
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
-	
 	srv := &http.Server{
-		Addr:    ":" + port,
+		Addr:    ":" + appConfig.APIPort,
 		Handler: router,
 	}
 	
 	// Start HTTP server in a goroutine
 	go func() {
-		log.Info("Starting HTTP server", logger.String("port", port))
-		log.Info("Swagger documentation available at: http://localhost:" + port + "/swagger/index.html")
+		log.Info("Starting HTTP server", logger.String("port", appConfig.APIPort))
+		
+		if appConfig.EnableSwagger {
+			log.Info("Swagger documentation available at", 
+				logger.String("url", fmt.Sprintf("http://localhost:%s/swagger/index.html", appConfig.APIPort)))
+		}
 		
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatal("Failed to start HTTP server", logger.Error(err))
@@ -122,7 +178,7 @@ func main() {
 	log.Info("Shutting down server...")
 	
 	// Create shutdown context with timeout
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	
 	// Shutdown HTTP server
@@ -131,7 +187,7 @@ func main() {
 	}
 	
 	// Shutdown application components
-	if err := app.Shutdown(ctx); err != nil {
+	if err := bootstrapper.Shutdown(ctx); err != nil {
 		log.Fatal("Failed to shutdown application components", logger.Error(err))
 	}
 	

@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/systentandobr/life-tracker/backend/invest-tracker/templates/common"
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/cmd/templates/common"
 
 )
 
@@ -231,15 +231,15 @@ func main() {
 	
 	// Create strategy interface if it doesn't exist
 	if !CheckFileExists(strategyInterfacePath) {
-		if err := CreateFileFromTemplate(strategyInterfaceTemplate, strategyInterfacePath, data); err != nil {
+		if err := common.CreateFileFromTemplate(strategyInterfaceTemplate, strategyInterfacePath, data); err != nil {
 			fmt.Printf("Error creating strategy interface: %v\n", err)
 			os.Exit(1)
 		}
 	}
 	
 	// Create strategy implementation
-	if PromptOverwrite(strategyImplPath) {
-		if err := CreateFileFromTemplate(strategyImplementationTemplate, strategyImplPath, data); err != nil {
+	if common.PromptOverwrite(strategyImplPath) {
+		if err := common.CreateFileFromTemplate(strategyImplementationTemplate, strategyImplPath, data); err != nil {
 			fmt.Printf("Error creating strategy implementation: %v\n", err)
 			os.Exit(1)
 		}

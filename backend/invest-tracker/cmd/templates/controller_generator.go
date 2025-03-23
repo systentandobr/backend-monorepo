@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"github.com/systentandobr/life-tracker/backend/invest-tracker/templates/common"
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/cmd/templates/common"
 
 )
 
@@ -194,13 +194,13 @@ func main() {
 	controllerPath := filepath.Join(controllerDir, strings.ToLower(entityName)+"_controller.go")
 	
 	// Check if file already exists and prompt for overwrite
-	if !PromptOverwrite(controllerPath) {
+	if !common.PromptOverwrite(controllerPath) {
 		fmt.Printf("Skipping file: %s\n", controllerPath)
 		return
 	}
 	
 	// Create the controller file
-	if err := CreateFileFromTemplate(controllerTemplate, controllerPath, data); err != nil {
+	if err := common.CreateFileFromTemplate(controllerTemplate, controllerPath, data); err != nil {
 		fmt.Printf("Error creating controller: %v\n", err)
 		os.Exit(1)
 	}

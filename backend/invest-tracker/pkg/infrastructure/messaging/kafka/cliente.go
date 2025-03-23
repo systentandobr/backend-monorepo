@@ -1,0 +1,336 @@
+package kafka
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	// "github.com/Shopify/sarama"
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/common/logger"
+)
+
+// Config holds configuration for Kafka
+type Config struct {
+	Brokers                 []string
+	ClientID                string
+	ProducerRetryMax        int
+	ProducerRetryBackoff    time.Duration
+	ConsumerSessionTimeout  time.Duration
+	ConsumerRebalanceTimeout time.Duration
+	ConsumerMaxWaitTime     time.Duration
+}
+
+// DefaultConfig returns the default configuration
+func DefaultConfig() Config {
+	return Config{
+		Brokers:                 []string{"localhost:9092"},
+		ClientID:                "invest-tracker",
+		ProducerRetryMax:        3,
+		ProducerRetryBackoff:    100 * time.Millisecond,
+		ConsumerSessionTimeout:  10 * time.Second,
+		ConsumerRebalanceTimeout: 5 * time.Second,
+		ConsumerMaxWaitTime:     250 * time.Millisecond,
+	}
+}
+
+// Client represents a Kafka client for both producing and consuming messages
+type Client struct {
+	config           Config
+	logger           logger.Logger
+	adminClient      sarama.ClusterAdmin
+	syncProducer     sarama.SyncProducer
+	asyncProducer    sarama.AsyncProducer
+	producerConfig   *sarama.Config
+	consumerConfig   *sarama.Config
+	consumerGroups   map[string]sarama.ConsumerGroup
+}
+
+// NewClient creates a new Kafka client
+func NewClient(config Config, logger logger.Logger) (*Client, error) {
+	client := &Client{
+		config:         config,
+		logger:         logger,
+		consumerGroups: make(map[string]sarama.ConsumerGroup),
+	}
+	
+	// Initialize producer config
+	producerConfig := sarama.NewConfig()
+	producerConfig.ClientID = config.ClientID
+	producerConfig.Producer.RequiredAcks = sarama.WaitForAll
+	producerConfig.Producer.Retry.Max = config.ProducerRetryMax
+	producerConfig.Producer.Retry.Backoff = config.ProducerRetryBackoff
+	producerConfig.Producer.Return.Successes = true
+	
+	client.producerConfig = producerConfig
+	
+	// Initialize consumer config
+	consumerConfig := sarama.NewConfig()
+	consumerConfig.ClientID = config.ClientID
+	consumerConfig.Consumer.Return.Errors = true
+	consumerConfig.Consumer.Offsets.Initial = sarama.OffsetNewest
+	consumerConfig.Consumer.Group.Session.Timeout = config.ConsumerSessionTimeout
+	consumerConfig.Consumer.Group.Rebalance.Timeout = config.ConsumerRebalanceTimeout
+	consumerConfig.Consumer.MaxWaitTime = config.ConsumerMaxWaitTime
+	
+	client.consumerConfig = consumerConfig
+	
+	// Initialize admin client
+	adminClient, err := sarama.NewClusterAdmin(config.Brokers, producerConfig)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create admin client: %w", err)
+	}
+	client.adminClient = adminClient
+	
+	// Initialize sync producer
+	syncProducer, err := sarama.NewSyncProducer(config.Brokers, producerConfig)
+	if err != nil {
+		adminClient.Close()
+		return nil, fmt.Errorf("failed to create sync producer: %w", err)
+	}
+	client.syncProducer = syncProducer
+	
+	// Initialize async producer
+	asyncProducer, err := sarama.NewAsyncProducer(config.Brokers, producerConfig)
+	if err != nil {
+		syncProducer.Close()
+		adminClient.Close()
+		return nil, fmt.Errorf("failed to create async producer: %w", err)
+	}
+	client.asyncProducer = asyncProducer
+	
+	// Handle async producer errors
+	go func() {
+		for err := range asyncProducer.Errors() {
+			logger.Error("Async producer error", 
+				logger.String("topic", err.Msg.Topic),
+				logger.Error(err.Err))
+		}
+	}()
+	
+	logger.Info("Kafka client initialized", 
+		logger.String("brokers", fmt.Sprintf("%v", config.Brokers)))
+	
+	return client, nil
+}
+
+// EnsureTopic ensures that a topic exists, creating it if necessary
+func (c *Client) EnsureTopic(topic string, partitions int, replicationFactor int) error {
+	topics, err := c.adminClient.ListTopics()
+	if err != nil {
+		return fmt.Errorf("failed to list topics: %w", err)
+	}
+	
+	if _, exists := topics[topic]; exists {
+		c.logger.Info("Topic already exists", logger.String("topic", topic))
+		return nil
+	}
+	
+	// Create the topic
+	topicDetail := &sarama.TopicDetail{
+		NumPartitions:     int32(partitions),
+		ReplicationFactor: int16(replicationFactor),
+	}
+	
+	if err := c.adminClient.CreateTopic(topic, topicDetail, false); err != nil {
+		return fmt.Errorf("failed to create topic %s: %w", topic, err)
+	}
+	
+	c.logger.Info("Topic created", 
+		logger.String("topic", topic),
+		logger.Int("partitions", partitions),
+		logger.Int("replicationFactor", replicationFactor))
+	
+	return nil
+}
+
+// PublishMessage publishes a message to a topic synchronously
+func (c *Client) PublishMessage(topic, key string, message []byte) (int32, int64, error) {
+	msg := &sarama.ProducerMessage{
+		Topic: topic,
+		Value: sarama.ByteEncoder(message),
+	}
+	
+	if key != "" {
+		msg.Key = sarama.StringEncoder(key)
+	}
+	
+	partition, offset, err := c.syncProducer.SendMessage(msg)
+	if err != nil {
+		return 0, 0, fmt.Errorf("failed to publish message to %s: %w", topic, err)
+	}
+	
+	c.logger.Debug("Message published",
+		logger.String("topic", topic),
+		logger.String("key", key),
+		logger.Int32("partition", partition),
+		logger.Int64("offset", offset))
+	
+	return partition, offset, nil
+}
+
+// PublishMessageAsync publishes a message to a topic asynchronously
+func (c *Client) PublishMessageAsync(topic, key string, message []byte) {
+	msg := &sarama.ProducerMessage{
+		Topic: topic,
+		Value: sarama.ByteEncoder(message),
+	}
+	
+	if key != "" {
+		msg.Key = sarama.StringEncoder(key)
+	}
+	
+	c.asyncProducer.Input() <- msg
+	
+	c.logger.Debug("Message queued for async publishing",
+		logger.String("topic", topic),
+		logger.String("key", key))
+}
+
+// ConsumeMessages starts consuming messages from a topic with the given consumer group
+func (c *Client) ConsumeMessages(ctx context.Context, topic, groupID string, handler ConsumerHandler) error {
+	// Check if consumer group already exists
+	if _, exists := c.consumerGroups[groupID]; !exists {
+		consumerGroup, err := sarama.NewConsumerGroup(c.config.Brokers, groupID, c.consumerConfig)
+		if err != nil {
+			return fmt.Errorf("failed to create consumer group %s: %w", groupID, err)
+		}
+		
+		c.consumerGroups[groupID] = consumerGroup
+		
+		// Handle errors
+		go func() {
+			for err := range consumerGroup.Errors() {
+				c.logger.Error("Consumer group error",
+					logger.String("group", groupID),
+					logger.Error(err))
+			}
+		}()
+	}
+	
+	consumerGroup := c.consumerGroups[groupID]
+	
+	// Create consumer group handler
+	consumerHandler := &kafkaConsumerHandler{
+		handler: handler,
+		logger:  c.logger,
+		topic:   topic,
+		groupID: groupID,
+	}
+	
+	// Start consuming
+	go func() {
+		for {
+			c.logger.Info("Starting consumer group",
+				logger.String("topic", topic),
+				logger.String("group", groupID))
+				
+			if err := consumerGroup.Consume(ctx, []string{topic}, consumerHandler); err != nil {
+				c.logger.Error("Error from consumer group",
+					logger.String("group", groupID),
+					logger.Error(err))
+			}
+			
+			// Check if context was cancelled
+			if ctx.Err() != nil {
+				c.logger.Info("Context cancelled, stopping consumer group",
+					logger.String("group", groupID))
+				return
+			}
+			
+			// Reconnect if the context wasn't cancelled
+			c.logger.Warn("Consumer group session ended, reconnecting",
+				logger.String("group", groupID))
+		}
+	}()
+	
+	return nil
+}
+
+// Close closes the Kafka client and all its resources
+func (c *Client) Close() error {
+	// Close all consumer groups
+	for groupID, consumerGroup := range c.consumerGroups {
+		if err := consumerGroup.Close(); err != nil {
+			c.logger.Error("Failed to close consumer group",
+				logger.String("group", groupID),
+				logger.Error(err))
+		}
+	}
+	
+	// Close producers and admin client
+	if err := c.asyncProducer.Close(); err != nil {
+		c.logger.Error("Failed to close async producer", logger.Error(err))
+	}
+	
+	if err := c.syncProducer.Close(); err != nil {
+		c.logger.Error("Failed to close sync producer", logger.Error(err))
+	}
+	
+	if err := c.adminClient.Close(); err != nil {
+		c.logger.Error("Failed to close admin client", logger.Error(err))
+	}
+	
+	c.logger.Info("Kafka client closed")
+	return nil
+}
+
+// ConsumerHandler is the interface for handling consumed messages
+type ConsumerHandler interface {
+	Setup(sarama.ConsumerGroupSession) error
+	Cleanup(sarama.ConsumerGroupSession) error
+	HandleMessage(context.Context, *sarama.ConsumerMessage) error
+}
+
+// kafkaConsumerHandler implements sarama.ConsumerGroupHandler
+type kafkaConsumerHandler struct {
+	handler ConsumerHandler
+	logger  logger.Logger
+	topic   string
+	groupID string
+}
+
+// Setup is run at the beginning of a new session
+func (h *kafkaConsumerHandler) Setup(session sarama.ConsumerGroupSession) error {
+	h.logger.Info("Consumer group session started",
+		logger.String("topic", h.topic),
+		logger.String("group", h.groupID))
+	return h.handler.Setup(session)
+}
+
+// Cleanup is run at the end of a session
+func (h *kafkaConsumerHandler) Cleanup(session sarama.ConsumerGroupSession) error {
+	h.logger.Info("Consumer group session ended",
+		logger.String("topic", h.topic),
+		logger.String("group", h.groupID))
+	return h.handler.Cleanup(session)
+}
+
+// ConsumeClaim must start a consumer loop of ConsumerGroupClaim's Messages()
+func (h *kafkaConsumerHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
+	for message := range claim.Messages() {
+		startTime := time.Now()
+		
+		h.logger.Debug("Message received",
+			logger.String("topic", message.Topic),
+			logger.Int32("partition", message.Partition),
+			logger.Int64("offset", message.Offset),
+			logger.String("key", string(message.Key)))
+		
+		if err := h.handler.HandleMessage(session.Context(), message); err != nil {
+			h.logger.Error("Error handling message",
+				logger.String("topic", message.Topic),
+				logger.Int64("offset", message.Offset),
+				logger.Error(err))
+		} else {
+			// Mark message as processed
+			session.MarkMessage(message, "")
+			
+			h.logger.Debug("Message processed",
+				logger.String("topic", message.Topic),
+				logger.Int64("offset", message.Offset),
+				logger.String("duration", time.Since(startTime).String()))
+		}
+	}
+	
+	return nil
+}

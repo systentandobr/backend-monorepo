@@ -1,157 +1,231 @@
-package main
+package bootstrap
 
 import (
 	"context"
 	"fmt"
-	"log"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
 	"time"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/systentandobr/life-tracker/backend/invest-tracker/docs"
-	"github.com/systentandobr/life-tracker/backend/invest-tracker/internal/bootstrap"
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/internal/adapter/factory"
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/internal/scheduler"
 	"github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/common/logger"
 	"github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/database/mongodb"
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/messaging/kafka"
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/telemetry"
 )
 
-// @title Investment Tracker API
-// @version 1.0
-// @description API for tracking and analyzing investments across different asset types
-// @termsOfService http://swagger.io/terms/
-
-// @contact.name API Support
-// @contact.url http://www.systentando.com.br/support
-// @contact.email support@systentando.com.br
-
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host localhost:8080
-// @BasePath /api/v1
-// @schemes http https
-func main() {
-	// Initialize logger
-	log, err := logger.New(logger.DefaultConfig())
-	if err != nil {
-		panic(fmt.Sprintf("Failed to initialize logger: %v", err))
-	}
+// AppBootstrap handles application initialization and dependency wiring
+type AppBootstrap struct {
+	logger      logger.Logger
+	mongoClient *mongodb.Client
+	router      *gin.Engine
+	kafkaClient *kafka.Client
+	telemetry   *telemetry.Client
+	scheduler   *scheduler.JobScheduler
 	
-	log.Info("Starting Investment Tracker application")
+	// Domain factories
+	assetFactory     *factory.AssetFactory
+	analysisFactory  *factory.AnalysisFactory
+	simulationFactory *factory.SimulationFactory
+	notificationFactory *factory.NotificationFactory
 	
-	// Initialize MongoDB client
-	mongoConfig := mongodb.DefaultConfig()
-	
-	// Override with environment variables if available
-	if mongoURI := os.Getenv("MONGODB_URI"); mongoURI != "" {
-		mongoConfig.URI = mongoURI
-	}
-	
-	if mongoDBName := os.Getenv("MONGODB_DATABASE"); mongoDBName != "" {
-		mongoConfig.DatabaseName = mongoDBName
-	}
-	
-	mongoClient, err := mongodb.NewClient(mongoConfig, log)
-	if err != nil {
-		log.Fatal("Failed to connect to MongoDB", logger.Error(err))
-	}
-	
-	// Initialize Gin router
-	router := gin.Default()
-	
-	// Configure CORS
-	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
-	}))
-	
-	// Setup Swagger documentation
-	setupSwagger(router)
-	
-	// Create application bootstrap
-	app := bootstrap.NewAppBootstrap(log, mongoClient, router)
-	
-	// Bootstrap application components
-	if err := app.Bootstrap(context.Background()); err != nil {
-		log.Fatal("Failed to bootstrap application", logger.Error(err))
-	}
-	
-	// Add health check endpoint
-	router.GET("/health", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"status": "up",
-			"time":   time.Now().Format(time.RFC3339),
-		})
-	})
-	
-	// Set up HTTP server
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
-	
-	srv := &http.Server{
-		Addr:    ":" + port,
-		Handler: router,
-	}
-	
-	// Start HTTP server in a goroutine
-	go func() {
-		log.Info("Starting HTTP server", logger.String("port", port))
-		log.Info("Swagger documentation available at: http://localhost:" + port + "/swagger/index.html")
-		
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatal("Failed to start HTTP server", logger.Error(err))
-		}
-	}()
-	
-	// Set up graceful shutdown
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
-	
-	log.Info("Shutting down server...")
-	
-	// Create shutdown context with timeout
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	
-	// Shutdown HTTP server
-	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatal("Server forced to shutdown", logger.Error(err))
-	}
-	
-	// Shutdown application components
-	if err := app.Shutdown(ctx); err != nil {
-		log.Fatal("Failed to shutdown application components", logger.Error(err))
-	}
-	
-	// Disconnect from MongoDB
-	if err := mongoClient.Disconnect(ctx); err != nil {
-		log.Fatal("Failed to disconnect from MongoDB", logger.Error(err))
-	}
-	
-	log.Info("Server exited gracefully")
+	// Configuration
+	config *AppConfig
 }
 
-// setupSwagger configures Swagger documentation for the API
-func setupSwagger(router *gin.Engine) {
-	// Configure swagger info
-	docs.SwaggerInfo.Title = "Investment Tracker API"
-	docs.SwaggerInfo.Description = "API for tracking and analyzing investments across different asset types"
-	docs.SwaggerInfo.Version = "1.0"
-	docs.SwaggerInfo.BasePath = "/api/v1"
-	docs.SwaggerInfo.Schemes = []string{"http", "https"}
+// AppConfig holds application configuration
+type AppConfig struct {
+	Environment   string
+	APIPort       string
+	EnableSwagger bool
+	EnableCORS    bool
+	EnableJobs    bool
+	EnableMetrics bool
+	EnableTracing bool
+}
+
+// DefaultConfig returns the default configuration
+func DefaultConfig() *AppConfig {
+	return &AppConfig{
+		Environment:   "development",
+		APIPort:       "8080",
+		EnableSwagger: true,
+		EnableCORS:    true,
+		EnableJobs:    true,
+		EnableMetrics: true,
+		EnableTracing: true,
+	}
+}
+
+// NewAppBootstrap creates a new application bootstrap instance
+func NewAppBootstrap(
+	logger logger.Logger,
+	mongoClient *mongodb.Client,
+	router *gin.Engine,
+	config *AppConfig,
+) *AppBootstrap {
+	return &AppBootstrap{
+		logger:      logger,
+		mongoClient: mongoClient,
+		router:      router,
+		config:      config,
+	}
+}
+
+// Bootstrap initializes all application components
+func (b *AppBootstrap) Bootstrap(ctx context.Context) error {
+	startTime := time.Now()
+	b.logger.Info("Starting application bootstrap", 
+		logger.String("environment", b.config.Environment))
 	
-	// Add swagger endpoint
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	// Initialize infrastructure services
+	if err := b.initializeInfrastructure(ctx); err != nil {
+		return fmt.Errorf("failed to initialize infrastructure: %w", err)
+	}
+	
+	// Initialize domain factories
+	if err := b.initializeDomainFactories(); err != nil {
+		return fmt.Errorf("failed to initialize domain factories: %w", err)
+	}
+	
+	// Create API router group
+	apiRouter := b.router.Group("/api/v1")
+	
+	// Register domain routes
+	b.registerRoutes(apiRouter)
+	
+	// Start scheduled jobs if enabled
+	if b.config.EnableJobs {
+		b.startScheduledJobs()
+	}
+	
+	b.logger.Info("Application bootstrap completed successfully",
+		logger.String("duration", time.Since(startTime).String()))
+	return nil
+}
+
+// Shutdown gracefully shuts down application components
+func (b *AppBootstrap) Shutdown(ctx context.Context) error {
+	b.logger.Info("Shutting down application components")
+	
+	// Stop scheduled jobs
+	if b.scheduler != nil {
+		b.scheduler.StopAll(ctx)
+	}
+	
+	// Close Kafka client if initialized
+	if b.kafkaClient != nil {
+		if err := b.kafkaClient.Close(); err != nil {
+			b.logger.Error("Error closing Kafka client", logger.Error(err))
+		}
+	}
+	
+	// Shutdown telemetry
+	if b.telemetry != nil {
+		if err := b.telemetry.Shutdown(ctx); err != nil {
+			b.logger.Error("Error shutting down telemetry", logger.Error(err))
+		}
+	}
+	
+	return nil
+}
+
+// initializeInfrastructure initializes infrastructure services
+func (b *AppBootstrap) initializeInfrastructure(ctx context.Context) error {
+	// Initialize Kafka if messaging is used
+	// kafkaConfig := kafka.DefaultConfig()
+	// var err error
+	// b.kafkaClient, err = kafka.NewClient(kafkaConfig, b.logger)
+	// if err != nil {
+	// 	return fmt.Errorf("failed to initialize Kafka client: %w", err)
+	// }
+	
+	// Initialize telemetry if enabled
+	if b.config.EnableMetrics || b.config.EnableTracing {
+		telemetryConfig := telemetry.Config{
+			ServiceName:  "invest-tracker",
+			Environment:  b.config.Environment,
+			EnableMetrics: b.config.EnableMetrics,
+			EnableTracing: b.config.EnableTracing,
+		}
+		
+		var err error
+		b.telemetry, err = telemetry.NewClient(telemetryConfig, b.logger)
+		if err != nil {
+			return fmt.Errorf("failed to initialize telemetry: %w", err)
+		}
+	}
+	
+	// Initialize job scheduler if jobs are enabled
+	if b.config.EnableJobs {
+		b.scheduler = scheduler.NewJobScheduler(b.logger)
+	}
+	
+	return nil
+}
+
+// initializeDomainFactories initializes all domain factories
+func (b *AppBootstrap) initializeDomainFactories() error {
+	// Initialize Asset domain factory
+	b.assetFactory = factory.NewAssetFactory(b.mongoClient, b.logger)
+	
+	// Initialize Analysis domain factory
+	b.analysisFactory = factory.NewAnalysisFactory(b.mongoClient, b.logger)
+	
+	// Initialize Simulation domain factory
+	b.simulationFactory = factory.NewSimulationFactory(b.mongoClient, b.logger)
+	
+	// Initialize Notification domain factory
+	b.notificationFactory = factory.NewNotificationFactory(b.mongoClient, b.logger)
+	
+	// Bootstrap domain components
+	b.assetFactory.Bootstrap()
+	b.analysisFactory.Bootstrap()
+	b.simulationFactory.Bootstrap()
+	b.notificationFactory.Bootstrap()
+	
+	return nil
+}
+
+// registerRoutes registers all domain routes
+func (b *AppBootstrap) registerRoutes(router *gin.RouterGroup) {
+	// Register Asset domain routes
+	b.assetFactory.RegisterRoutes(router)
+	
+	// Register Analysis domain routes
+	b.analysisFactory.RegisterRoutes(router)
+	
+	// Register Simulation domain routes
+	b.simulationFactory.RegisterRoutes(router)
+	
+	// Register Notification domain routes
+	b.notificationFactory.RegisterRoutes(router)
+}
+
+// startScheduledJobs registers and starts all scheduled jobs
+func (b *AppBootstrap) startScheduledJobs() {
+	b.logger.Info("Setting up scheduled jobs")
+	
+	// Register asset data collection job
+	assetDataJob := b.scheduler.RegisterAssetDataJob(
+		b.assetFactory.GetStockService(),
+	)
+	assetDataJob.SetSchedule("0 */1 * * *") // Run hourly
+	
+	// Register asset analysis job
+	assetAnalysisJob := b.scheduler.RegisterAssetAnalysisJob(
+		b.assetFactory.GetStockService(),
+		b.analysisFactory.GetMarketAnalysisService(),
+	)
+	assetAnalysisJob.SetSchedule("0 0 * * *") // Run daily at midnight
+	
+	// Register opportunity detection job
+	opportunityJob := b.scheduler.RegisterOpportunityDetectionJob(
+		b.analysisFactory.GetOpportunityService(),
+		b.notificationFactory.GetNotificationService(),
+	)
+	opportunityJob.SetSchedule("0 */3 * * *") // Run every 3 hours
+	
+	// Start all jobs
+	b.scheduler.StartAll()
 }
