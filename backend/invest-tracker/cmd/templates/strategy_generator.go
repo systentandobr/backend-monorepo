@@ -5,6 +5,9 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/templates/common"
+
 )
 
 const strategyInterfaceTemplate = `package strategy
@@ -220,7 +223,7 @@ func main() {
 	// Ensure first letter of strategy name is uppercase
 	strategyName = strings.Title(strategyName)
 	
-	data := NewTemplateData(domainName, strategyName)
+	data := common.NewTemplateData(domainName, strategyName)
 	
 	// Define paths
 	strategyInterfacePath := filepath.Join("invest-tracker", "internal", "domain", domainName, "strategy", "strategy.go")

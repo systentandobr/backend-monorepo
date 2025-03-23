@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/templates/common"
+
 )
 
 const controllerTemplate = `package controller
@@ -180,7 +182,7 @@ func main() {
 	// Ensure first letter of entity name is uppercase
 	entityName = strings.Title(entityName)
 	
-	data := NewTemplateData(domainName, entityName)
+	data := common.NewTemplateData(domainName, entityName)
 	
 	// Define path for controller
 	controllerDir := filepath.Join("invest-tracker", "internal", "adapter", "controller")

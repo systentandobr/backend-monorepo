@@ -5,6 +5,9 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/templates/common"
+
 )
 
 const factoryTemplate = `package factory
@@ -227,7 +230,7 @@ func main() {
 	// Ensure first letter of entity name is uppercase
 	entityName = strings.Title(entityName)
 	
-	data := NewTemplateData(domainName, entityName)
+	data := common.NewTemplateData(domainName, entityName)
 	
 	// Define paths
 	factoryDir := filepath.Join("invest-tracker", "internal", "adapter", "factory")
@@ -555,7 +558,7 @@ func main() {
 	// Ensure first letter of entity name is uppercase
 	entityName = strings.Title(entityName)
 	
-	data := NewTemplateData(domainName, entityName)
+	data := common.NewTemplateData(domainName, entityName)
 	
 	// Define paths
 	factoryDir := filepath.Join("invest-tracker", "internal", "adapter", "factory")

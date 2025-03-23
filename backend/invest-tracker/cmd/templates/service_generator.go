@@ -5,6 +5,9 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/templates/common"
+
 )
 
 const serviceInterfaceTemplate = `package service
@@ -148,6 +151,8 @@ func (s *{{.ServiceName}}Impl) Delete{{.EntityName}}(ctx context.Context, id str
 `
 
 func main() {
+
+	
 	// Validate input arguments
 	if len(os.Args) < 3 {
 		fmt.Println("Usage: go run service-generator.go <domain-name> <entity-name>")
@@ -161,7 +166,7 @@ func main() {
 	// Ensure first letter of entity name is uppercase
 	entityName = strings.Title(entityName)
 	
-	data := NewTemplateData(domainName, entityName)
+	data := common.NewTemplateData(domainName, entityName)
 	
 	// Define paths
 	serviceInterfacePath := filepath.Join("invest-tracker", "internal", "domain", domainName, "service", strings.ToLower(entityName)+"_service.go")
@@ -187,5 +192,6 @@ func main() {
 		fmt.Printf("Skipping file: %s\n", serviceImplPath)
 	}
 	
+
 	fmt.Printf("Successfully created service interface and implementation for '%s' in domain '%s'\n", entityName, domainName)
 }

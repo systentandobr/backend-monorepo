@@ -5,6 +5,9 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/templates/common"
+
 )
 
 const jobTemplate = `package jobs
@@ -248,7 +251,7 @@ func main() {
 	// Ensure first letter of entity name is uppercase
 	entityName = strings.Title(entityName)
 	
-	data := NewTemplateData(domainName, entityName)
+	data := common.NewTemplateData(domainName, entityName)
 	
 	// Define paths for job files
 	jobsDir := filepath.Join("invest-tracker", "internal", "jobs")
@@ -294,72 +297,4 @@ func main() {
 	
 	fmt.Printf("Successfully created job for '%s' in domain '%s'\n", entityName, domainName)
 	fmt.Println("Don't forget to add the job to the scheduler in your application bootstrap")
-}
-
-// These functions would normally be imported from common template utils
-type TemplateData struct {
-	DomainName      string
-	EntityName      string
-	EntityNameLower string
-	EntityNamePlural string
-	ServiceName     string
-	ImportBasePath  string
-}
-
-func NewTemplateData(domainName, entityName string) TemplateData {
-	entityLower := strings.ToLower(entityName)
-	entityPlural := entityLower + "s"
-	
-	// Handle irregular plurals
-	if strings.HasSuffix(entityLower, "y") {
-		entityPlural = entityLower[:len(entityLower)-1] + "ies"
-	}
-	
-	return TemplateData{
-		DomainName:      domainName,
-		EntityName:      entityName,
-		EntityNameLower: entityLower,
-		EntityNamePlural: entityPlural,
-		ServiceName:     entityName + "Service",
-		ImportBasePath:  "github.com/systentandobr/life-tracker/backend/invest-tracker",
-	}
-}
-
-func CheckFileExists(filePath string) bool {
-	_, err := os.Stat(filePath)
-	return !os.IsNotExist(err)
-}
-
-func PromptOverwrite(filePath string) bool {
-	if !CheckFileExists(filePath) {
-		return true
-	}
-	
-	fmt.Printf("File already exists: %s\nOverwrite? (y/n): ", filePath)
-	var response string
-	fmt.Scanln(&response)
-	
-	return strings.ToLower(response) == "y" || strings.ToLower(response) == "yes"
-}
-
-func CreateFileFromTemplate(templateStr, filePath string, data interface{}) error {
-	// Ensure directory exists
-	dir := filepath.Dir(filePath)
-	if err := os.MkdirAll(dir, 0755); err != nil {
-		return fmt.Errorf("failed to create directory %s: %w", dir, err)
-	}
-	
-	// Create file
-	file, err := os.Create(filePath)
-	if err != nil {
-		return fmt.Errorf("failed to create file %s: %w", filePath, err)
-	}
-	defer file.Close()
-	
-	// For demonstration purposes - in a real implementation, you would parse and execute the template
-	fmt.Fprintf(file, "// Template content for %s\n", filePath)
-	fmt.Fprintf(file, "// This would contain the generated code for:\n")
-	fmt.Fprintf(file, "// Domain: %s, Entity: %s\n", data.(TemplateData).DomainName, data.(TemplateData).EntityName)
-	
-	return nil
 }

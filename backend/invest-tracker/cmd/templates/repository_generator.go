@@ -5,6 +5,9 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/templates/common"
+
 )
 
 const repositoryInterfaceTemplate = `package repository
@@ -204,7 +207,7 @@ func main() {
 	// Ensure first letter of entity name is uppercase
 	entityName = strings.Title(entityName)
 	
-	data := NewTemplateData(domainName, entityName)
+	data := common.NewTemplateData(domainName, entityName)
 	
 	// Define paths
 	repoInterfacePath := filepath.Join("invest-tracker", "internal", "domain", domainName, "repository", strings.ToLower(entityName)+"_repository.go")
