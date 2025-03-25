@@ -19,7 +19,7 @@ import (
 	"github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/common/logger"
 	"github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/config"
 	"github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/database/mongodb"
-	"github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/telemetry"
+	// "github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/telemetry"
 )
 
 // @title Investment Tracker API

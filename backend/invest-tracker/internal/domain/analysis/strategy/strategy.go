@@ -1,4 +1,3 @@
-// internal/domain/analysis/strategy/strategy.go
 package strategy
 
 import (
@@ -7,26 +6,26 @@ import (
 	"github.com/systentandobr/life-tracker/backend/invest-tracker/internal/domain/asset/valueobject"
 )
 
-// InvestmentStrategyService define a interface para diferentes estratégias de investimento
+// InvestmentStrategyService defines the interface for different investment strategies
 type InvestmentStrategyService interface {
-	// Retorna o tipo da estratégia
+	// Returns the strategy type
 	GetType() entity.InvestmentStrategy
 	
-	// Retorna o nome da estratégia
+	// Returns the strategy name
 	GetName() string
 	
-	// Retorna a descrição da estratégia
+	// Returns the strategy description
 	GetDescription() string
 	
-	// Verifica se um ativo é adequado para a estratégia
+	// Checks if an asset is suitable for this strategy
 	IsAssetSuitable(asset assetEntity.Asset) bool
 	
-	// Analisa um ativo e retorna oportunidades de investimento
+	// Analyzes an asset and returns investment opportunities
 	AnalyzeAsset(asset assetEntity.Asset, priceHistory valueobject.PriceHistory) (*entity.InvestmentOpportunity, error)
 	
-	// Verifica se é hora de vender um ativo
+	// Checks if an asset should be sold 
 	ShouldSell(asset assetEntity.Asset, entryPrice float64, priceHistory valueobject.PriceHistory) (bool, entity.OpportunityType, string, error)
 	
-	// Retorna parâmetros para simulação
+	// Returns parameters for simulation
 	GetSimulationParameters(asset assetEntity.Asset) (scenarios []float64, timeHorizon int)
 }

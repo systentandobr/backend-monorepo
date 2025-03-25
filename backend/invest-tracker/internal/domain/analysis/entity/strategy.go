@@ -103,7 +103,6 @@ func (o *InvestmentOpportunity) MarkAsExpired() {
 
 // Helper function to generate a unique ID with a prefix
 func generateID(prefix string) string {
-	timestamp := time.Now().UnixNano()
 	return prefix + "-" + time.Now().Format("20060102150405") + "-" + randomString(6)
 }
 

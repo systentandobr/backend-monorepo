@@ -10,8 +10,8 @@ import (
 	"github.com/systentandobr/life-tracker/backend/invest-tracker/internal/scheduler"
 	"github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/common/logger"
 	"github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/database/mongodb"
-	"github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/messaging/kafka"
-	"github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/telemetry"
+	// "github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/messaging/kafka"
+	// "github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/telemetry"
 )
 
 // AppBootstrap handles application initialization and dependency wiring
@@ -19,7 +19,7 @@ type AppBootstrap struct {
 	logger      logger.Logger
 	mongoClient *mongodb.Client
 	router      *gin.Engine
-	kafkaClient *kafka.Client
+	// kafkaClient *kafka.Client
 	telemetry   *telemetry.Client
 	scheduler   *scheduler.JobScheduler
 	
@@ -114,11 +114,11 @@ func (b *AppBootstrap) Shutdown(ctx context.Context) error {
 	}
 	
 	// Close Kafka client if initialized
-	if b.kafkaClient != nil {
-		if err := b.kafkaClient.Close(); err != nil {
-			b.logger.Error("Error closing Kafka client", logger.Error(err))
-		}
-	}
+	// if b.kafkaClient != nil {
+	// 	if err := b.kafkaClient.Close(); err != nil {
+	// 		b.logger.Error("Error closing Kafka client", logger.Error(err))
+	// 	}
+	// }
 	
 	// Shutdown telemetry
 	if b.telemetry != nil {

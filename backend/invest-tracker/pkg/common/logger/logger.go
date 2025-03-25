@@ -10,6 +10,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+// Logger defines logging operations
 type Logger interface {
 	Debug(msg string, fields ...Field)
 	Info(msg string, fields ...Field)
@@ -20,11 +21,13 @@ type Logger interface {
 	WithContext(ctx context.Context) Logger
 }
 
+// Field represents a log field
 type Field struct {
 	Key   string
 	Value interface{}
 }
 
+// Config holds logger configuration
 type Config struct {
 	Level      string
 	Format     string
@@ -32,6 +35,7 @@ type Config struct {
 	TimeFormat string
 }
 
+// DefaultConfig returns default logger configuration
 func DefaultConfig() Config {
 	return Config{
 		Level:      "info",
@@ -41,12 +45,14 @@ func DefaultConfig() Config {
 	}
 }
 
-// Implementation
-type zapLogger struct {
+// ZapLogger implements Logger using zap
+type ZapLogger struct {
 	logger *zap.Logger
 }
 
+// New creates a new logger instance
 func New(config Config) (Logger, error) {
+	// Set log level
 	var level zapcore.Level
 	switch config.Level {
 	case "debug":
@@ -63,6 +69,7 @@ func New(config Config) (Logger, error) {
 		level = zapcore.InfoLevel
 	}
 
+	// Configure encoder
 	encoderConfig := zapcore.EncoderConfig{
 		TimeKey:        "time",
 		LevelKey:       "level",
@@ -77,6 +84,7 @@ func New(config Config) (Logger, error) {
 		EncodeCaller:   zapcore.ShortCallerEncoder,
 	}
 
+	// Create encoder based on format
 	var encoder zapcore.Encoder
 	if config.Format == "json" {
 		encoder = zapcore.NewJSONEncoder(encoderConfig)
@@ -84,27 +92,57 @@ func New(config Config) (Logger, error) {
 		encoder = zapcore.NewConsoleEncoder(encoderConfig)
 	}
 
-	writeSyncer := zapcore.AddSync(config.Output)
+	// Set output
+	output := config.Output
+	if output == nil {
+		output = os.Stdout
+	}
+	writeSyncer := zapcore.AddSync(output)
+
+	// Create core and logger
 	core := zapcore.NewCore(encoder, writeSyncer, level)
-	zapLogger := zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
+	zapLog := zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
 
-	return &zapLogger{logger: zapLogger}, nil
+	return &ZapLogger{logger: zapLog}, nil
 }
 
-func (l *zapLogger) Debug(msg string, fields ...Field) { l.logger.Debug(msg, fieldsToZapFields(fields)...) }
-func (l *zapLogger) Info(msg string, fields ...Field)  { l.logger.Info(msg, fieldsToZapFields(fields)...) }
-func (l *zapLogger) Warn(msg string, fields ...Field)  { l.logger.Warn(msg, fieldsToZapFields(fields)...) }
-func (l *zapLogger) Error(msg string, fields ...Field) { l.logger.Error(msg, fieldsToZapFields(fields)...) }
-func (l *zapLogger) Fatal(msg string, fields ...Field) { l.logger.Fatal(msg, fieldsToZapFields(fields)...) }
-
-func (l *zapLogger) With(fields ...Field) Logger {
-	return &zapLogger{logger: l.logger.With(fieldsToZapFields(fields)...)}
+// Debug logs a debug message
+func (l *ZapLogger) Debug(msg string, fields ...Field) {
+	l.logger.Debug(msg, fieldsToZapFields(fields)...)
 }
 
-func (l *zapLogger) WithContext(ctx context.Context) Logger {
+// Info logs an info message
+func (l *ZapLogger) Info(msg string, fields ...Field) {
+	l.logger.Info(msg, fieldsToZapFields(fields)...)
+}
+
+// Warn logs a warning message
+func (l *ZapLogger) Warn(msg string, fields ...Field) {
+	l.logger.Warn(msg, fieldsToZapFields(fields)...)
+}
+
+// Error logs an error message
+func (l *ZapLogger) Error(msg string, fields ...Field) {
+	l.logger.Error(msg, fieldsToZapFields(fields)...)
+}
+
+// Fatal logs a fatal message and exits
+func (l *ZapLogger) Fatal(msg string, fields ...Field) {
+	l.logger.Fatal(msg, fieldsToZapFields(fields)...)
+}
+
+// With returns a logger with the fields added to it
+func (l *ZapLogger) With(fields ...Field) Logger {
+	return &ZapLogger{logger: l.logger.With(fieldsToZapFields(fields)...)}
+}
+
+// WithContext returns a logger with the context
+func (l *ZapLogger) WithContext(ctx context.Context) Logger {
+	// Context not used in this implementation
 	return l
 }
 
+// Helper functions for creating fields
 func fieldsToZapFields(fields []Field) []zap.Field {
 	zapFields := make([]zap.Field, 0, len(fields))
 	for _, field := range fields {
@@ -113,9 +151,17 @@ func fieldsToZapFields(fields []Field) []zap.Field {
 	return zapFields
 }
 
-// Helper functions
-func String(key string, value string) Field       { return Field{Key: key, Value: value} }
-func Int(key string, value int) Field             { return Field{Key: key, Value: value} }
-func Float64(key string, value float64) Field     { return Field{Key: key, Value: value} }
-func Error(err error) Field                       { return Field{Key: "error", Value: err.Error()} }
-func Any(key string, value interface{}) Field     { return Field{Key: key, Value: value} }
+// Field helpers
+func String(key string, value string) Field { return Field{Key: key, Value: value} }
+func Int(key string, value int) Field { return Field{Key: key, Value: value} }
+func Int64(key string, value int64) Field { return Field{Key: key, Value: value} }
+func Float64(key string, value float64) Field { return Field{Key: key, Value: value} }
+func Bool(key string, value bool) Field { return Field{Key: key, Value: value} }
+func Error(err error) Field { 
+	if err == nil {
+		return Field{Key: "error", Value: nil}
+	}
+	return Field{Key: "error", Value: err.Error()} 
+}
+func Any(key string, value interface{}) Field { return Field{Key: key, Value: value} }
+func Duration(key string, value time.Duration) Field { return Field{Key: key, Value: value} }
