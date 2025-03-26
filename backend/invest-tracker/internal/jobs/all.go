@@ -32,6 +32,9 @@ func (j *AssetDataJob) Stop() {}
 // Run executes the job logic
 func (j *AssetDataJob) Run() {}
 
+// SetSchedule sets the job schedule
+func (j *AssetDataJob) SetSchedule(cronSpec string) {}
+
 // AssetAnalysisJob implements a job for analyzing assets
 type AssetAnalysisJob struct {}
 
@@ -56,8 +59,13 @@ func (j *AssetAnalysisJob) Stop() {}
 // Run executes the job logic
 func (j *AssetAnalysisJob) Run() {}
 
+// SetSchedule sets the job schedule
+func (j *AssetAnalysisJob) SetSchedule(cronSpec string) {}
+
 // OpportunityDetectionJob implements a job for detecting opportunities
-type OpportunityDetectionJob struct {}
+type OpportunityDetectionJob struct {
+	
+}
 
 // NewOpportunityDetectionJob creates a new opportunity detection job
 func NewOpportunityDetectionJob(
@@ -79,3 +87,6 @@ func (j *OpportunityDetectionJob) Stop() {}
 
 // Run executes the job logic
 func (j *OpportunityDetectionJob) Run() {}
+
+// SetSchedule sets the job schedule
+func (j *OpportunityDetectionJob) SetSchedule(cronSpec string) {}

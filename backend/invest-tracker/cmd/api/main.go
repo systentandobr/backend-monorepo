@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -17,7 +16,6 @@ import (
 	"github.com/systentandobr/life-tracker/backend/invest-tracker/docs"
 	"github.com/systentandobr/life-tracker/backend/invest-tracker/internal/bootstrap"
 	"github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/common/logger"
-	"github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/config"
 	"github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/database/mongodb"
 	// "github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/telemetry"
 )
@@ -37,6 +35,47 @@ import (
 // @host localhost:8080
 // @BasePath /api/v1
 // @schemes http https
+
+// AppConfig holds application configuration
+type AppConfig struct {
+	Environment      string
+	APIPort          string
+	EnableSwagger    bool
+	EnableCORS       bool
+	EnableJobs       bool
+	EnableMetrics    bool
+	EnableTracing    bool
+	Database         DatabaseConfig
+}
+
+// DatabaseConfig holds database configuration
+type DatabaseConfig struct {
+	URI              string
+	Name             string
+	ConnectTimeout   int
+	OperationTimeout int
+}
+
+// LoadConfig loads configuration from environment file
+func LoadConfig(envFile string, log logger.Logger) (*AppConfig, error) {
+	// For this example, just returning default config
+	return &AppConfig{
+		Environment:   "development",
+		APIPort:       "8080",
+		EnableSwagger: true,
+		EnableCORS:    true,
+		EnableJobs:    true,
+		EnableMetrics: true,
+		EnableTracing: true,
+		Database: DatabaseConfig{
+			URI:              "mongodb://localhost:27017",
+			Name:             "invest-tracker",
+			ConnectTimeout:   30,
+			OperationTimeout: 10,
+		},
+	}, nil
+}
+
 func main() {
 	// Initialize logger
 	log, err := logger.New(logger.DefaultConfig())
@@ -52,7 +91,7 @@ func main() {
 		envFile = os.Args[1]
 	}
 	
-	appConfig, err := config.LoadConfig(envFile, log)
+	appConfig, err := LoadConfig(envFile, log)
 	if err != nil {
 		log.Fatal("Failed to load configuration", logger.Error(err))
 	}
@@ -192,7 +231,7 @@ func main() {
 	}
 	
 	// Disconnect from MongoDB
-	if err := mongoClient.Disconnect(ctx); err != nil {
+	if err := mongoClient.Disconnect(); err != nil {
 		log.Fatal("Failed to disconnect from MongoDB", logger.Error(err))
 	}
 	

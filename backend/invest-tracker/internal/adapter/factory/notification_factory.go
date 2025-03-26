@@ -1,6 +1,7 @@
 package factory
 
 import (
+    "github.com/systentandobr/life-tracker/backend/invest-tracker/internal/domain/notification/service"
     "github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/common/logger"
     "github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/database/mongodb"
 )
@@ -20,6 +21,6 @@ func (f *NotificationFactory) Bootstrap() {}
 func (f *NotificationFactory) RegisterRoutes(router interface{}) {}
 
 // GetNotificationService returns the notification service
-func (f *NotificationFactory) GetNotificationService() interface{} {
+func (f *NotificationFactory) GetNotificationService() service.NotificationService {
     return nil
 }

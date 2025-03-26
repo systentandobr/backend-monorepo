@@ -1,6 +1,7 @@
 package factory
 
 import (
+    "github.com/systentandobr/life-tracker/backend/invest-tracker/internal/domain/analysis/service"
     "github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/common/logger"
     "github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/database/mongodb"
 )
@@ -20,11 +21,11 @@ func (f *AnalysisFactory) Bootstrap() {}
 func (f *AnalysisFactory) RegisterRoutes(router interface{}) {}
 
 // GetMarketAnalysisService returns the market analysis service
-func (f *AnalysisFactory) GetMarketAnalysisService() interface{} {
+func (f *AnalysisFactory) GetMarketAnalysisService() service.MarketAnalysisService {
     return nil
 }
 
 // GetOpportunityService returns the opportunity service
-func (f *AnalysisFactory) GetOpportunityService() interface{} {
+func (f *AnalysisFactory) GetOpportunityService() service.OpportunityService {
     return nil
 }

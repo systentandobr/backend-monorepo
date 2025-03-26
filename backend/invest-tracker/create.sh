@@ -1,140 +1,254 @@
-# Create telemetry client
-mkdir -p pkg/infrastructure/telemetry
-cat > pkg/infrastructure/telemetry/client.go << 'EOF'
-package telemetry
-
-// Client represents a telemetry client
-type Client struct {}
-
-// Config holds configuration for telemetry
-type Config struct {
-    ServiceName    string
-    Environment    string
-    EnableMetrics  bool
-    EnableTracing  bool
-}
-
-// NewClient creates a new telemetry client
-func NewClient(config Config, logger interface{}) (*Client, error) {
-    return &Client{}, nil
-}
-
-// Shutdown gracefully shuts down the telemetry client
-func (c *Client) Shutdown(ctx interface{}) error {
-    return nil
-}
-EOF
-
-# Create factory types
-mkdir -p internal/adapter/factory
-cat > internal/adapter/factory/asset_factory.go << 'EOF'
-package factory
+cat > cmd/api/main.go << 'EOF'
+package main
 
 import (
-    "github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/common/logger"
-    "github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/database/mongodb"
+	"context"
+	"fmt"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/docs"
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/internal/bootstrap"
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/common/logger"
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/database/mongodb"
+	// "github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/telemetry"
 )
 
-// AssetFactory manages asset domain components
-type AssetFactory struct {}
+// @title Investment Tracker API
+// @version 1.0
+// @description API for tracking and analyzing investments across different asset types
+// @termsOfService http://swagger.io/terms/
 
-// NewAssetFactory creates a new asset factory
-func NewAssetFactory(client *mongodb.Client, logger logger.Logger) *AssetFactory {
-    return &AssetFactory{}
+// @contact.name API Support
+// @contact.url http://www.systentando.com.br/support
+// @contact.email support@systentando.com.br
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:8080
+// @BasePath /api/v1
+// @schemes http https
+
+// AppConfig holds application configuration
+type AppConfig struct {
+	Environment      string
+	APIPort          string
+	EnableSwagger    bool
+	EnableCORS       bool
+	EnableJobs       bool
+	EnableMetrics    bool
+	EnableTracing    bool
+	Database         DatabaseConfig
 }
 
-// Bootstrap initializes domain components
-func (f *AssetFactory) Bootstrap() {}
-
-// RegisterRoutes registers domain routes
-func (f *AssetFactory) RegisterRoutes(router interface{}) {}
-
-// GetStockService returns the stock service
-func (f *AssetFactory) GetStockService() interface{} {
-    return nil
-}
-EOF
-
-cat > internal/adapter/factory/analysis_factory.go << 'EOF'
-package factory
-
-import (
-    "github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/common/logger"
-    "github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/database/mongodb"
-)
-
-// AnalysisFactory manages analysis domain components
-type AnalysisFactory struct {}
-
-// NewAnalysisFactory creates a new analysis factory
-func NewAnalysisFactory(client *mongodb.Client, logger logger.Logger) *AnalysisFactory {
-    return &AnalysisFactory{}
+// DatabaseConfig holds database configuration
+type DatabaseConfig struct {
+	URI              string
+	Name             string
+	ConnectTimeout   int
+	OperationTimeout int
 }
 
-// Bootstrap initializes domain components
-func (f *AnalysisFactory) Bootstrap() {}
-
-// RegisterRoutes registers domain routes
-func (f *AnalysisFactory) RegisterRoutes(router interface{}) {}
-
-// GetMarketAnalysisService returns the market analysis service
-func (f *AnalysisFactory) GetMarketAnalysisService() interface{} {
-    return nil
+// LoadConfig loads configuration from environment file
+func LoadConfig(envFile string, log logger.Logger) (*AppConfig, error) {
+	// For this example, just returning default config
+	return &AppConfig{
+		Environment:   "development",
+		APIPort:       "8080",
+		EnableSwagger: true,
+		EnableCORS:    true,
+		EnableJobs:    true,
+		EnableMetrics: true,
+		EnableTracing: true,
+		Database: DatabaseConfig{
+			URI:              "mongodb://localhost:27017",
+			Name:             "invest-tracker",
+			ConnectTimeout:   30,
+			OperationTimeout: 10,
+		},
+	}, nil
 }
 
-// GetOpportunityService returns the opportunity service
-func (f *AnalysisFactory) GetOpportunityService() interface{} {
-    return nil
+func main() {
+	// Initialize logger
+	log, err := logger.New(logger.DefaultConfig())
+	if err != nil {
+		panic(fmt.Sprintf("Failed to initialize logger: %v", err))
+	}
+	
+	log.Info("Starting Investment Tracker application")
+	
+	// Load configuration
+	envFile := ".env"
+	if len(os.Args) > 1 {
+		envFile = os.Args[1]
+	}
+	
+	appConfig, err := LoadConfig(envFile, log)
+	if err != nil {
+		log.Fatal("Failed to load configuration", logger.Error(err))
+	}
+	
+	// Set Gin mode based on environment
+	if appConfig.Environment == "production" {
+		gin.SetMode(gin.ReleaseMode)
+	}
+	
+	// Initialize MongoDB client
+	mongoConfig := mongodb.DefaultConfig()
+	mongoConfig.URI = appConfig.Database.URI
+	mongoConfig.DatabaseName = appConfig.Database.Name
+	mongoConfig.ConnectTimeout = time.Duration(appConfig.Database.ConnectTimeout) * time.Second
+	mongoConfig.OperationTimeout = time.Duration(appConfig.Database.OperationTimeout) * time.Second
+	
+	mongoClient, err := mongodb.NewClient(mongoConfig, log)
+	if err != nil {
+		log.Fatal("Failed to connect to MongoDB", logger.Error(err))
+	}
+	
+	// Initialize Gin router
+	router := gin.New()
+	
+	// Add middleware
+	router.Use(gin.Recovery())
+	
+	// Add logger middleware
+	router.Use(func(c *gin.Context) {
+		// Start timer
+		start := time.Now()
+		path := c.Request.URL.Path
+		
+		// Process request
+		c.Next()
+		
+		// Log request
+		latency := time.Since(start)
+		statusCode := c.Writer.Status()
+		clientIP := c.ClientIP()
+		method := c.Request.Method
+		
+		log.Info("HTTP Request",
+			logger.String("method", method),
+			logger.String("path", path),
+			logger.Int("status", statusCode),
+			logger.String("ip", clientIP),
+			logger.String("latency", latency.String()))
+			
+		// Record metrics if enabled
+		if appConfig.EnableMetrics {
+			// This would use the telemetry client in a real implementation
+		}
+	})
+	
+	// Configure CORS if enabled
+	if appConfig.EnableCORS {
+		router.Use(cors.New(cors.Config{
+			AllowOrigins:     []string{"*"},
+			AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+			AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+			ExposeHeaders:    []string{"Content-Length"},
+			AllowCredentials: true,
+			MaxAge:           12 * time.Hour,
+		}))
+	}
+	
+	// Setup Swagger documentation if enabled
+	if appConfig.EnableSwagger {
+		setupSwagger(router)
+	}
+	
+	// Create application bootstrap
+	bootstrapper := bootstrap.NewAppBootstrap(log, mongoClient, router, &bootstrap.AppConfig{
+		Environment:   appConfig.Environment,
+		APIPort:       appConfig.APIPort,
+		EnableSwagger: appConfig.EnableSwagger,
+		EnableCORS:    appConfig.EnableCORS,
+		EnableJobs:    appConfig.EnableJobs,
+		EnableMetrics: appConfig.EnableMetrics,
+		EnableTracing: appConfig.EnableTracing,
+	})
+	
+	// Bootstrap application components
+	if err := bootstrapper.Bootstrap(context.Background()); err != nil {
+		log.Fatal("Failed to bootstrap application", logger.Error(err))
+	}
+	
+	// Add health check endpoint
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"status": "up",
+			"time":   time.Now().Format(time.RFC3339),
+			"env":    appConfig.Environment,
+		})
+	})
+	
+	// Set up HTTP server
+	srv := &http.Server{
+		Addr:    ":" + appConfig.APIPort,
+		Handler: router,
+	}
+	
+	// Start HTTP server in a goroutine
+	go func() {
+		log.Info("Starting HTTP server", logger.String("port", appConfig.APIPort))
+		
+		if appConfig.EnableSwagger {
+			log.Info("Swagger documentation available at", 
+				logger.String("url", fmt.Sprintf("http://localhost:%s/swagger/index.html", appConfig.APIPort)))
+		}
+		
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatal("Failed to start HTTP server", logger.Error(err))
+		}
+	}()
+	
+	// Set up graceful shutdown
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	
+	log.Info("Shutting down server...")
+	
+	// Create shutdown context with timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	
+	// Shutdown HTTP server
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatal("Server forced to shutdown", logger.Error(err))
+	}
+	
+	// Shutdown application components
+	if err := bootstrapper.Shutdown(ctx); err != nil {
+		log.Fatal("Failed to shutdown application components", logger.Error(err))
+	}
+	
+	// Disconnect from MongoDB
+	if err := mongoClient.Disconnect(); err != nil {
+		log.Fatal("Failed to disconnect from MongoDB", logger.Error(err))
+	}
+	
+	log.Info("Server exited gracefully")
 }
-EOF
 
-cat > internal/adapter/factory/simulation_factory.go << 'EOF'
-package factory
-
-import (
-    "github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/common/logger"
-    "github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/database/mongodb"
-)
-
-// SimulationFactory manages simulation domain components
-type SimulationFactory struct {}
-
-// NewSimulationFactory creates a new simulation factory
-func NewSimulationFactory(client *mongodb.Client, logger logger.Logger) *SimulationFactory {
-    return &SimulationFactory{}
-}
-
-// Bootstrap initializes domain components
-func (f *SimulationFactory) Bootstrap() {}
-
-// RegisterRoutes registers domain routes
-func (f *SimulationFactory) RegisterRoutes(router interface{}) {}
-EOF
-
-cat > internal/adapter/factory/notification_factory.go << 'EOF'
-package factory
-
-import (
-    "github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/common/logger"
-    "github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/database/mongodb"
-)
-
-// NotificationFactory manages notification domain components
-type NotificationFactory struct {}
-
-// NewNotificationFactory creates a new notification factory
-func NewNotificationFactory(client *mongodb.Client, logger logger.Logger) *NotificationFactory {
-    return &NotificationFactory{}
-}
-
-// Bootstrap initializes domain components
-func (f *NotificationFactory) Bootstrap() {}
-
-// RegisterRoutes registers domain routes
-func (f *NotificationFactory) RegisterRoutes(router interface{}) {}
-
-// GetNotificationService returns the notification service
-func (f *NotificationFactory) GetNotificationService() interface{} {
-    return nil
+// setupSwagger configures Swagger documentation for the API
+func setupSwagger(router *gin.Engine) {
+	// Configure swagger info
+	docs.SwaggerInfo.Title = "Investment Tracker API"
+	docs.SwaggerInfo.Description = "API for tracking and analyzing investments across different asset types"
+	docs.SwaggerInfo.Version = "1.0"
+	docs.SwaggerInfo.BasePath = "/api/v1"
+	docs.SwaggerInfo.Schemes = []string{"http", "https"}
+	
+	// Add swagger endpoint
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 }
 EOF

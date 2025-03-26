@@ -72,7 +72,7 @@ docker:
 
 docker-compose:
 	@echo "Building and starting services with Docker Compose..."
-	@docker-compose up --build -d
+	@docker compose up --build -d
 
 # Generate new component using templates
 gen-entity:

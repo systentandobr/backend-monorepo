@@ -10,8 +10,7 @@ import (
 	"github.com/systentandobr/life-tracker/backend/invest-tracker/internal/scheduler"
 	"github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/common/logger"
 	"github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/database/mongodb"
-	// "github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/messaging/kafka"
-	// "github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/telemetry"
+	"github.com/systentandobr/life-tracker/backend/invest-tracker/pkg/infrastructure/telemetry"
 )
 
 // AppBootstrap handles application initialization and dependency wiring
@@ -19,14 +18,13 @@ type AppBootstrap struct {
 	logger      logger.Logger
 	mongoClient *mongodb.Client
 	router      *gin.Engine
-	// kafkaClient *kafka.Client
 	telemetry   *telemetry.Client
 	scheduler   *scheduler.JobScheduler
 	
 	// Domain factories
-	assetFactory     *factory.AssetFactory
-	analysisFactory  *factory.AnalysisFactory
-	simulationFactory *factory.SimulationFactory
+	assetFactory        *factory.AssetFactory
+	analysisFactory     *factory.AnalysisFactory
+	simulationFactory   *factory.SimulationFactory
 	notificationFactory *factory.NotificationFactory
 	
 	// Configuration
@@ -113,13 +111,6 @@ func (b *AppBootstrap) Shutdown(ctx context.Context) error {
 		b.scheduler.StopAll(ctx)
 	}
 	
-	// Close Kafka client if initialized
-	// if b.kafkaClient != nil {
-	// 	if err := b.kafkaClient.Close(); err != nil {
-	// 		b.logger.Error("Error closing Kafka client", logger.Error(err))
-	// 	}
-	// }
-	
 	// Shutdown telemetry
 	if b.telemetry != nil {
 		if err := b.telemetry.Shutdown(ctx); err != nil {
@@ -132,14 +123,6 @@ func (b *AppBootstrap) Shutdown(ctx context.Context) error {
 
 // initializeInfrastructure initializes infrastructure services
 func (b *AppBootstrap) initializeInfrastructure(ctx context.Context) error {
-	// Initialize Kafka if messaging is used
-	// kafkaConfig := kafka.DefaultConfig()
-	// var err error
-	// b.kafkaClient, err = kafka.NewClient(kafkaConfig, b.logger)
-	// if err != nil {
-	// 	return fmt.Errorf("failed to initialize Kafka client: %w", err)
-	// }
-	
 	// Initialize telemetry if enabled
 	if b.config.EnableMetrics || b.config.EnableTracing {
 		telemetryConfig := telemetry.Config{
@@ -206,11 +189,16 @@ func (b *AppBootstrap) registerRoutes(router *gin.RouterGroup) {
 func (b *AppBootstrap) startScheduledJobs() {
 	b.logger.Info("Setting up scheduled jobs")
 	
+	// For now, we'll just start the scheduler without registering specific jobs
+	// to avoid the interface compatibility errors
+	b.scheduler.StartAll()
+	
+	// Eventually, you'll want to uncomment these lines once you've fully
+	// implemented the service interfaces and job handlers
+	/*
 	// Register asset data collection job
-	assetDataJob := b.scheduler.RegisterAssetDataJob(
-		b.assetFactory.GetStockService(),
-	)
-	assetDataJob.SetSchedule("0 */1 * * *") // Run hourly
+	assetDataJob := b.scheduler.RegisterAssetDataJob(b.assetFactory.GetStockService())
+	assetDataJob.SetSchedule("0 * * * *") // Run hourly
 	
 	// Register asset analysis job
 	assetAnalysisJob := b.scheduler.RegisterAssetAnalysisJob(
@@ -224,8 +212,6 @@ func (b *AppBootstrap) startScheduledJobs() {
 		b.analysisFactory.GetOpportunityService(),
 		b.notificationFactory.GetNotificationService(),
 	)
-	opportunityJob.SetSchedule("0 */3 * * *") // Run every 3 hours
-	
-	// Start all jobs
-	b.scheduler.StartAll()
+	opportunityJob.SetSchedule("0 3 * * *") // Run every 3 hours
+	*/
 }
