@@ -1,25 +1,25 @@
-# Investment Tracker
+# Rastreador de Investimentos
 
-A system that monitors, analyzes, and simulates investments across various asset types.
+Um sistema que monitora, analisa e simula investimentos em vários tipos de ativos.
 
-## Features
+## Recursos
 
-- Data collection from financial APIs
-- Asset fundamental analysis
-- Investment opportunity detection
-- Portfolio simulation
-- Real-time notifications
+- Coleta de dados de APIs financeiras
+- Análise fundamental de ativos
+- Detecção de oportunidade de investimento
+- Simulação de portfólio
+- Notificações em tempo real
 
-## Architecture
+## Arquitetura
 
-This project follows Clean Architecture principles and SOLID design:
+Este projeto segue os princípios da Arquitetura Limpa e design SOLID:
 
-- **Domain Layer**: Core business entities and rules
-- **Application Layer**: Use cases and business logic
-- **Adapter Layer**: Implementation of interfaces
-- **Infrastructure Layer**: External services integration
+- **Camada de Domínio**: Entidades e regras de negócios principais
+- **Camada de Aplicação**: Casos de uso e lógica de negócios
+- **Camada de Adaptador**: Implementação de interfaces
+- **Camada de Infraestrutura**: Integração de serviços externos
 
-## Getting Started
+## Primeiros passos
 
 ```bash
 # Build the services
