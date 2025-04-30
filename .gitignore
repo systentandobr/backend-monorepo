@@ -41,3 +41,8 @@ node_modules/
 # Build artifacts
 /web/react/build/
 /web/react-native/build/
+
+# python
+venv*
+example
+deploy*
