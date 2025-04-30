@@ -1,0 +1,46 @@
+# Requisitos para o projeto Meu Nutri
+
+# LangChain para construção do agente
+langchain>=0.1.0
+langchain-openai>=0.0.2
+langchain-community>=0.0.10
+
+# LLMs
+openai>=1.0.0
+anthropic>=0.5.0
+
+# Visão Computacional
+opencv-python>=4.8.0
+mediapipe>=0.10.0
+numpy>=1.24.0
+
+# API e Backend
+fastapi>=0.100.0
+uvicorn>=0.22.0
+pydantic>=2.0.0
+motor>=3.2.0
+python-multipart>=0.0.6
+asyncpg>=0.27.0
+
+# Alexa Skills Kit
+ask-sdk-core>=1.17.0
+ask-sdk-model>=1.35.0
+boto3>=1.28.0
+
+# Utilidades
+python-dotenv>=1.0.0
+requests>=2.31.0
+pandas>=2.0.0
+matplotlib>=3.7.0
+pillow>=10.0.0
+
+# Embeddings e Similaridade
+faiss-cpu>=1.7.4  # ou faiss-gpu
+chromadb>=0.4.15
+sentence-transformers>=2.2.2
+
+# Visualização e demonstração
+gradio>=3.35.0
+
+# Testes
+pytest>=7.3.1
