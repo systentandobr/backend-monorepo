@@ -12,7 +12,14 @@ from fastapi.middleware.cors import CORSMiddleware
 load_dotenv()
 
 # Importa módulos do aplicativo
-from app.api.routers import agent_router, vision_router, circadian_router, user_router
+from app.api.routers import (
+    agent_router, 
+    vision_router, 
+    circadian_router, 
+    users_router, 
+    profile_router, 
+    nutrition_router
+)
 from app.db.database import init_db
 
 # Cria o aplicativo FastAPI
@@ -35,7 +42,10 @@ app.add_middleware(
 app.include_router(agent_router, prefix="/api/agent", tags=["Agent"])
 app.include_router(vision_router, prefix="/api/vision", tags=["Vision"])
 app.include_router(circadian_router, prefix="/api/circadian", tags=["Circadian"])
-app.include_router(user_router, prefix="/api/users", tags=["Users"])
+# Adicionar novos roteadores
+app.include_router(users_router, prefix="/api/users", tags=["Users"])
+app.include_router(profile_router, prefix="/api/profile", tags=["Profile"])
+app.include_router(nutrition_router, prefix="/api/nutrition", tags=["Nutrition"])
 
 @app.on_event("startup")
 async def startup_event():
@@ -53,4 +63,4 @@ async def root():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8001, reload=True)

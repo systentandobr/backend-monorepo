@@ -17,10 +17,22 @@ numpy>=1.24.0
 # API e Backend
 fastapi>=0.100.0
 uvicorn>=0.22.0
-pydantic>=2.0.0
+pydantic>=2.0.3
 motor>=3.2.0
 python-multipart>=0.0.6
 asyncpg>=0.27.0
+
+# Supabase e Postgres
+supabase>=1.0.0
+postgrest>=0.10.0
+psycopg2-binary>=2.9.6  # Driver PostgreSQL
+SQLAlchemy>=1.4.41      # ORM
+alembic>=1.8.1          # Migrations
+
+# Autenticação e Segurança
+python-jose>=3.3.0      # JWT tokens
+passlib>=1.7.4          # Hashing
+python-multipart>=0.0.6 # Suporte para form data
 
 # Alexa Skills Kit
 ask-sdk-core>=1.17.0
@@ -44,3 +56,4 @@ gradio>=3.35.0
 
 # Testes
 pytest>=7.3.1
+httpx>=0.23.0          # Testes assíncronos para FastAPI
