@@ -32,7 +32,7 @@ Bem-vindo à documentação completa do ecossistema Systentando ONE. Este índic
 
 ## Produtos do Ecossistema
 
-### ZEN Launcher
+### Mindful Launcher
 - Documento de produto (em breve)
 - Especificações técnicas (em breve)
 

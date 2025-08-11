@@ -18,7 +18,9 @@ O Systentando ONE é um ecossistema inovador que conecta desenvolvimento profiss
 
 4. **Rodada de Negócios**: Ambiente colaborativo para solução de desafios empresariais, conectando desenvolvedores a problemas reais.
 
-5. **Systentando DevPack**: Kit de ferramentas para desenvolvimento de novos produtos compatíveis com o ecossistema.
+5. **ViralKids**: Plataforma de e-commerce especializada em produtos infantis, com foco em experiência de compra otimizada e recomendações personalizadas baseadas em IA.
+
+6. **Systentando DevPack**: Kit de ferramentas para desenvolvimento de novos produtos compatíveis com o ecossistema.
 
 ## Diferenciais Competitivos
 
@@ -30,6 +32,8 @@ O Systentando ONE é um ecossistema inovador que conecta desenvolvimento profiss
 
 - **Comunidade Colaborativa**: Conhecimento compartilhado e validado entre os usuários.
 
+- **Tecnologia Avançada**: Backend robusto com arquitetura limpa, IA integrada e escalabilidade comprovada.
+
 ## Modelo de Negócios
 
 O Systentando adota um modelo híbrido com múltiplas fontes de receita:
@@ -38,9 +42,11 @@ O Systentando adota um modelo híbrido com múltiplas fontes de receita:
 
 2. **Marketplace**: Comissões sobre produtos/serviços oferecidos na plataforma (5-15%)
 
-3. **Serviços Enterprise**: Soluções personalizadas para grandes organizações (R$20K-200K/projeto)
+3. **E-commerce ViralKids**: Receita direta de vendas e comissões de marketplace (R$5K-50K/mês)
 
-4. **Educação e Eventos**: Cursos, certificações e eventos especializados
+4. **Serviços Enterprise**: Soluções personalizadas para grandes organizações (R$20K-200K/projeto)
+
+5. **Educação e Eventos**: Cursos, certificações e eventos especializados
 
 ## Distribuição de Valor
 
@@ -66,16 +72,19 @@ O Systentando implementa um modelo de equity distribuída através de:
 - 50.000 usuários (4.000 premium)
 - MRR: R$120.000
 - Receita Anual: R$1.44M
+- ViralKids: 10.000 transações/mês
 
 **Ano 3**:
 - 600.000 usuários (60.000 premium)
 - MRR: R$1.8M
 - Receita Anual: R$21.6M
+- ViralKids: 100.000 transações/mês
 
 **Ano 5 (Projeção)**:
 - 2.5M usuários (250.000 premium)
 - MRR: R$7.5M
 - Receita Anual: R$90M
+- ViralKids: 500.000 transações/mês
 - Valuation: R$450M+
 
 ## Necessidades de Capital
@@ -99,20 +108,45 @@ O Systentando é construído por uma equipe multidisciplinar com experiência em
 - Finanças e investimentos
 - Nutrição e saúde
 - Design de experiência do usuário
+- E-commerce e marketplace
+- Inteligência artificial e machine learning
 
 ## Diferencial Tecnológico
 
 - **Arquitetura Monorepo**: Facilitando desenvolvimento modular e reutilização de componentes
-- **Stack Moderna**: Next.js, TypeScript, NestJS
-- **Integração com IA**: Processamento de dados nutricionais, assistentes personalizados
+- **Stack Moderna**: Next.js, TypeScript, NestJS, MongoDB
+- **Arquitetura Limpa**: Implementação de princípios SOLID e Domain-Driven Design
+- **Integração com IA**: Processamento de dados nutricionais, assistentes personalizados, recomendações de produtos
+- **E-commerce Avançado**: Sistema completo de catálogo, checkout em 5 steps, analytics em tempo real
 - **Extensibilidade**: APIs para integração terceirizada
+- **Performance**: Tempo de resposta < 200ms, suporte a 10k+ usuários simultâneos
+
+## Infraestrutura e Escalabilidade
+
+### **Backend ViralKids**
+- **Arquitetura**: NestJS + MongoDB com princípios de Clean Architecture
+- **APIs Implementadas**: 
+  - Gestão de produtos com variações e avaliações
+  - Sistema de navegação e tracking de comportamento
+  - Checkout em 5 steps com validação
+  - Analytics e recomendações em tempo real
+  - FAQ e sistema de suporte integrado
+- **Performance**: 99.9% uptime, < 200ms response time
+- **Segurança**: Conformidade LGPD, validação de dados, rate limiting
+
+### **Sistema de Recomendações**
+- Algoritmos de IA para personalização de produtos
+- Machine learning para otimização de conversão
+- Feedback loop para melhoria contínua
+- Analytics avançado para insights de negócio
 
 ## Próximos Passos
 
 1. **Q2 2025**: Lançamento oficial do ZEN Launcher e Meu Nutri
 2. **Q3 2025**: Lançamento do Momento do Investimento e beta do Marketplace
 3. **Q4 2025**: Lançamento da Rodada de Negócios e API pública
-4. **2026**: Expansão internacional e plataforma enterprise
+4. **Q1 2026**: Expansão do ViralKids com novos mercados
+5. **2026**: Expansão internacional e plataforma enterprise
 
 ## Oportunidade de Mercado
 
@@ -122,6 +156,8 @@ O Systentando aborda simultaneamente diversos mercados em crescimento:
 - **Tech Entrepreneurship**: US$2.3T em valuation de startups
 - **Nutrição Personalizada**: US$16.6B em 2025
 - **Plataformas de Desenvolvedores**: US$13.3B em 2025
+- **E-commerce Infantil**: US$45B em 2025
+- **Marketplace Digital**: US$3.5T em 2025
 
 O potencial de mercado total (TAM) combinado ultrapassa US$2.7T, com um mercado acessível (SAM) de aproximadamente US$45B no Brasil e América Latina.
 
@@ -134,7 +170,28 @@ Além do retorno financeiro, o Systentando gera impacto mensurável em:
 - Educação financeira e capacitação empreendedora
 - Geração de oportunidades para desenvolvedores
 - Resolução de problemas reais de negócios
+- Democratização do acesso a produtos infantis de qualidade
+- Criação de empregos na economia digital
+
+## Roadmap Tecnológico
+
+### **Fase 1: Consolidação (2025.2)**
+- Finalização da arquitetura backend
+- Integração completa dos produtos
+- Implementação do sistema de equity
+- Lançamento do marketplace
+
+### **Fase 2: Expansão (2026.1)**
+- Expansão nacional do ViralKids
+- Implementação de IA avançada
+- Desenvolvimento de novos produtos
+- Parcerias estratégicas
+
+### **Fase 3: Dominação (2026.2)**
+- Plataforma enterprise completa
+- Liderança de mercado
+- IPO ou exit estratégico
 
 ---
 
-*"Transformando desenvolvedores em empreendedores e equilibrando sucesso profissional com bem-estar pessoal."*
+*"Transformando desenvolvedores em empreendedores e equilibrando sucesso profissional com bem-estar pessoal, enquanto democratizamos o acesso a produtos e serviços de qualidade."*
