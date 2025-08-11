@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/apis-monorepo/src",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/apis-monorepo/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/apis-monorepo",
+  "projects": {
+    "apis-monorepo": {
+      "type": "application",
+      "root": "apps/apis-monorepo",
+      "entryFile": "main",
+      "sourceRoot": "apps/apis-monorepo/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/apis-monorepo/tsconfig.app.json"
+      }
+    },
+    "sys-assistente-estudos": {
+      "type": "application",
+      "root": "apps/sys-assistente-estudos",
+      "entryFile": "main",
+      "sourceRoot": "apps/sys-assistente-estudos/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/sys-assistente-estudos/tsconfig.app.json"
+      }
+    },
+    "sys-produtos": {
+      "type": "application",
+      "root": "apps/sys-produtos",
+      "entryFile": "main",
+      "sourceRoot": "apps/sys-produtos/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/sys-produtos/tsconfig.app.json"
+      }
+    },
+    "sys-pagamentos": {
+      "type": "application",
+      "root": "apps/sys-pagamentos",
+      "entryFile": "main",
+      "sourceRoot": "apps/sys-pagamentos/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/sys-pagamentos/tsconfig.app.json"
+      }
+    },
+    "sys-seguranca": {
+      "type": "application",
+      "root": "apps/sys-seguranca",
+      "entryFile": "main",
+      "sourceRoot": "apps/sys-seguranca/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/sys-seguranca/tsconfig.app.json"
+      }
+    },
+    "utis": {
+      "type": "library",
+      "root": "libs/utis",
+      "entryFile": "index",
+      "sourceRoot": "libs/utis/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/utis/tsconfig.lib.json"
+      }
+    }
+  }
+}
