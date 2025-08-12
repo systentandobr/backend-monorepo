@@ -66,8 +66,8 @@ RUN yarn build
 EXPOSE 3000
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:3000/debug/health || exit 1
+# HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+#     CMD curl -f http://localhost:3000/debug/health || exit 1
 
 # Comando de inicialização com debug
 CMD ["/app/start-with-debug.sh"] 
