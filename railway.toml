@@ -17,5 +17,8 @@
           "numReplicas": 2
         }
       }
+    },
+    "networking": {
+      "staticOutboundIp": true
     }
   }
