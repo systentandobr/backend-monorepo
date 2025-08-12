@@ -14,7 +14,7 @@ healthcheckTimeout = 300
 restartPolicyType = "on-failure"
 
 [deploy.multiRegionConfig.us-west2]
-numReplicas = 2
+numReplicas = 1
 
 [networking]
 staticOutboundIp = true
