@@ -140,4 +140,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:3000/health || exit 1
 
 # Comando de inicialização
-CMD ["/app/scripts/start-services.sh"] 
+CMD ["/app/scripts/start-services.sh"]
+
+# Comando alternativo para Railway
+# CMD ["/app/scripts/start-railway.sh"] 

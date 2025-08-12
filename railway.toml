@@ -1,15 +1,10 @@
 [build]
-builder = "NIXPACKS"
-buildCommand = "echo 'Running custom build command'"
-rootDirectory = "/nodejs/apis"
-watchPaths = ["src/**", "package.json"]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile.railway"
 
 [deploy]
-startCommand = "node dist/index.js"
-preDeployCommand = ["npm install", "npm run migrate"]
 healthcheckPath = "/healthz"
 healthcheckTimeout = 300
-restartPolicyType = "on-failure"
 
 [deploy.multiRegionConfig.us-west2]
 numReplicas = 1

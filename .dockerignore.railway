@@ -1,0 +1,40 @@
+# Arquivos e diretórios a serem ignorados no build do Railway
+node_modules
+npm-debug.log
+.git
+.gitignore
+README.md
+.env
+.nyc_output
+coverage
+.nyc_output
+.coverage
+.cache
+.parcel-cache
+.next
+.nuxt
+dist
+build
+.DS_Store
+*.tgz
+*.tar.gz
+
+# Diretórios específicos do monorepo que não são necessários
+python/
+golang/
+deploy/
+docs/
+_prompts/
+*.md
+Makefile
+docker-compose.yml
+Dockerfile
+.dockerignore
+
+# Logs
+logs
+*.log
+
+# Arquivos temporários
+tmp/
+temp/ 
