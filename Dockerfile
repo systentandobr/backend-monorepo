@@ -3,14 +3,42 @@
 
 FROM node:18-alpine
 
+# Definir build args para variáveis de ambiente
+ARG USER_DB
+ARG PASS_DB
+ARG HOST_DB
+
+# Definir variáveis de ambiente durante o build
+ENV USER_DB=$USER_DB
+ENV PASS_DB=$PASS_DB
+ENV HOST_DB=$HOST_DB
+
 # Instalar curl e ferramentas de rede para debug
-RUN apk add --no-cache curl netcat-openbsd telnet
+RUN apk add --no-cache curl netcat-openbsd telnet bind-tools
 
 # Instalar yarn
 RUN npm install -g yarn
 
 # Configurar diretório de trabalho
 WORKDIR /app
+
+# Teste de IP de saída durante o build
+RUN echo "=== TESTE DE IP DURANTE BUILD ===" && \
+    echo "Data/Hora: $(date)" && \
+    echo "IP Público (ifconfig.me):" && \
+    curl -s ifconfig.me || echo "Erro ao obter IP" && \
+    echo "IP Público (ipinfo.io):" && \
+    curl -s ipinfo.io/ip || echo "Erro ao obter IP" && \
+    echo "IP Público (icanhazip.com):" && \
+    curl -s icanhazip.com || echo "Erro ao obter IP" && \
+    echo "=== FIM DO TESTE DE IP ==="
+
+# Copiar script de teste MongoDB
+COPY test-mongodb-build.sh /app/test-mongodb-build.sh
+RUN chmod +x /app/test-mongodb-build.sh
+
+# Teste de conectividade MongoDB (se variáveis estiverem disponíveis)
+RUN /app/test-mongodb-build.sh
 
 # Copiar package.json limpo
 COPY nodejs/apis/package.json.clean ./package.json
