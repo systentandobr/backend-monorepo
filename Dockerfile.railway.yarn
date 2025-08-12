@@ -1,25 +1,24 @@
-# Dockerfile específico para Railway
-# Versão ultra-simplificada para evitar problemas de build
+# Dockerfile para Railway usando Yarn
+# Evita bug do npm com pnpm-lock.yaml
 
 FROM node:18-alpine
 
 # Instalar curl para health check
 RUN apk add --no-cache curl
 
-# Instalar pnpm
-RUN npm install -g pnpm
+# Instalar yarn
+RUN npm install -g yarn
 
 # Configurar diretório de trabalho
 WORKDIR /app
 
-# Copiar package.json e pnpm-lock.yaml
-COPY nodejs/apis/package.json ./
-COPY nodejs/apis/pnpm-lock.yaml ./
+# Copiar package.json limpo
+COPY nodejs/apis/package.json.clean ./package.json
 
-# Instalar dependências
-RUN pnpm install --frozen-lockfile
+# Instalar dependências com yarn
+RUN yarn install --frozen-lockfile
 
-# Copiar código fonte (apenas o necessário)
+# Copiar código fonte
 COPY nodejs/apis/apps/ ./apps/
 COPY nodejs/apis/libs/ ./libs/
 COPY nodejs/apis/nest-cli.json ./
@@ -28,7 +27,7 @@ COPY nodejs/apis/.eslintrc.js ./
 COPY nodejs/apis/.prettierrc ./
 
 # Build da aplicação
-RUN pnpm run build
+RUN yarn build
 
 # Expor porta
 EXPOSE 3000

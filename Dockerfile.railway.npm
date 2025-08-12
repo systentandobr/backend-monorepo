@@ -1,4 +1,4 @@
-# Dockerfile específico para Railway
+# Dockerfile alternativo para Railway usando npm
 # Versão ultra-simplificada para evitar problemas de build
 
 FROM node:18-alpine
@@ -6,18 +6,14 @@ FROM node:18-alpine
 # Instalar curl para health check
 RUN apk add --no-cache curl
 
-# Instalar pnpm
-RUN npm install -g pnpm
-
 # Configurar diretório de trabalho
 WORKDIR /app
 
-# Copiar package.json e pnpm-lock.yaml
+# Copiar package.json
 COPY nodejs/apis/package.json ./
-COPY nodejs/apis/pnpm-lock.yaml ./
 
 # Instalar dependências
-RUN pnpm install --frozen-lockfile
+RUN npm install
 
 # Copiar código fonte (apenas o necessário)
 COPY nodejs/apis/apps/ ./apps/
@@ -28,7 +24,7 @@ COPY nodejs/apis/.eslintrc.js ./
 COPY nodejs/apis/.prettierrc ./
 
 # Build da aplicação
-RUN pnpm run build
+RUN npm run build
 
 # Expor porta
 EXPOSE 3000

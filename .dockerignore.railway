@@ -1,40 +1,103 @@
-# Arquivos e diretórios a serem ignorados no build do Railway
-node_modules
-npm-debug.log
+# .dockerignore específico para Railway
+# Exclui apenas arquivos desnecessários para o build
+
+# Git
 .git
 .gitignore
+.gitattributes
+
+# Documentação
 README.md
-.env
+README-DEPLOY.md
+docs/
+*.md
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory
+coverage/
+*.lcov
 .nyc_output
-coverage
-.nyc_output
-.coverage
+
+# Optional npm cache
+.npm
+.eslintcache
+
+# Cache directories
 .cache
 .parcel-cache
-.next
-.nuxt
-dist
-build
-.DS_Store
-*.tgz
-*.tar.gz
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
 
-# Diretórios específicos do monorepo que não são necessários
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Environment files
+.env
+.env.test
+.env.local
+.env.production
+
+# Next.js build output
+.next
+
+# Nuxt.js build output
+.nuxt
+
+# Gatsby files
+public
+
+# Storybook build outputs
+.out
+.storybook-out
+
+# Temporary folders
+tmp/
+temp/
+
+# Editor directories
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Diretórios específicos do monorepo que não são necessários para o Railway
 python/
 golang/
 deploy/
-docs/
 _prompts/
-*.md
 Makefile
 docker-compose.yml
 Dockerfile
 .dockerignore
+railway.toml
 
-# Logs
-logs
-*.log
-
-# Arquivos temporários
-tmp/
-temp/ 
+# Excluir node_modules existentes (serão reinstalados)
+nodejs/apis/node_modules/ 
