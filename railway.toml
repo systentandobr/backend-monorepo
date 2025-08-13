@@ -1,0 +1,11 @@
+[build]
+builder = "DOCKERFILE"
+[deploy]
+healthcheckPath = "/debug/health"
+healthcheckTimeout = 300
+
+[deploy.multiRegionConfig.us-west2]
+numReplicas = 1
+
+[networking]
+staticOutboundIp = true

@@ -27,14 +27,17 @@
     "@nestjs/swagger": "^7.3.0",
     "axios": "^1.6.0",
     "bcrypt": "^5.1.1",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
     "express": "^4.21.0",
     "mongoose": "^7.5.3",
+    "multer": "^2.0.2",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "pdf-parse": "^1.1.1",
     "reflect-metadata": "^0.2.0",
-    "uuid": "^9.0.1",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
@@ -103,4 +106,4 @@
       "^@lib/utils(|/.*)$": "<rootDir>/libs/utils/src/$1"
     }
   }
-} 
+}

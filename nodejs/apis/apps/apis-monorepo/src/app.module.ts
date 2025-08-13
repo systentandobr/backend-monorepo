@@ -6,6 +6,7 @@ import { SysSegurancaModule } from 'apps/sys-seguranca/src/sys-seguranca.module'
 import { SysAssistenteEstudosModule } from 'apps/sys-assistente-estudos/src/sys-assistente-estudos.module';
 import { SysPagamentosModule } from 'apps/sys-pagamentos/src/sys-pagamentos.module';
 import { SysProdutosModule } from 'apps/sys-produtos/src/sys-produtos.module';
+import { LifeTrackerModule } from 'apps/life-tracker/src/life-tracker.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { SysProdutosModule } from 'apps/sys-produtos/src/sys-produtos.module';
     SysAssistenteEstudosModule,
     SysPagamentosModule,
     SysProdutosModule,
+    LifeTrackerModule,
   ],
   controllers: [AppController, DebugController],
   providers: [AppService],

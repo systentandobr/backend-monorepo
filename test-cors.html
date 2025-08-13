@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste CORS - Life Tracker API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste CORS - Life Tracker API</h1>
+        <p>Este teste verifica se o CORS está configurado corretamente para permitir requisições do frontend.</p>
+        
+        <div class="test-section info">
+            <h3>📋 Informações do Teste</h3>
+            <p><strong>Frontend:</strong> http://localhost:3000 (simulado)</p>
+            <p><strong>Backend:</strong> http://localhost:9090</p>
+            <p><strong>Endpoint de teste:</strong> /habits</p>
+        </div>
+
+        <div class="test-section">
+            <h3>🔧 Testes Disponíveis</h3>
+            <button onclick="testCORS()">Testar CORS - GET /habits</button>
+            <button onclick="testPreflight()">Testar Preflight OPTIONS</button>
+            <button onclick="testWithCredentials()">Testar com Credentials</button>
+            <button onclick="clearResults()">Limpar Resultados</button>
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:9090';
+        const resultsDiv = document.getElementById('results');
+
+        function addResult(title, content, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `test-section ${type}`;
+            div.innerHTML = `
+                <h4>${title}</h4>
+                <pre>${content}</pre>
+            `;
+            resultsDiv.appendChild(div);
+        }
+
+        function clearResults() {
+            resultsDiv.innerHTML = '';
+        }
+
+        async function testCORS() {
+            try {
+                addResult('🔄 Testando CORS - GET /habits', 'Fazendo requisição...', 'info');
+                
+                const response = await fetch(`${API_BASE}/habits`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const data = await response.json();
+                
+                addResult('✅ CORS Funcionando!', 
+                    `Status: ${response.status}\nHeaders: ${JSON.stringify(Object.fromEntries(response.headers.entries()), null, 2)}\nData: ${JSON.stringify(data, null, 2)}`, 
+                    'success'
+                );
+            } catch (error) {
+                addResult('❌ Erro CORS', 
+                    `Erro: ${error.message}\n\nDetalhes:\n${error.stack}`, 
+                    'error'
+                );
+            }
+        }
+
+        async function testPreflight() {
+            try {
+                addResult('🔄 Testando Preflight OPTIONS', 'Fazendo requisição OPTIONS...', 'info');
+                
+                const response = await fetch(`${API_BASE}/habits`, {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Request-Method': 'POST',
+                        'Access-Control-Request-Headers': 'Content-Type, Authorization',
+                    },
+                });
+
+                addResult('✅ Preflight Funcionando!', 
+                    `Status: ${response.status}\nHeaders: ${JSON.stringify(Object.fromEntries(response.headers.entries()), null, 2)}`, 
+                    'success'
+                );
+            } catch (error) {
+                addResult('❌ Erro Preflight', 
+                    `Erro: ${error.message}\n\nDetalhes:\n${error.stack}`, 
+                    'error'
+                );
+            }
+        }
+
+        async function testWithCredentials() {
+            try {
+                addResult('🔄 Testando com Credentials', 'Fazendo requisição com credentials...', 'info');
+                
+                const response = await fetch(`${API_BASE}/habits`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const data = await response.json();
+                
+                addResult('✅ Credentials Funcionando!', 
+                    `Status: ${response.status}\nHeaders: ${JSON.stringify(Object.fromEntries(response.headers.entries()), null, 2)}\nData: ${JSON.stringify(data, null, 2)}`, 
+                    'success'
+                );
+            } catch (error) {
+                addResult('❌ Erro com Credentials', 
+                    `Erro: ${error.message}\n\nDetalhes:\n${error.stack}`, 
+                    'error'
+                );
+            }
+        }
+
+        // Teste automático ao carregar a página
+        window.addEventListener('load', () => {
+            addResult('🚀 Página Carregada', 'Clique nos botões acima para testar o CORS.', 'info');
+        });
+    </script>
+</body>
+</html> 

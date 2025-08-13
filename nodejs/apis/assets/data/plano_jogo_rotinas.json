@@ -1,0 +1,822 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2025-01-15T10:00:00Z",
+  "locale": "pt-BR",
+  "user_profile": {
+    "name": "Maria Aparecida (alias)",
+    "age": 69,
+    "sex": "F",
+    "notes": [
+      "Doença renal crônica (estimada pelo TGF ~21,7 ml/min/1,73m²)",
+      "Gastrite antral com metaplasia intestinal leve; H. pylori negativo",
+      "Diabetes mellitus (HbA1c 7,1%)",
+      "Anemia (Hb 10,0 g/dL; Ferritina 11,1 ng/mL)",
+      "Vitamin D baixa (25-OH 18,3 ng/mL)",
+      "PTH levemente elevado (90 pg/mL)",
+      "Albuminúria A2 (RAC 38 mg/g)",
+      "Ansiedade, problema bucal, catarata (um olho)"
+    ]
+  },
+  "domains": {
+    "healthness": {
+      "goals": [
+        {
+          "id": "renal_protection",
+          "label": "Proteger a função renal",
+          "priority": 10
+        },
+        {
+          "id": "glycemic_control",
+          "label": "Melhorar controle glicêmico",
+          "priority": 9
+        },
+        {
+          "id": "anemia_support",
+          "label": "Tratar/amenizar anemia",
+          "priority": 9
+        },
+        {
+          "id": "gastritis_care",
+          "label": "Reduzir irritação gástrica",
+          "priority": 8
+        },
+        {
+          "id": "bone_health",
+          "label": "Proteger saúde óssea",
+          "priority": 7
+        },
+        {
+          "id": "mental_health",
+          "label": "Reduzir ansiedade e promover bem‑estar",
+          "priority": 8
+        }
+      ],
+      "habits": [
+        {
+          "id": "hidratacao",
+          "name": "Hidratação controlada",
+          "icon": "droplets",
+          "color": "#2E86AB",
+          "description": "Respeitar limite diário de líquidos conforme orientação médica",
+          "target": "Diário",
+          "timeOfDay": "morning"
+        },
+        {
+          "id": "refeicao_planejada",
+          "name": "Refeição planejada",
+          "icon": "utensils",
+          "color": "#27AE60",
+          "description": "Seguir plano alimentar específico para condição renal",
+          "target": "Diário",
+          "timeOfDay": "all"
+        },
+        {
+          "id": "atividade_fisica",
+          "name": "Atividade física leve",
+          "icon": "walk",
+          "color": "#8E44AD",
+          "description": "Caminhada, alongamento ou hidroginástica conforme liberação médica",
+          "target": "Diário",
+          "timeOfDay": "morning"
+        },
+        {
+          "id": "relaxamento",
+          "name": "Relaxamento e meditação",
+          "icon": "heart",
+          "color": "#E67E22",
+          "description": "Oração, respiração 4-4 ou meditação por pelo menos 5 minutos",
+          "target": "Diário",
+          "timeOfDay": "evening"
+        },
+        {
+          "id": "banho_sol",
+          "name": "Banho de sol",
+          "icon": "sun",
+          "color": "#F39C12",
+          "description": "Exposição solar leve por 10-15 minutos para vitamina D",
+          "target": "Diário",
+          "timeOfDay": "morning"
+        },
+        {
+          "id": "higiene_sono",
+          "name": "Higiene do sono",
+          "icon": "moon",
+          "color": "#34495E",
+          "description": "Preparação adequada para dormir com rotina relaxante",
+          "target": "Diário",
+          "timeOfDay": "evening"
+        }
+      ],
+      "game": {
+        "board": {
+          "rows": 5,
+          "cols": 10,
+          "milestones": [
+            {
+              "tile": 10,
+              "label": "Menos inchaço, mais energia"
+            },
+            {
+              "tile": 20,
+              "label": "Força e ânimo maiores"
+            },
+            {
+              "tile": 30,
+              "label": "Rotina consistente"
+            },
+            {
+              "tile": 50,
+              "label": "Semana completa 🎉"
+            }
+          ]
+        },
+        "scoring_rules": [
+          {
+            "action": "refeicao_ok",
+            "points": 1,
+            "desc": "Fez a refeição planejada"
+          },
+          {
+            "action": "agua_ok",
+            "points": 1,
+            "desc": "Respeitou o limite diário de líquidos"
+          },
+          {
+            "action": "atividade_fisica",
+            "points": 1,
+            "desc": "Realizou atividade física leve"
+          },
+          {
+            "action": "relaxamento",
+            "points": 1,
+            "desc": "Fez oração/respiração/meditação (≥5 min)"
+          }
+        ],
+        "weekly_goal_points": 30
+      },
+      "meal_plan_week": {
+        "days": [
+          "segunda",
+          "terca",
+          "quarta",
+          "quinta",
+          "sexta",
+          "sabado",
+          "domingo"
+        ],
+        "meals": [
+          "cafe",
+          "lanche_manha",
+          "almoco",
+          "lanche_tarde",
+          "jantar",
+          "ceia"
+        ],
+        "plan": {
+          "segunda": {
+            "cafe": "Mingau de aveia com maçã verde cozida",
+            "lanche_manha": "Pera cozida",
+            "almoco": "Arroz + pescada + abóbora cozida",
+            "lanche_tarde": "Chá camomila + biscoito integral",
+            "jantar": "Sopa de mandioquinha + frango desfiado",
+            "ceia": "Chá calmante"
+          },
+          "terca": {
+            "cafe": "Pão integral + ricota sem sal",
+            "lanche_manha": "Melão",
+            "almoco": "Arroz + frango + chuchu",
+            "lanche_tarde": "Gelatina sem açúcar",
+            "jantar": "Purê de abóbora + peixe",
+            "ceia": "Chá de erva‑doce"
+          },
+          "quarta": {
+            "cafe": "Omelete de claras com chuchu",
+            "lanche_manha": "Maçã verde",
+            "almoco": "Macarrão integral + tilápia",
+            "lanche_tarde": "Pão integral pequeno + azeite",
+            "jantar": "Sopa de cenoura",
+            "ceia": "Chá de camomila"
+          },
+          "quinta": {
+            "cafe": "Mingau de aveia + canela",
+            "lanche_manha": "Gelatina sem açúcar",
+            "almoco": "Arroz + frango + couve cozida",
+            "lanche_tarde": "Chá hortelã suave + torrada",
+            "jantar": "Creme de chuchu",
+            "ceia": "Chá de hortelã"
+          },
+          "sexta": {
+            "cafe": "Pão integral + pasta de frango",
+            "lanche_manha": "Pera cozida",
+            "almoco": "Arroz + pescada + cenoura",
+            "lanche_tarde": "Gelatina sem açúcar",
+            "jantar": "Purê de abobrinha + frango",
+            "ceia": "Chá de camomila"
+          },
+          "sabado": {
+            "cafe": "Crepioca de claras + queijo fresco",
+            "lanche_manha": "Melão",
+            "almoco": "Purê de abóbora + frango",
+            "lanche_tarde": "Pão integral + pepino",
+            "jantar": "Sopa de legumes claros",
+            "ceia": "Chá de erva‑doce"
+          },
+          "domingo": {
+            "cafe": "Pão integral + pepino",
+            "lanche_manha": "Mamão (porção pequena)",
+            "almoco": "Arroz + frango + abobrinha",
+            "lanche_tarde": "Chá de erva‑doce + biscoito integral",
+            "jantar": "Creme de abóbora",
+            "ceia": "Chá de camomila"
+          }
+        }
+      },
+      "routines": {
+        "daily_schedule": [
+          {
+            "time": "06:30",
+            "activity": "Higiene e oração (2 min de respiração 4-4)"
+          },
+          {
+            "time": "07:00",
+            "activity": "Banho de sol leve (10–15 min)"
+          },
+          {
+            "time": "07:30",
+            "activity": "Café da manhã"
+          },
+          {
+            "time": "08:30",
+            "activity": "Caminhada/alongamento 15–20 min ou pilates suave"
+          },
+          {
+            "time": "09:30",
+            "activity": "Atividade mental (leitura/artesanato) 20 min"
+          },
+          {
+            "time": "12:00",
+            "activity": "Almoço"
+          },
+          {
+            "time": "13:00",
+            "activity": "Descanso / música relaxante"
+          },
+          {
+            "time": "15:00",
+            "activity": "Atividade social / jardinagem"
+          },
+          {
+            "time": "16:00",
+            "activity": "Lanche da tarde"
+          },
+          {
+            "time": "17:00",
+            "activity": "Hidroginástica ou dança suave 15 min (se liberado)"
+          },
+          {
+            "time": "18:30",
+            "activity": "Momento espiritual/relaxamento guiado"
+          },
+          {
+            "time": "19:00",
+            "activity": "Jantar leve"
+          },
+          {
+            "time": "21:00",
+            "activity": "Higiene do sono; escovar dentes e preparar para dormir"
+          },
+          {
+            "time": "21:30",
+            "activity": "Dormir"
+          }
+        ]
+      },
+      "latest_labs": {
+        "creatinina_mg_dl": 2.4,
+        "ureia_mg_dl": 78.51,
+        "egfr_ml_min_1_73": 21.7,
+        "fosforo_mg_dl": 6.6,
+        "calcio_total_mg_dl": 8.749,
+        "calcio_ionico_mmol_l": 1.2,
+        "sodio_mmol_l": 143.0,
+        "potassio_mmol_l": 3.6,
+        "hba1c_percent": 7.1,
+        "glicose_mg_dl": 68.98,
+        "hb_g_dl": 10.0,
+        "ferritina_ng_ml": 11.1,
+        "vitamina_d_25oh_ng_ml": 18.3,
+        "pth_pg_ml": 90.0,
+        "sangue_oculto_fezes": "positivo"
+      },
+      "diet_parameters": {
+        "protein_g_per_day_target": {
+          "min": 40,
+          "max": 50,
+          "note": "Ajustar com nefrologista; estimado ~0,8 g/kg/dia conforme tolerância e estágio renal."
+        },
+        "sodium_mg_per_day_max": 2000,
+        "phosphorus_mg_per_day_target": {
+          "max": 900,
+          "note": "Preferir fontes naturais e evitar ultraprocessados/colas."
+        },
+        "potassium_strategy": {
+          "restriction": "moderada",
+          "techniques": [
+            "dupla cocção e descarte da água",
+            "preferir frutas de menor potássio (maçã, pera, melão)"
+          ],
+          "avoid_examples": [
+            "banana",
+            "laranja",
+            "manga",
+            "tomate em excesso",
+            "batata sem pré-cozimento"
+          ]
+        },
+        "fiber_g_per_day_target": 20,
+        "fluid_limit_ml_per_day": null,
+        "fluid_note": "Definir com o médico de acordo com balanço hídrico/edema. Caso não haja restrição: 1500–1800 ml/dia."
+      },
+      "shopping_list": {
+        "Proteinas": [
+          "filé de pescada",
+          "tilápia",
+          "frango sem pele",
+          "claras de ovo",
+          "ricota sem sal"
+        ],
+        "Carboidratos": [
+          "arroz branco",
+          "pão integral sem açúcar",
+          "aveia em flocos finos",
+          "macarrão integral"
+        ],
+        "Legumes_Verduras": [
+          "abóbora",
+          "chuchu",
+          "cenoura",
+          "alface americana",
+          "pepino",
+          "couve cozida"
+        ],
+        "Frutas": [
+          "maçã verde",
+          "pera",
+          "melão",
+          "mamão (porção pequena)"
+        ],
+        "Outros": [
+          "azeite extra virgem",
+          "canela",
+          "gelatina sem açúcar",
+          "leite sem lactose",
+          "chá de camomila",
+          "chá de erva‑doce",
+          "hortelã suave"
+        ]
+      },
+      "recipes": [
+        {
+          "id": "mingau_aveia_maca",
+          "title": "Mingau de aveia com maçã verde",
+          "servings": 1,
+          "ingredients": [
+            {
+              "item": "aveia em flocos",
+              "qty": "2 colheres sopa"
+            },
+            {
+              "item": "leite sem lactose",
+              "qty": "200 ml"
+            },
+            {
+              "item": "maçã verde",
+              "qty": "1/2 unidade, cozida em cubos"
+            },
+            {
+              "item": "canela",
+              "qty": "a gosto"
+            }
+          ],
+          "steps": [
+            "Cozinhe a aveia no leite até engrossar (5–7 min).",
+            "Adicione a maçã verde previamente cozida e a canela.",
+            "Servir morno."
+          ],
+          "renal_tip": "Cozinhar a maçã em água e descartar reduz ligeiramente o potássio."
+        },
+        {
+          "id": "frango_desfiado",
+          "title": "Frango desfiado suave",
+          "servings": 4,
+          "ingredients": [
+            {
+              "item": "peito de frango sem pele",
+              "qty": "400 g"
+            },
+            {
+              "item": "cebola pequena",
+              "qty": "1/2 un"
+            },
+            {
+              "item": "salsinha",
+              "qty": "1 col. sopa"
+            },
+            {
+              "item": "água",
+              "qty": "cobrir"
+            }
+          ],
+          "steps": [
+            "Cozinhe o frango com a cebola até ficar macio.",
+            "Desfie, ajuste com salsinha e use em sopas/purês."
+          ],
+          "renal_tip": "Evitar caldos prontos (sódio/fósforo)."
+        },
+        {
+          "id": "sopa_mandioquinha",
+          "title": "Sopa de mandioquinha e cenoura",
+          "servings": 3,
+          "ingredients": [
+            {
+              "item": "mandioquinha",
+              "qty": "300 g, em cubos"
+            },
+            {
+              "item": "cenoura",
+              "qty": "150 g, em rodelas"
+            },
+            {
+              "item": "azeite extra virgem",
+              "qty": "1 col. sopa"
+            }
+          ],
+          "steps": [
+            "Cozinhe os legumes em bastante água; descarte parte da água.",
+            "Bata no liquidificador até creme e finalize com azeite."
+          ],
+          "renal_tip": "Dupla cocção ajuda a reduzir potássio."
+        }
+      ],
+      "supplementation": [
+        {
+          "name": "Vitamina D3",
+          "suggested_dose_ui_per_day": 2000,
+          "requires_medical_supervision": true
+        },
+        {
+          "name": "Ferro (bisglicinato)",
+          "suggested_dose_mg_elemental": 30,
+          "timing": "em jejum com vitamina C",
+          "requires_medical_supervision": true
+        }
+      ],
+      "notes_for_doctor_review": [
+        "Confirmar necessidade de restrição de líquidos e dose ideal de proteína conforme estágio da DRC.",
+        "Avaliar reposição de vitamina D e ferro, e possíveis quelantes de fósforo se indicado.",
+        "Ajustar plano conforme tolerância gástrica e saúde bucal (texturas macias)."
+      ]
+    },
+    "finances": {
+      "goals": [
+        {
+          "id": "emergency_fund",
+          "label": "Criar fundo de emergência",
+          "priority": 9
+        },
+        {
+          "id": "debt_reduction",
+          "label": "Reduzir dívidas",
+          "priority": 8
+        },
+        {
+          "id": "investment_start",
+          "label": "Iniciar investimentos",
+          "priority": 7
+        }
+      ],
+      "habits": [
+        {
+          "id": "budget_tracking",
+          "name": "Controle de orçamento",
+          "icon": "calculator",
+          "color": "#27AE60",
+          "description": "Registrar todas as despesas e receitas diariamente",
+          "target": "Diário",
+          "timeOfDay": "evening"
+        },
+        {
+          "id": "savings_goal",
+          "name": "Poupança automática",
+          "icon": "piggy-bank",
+          "color": "#2E86AB",
+          "description": "Separar 10% da renda para poupança",
+          "target": "Mensal",
+          "timeOfDay": "all"
+        },
+        {
+          "id": "investment_research",
+          "name": "Pesquisa de investimentos",
+          "icon": "trending-up",
+          "color": "#8E44AD",
+          "description": "Estudar opções de investimento por 15 minutos",
+          "target": "Semanal",
+          "timeOfDay": "afternoon"
+        }
+      ],
+      "portfolio": {
+        "total_value": 15000,
+        "total_return": 8.5,
+        "assets": [
+          {
+            "id": "tesouro_direto",
+            "name": "Tesouro Direto",
+            "value": 8000,
+            "return": 12.5,
+            "allocation": 53.3
+          },
+          {
+            "id": "cdb",
+            "name": "CDB",
+            "value": 5000,
+            "return": 6.2,
+            "allocation": 33.3
+          },
+          {
+            "id": "acoes",
+            "name": "Ações",
+            "value": 2000,
+            "return": 15.8,
+            "allocation": 13.4
+          }
+        ]
+      },
+      "financial_goals": [
+        {
+          "id": "emergency_6_months",
+          "name": "Fundo de emergência 6 meses",
+          "target": 30000,
+          "current": 15000,
+          "deadline": "2024-12-31"
+        },
+        {
+          "id": "vacation_fund",
+          "name": "Férias em família",
+          "target": 8000,
+          "current": 2000,
+          "deadline": "2024-06-30"
+        }
+      ]
+    },
+    "business": {
+      "goals": [
+        {
+          "id": "business_plan",
+          "label": "Desenvolver plano de negócios",
+          "priority": 9
+        },
+        {
+          "id": "market_research",
+          "label": "Pesquisa de mercado",
+          "priority": 8
+        },
+        {
+          "id": "client_acquisition",
+          "label": "Aquisição de clientes",
+          "priority": 7
+        }
+      ],
+      "habits": [
+        {
+          "id": "business_planning",
+          "name": "Planejamento de negócios",
+          "icon": "briefcase",
+          "color": "#E67E22",
+          "description": "Dedicar 30 minutos ao planejamento estratégico",
+          "target": "Diário",
+          "timeOfDay": "morning"
+        },
+        {
+          "id": "networking",
+          "name": "Networking",
+          "icon": "users",
+          "color": "#3498DB",
+          "description": "Participar de eventos ou conectar com profissionais",
+          "target": "Semanal",
+          "timeOfDay": "afternoon"
+        },
+        {
+          "id": "skill_development",
+          "name": "Desenvolvimento de habilidades",
+          "icon": "book-open",
+          "color": "#9B59B6",
+          "description": "Estudar ou praticar habilidades relacionadas ao negócio",
+          "target": "Diário",
+          "timeOfDay": "evening"
+        }
+      ],
+      "opportunities": [
+        {
+          "id": "consultoria_saude",
+          "title": "Consultoria em Saúde",
+          "description": "Oferecer consultoria especializada em saúde renal",
+          "investment": 5000,
+          "potential_return": 15000,
+          "risk": "baixo",
+          "timeline": "6 meses"
+        },
+        {
+          "id": "app_saude",
+          "title": "App de Monitoramento",
+          "description": "Desenvolver app para monitoramento de saúde renal",
+          "investment": 15000,
+          "potential_return": 50000,
+          "risk": "médio",
+          "timeline": "12 meses"
+        }
+      ],
+      "business_plan_progress": {
+        "market_research": 75,
+        "financial_planning": 60,
+        "legal_structure": 40,
+        "marketing_strategy": 30
+      },
+      "projects": [
+        {
+          "id": "website",
+          "name": "Website profissional",
+          "status": "em_andamento",
+          "progress": 60,
+          "deadline": "2024-03-31"
+        },
+        {
+          "id": "portfolio",
+          "name": "Portfolio de serviços",
+          "status": "planejado",
+          "progress": 20,
+          "deadline": "2024-04-30"
+        }
+      ]
+    },
+    "productivity": {
+      "goals": [
+        {
+          "id": "time_management",
+          "label": "Melhorar gestão do tempo",
+          "priority": 8
+        },
+        {
+          "id": "skill_learning",
+          "label": "Aprender novas habilidades",
+          "priority": 7
+        },
+        {
+          "id": "goal_achievement",
+          "label": "Alcançar metas pessoais",
+          "priority": 9
+        }
+      ],
+      "habits": [
+        {
+          "id": "morning_routine",
+          "name": "Rotina matinal",
+          "icon": "sunrise",
+          "color": "#F39C12",
+          "description": "Acordar cedo e seguir rotina matinal estruturada",
+          "target": "Diário",
+          "timeOfDay": "morning"
+        },
+        {
+          "id": "task_planning",
+          "name": "Planejamento de tarefas",
+          "icon": "check-square",
+          "color": "#27AE60",
+          "description": "Listar e priorizar tarefas do dia",
+          "target": "Diário",
+          "timeOfDay": "morning"
+        },
+        {
+          "id": "learning_time",
+          "name": "Tempo de aprendizado",
+          "icon": "book",
+          "color": "#8E44AD",
+          "description": "Dedicar 30 minutos ao aprendizado de algo novo",
+          "target": "Diário",
+          "timeOfDay": "afternoon"
+        },
+        {
+          "id": "evening_review",
+          "name": "Revisão noturna",
+          "icon": "moon",
+          "color": "#34495E",
+          "description": "Revisar conquistas do dia e planejar o próximo",
+          "target": "Diário",
+          "timeOfDay": "evening"
+        }
+      ]
+    }
+  },
+  "integrated_goals": [
+    {
+      "id": "health_financial_balance",
+      "name": "Equilíbrio Saúde-Finanças",
+      "domains": ["healthness", "finances"],
+      "description": "Manter saúde renal estável enquanto constrói segurança financeira",
+      "progress": 65,
+      "target_date": "2024-12-31",
+      "key_metrics": ["Creatinina estável", "Fundo de emergência 6 meses"]
+    },
+    {
+      "id": "business_health_synergy",
+      "name": "Sinergia Negócios-Saúde",
+      "domains": ["business", "healthness"],
+      "description": "Desenvolver negócio relacionado à saúde renal",
+      "progress": 40,
+      "target_date": "2024-06-30",
+      "key_metrics": ["Plano de negócios completo", "Experiência pessoal como diferencial"]
+    },
+    {
+      "id": "productivity_wellness",
+      "name": "Produtividade e Bem-estar",
+      "domains": ["productivity", "healthness"],
+      "description": "Manter alta produtividade sem comprometer a saúde",
+      "progress": 75,
+      "target_date": "2024-12-31",
+      "key_metrics": ["Rotina consistente", "Metas alcançadas", "Saúde estável"]
+    }
+  ],
+  "routines": {
+    "daily_schedule": [
+      {
+        "time": "06:30",
+        "activity": "Higiene e oração (2 min de respiração 4-4)"
+      },
+      {
+        "time": "07:00",
+        "activity": "Banho de sol leve (10–15 min)"
+      },
+      {
+        "time": "07:30",
+        "activity": "Café da manhã"
+      },
+      {
+        "time": "08:30",
+        "activity": "Caminhada/alongamento 15–20 min ou pilates suave"
+      },
+      {
+        "time": "09:30",
+        "activity": "Atividade mental (leitura/artesanato) 20 min"
+      },
+      {
+        "time": "12:00",
+        "activity": "Almoço"
+      },
+      {
+        "time": "13:00",
+        "activity": "Descanso / música relaxante"
+      },
+      {
+        "time": "15:00",
+        "activity": "Atividade social / jardinagem"
+      },
+      {
+        "time": "16:00",
+        "activity": "Lanche da tarde"
+      },
+      {
+        "time": "17:00",
+        "activity": "Hidroginástica ou dança suave 15 min (se liberado)"
+      },
+      {
+        "time": "18:30",
+        "activity": "Momento espiritual/relaxamento guiado"
+      },
+      {
+        "time": "19:00",
+        "activity": "Jantar leve"
+      },
+      {
+        "time": "21:00",
+        "activity": "Higiene do sono; escovar dentes e preparar para dormir"
+      },
+      {
+        "time": "21:30",
+        "activity": "Dormir"
+      }
+    ]
+  },
+  "ui_hints": {
+    "colors": {
+      "healthness": "#2E86AB",
+      "finances": "#27AE60",
+      "business": "#E67E22",
+      "productivity": "#8E44AD"
+    },
+    "icons": {
+      "healthness": "heart",
+      "finances": "dollar-sign",
+      "business": "briefcase",
+      "productivity": "target"
+    }
+  }
+}

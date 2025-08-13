@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  life-tracker-api:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://mongo:27017/life-tracker
+      - PORT=3000
+    depends_on:
+      - mongo
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - life-tracker-network
+
+  mongo:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=life-tracker
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - life-tracker-network
+
+volumes:
+  mongo_data:
+
+networks:
+  life-tracker-network:
+    driver: bridge 
