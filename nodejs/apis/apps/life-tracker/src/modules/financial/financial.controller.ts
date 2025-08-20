@@ -16,6 +16,11 @@ export class FinancialController {
     return this.financialService.getPortfolioSummary();
   }
 
+  @Get('portfolio/risk-analysis')
+  async getPortfolioRiskAnalysis(): Promise<ApiResponse<any>> {
+    return this.financialService.getPortfolioRiskAnalysis();
+  }
+
   @Get('assets')
   async getAssets(): Promise<ApiResponse<any[]>> {
     return this.financialService.getAssets();

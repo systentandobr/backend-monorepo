@@ -21,6 +21,11 @@ export class BusinessController {
     return this.businessService.createOpportunity(opportunityData);
   }
 
+  @Get('habits')
+  async getBusinessHabits(): Promise<ApiResponse<any[]>> {
+    return this.businessService.getBusinessHabits();
+  }
+
   @Get('projects')
   async getProjects(): Promise<ApiResponse<any[]>> {
     return this.businessService.getProjects();

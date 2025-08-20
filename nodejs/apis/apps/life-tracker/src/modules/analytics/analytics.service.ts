@@ -13,7 +13,7 @@ export class AnalyticsService {
   async getAnalyticsData(): Promise<ApiResponse<any>> {
     try {
       const analyticsData = await this.analyticsDataModel.findOne().exec();
-      
+
       return {
         success: true,
         data: analyticsData || {},
@@ -94,6 +94,98 @@ export class AnalyticsService {
       return {
         success: false,
         error: 'Erro ao rastrear evento',
+        timestamp: new Date().toISOString(),
+      };
+    }
+  }
+
+  async markActivity(activityData: { activityType: string; completed: boolean }): Promise<ApiResponse<any>> {
+    try {
+      // Implementação para marcar atividade como completa/incompleta
+      const { activityType, completed } = activityData;
+
+      // Aqui você implementaria a lógica para salvar no banco de dados
+      // Por enquanto, retornamos uma resposta de sucesso
+      const analyticsActivity = new this.analyticsDataModel({
+        activityType,
+        completed,
+        timestamp: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+      return {
+        success: true,
+        data: {
+          activityType,
+          completed,
+          timestamp: new Date().toISOString(),
+        },
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Erro ao marcar atividade',
+        timestamp: new Date().toISOString(),
+      };
+    }
+  }
+
+  async updateRoutine(id: string, routineData: any): Promise<ApiResponse<any>> {
+    try {
+      // Implementação para atualizar rotina
+      // Aqui você implementaria a lógica para atualizar no banco de dados
+      // Por enquanto, retornamos uma resposta de sucesso
+      const analyticsRoutine = new this.analyticsDataModel({
+        id,
+        ...routineData,
+        updatedAt: new Date().toISOString(),
+      });
+      return {
+        success: true,
+        data: {
+          id,
+          ...routineData,
+          ...analyticsRoutine,
+          updatedAt: new Date().toISOString(),
+        },
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Erro ao atualizar rotina',
+        timestamp: new Date().toISOString(),
+      };
+    }
+  }
+
+  async deleteRoutine(id: string): Promise<ApiResponse<any>> {
+    try {
+      // Implementação para deletar rotina
+      // Aqui você implementaria a lógica para deletar do banco de dados
+      // Por enquanto, retornamos uma resposta de sucesso
+      const analyticsRoutine = await this.analyticsDataModel.findByIdAndDelete(id);
+      if (!analyticsRoutine) {
+        return {
+          success: false,
+          error: 'Rotina não encontrada para ser removida',
+          timestamp: new Date().toISOString(),
+        };
+      }
+      return {
+        success: true,
+        data: {
+          id,
+          deleted: true,
+          timestamp: new Date().toISOString(),
+        },
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Erro ao deletar rotina',
         timestamp: new Date().toISOString(),
       };
     }

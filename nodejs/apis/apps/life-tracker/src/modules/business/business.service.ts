@@ -181,6 +181,66 @@ export class BusinessService {
     }
   }
 
+  async getBusinessHabits(): Promise<ApiResponse<any[]>> {
+    try {
+      // Implementação dos hábitos de negócio
+      // Baseado no frontend, retorna hábitos relacionados a negócios
+      const mockHabits = [
+        {
+          id: '1',
+          name: 'Curso de gestão',
+          description: 'Dedicar tempo para aprender sobre gestão de negócios',
+          category: 'learning',
+          frequency: 'weekly',
+          target: '3x por semana',
+          progress: 60,
+          completed: false,
+          linkedOpportunityId: '1',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          id: '2',
+          name: 'Networking',
+          description: 'Construir rede de contatos profissionais',
+          category: 'networking',
+          frequency: 'weekly',
+          target: '1 novo contato por semana',
+          progress: 25,
+          completed: false,
+          linkedOpportunityId: '2',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          id: '3',
+          name: 'Análise de mercado',
+          description: 'Pesquisar tendências e oportunidades',
+          category: 'planning',
+          frequency: 'daily',
+          target: '30 minutos por dia',
+          progress: 80,
+          completed: true,
+          linkedOpportunityId: '3',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      ];
+
+      return {
+        success: true,
+        data: mockHabits,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Erro ao carregar hábitos de negócio',
+        timestamp: new Date().toISOString(),
+      };
+    }
+  }
+
   async getBusinessAnalytics(): Promise<ApiResponse<any>> {
     try {
       const opportunities = await this.opportunityModel.find().exec();
