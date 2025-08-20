@@ -1,0 +1,71 @@
+{
+  "id": "financial_focused_template",
+  "name": "Foco Financeiro",
+  "description": "Template para usuários com foco em finanças e investimentos",
+  "domains": {
+    "finances": {
+      "goals": [
+        {
+          "id": "emergency_fund",
+          "label": "Criar fundo de emergência",
+          "priority": 9
+        },
+        {
+          "id": "investment_start",
+          "label": "Iniciar investimentos",
+          "priority": 8
+        }
+      ],
+      "habits": [
+        {
+          "id": "budget_tracking",
+          "name": "Controle de orçamento",
+          "target": "Diário"
+        },
+        {
+          "id": "monthly_savings",
+          "name": "Poupança mensal",
+          "target": "20% da renda"
+        }
+      ]
+    },
+    "productivity": {
+      "goals": [
+        {
+          "id": "financial_education",
+          "label": "Educação financeira",
+          "priority": 7
+        }
+      ],
+      "habits": [
+        {
+          "id": "financial_reading",
+          "name": "Leitura sobre finanças",
+          "target": "30 minutos diários"
+        }
+      ]
+    }
+  },
+  "daily_schedule": [
+    {
+      "time": "08:00",
+      "activity": "Revisão de gastos do dia anterior",
+      "domain": "finances"
+    },
+    {
+      "time": "12:00",
+      "activity": "Almoço econômico",
+      "domain": "finances"
+    },
+    {
+      "time": "19:00",
+      "activity": "Leitura sobre investimentos",
+      "domain": "productivity"
+    },
+    {
+      "time": "21:00",
+      "activity": "Planejamento financeiro semanal",
+      "domain": "finances"
+    }
+  ]
+}

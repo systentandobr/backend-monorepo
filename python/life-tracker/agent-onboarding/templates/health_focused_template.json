@@ -1,0 +1,76 @@
+{
+  "id": "health_focused_template",
+  "name": "Foco em Saúde",
+  "description": "Template para usuários com foco em saúde e bem-estar",
+  "domains": {
+    "healthness": {
+      "goals": [
+        {
+          "id": "improve_energy",
+          "label": "Melhorar nível de energia",
+          "priority": 9
+        },
+        {
+          "id": "better_sleep",
+          "label": "Melhorar qualidade do sono",
+          "priority": 8
+        }
+      ],
+      "habits": [
+        {
+          "id": "daily_exercise",
+          "name": "Exercício diário",
+          "target": "30 minutos"
+        },
+        {
+          "id": "healthy_eating",
+          "name": "Alimentação saudável",
+          "target": "Diário"
+        }
+      ]
+    },
+    "productivity": {
+      "goals": [
+        {
+          "id": "stress_management",
+          "label": "Gerenciar estresse",
+          "priority": 7
+        }
+      ],
+      "habits": [
+        {
+          "id": "meditation",
+          "name": "Meditação",
+          "target": "10 minutos diários"
+        }
+      ]
+    }
+  },
+  "daily_schedule": [
+    {
+      "time": "07:00",
+      "activity": "Café da manhã saudável",
+      "domain": "healthness"
+    },
+    {
+      "time": "08:00",
+      "activity": "Exercício matinal",
+      "domain": "healthness"
+    },
+    {
+      "time": "12:00",
+      "activity": "Almoço equilibrado",
+      "domain": "healthness"
+    },
+    {
+      "time": "18:00",
+      "activity": "Meditação",
+      "domain": "productivity"
+    },
+    {
+      "time": "22:00",
+      "activity": "Preparação para dormir",
+      "domain": "healthness"
+    }
+  ]
+}

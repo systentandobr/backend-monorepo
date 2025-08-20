@@ -17,9 +17,6 @@
 # Go workspace file
 go.work
 
-# Environment variables
-.env
-
 # macOS
 .DS_Store
 
@@ -44,5 +41,8 @@ node_modules/
 
 # python
 venv*
-example
+.env*
 deploy*
+
+*.db
+*.pyc

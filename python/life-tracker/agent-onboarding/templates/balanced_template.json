@@ -1,0 +1,98 @@
+{
+  "id": "balanced_template",
+  "name": "Equilibrado",
+  "description": "Template para usuários com interesses equilibrados",
+  "domains": {
+    "healthness": {
+      "goals": [
+        {
+          "id": "maintain_health",
+          "label": "Manter saúde equilibrada",
+          "priority": 7
+        }
+      ],
+      "habits": [
+        {
+          "id": "regular_exercise",
+          "name": "Exercício regular",
+          "target": "3x por semana"
+        }
+      ]
+    },
+    "finances": {
+      "goals": [
+        {
+          "id": "financial_stability",
+          "label": "Estabilidade financeira",
+          "priority": 7
+        }
+      ],
+      "habits": [
+        {
+          "id": "monthly_budget",
+          "name": "Orçamento mensal",
+          "target": "Mensal"
+        }
+      ]
+    },
+    "productivity": {
+      "goals": [
+        {
+          "id": "work_life_balance",
+          "label": "Equilíbrio trabalho-vida",
+          "priority": 8
+        }
+      ],
+      "habits": [
+        {
+          "id": "time_management",
+          "name": "Gestão do tempo",
+          "target": "Diário"
+        }
+      ]
+    },
+    "learning": {
+      "goals": [
+        {
+          "id": "continuous_learning",
+          "label": "Aprendizado contínuo",
+          "priority": 6
+        }
+      ],
+      "habits": [
+        {
+          "id": "daily_learning",
+          "name": "Aprendizado diário",
+          "target": "30 minutos"
+        }
+      ]
+    }
+  },
+  "daily_schedule": [
+    {
+      "time": "07:00",
+      "activity": "Café da manhã e planejamento do dia",
+      "domain": "productivity"
+    },
+    {
+      "time": "12:00",
+      "activity": "Almoço e pausa",
+      "domain": "healthness"
+    },
+    {
+      "time": "18:00",
+      "activity": "Exercício ou aprendizado",
+      "domain": "healthness"
+    },
+    {
+      "time": "20:00",
+      "activity": "Tempo com família/amigos",
+      "domain": "relationships"
+    },
+    {
+      "time": "22:00",
+      "activity": "Reflexão e preparação para dormir",
+      "domain": "productivity"
+    }
+  ]
+}

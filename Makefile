@@ -40,6 +40,7 @@ help: ## Mostra esta ajuda
 	@echo "  make prod           # Deploy em produção"
 	@echo "  make dev            # Iniciar ambiente de desenvolvimento"
 	@echo "  make logs           # Ver logs dos serviços"
+	@echo "  make build-docker   # Build da imagem Docker"
 
 # ===========================================
 # BUILD E COMPILAÇÃO

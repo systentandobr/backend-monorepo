@@ -14,10 +14,10 @@ ENV PASS_DB=$PASS_DB
 ENV HOST_DB=$HOST_DB
 
 # Instalar curl e ferramentas de rede para debug
-RUN apk add --no-cache curl netcat-openbsd telnet bind-tools
+# RUN apk add --no-cache curl netcat-openbsd telnet bind-tools
 
-# Instalar yarn
-RUN npm install -g yarn
+# Instalar yarn change command to install yarn is not resolved https://registry.npmjs.org/yarn
+RUN npm install -g yarn 
 
 # Configurar diretório de trabalho
 WORKDIR /app

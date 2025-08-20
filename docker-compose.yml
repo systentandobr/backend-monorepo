@@ -16,7 +16,8 @@ services:
       - "3001:3001"  # Catalog Products
       
       # Python Services
-      - "8000:8000"  # Meu Nutri (FastAPI)
+      - "9000:9000"  # Meu Nutri (FastAPI)
+      - "9001:9001"  # Life Tracker (Agent Onboarding)
       
       # Go Services
       - "8080:8080"  # Invest Tracker
@@ -29,14 +30,14 @@ services:
       - PORT=3000
       
       # Python Environment
-      - PYTHONPATH=/app/services/python/meu-nutri
+      - PYTHONPATH=/app/services/python/
       - PYTHONUNBUFFERED=1
       
       # Go Environment
       - GIN_MODE=release
       
       # Database URLs (ajustar conforme necessário)
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/meu_nutri
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/backend_monorepo_db
       - MONGODB_URI=mongodb://mongodb:27017
       - REDIS_URL=redis://redis:6379
       
@@ -68,7 +69,7 @@ services:
     image: postgres:14-alpine
     container_name: postgres-db
     environment:
-      POSTGRES_DB: meu_nutri
+      POSTGRES_DB: backend_monorepo_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
@@ -78,8 +79,9 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./python/meu-nutri/database_setup.sql:/docker-entrypoint-initdb.d/01-setup.sql
       - ./python/meu-nutri/seed_database.sql:/docker-entrypoint-initdb.d/02-seed.sql
+      - ./python/life-tracker/database_setup.sql:/docker-entrypoint-initdb.d/01-setup.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d meu_nutri"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d backend_monorepo_db"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -92,7 +94,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password
-      MONGO_INITDB_DATABASE: backend_monorepo
+      MONGO_INITDB_DATABASE: backend_monorepo_vectordb
     ports:
       - "27017:27017"
     volumes:
