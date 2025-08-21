@@ -1,5 +1,6 @@
 [build]
 builder = "DOCKERFILE"
+#dockerpath / how to configure
 
 [deploy]
 healthcheckPath = "/health"
@@ -11,7 +12,7 @@ restartPolicyMaxRetries = 3
 numReplicas = 1
 
 [networking]
-staticOutboundIp = true
+staticOutboundIp = false
 
 # Configurações específicas para Python
 [deploy.env]

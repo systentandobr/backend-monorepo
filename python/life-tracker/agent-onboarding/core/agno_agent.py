@@ -17,6 +17,9 @@ from agno.memory.v2.db.postgres import PostgresMemoryDb
 from agno.memory.v2.db.sqlite import SqliteMemoryDb
 from agno.tools.tavily import TavilyTools
 from agno.tools.reasoning import ReasoningTools
+# from agno.embedder.openai import OpenAIEmbedder
+# from agno.vectordb.lancedb import LanceDb, SearchType
+# from agno.knowledge.url import UrlKnowledge
 
 from models.schemas import (
     OnboardingRequest,
@@ -35,6 +38,8 @@ from utils.config import Settings
 from core.tools.onboarding_tools import OnboardingTools
 
 logger = logging.getLogger(__name__)
+
+
 
 class AgnoOnboardingAgent:
     """
@@ -61,6 +66,19 @@ class AgnoOnboardingAgent:
         
         # Criar diretório para dados se não existir
         os.makedirs("data", exist_ok=True)
+
+        # Load Agno documentation in a knowledge base
+        # You can also use `https://docs.agno.com/llms-full.txt` for the full documentation
+        # self.knowledge = UrlKnowledge(
+        #     urls=["https://docs.agno.com/introduction.md"],
+        #     vector_db=LanceDb(
+        #         uri="tmp/lancedb",
+        #         table_name="agno_docs",
+        #         search_type=SearchType.hybrid,
+        #         # Use OpenAI for embeddings
+        #         embedder=OpenAIEmbedder(id="text-embedding-3-small", dimensions=1536),
+        #     ),
+        # )
         
         # Configurar memória SQLite (temporário até resolver PostgreSQL)
         self.memory = Memory(
@@ -70,6 +88,8 @@ class AgnoOnboardingAgent:
                 db_file="data/agno_memory.db"
             ),
         )
+
+
         
         # Configurar ferramentas
         onboarding_tools = OnboardingTools(
@@ -92,6 +112,7 @@ class AgnoOnboardingAgent:
                 onboarding_tools.save_results_tool,
                 onboarding_tools.get_user_history_tool
             ],
+            # knowledge=self.knowledge,
             instructions=self._get_agent_instructions(),
             memory=self.memory,
             enable_agentic_memory=True,

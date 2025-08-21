@@ -41,7 +41,51 @@ load_dotenv()
 # Configurações da aplicação
 APP_VERSION = "2.0.0"
 APP_NAME = "Life Tracker - Agente de Onboarding"
-APP_DESCRIPTION = "Agente inteligente de onboarding com suporte ao framework Agno"
+APP_DESCRIPTION = """
+# Life Tracker - Agente de Onboarding
+
+Sistema inteligente de onboarding que utiliza o framework Agno para criar planos personalizados de desenvolvimento pessoal.
+
+## 🚀 Funcionalidades
+
+- **Análise de Perfil**: Identifica o tipo de perfil do usuário baseado nas respostas do questionário
+- **Geração de Planos**: Cria planos personalizados com rotinas, hábitos e objetivos
+- **Memória Inteligente**: Utiliza o framework Agno para manter contexto e melhorar recomendações
+- **Templates**: Sistema de templates para diferentes focos (saúde, finanças, produtividade)
+
+## 🔧 Tecnologias
+
+- **FastAPI**: Framework web moderno e rápido
+- **Agno Framework**: Sistema de memória e agentes inteligentes
+- **PostgreSQL**: Banco de dados principal
+- **Pydantic**: Validação de dados e serialização
+
+## 📚 Endpoints Principais
+
+### Onboarding
+- `POST /onboarding/complete` - Processo completo de onboarding
+- `POST /onboarding/analyze-profile` - Análise de perfil
+- `POST /onboarding/generate-plan` - Geração de plano personalizado
+
+### Usuários
+- `GET /onboarding/user/{user_id}/plan` - Recuperar plano do usuário
+- `GET /onboarding/user/{user_id}/profile` - Recuperar perfil do usuário
+- `GET /onboarding/user/{user_id}/recommendations` - Obter recomendações
+
+### Sistema
+- `GET /health` - Verificação de saúde
+- `GET /onboarding/status` - Status do serviço
+
+## 🔐 Autenticação
+
+Atualmente o sistema não requer autenticação, mas está preparado para implementação futura.
+
+## 📖 Documentação
+
+- **Swagger UI**: `/docs`
+- **ReDoc**: `/redoc`
+- **OpenAPI JSON**: `/openapi.json`
+"""
 
 # Criar aplicação FastAPI
 app = FastAPI(
@@ -49,7 +93,36 @@ app = FastAPI(
     description=APP_DESCRIPTION,
     version=APP_VERSION,
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    openapi_url="/openapi.json",
+    contact={
+        "name": "Life Tracker Team",
+        "email": "dev@lifetracker.com",
+    },
+    license_info={
+        "name": "MIT",
+        "url": "https://opensource.org/licenses/MIT",
+    },
+    servers=[
+        {
+            "url": "http://localhost:8000",
+            "description": "Servidor de Desenvolvimento"
+        },
+        {
+            "url": "https://api.lifetracker.com",
+            "description": "Servidor de Produção"
+        }
+    ],
+    tags_metadata=[
+        {
+            "name": "onboarding",
+            "description": "Operações relacionadas ao processo de onboarding de usuários. Inclui análise de perfil, geração de planos e gerenciamento de templates.",
+        },
+        {
+            "name": "health",
+            "description": "Endpoints de verificação de saúde da aplicação. Usados para monitoramento e load balancing.",
+        },
+    ]
 )
 
 # Variáveis globais para agentes
