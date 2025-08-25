@@ -42,6 +42,8 @@ COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/pytho
 COPY --from=builder /usr/local/bin /usr/local/bin
 
 # Copiar código fonte do projeto
+RUN ls -la /app
+RUN pwd
 COPY python/life-tracker/agent-onboarding/ /app/
 
 # Mudar permissões
@@ -55,7 +57,22 @@ EXPOSE 8000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/health || exit 1
+    CMD curl -f http://localhost:8000/health/status || exit 1
 
-# Comando de inicialização
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Adicionar logs de debug
+RUN echo "=== Verificando estrutura de arquivos ===" && \
+    ls -la /app && \
+    echo "=== Verificando Python path ===" && \
+    python -c "import sys; print('\\n'.join(sys.path))" && \
+    echo "=== Verificando imports ===" && \
+    python -c "import fastapi; print('FastAPI OK')" && \
+    python -c "import uvicorn; print('Uvicorn OK')"
+
+# Modificar o comando de inicialização para ter mais logs
+CMD ["sh", "-c", "python -c 'import sys; print(\"Python path:\", sys.path)' && uvicorn main:app --host 0.0.0.0 --port 8000 --log-level debug"]
+
+# Copiar script de inicialização
+COPY python/life-tracker/agent-onboarding/start_server.py /app/start_server.py
+
+# Usar script de inicialização
+CMD ["python", "run_script.py" "main"]

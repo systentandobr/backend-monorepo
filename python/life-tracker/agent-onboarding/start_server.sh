@@ -26,6 +26,7 @@ if [ ! -f "requirements.txt" ]; then
 else
     echo "📦 Instalando dependências..."
     pip install -r requirements.txt
+    pip install -U agno openai
 fi
 
 echo ""

@@ -167,7 +167,7 @@ async def root():
         "timestamp": datetime.now().isoformat(),
         "endpoints": {
             "docs": "/docs",
-            "health": "/health",
+            "health": "/health/status",
             "onboarding": "/onboarding",
             "legacy": "Endpoints legados com redirecionamento automático"
         }

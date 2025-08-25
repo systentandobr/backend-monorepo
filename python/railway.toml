@@ -8,6 +8,8 @@ healthcheckPath = "/health"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
+# Adicionar delay para healthcheck
+healthcheckInterval = 30
 
 [deploy.multiRegionConfig.us-west2]
 numReplicas = 1
@@ -20,3 +22,6 @@ staticOutboundIp = false
 PYTHONPATH = "/app"
 PYTHONUNBUFFERED = "1"
 PORT = "8000"
+# Adicionar variáveis de ambiente padrão
+OPENAI_API_KEY = "dummy_key_for_testing"
+DEBUG = "true"

@@ -7,7 +7,7 @@ from fastapi import APIRouter
 
 router = APIRouter(prefix="/health", tags=["health"])
 
-@router.get("/")
+@router.get("/status")
 async def health_check():
     """
     Endpoint de verificação de saúde da aplicação
