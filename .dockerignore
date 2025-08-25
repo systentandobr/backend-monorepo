@@ -32,6 +32,8 @@ coverage/
 .nyc_output
 
 # Dependency directories
+# Node.js
+nodejs/
 node_modules/
 jspm_packages/
 
@@ -134,6 +136,7 @@ venv.bak/
 htmlcov/
 
 # Go
+golang/
 *.exe
 *.exe~
 *.dll

@@ -21,7 +21,7 @@ COPY life-tracker/agent-onboarding/requirements.txt /app/requirements.txt
 
 # Instalar dependências Python com retry e timeout
 RUN pip install --no-cache-dir --timeout 100 --retries 3 -U -r /app/requirements.txt
-
+RUN pip install -U agno openai
 # ===========================================
 # RUNTIME STAGE
 # ===========================================

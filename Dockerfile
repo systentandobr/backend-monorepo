@@ -16,8 +16,37 @@ ENV HOST_DB=$HOST_DB
 # Instalar curl e ferramentas de rede para debug
 # RUN apk add --no-cache curl netcat-openbsd telnet bind-tools
 
-# Instalar yarn change command to install yarn is not resolved https://registry.npmjs.org/yarn
-RUN npm install -g yarn 
+# Instalar dependências do sistema
+RUN sudo apt update -y && sudo apt install -y \
+    gcc \
+    g++ \
+    curl 
+    # && rm -rf /var/lib/apt/lists/*
+
+
+# ===========================================
+# OPÇÕES PARA INSTALAR YARN
+# ===========================================
+
+# OPÇÃO 1: Instalar Yarn via npm (mais simples)
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt install -y nodejs \
+    && npm install -g yarn
+
+# OPÇÃO 2: Instalar Yarn via repositório oficial (mais rápido)
+# RUN curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor -o /usr/share/keyrings/yarnkey.gpg \
+#     && echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
+#     && apt-get update \
+#     && apt-get install -y yarn
+
+# OPÇÃO 3: Instalar Yarn via corepack (Node.js 16.10+)
+# RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+#     && apt-get install -y nodejs \
+#     && corepack enable \
+#     && corepack prepare yarn@stable --activate
+
+# OPÇÃO 4: Instalar Yarn via script oficial (mais flexível)
+# RUN curl -o- -L https://yarnpkg.com/install.sh | bash
 
 # Configurar diretório de trabalho
 WORKDIR /app
