@@ -103,7 +103,7 @@ class AgnoOnboardingAgent:
         self.agno_agent = Agent(
             model=OpenAIChat(id="gpt-4"),
             tools=[
-                TavilyTools(),  # Ferramenta de pesquisa web
+                # TavilyTools(),  # Ferramenta de pesquisa web
                 ReasoningTools(),
 
                 onboarding_tools.analyze_profile_tool,
