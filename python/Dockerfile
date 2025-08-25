@@ -55,6 +55,7 @@ USER python
 # Expor porta
 EXPOSE 8000
 
+
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health/status || exit 1
@@ -67,10 +68,6 @@ RUN echo "=== Verificando estrutura de arquivos ===" && \
     echo "=== Verificando imports ===" && \
     python -c "import fastapi; print('FastAPI OK')" && \
     python -c "import uvicorn; print('Uvicorn OK')"
-
-# Modificar o comando de inicialização para ter mais logs
-CMD ["sh", "-c", "python -c 'import sys; print(\"Python path:\", sys.path)' && uvicorn main:app --host 0.0.0.0 --port 8000 --log-level debug"]
-
 
 # Usar script de inicialização
 CMD ["python", "run_script.py" "main"]
