@@ -1,19 +1,15 @@
 # Arquivos e diretórios a serem ignorados no build Docker
-
-# Git
-.git
-.gitignore
-
-# Python
-__pycache__
+__pycache__/
 *.pyc
 *.pyo
 *.pyd
 .Python
-env
+env/
+venv/
+.venv/
 pip-log.txt
 pip-delete-this-directory.txt
-.tox
+.tox/
 .coverage
 .coverage.*
 .cache
@@ -21,63 +17,52 @@ nosetests.xml
 coverage.xml
 *.cover
 *.log
-.git
-.mypy_cache
-.pytest_cache
-.hypothesis
-
-# IDEs
-.vscode
-.idea
+.git/
+.mypy_cache/
+.pytest_cache/
+.hypothesis/
+.DS_Store
 *.swp
 *.swo
 *~
 
-# OS
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# Logs
-logs
-*.log
-
-# Dados temporários
-tmp
-temp
-*.tmp
-
-# Banco de dados
-*.db
-*.sqlite
-*.sqlite3
-
-# Documentação
-docs
-*.md
-README*
-
-# Testes
-test
-tests
-*_test.py
-test_*.py
-
-# Scripts de desenvolvimento
-scripts
-*.sh
-
-# Configurações locais
+# Arquivos de desenvolvimento
 .env
 .env.local
-.env.*.local
+.env.development
+.env.test
+.env.production
 
-# Outros
-node_modules
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# Logs
+logs/
+*.log
+
+# Arquivos temporários
+tmp/
+temp/
+.tmp/
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-*
+
+# Documentação
+docs/
+*.md
+!README.md
+
+# Testes
+tests/
+test_*
+*_test.py
+
+# Scripts de desenvolvimento
+scripts/
+*.sh
+!create.sh
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore

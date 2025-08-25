@@ -1,54 +1,54 @@
 # Dockerfile para serviços Python no Railway
-FROM python:3.11-slim AS builder
+FROM python:3.11-slim-bookworm AS builder
 
-# Instalar dependências do sistema
-RUN apt-get update && apt-get install -y \
-    gcc \
-    g++ \
-    curl \
-    gnupg \
-    && rm -rf /var/lib/apt/lists/*
-
-# ===========================================
-# OPÇÕES PARA INSTALAR YARN
-# ===========================================
-
-# OPÇÃO 1: Instalar Yarn via npm (mais simples)
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs \
-    && npm install -g yarn
-
-# OPÇÃO 2: Instalar Yarn via repositório oficial (mais rápido)
-# RUN curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor -o /usr/share/keyrings/yarnkey.gpg \
-#     && echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
-#     && apt-get update \
-#     && apt-get install -y yarn
-
-# OPÇÃO 3: Instalar Yarn via corepack (Node.js 16.10+)
-# RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-#     && apt-get install -y nodejs \
-#     && corepack enable \
-#     && corepack prepare yarn@stable --activate
-
-# OPÇÃO 4: Instalar Yarn via script oficial (mais flexível)
-# RUN curl -o- -L https://yarnpkg.com/install.sh | bash
+# Configurar variáveis de ambiente para melhorar a conectividade
+ENV PYTHONUNBUFFERED=1
+ENV PIP_NO_CACHE_DIR=1
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 
 # Configurar diretório de trabalho
 WORKDIR /app
 
+# Configurar DNS alternativos para melhorar conectividade
+# RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf && \
+#     echo "nameserver 8.8.4.4" >> /etc/resolv.conf
+
+# # Atualizar sistema e instalar dependências necessárias
+# RUN apt-get update && \
+#     apt-get install -y --no-install-recommends \
+#         curl \
+#         ca-certificates \
+#         lsb-release \
+#         && \
+#     rm -rf /var/lib/apt/lists/*
+
+
+
+# Atualizar pip para versão mais recente
+RUN pip install --upgrade pip setuptools wheel
+
 # Copiar requirements primeiro (para cache de layers)
 COPY life-tracker/agent-onboarding/requirements.txt /app/requirements.txt
 
-# Instalar dependências Python
-RUN pip install --no-cache-dir -r /app/requirements.txt
+# Instalar dependências Python com retry e timeout
+RUN pip install --no-cache-dir --timeout 100 --retries 3 -r /app/requirements.txt
 
 # ===========================================
 # RUNTIME STAGE
 # ===========================================
-FROM python:3.11-slim AS runtime
+FROM python:3.11-slim-bookworm AS runtime
 
-# Instalar curl para health checks
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+# Configurar variáveis de ambiente
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Instalar curl para health checks e dependências básicas
+# RUN apt-get update && \
+#     apt-get install -y --no-install-recommends \
+#         curl \
+#         ca-certificates \
+#         && \
+#     rm -rf /var/lib/apt/lists/*
 
 # Criar usuário não-root
 RUN groupadd -r python && useradd -r -g python python
@@ -59,12 +59,6 @@ WORKDIR /app
 # Copiar dependências instaladas
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
-
-# Copiar Node.js e Yarn do builder (se necessário)
-COPY --from=builder /usr/bin/node /usr/bin/node
-COPY --from=builder /usr/bin/npm /usr/bin/npm
-COPY --from=builder /usr/bin/yarn /usr/bin/yarn
-COPY --from=builder /usr/local/bin/yarn /usr/local/bin/yarn
 
 # Copiar código fonte do projeto
 COPY life-tracker/agent-onboarding/ /app/
