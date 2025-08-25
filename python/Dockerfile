@@ -17,7 +17,7 @@ WORKDIR /app
 RUN pip install --upgrade pip setuptools wheel
 
 # Copiar requirements primeiro (para cache de layers)
-COPY life-tracker/agent-onboarding/requirements.txt /app/requirements.txt
+COPY python/life-tracker/agent-onboarding/requirements.txt /app/requirements.txt
 
 # Instalar dependências Python com retry e timeout
 RUN pip install --no-cache-dir --timeout 100 --retries 3 -U -r /app/requirements.txt
@@ -42,7 +42,7 @@ COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/pytho
 COPY --from=builder /usr/local/bin /usr/local/bin
 
 # Copiar código fonte do projeto
-COPY life-tracker/agent-onboarding/ /app/
+COPY python/life-tracker/agent-onboarding/ /app/
 
 # Mudar permissões
 RUN chown -R python:python /app
