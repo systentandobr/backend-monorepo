@@ -71,8 +71,6 @@ RUN echo "=== Verificando estrutura de arquivos ===" && \
 # Modificar o comando de inicialização para ter mais logs
 CMD ["sh", "-c", "python -c 'import sys; print(\"Python path:\", sys.path)' && uvicorn main:app --host 0.0.0.0 --port 8000 --log-level debug"]
 
-# Copiar script de inicialização
-COPY python/life-tracker/agent-onboarding/start_server.py /app/start_server.py
 
 # Usar script de inicialização
 CMD ["python", "run_script.py" "main"]
