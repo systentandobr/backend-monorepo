@@ -70,4 +70,5 @@ RUN echo "=== Verificando estrutura de arquivos ===" && \
     python -c "import uvicorn; print('Uvicorn OK')"
 
 # Usar script de inicialização
-CMD ["python", "run_script.py" "main"]
+# CMD ["python", "run_script.py" "main"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--log-level", "debug"]
