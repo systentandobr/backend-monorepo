@@ -13,17 +13,6 @@ WORKDIR /app
 # RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf && \
 #     echo "nameserver 8.8.4.4" >> /etc/resolv.conf
 
-# # Atualizar sistema e instalar dependências necessárias
-# RUN apt-get update && \
-#     apt-get install -y --no-install-recommends \
-#         curl \
-#         ca-certificates \
-#         lsb-release \
-#         && \
-#     rm -rf /var/lib/apt/lists/*
-
-
-
 # Atualizar pip para versão mais recente
 RUN pip install --upgrade pip setuptools wheel
 
@@ -31,7 +20,7 @@ RUN pip install --upgrade pip setuptools wheel
 COPY life-tracker/agent-onboarding/requirements.txt /app/requirements.txt
 
 # Instalar dependências Python com retry e timeout
-RUN pip install --no-cache-dir --timeout 100 --retries 3 -r /app/requirements.txt
+RUN pip install --no-cache-dir --timeout 100 --retries 3 -U -r /app/requirements.txt
 
 # ===========================================
 # RUNTIME STAGE
@@ -41,14 +30,6 @@ FROM python:3.11-slim-bookworm AS runtime
 # Configurar variáveis de ambiente
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
-
-# Instalar curl para health checks e dependências básicas
-# RUN apt-get update && \
-#     apt-get install -y --no-install-recommends \
-#         curl \
-#         ca-certificates \
-#         && \
-#     rm -rf /var/lib/apt/lists/*
 
 # Criar usuário não-root
 RUN groupadd -r python && useradd -r -g python python
