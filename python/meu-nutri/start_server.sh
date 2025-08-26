@@ -27,7 +27,7 @@ POSTGRES_CONNECTION_STRING=postgresql://postgres:postgres@localhost:5432/meu_nut
 VISUALIZATIONS_DIR=/tmp/meu-nutri/visualizations
 
 # Configurações Alexa (para ambiente de produção)
-MEUNUTRI_API_ENDPOINT=http://localhost:8000
+MEUNUTRI_API_ENDPOINT=http://0.0.0.0:8000
 MEUNUTRI_API_KEY=chave_teste_local
 EOL
     echo "Modelo de .env criado. Por favor, edite o arquivo com suas configurações reais."

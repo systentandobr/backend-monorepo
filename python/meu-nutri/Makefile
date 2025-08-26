@@ -113,7 +113,7 @@ create-env:
 		echo "VISUALIZATIONS_DIR=$(TMP_DIR)/visualizations" >> .env; \
 		echo "" >> .env; \
 		echo "# Configurações Alexa (para ambiente de produção)" >> .env; \
-		echo "MEUNUTRI_API_ENDPOINT=http://localhost:8000" >> .env; \
+		echo "MEUNUTRI_API_ENDPOINT=http://0.0.0.0:8000" >> .env; \
 		echo "MEUNUTRI_API_KEY=chave_teste_local" >> .env; \
 		echo "${YELLOW}Arquivo .env criado. Edite-o para incluir suas chaves reais.${NC}"; \
 	else \

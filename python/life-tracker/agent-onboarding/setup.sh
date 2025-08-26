@@ -211,7 +211,7 @@ show_next_steps() {
     echo "   - Ou: uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
     echo ""
     echo "4. ${BLUE}Teste a API${NC}"
-    echo "   - Acesse: http://localhost:8000/docs"
+    echo "   - Acesse: http://0.0.0.0:8000/docs"
     echo "   - Teste o endpoint: GET /health"
     echo ""
     echo "5. ${BLUE}Integre com o frontend${NC}"

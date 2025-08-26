@@ -105,11 +105,11 @@ app = FastAPI(
     },
     servers=[
         {
-            "url": "http://localhost:8000",
+            "url": "http://0.0.0.0:8000",
             "description": "Servidor de Desenvolvimento"
         },
         {
-            "url": "https://api.lifetracker.com",
+            "url": "https://backend-monorepo-production.up.railway.app",
             "description": "Servidor de Produção"
         }
     ],

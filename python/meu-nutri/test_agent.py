@@ -174,7 +174,7 @@ async def test_alexa_integration():
         
         # Configura ambiente para teste
         if not os.getenv("MEUNUTRI_API_ENDPOINT"):
-            os.environ["MEUNUTRI_API_ENDPOINT"] = "http://localhost:8000"
+            os.environ["MEUNUTRI_API_ENDPOINT"] = "http://0.0.0.0:8000"
             os.environ["MEUNUTRI_API_KEY"] = "test_key_123"
         
         print("Esta é uma simulação de interação via Alexa.")

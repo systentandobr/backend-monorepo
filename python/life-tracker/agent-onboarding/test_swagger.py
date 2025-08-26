@@ -8,7 +8,7 @@ import json
 import sys
 from typing import Dict, Any
 
-def test_swagger_documentation(base_url: str = "http://localhost:8000") -> Dict[str, Any]:
+def test_swagger_documentation(base_url: str = "http://0.0.0.0:8000") -> Dict[str, Any]:
     """
     Testa a documentação Swagger da API
     
@@ -161,9 +161,9 @@ def print_results(results: Dict[str, Any]) -> None:
     if results["success"]:
         print("✅ TODOS OS TESTES PASSARAM!")
         print("\n📖 URLs da Documentação:")
-        print("   - Swagger UI: http://localhost:8000/docs")
-        print("   - ReDoc: http://localhost:8000/redoc")
-        print("   - OpenAPI JSON: http://localhost:8000/openapi.json")
+        print("   - Swagger UI: http://0.0.0.0:8000/docs")
+        print("   - ReDoc: http://0.0.0.0:8000/redoc")
+        print("   - OpenAPI JSON: http://0.0.0.0:8000/openapi.json")
     else:
         print("❌ ALGUNS TESTES FALHARAM!")
         print("\n💡 Verifique se a aplicação está rodando:")
@@ -174,7 +174,7 @@ def main():
     """
     Função principal do script
     """
-    base_url = "http://localhost:8000"
+    base_url = "http://0.0.0.0:8000"
     
     if len(sys.argv) > 1:
         base_url = sys.argv[1]
