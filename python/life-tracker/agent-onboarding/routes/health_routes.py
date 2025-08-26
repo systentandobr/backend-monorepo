@@ -24,7 +24,7 @@ async def health_check():
     **Exemplo de resposta:**
     ```json
     {
-        "status": "healthy",
+        "status": "ok",
         "timestamp": "2024-01-15T10:30:00Z",
         "service": "onboarding-agent",
         "version": "1.0.0"
