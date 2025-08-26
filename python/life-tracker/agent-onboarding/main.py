@@ -167,7 +167,7 @@ async def root():
         "timestamp": datetime.now().isoformat(),
         "endpoints": {
             "docs": "/docs",
-            "health": "/health/status",
+            "health": "/health",
             "onboarding": "/onboarding",
             "legacy": "Endpoints legados com redirecionamento automático"
         }
@@ -203,12 +203,6 @@ async def user_plan_legacy(user_id: str):
     """Endpoint legado - redireciona para novo endpoint"""
     logger.warning(f"Endpoint legado /user/{user_id}/plan usado - redirecionando para /onboarding/user/{user_id}/plan")
     return RedirectResponse(url=f"/onboarding/user/{user_id}/plan", status_code=307)
-
-@app.get("/health")
-async def health_legacy():
-    """Endpoint legado - redireciona para novo endpoint"""
-    logger.warning(f"Endpoint legado /health usado - redirecionando para /health")
-    return RedirectResponse(url="/health", status_code=307)
 
 if __name__ == "__main__":
     import uvicorn
