@@ -31,6 +31,7 @@ async function bootstrap() {
       'Authorization',
       'Cache-Control',
       'Pragma',
+      'x-api-key',
     ],
     credentials: true,
     preflightContinue: false,

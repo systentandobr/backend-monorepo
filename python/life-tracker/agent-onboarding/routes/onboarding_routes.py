@@ -10,7 +10,7 @@ from datetime import datetime
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
 from pydantic import BaseModel
 
-from core.agno_agent import AgnoOnboardingAgent
+from core.agent_onboarding import AgnoOnboardingAgent
 from core.agent import OnboardingAgent
 from models.schemas import (
     OnboardingRequest,
@@ -27,14 +27,41 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/onboarding", tags=["onboarding"])
 
-# Dependências
-def get_agno_agent() -> AgnoOnboardingAgent:
-    """Dependency para obter o agente Agno"""
-    return AgnoOnboardingAgent()
+# Importar instâncias globais do main
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Dependências atualizadas para usar instâncias globais
+def get_agent_onboarding() -> AgnoOnboardingAgent:
+    """Dependency para obter o agente Agno global"""
+    # Importar aqui para evitar circular imports
+    from main import agent_onboarding
+    
+    if agent_onboarding is None:
+        logger.error("❌ AgnoAgent não está inicializado!")
+        raise HTTPException(
+            status_code=503,
+            detail="Agente Agno não está inicializado. Tente novamente em alguns segundos."
+        )
+    
+    logger.info(f"✅ Usando AgnoAgent global: {id(agent_onboarding)}")
+    return agent_onboarding
 
 def get_legacy_agent() -> OnboardingAgent:
-    """Dependency para obter o agente legado"""
-    return OnboardingAgent()
+    """Dependency para obter o agente legado global"""
+    # Importar aqui para evitar circular imports
+    from main import legacy_agent
+    
+    if legacy_agent is None:
+        logger.error("❌ LegacyAgent não está inicializado!")
+        raise HTTPException(
+            status_code=503,
+            detail="Agente legado não está inicializado. Tente novamente em alguns segundos."
+        )
+    
+    logger.info(f"✅ Usando LegacyAgent global: {id(legacy_agent)}")
+    return legacy_agent
 
 def get_db_service() -> DatabaseService:
     """Dependency para obter o serviço de banco de dados"""
@@ -63,7 +90,7 @@ class MemoryQueryRequest(BaseModel):
 async def complete_onboarding_process(
     request: OnboardingRequest,
     background_tasks: BackgroundTasks,
-    agno_agent: AgnoOnboardingAgent = Depends(get_agno_agent),
+    agent_onboarding: AgnoOnboardingAgent = Depends(get_agent_onboarding),
     api_client: APIClient = Depends(get_api_client)
 ):
     """
@@ -97,7 +124,7 @@ async def complete_onboarding_process(
         logger.info(f"Completando onboarding com Agno para usuário: {request.user_id}")
         
         # Executar processo completo usando o agente Agno
-        result = await agno_agent.process_onboarding(
+        result = await agent_onboarding.process_onboarding(
             user_id=request.user_id,
             answers=request.answers
         )
@@ -163,7 +190,7 @@ async def complete_onboarding_process_legacy(
 @router.post("/analyze-profile", response_model=ProfileAnalysis)
 async def analyze_user_profile(
     request: OnboardingRequest,
-    agno_agent: AgnoOnboardingAgent = Depends(get_agno_agent),
+    agent_onboarding: AgnoOnboardingAgent = Depends(get_agent_onboarding),
     db_service: DatabaseService = Depends(get_db_service)
 ):
     """
@@ -205,7 +232,7 @@ async def analyze_user_profile(
         logger.info(f"Analisando perfil com Agno para usuário: {request.user_id}")
         
         # Analisar perfil usando Agno
-        profile_analysis = await agno_agent.analyze_profile_only(
+        profile_analysis = await agent_onboarding.analyze_profile_only(
             user_id=request.user_id,
             answers=request.answers
         )
@@ -220,7 +247,7 @@ async def analyze_user_profile(
 async def generate_personalized_plan(
     request: OnboardingRequest,
     background_tasks: BackgroundTasks,
-    agno_agent: AgnoOnboardingAgent = Depends(get_agno_agent),
+    agent_onboarding: AgnoOnboardingAgent = Depends(get_agent_onboarding),
     api_client: APIClient = Depends(get_api_client)
 ):
     """
@@ -273,13 +300,13 @@ async def generate_personalized_plan(
         logger.info(f"Gerando plano com Agno para usuário: {request.user_id}")
         
         # Analisar perfil primeiro
-        profile_analysis = await agno_agent.analyze_profile_only(
+        profile_analysis = await agent_onboarding.analyze_profile_only(
             user_id=request.user_id,
             answers=request.answers
         )
         
         # Gerar plano a partir da análise
-        personalized_plan = await agno_agent.generate_plan_from_analysis(
+        personalized_plan = await agent_onboarding.generate_plan_from_analysis(
             user_id=request.user_id,
             profile_analysis=profile_analysis
         )
@@ -410,7 +437,7 @@ async def get_user_profile(
 async def get_user_recommendations(
     user_id: str,
     domain: Optional[LifeDomain] = None,
-    agno_agent: AgnoOnboardingAgent = Depends(get_agno_agent)
+    agent_onboarding: AgnoOnboardingAgent = Depends(get_agent_onboarding)
 ):
     """
     Obtém recomendações personalizadas para o usuário usando Agno
@@ -419,7 +446,7 @@ async def get_user_recommendations(
     e perfil do usuário, usando a memória do agente Agno.
     
     **Parâmetros:**
-    - **user_id**: ID único do usuário
+    - **user_id**: {user_id}
     - **domain**: (Opcional) Domínio específico para filtrar recomendações
     
     **Retorna:**
@@ -448,7 +475,7 @@ async def get_user_recommendations(
     ```
     """
     try:
-        recommendations = await agno_agent.get_user_recommendations(
+        recommendations = await agent_onboarding.get_user_recommendations(
             user_id=user_id,
             domain=domain
         )
@@ -460,7 +487,7 @@ async def get_user_recommendations(
 @router.get("/user/{user_id}/memory")
 async def get_user_memory_summary(
     user_id: str,
-    agno_agent: AgnoOnboardingAgent = Depends(get_agno_agent)
+    agent_onboarding: AgnoOnboardingAgent = Depends(get_agent_onboarding)
 ):
     """
     Obtém um resumo da memória do usuário no Agno
@@ -489,7 +516,7 @@ async def get_user_memory_summary(
     ```
     """
     try:
-        memory_summary = await agno_agent.get_memory_summary(user_id)
+        memory_summary = await agent_onboarding.get_memory_summary(user_id)
         return memory_summary
     except Exception as e:
         logger.error(f"Erro ao obter resumo da memória: {str(e)}")
@@ -499,7 +526,7 @@ async def get_user_memory_summary(
 async def update_user_plan(
     user_id: str,
     updates: Dict[str, Any],
-    agno_agent: AgnoOnboardingAgent = Depends(get_agno_agent)
+    agent_onboarding: AgnoOnboardingAgent = Depends(get_agent_onboarding)
 ):
     """
     Atualiza um plano existente do usuário usando Agno
@@ -533,7 +560,7 @@ async def update_user_plan(
     ```
     """
     try:
-        updated_plan = await agno_agent.update_user_plan(
+        updated_plan = await agent_onboarding.update_user_plan(
             user_id=user_id,
             updates=updates
         )
@@ -560,7 +587,7 @@ async def get_service_status():
         "version": "1.0.0",
         "status": "operational",
         "features": {
-            "agno_agent": true,
+            "agent_onboarding": true,
             "legacy_agent": true,
             "memory": true,
             "postgres": true
@@ -574,7 +601,7 @@ async def get_service_status():
         "version": "1.0.0",
         "status": "operational",
         "features": {
-            "agno_agent": True,
+            "agent_onboarding": True,
             "legacy_agent": True,
             "memory": True,
             "postgres": True

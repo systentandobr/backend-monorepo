@@ -6,19 +6,23 @@ Aplicação principal com suporte ao framework Agno
 import json
 import logging
 import sys
+import os
 from typing import Dict, List, Optional, Any
 from datetime import datetime
 
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Request
 from fastapi.responses import RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
+from agno.playground import serve_playground_app
+
 
 # Configurar paths antes de qualquer import
 from utils.path_config import setup_project_paths
 setup_project_paths(__file__)
 
-from core.agno_agent import AgnoOnboardingAgent
+from core.agent_onboarding import AgnoOnboardingAgent, app as playground_app
 from core.agent import OnboardingAgent
 from models.schemas import (
     OnboardingRequest,
@@ -26,7 +30,7 @@ from models.schemas import (
     ProfileAnalysis,
     GeneratedPlan
 )
-from services.database import DatabaseService
+from services.database_factory import DatabaseFactory
 from services.api_client import APIClient
 from utils.config import Settings
 from routes import onboarding_router, health_router
@@ -87,6 +91,76 @@ Atualmente o sistema não requer autenticação, mas está preparado para implem
 - **OpenAPI JSON**: `/openapi.json`
 """
 
+# Configuração CORS baseada no ambiente
+def get_cors_config():
+    """Configuração CORS dinâmica baseada no ambiente"""
+    
+    # Ambiente atual
+    environment = os.getenv("ENVIRONMENT", "development").lower()
+    
+    # Configurações base
+    cors_config = {
+        "allow_origins": [],
+        "allow_credentials": True,
+        "allow_methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+        "allow_headers": [
+            "Accept",
+            "Accept-Language",
+            "Content-Language",
+            "Content-Type",
+            "Authorization",
+            "X-Requested-With",
+            "X-CSRF-Token",
+            "X-API-Key",
+            "Cache-Control",
+            "Pragma",
+            "Expires"
+        ],
+        "expose_headers": [
+            "Content-Length",
+            "Content-Range",
+            "X-Total-Count"
+        ]
+    }
+    
+    if environment == "development":
+        # Desenvolvimento: permitir localhost e variações
+        cors_config["allow_origins"] = [
+            "http://localhost:3000",      # React/Next.js padrão
+            "http://localhost:3001",      # Vite padrão
+            "http://localhost:5173",      # Vite alternativo
+            "http://127.0.0.1:3000",
+            "http://127.0.0.1:3001",
+            "http://127.0.0.1:5173",
+            "http://localhost:8080",      # Vue.js padrão
+            "http://localhost:4200",      # Angular padrão
+        ]
+        logger.info("🔧 CORS configurado para DESENVOLVIMENTO")
+        
+    elif environment == "production":
+        # Produção: permitir domínios específicos
+        allowed_domains = os.getenv("ALLOWED_ORIGINS", "").split(",")
+        cors_config["allow_origins"] = [
+            domain.strip() for domain in allowed_domains if domain.strip()
+        ]
+        
+        # Adicionar domínios padrão se nenhum foi configurado
+        if not cors_config["allow_origins"]:
+            cors_config["allow_origins"] = [
+                "https://lifetracker.com",
+                "https://www.lifetracker.com",
+                "https://app.lifetracker.com"
+            ]
+        
+        logger.info("🚀 CORS configurado para PRODUÇÃO")
+        
+    else:
+        # Ambiente não reconhecido: permitir tudo (não recomendado para produção)
+        cors_config["allow_origins"] = ["*"]
+        logger.warning("⚠️ CORS configurado para permitir TODAS as origens")
+    
+    return cors_config
+
 # Criar aplicação FastAPI
 app = FastAPI(
     title=APP_NAME,
@@ -125,31 +199,36 @@ app = FastAPI(
     ]
 )
 
+# Configurar CORS
+cors_config = get_cors_config()
+app.add_middleware(
+    CORSMiddleware,
+    **cors_config
+)
+
 # Variáveis globais para agentes
-agno_agent = None
+agent_onboarding = None
 legacy_agent = None
 
 @app.on_event("startup")
 async def startup_event():
     """Evento de inicialização da aplicação"""
-    global agno_agent, legacy_agent
+    global agent_onboarding, legacy_agent
     
-    logger.info(f"Iniciando {APP_NAME} v{APP_VERSION}")
+    logger.info("Inicializando agentes...")
     
+    # Inicializar com tratamento de erro
     try:
-        # Inicializar agentes
-        agno_agent = AgnoOnboardingAgent()
-        await agno_agent.initialize()
+        agent_onboarding = AgnoOnboardingAgent()
+        await agent_onboarding.initialize()
         logger.info("✓ Agente Agno inicializado")
         
         legacy_agent = OnboardingAgent()
         await legacy_agent.initialize()
         logger.info("✓ Agente legado inicializado")
         
-        logger.info("✅ Aplicação inicializada com sucesso")
-        
     except Exception as e:
-        logger.error(f"❌ Erro na inicialização: {str(e)}")
+        logger.error(f"❌ Erro na inicialização: {e}")
         raise
 
 # Incluir rotas organizadas
@@ -204,6 +283,19 @@ async def user_plan_legacy(user_id: str):
     logger.warning(f"Endpoint legado /user/{user_id}/plan usado - redirecionando para /onboarding/user/{user_id}/plan")
     return RedirectResponse(url=f"/onboarding/user/{user_id}/plan", status_code=307)
 
+@app.get("/cors-test")
+async def cors_test():
+    """Endpoint para testar configuração CORS"""
+    return {
+        "message": "CORS está funcionando!",
+        "timestamp": datetime.now().isoformat(),
+        "cors_headers": {
+            "Access-Control-Allow-Origin": "Configurado",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization"
+        }
+    }
+
 if __name__ == "__main__":
     import uvicorn
     
@@ -215,6 +307,7 @@ if __name__ == "__main__":
         reload=True,
         log_level="info"
     )
+
 
 
 

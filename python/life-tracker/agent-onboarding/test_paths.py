@@ -37,7 +37,7 @@ def test_path_configuration():
         print("✓ OnboardingRequest importado com sucesso")
         
         # Testar import dos agentes
-        from core.agno_agent import AgnoOnboardingAgent
+        from core.agent_onboarding import AgnoOnboardingAgent
         print("✓ AgnoOnboardingAgent importado com sucesso")
         
         from core.agent import OnboardingAgent

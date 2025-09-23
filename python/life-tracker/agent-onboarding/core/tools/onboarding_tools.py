@@ -1,84 +1,102 @@
 """
-Ferramentas do Agno para o agente de onboarding
-Implementação das ferramentas especializadas para análise e geração de planos
+Ferramentas do Agno para o agente de onboarding - Versão Robusta
+Implementação com tratamento robusto de erros e garantia de persistência
 """
 
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List, Union
 from datetime import datetime
+from pydantic import BaseModel, Field, ValidationError
 
 from agno.tools import tool
 
 from models.schemas import (
     ProfileAnalysis,
     GeneratedPlan,
-    LifeDomain
+    LifeDomain,
+    UserProfile,
+    UserProfileType
 )
 from core.profile_analyzer import ProfileAnalyzer
 from core.template_matcher import TemplateMatcher
 from core.plan_generator import PlanGenerator
-from services.database import DatabaseService
+from services.database_factory import DatabaseFactory
+from core.tools.data_mapper import ToolInputMapper, DataValidator
 
 logger = logging.getLogger(__name__)
 
-class OnboardingTools:
-    """
-    Ferramentas especializadas para o agente de onboarding
-    """
+# Variáveis globais para os serviços
+_profile_analyzer = None
+_template_matcher = None
+_plan_generator = None
+_db_service = None
+
+def initialize_tools(
+    profile_analyzer: ProfileAnalyzer,
+    template_matcher: TemplateMatcher,
+    plan_generator: PlanGenerator,
+    db_service: DatabaseFactory
+):
+    """Inicializar as ferramentas com os serviços"""
+    global _profile_analyzer, _template_matcher, _plan_generator, _db_service
+    _profile_analyzer = profile_analyzer
+    _template_matcher = template_matcher
+    _plan_generator = plan_generator
+    _db_service = db_service
+    logger.info("✅ Ferramentas inicializadas")
+
+class OnboardingOrchestrator:
+    """Orquestrador robusto para o processo de onboarding"""
     
-    def __init__(
-        self,
-        profile_analyzer: ProfileAnalyzer,
-        template_matcher: TemplateMatcher,
-        plan_generator: PlanGenerator,
-        db_service: DatabaseService
-    ):
-        self.profile_analyzer = profile_analyzer
-        self.template_matcher = template_matcher
-        self.plan_generator = plan_generator
-        self.db_service = db_service
+    def __init__(self):
+        self.context = {}
     
-    @tool
-    async def analyze_profile_tool(
-        self,
-        user_id: str,
-        answers: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """
-        Analisa as respostas do onboarding e identifica o perfil do usuário
-        
-        Args:
-            user_id: ID do usuário
-            answers: Respostas do questionário de onboarding
-            
-        Returns:
-            Análise completa do perfil do usuário
-        """
+    async def execute_full_onboarding(self, user_id: str, answers: Dict[str, Any]) -> Dict[str, Any]:
+        """Executa o processo completo de onboarding com garantia de persistência"""
         try:
-            logger.info(f"Ferramenta: Analisando perfil para usuário {user_id}")
+            logger.info(f"Iniciando onboarding completo para usuário {user_id}")
             
-            # Analisar respostas
-            profile_analysis = await self.profile_analyzer.analyze_responses(
-                user_id=user_id,
-                answers=answers
-            )
+            # Passo 1: Análise de perfil
+            profile_result = await self._analyze_profile(user_id, answers)
+            if not profile_result["success"]:
+                return profile_result
             
-            # Salvar no banco de dados
-            await self.db_service.save_profile_analysis(
-                user_id=user_id,
-                analysis=profile_analysis
+            # Passo 2: Match de template
+            template_result = await self._match_template(user_id, profile_result["profile_analysis"])
+            if not template_result["success"]:
+                return template_result
+            
+            # Passo 3: Geração de plano
+            plan_result = await self._generate_plan(
+                user_id, 
+                profile_result["profile_analysis"], 
+                template_result["template_match"]
             )
+            if not plan_result["success"]:
+                return plan_result
+            
+            # Passo 4: Salvar resultados (CRÍTICO)
+            save_result = await self._save_results(
+                user_id, 
+                profile_result["profile_analysis"], 
+                plan_result["generated_plan"]
+            )
+            if not save_result["success"]:
+                return save_result
             
             return {
                 "success": True,
-                "message": "Perfil analisado com sucesso",
-                "profile_analysis": profile_analysis.dict(),
+                "message": "Onboarding completado com sucesso",
                 "user_id": user_id,
+                "profile_analysis": profile_result["profile_analysis"],
+                "template_match": template_result["template_match"],
+                "generated_plan": plan_result["generated_plan"],
+                "saved": True,
                 "timestamp": datetime.now().isoformat()
             }
             
         except Exception as e:
-            logger.error(f"Erro na ferramenta analyze_profile_tool: {str(e)}")
+            logger.error(f"Erro no onboarding completo: {str(e)}")
             return {
                 "success": False,
                 "error": str(e),
@@ -86,86 +104,115 @@ class OnboardingTools:
                 "timestamp": datetime.now().isoformat()
             }
     
-    @tool
-    async def match_template_tool(
-        self,
-        user_id: str,
-        profile_analysis: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """
-        Encontra o template mais adequado baseado na análise de perfil
-        
-        Args:
-            user_id: ID do usuário
-            profile_analysis: Análise de perfil do usuário
-            
-        Returns:
-            Template match com customizações
-        """
+    async def _analyze_profile(self, user_id: str, answers: Dict[str, Any]) -> Dict[str, Any]:
+        """Passo 1: Análise de perfil com persistência obrigatória"""
         try:
-            logger.info(f"Ferramenta: Encontrando template para usuário {user_id}")
+            # Garantir que os campos de horário estejam presentes
+            if 'wakeup_time' not in answers:
+                answers['wakeup_time'] = '07:00'
+            if 'sleep_time' not in answers:
+                answers['sleep_time'] = '23:00'
             
-            # Converter dict para ProfileAnalysis
-            analysis = ProfileAnalysis(**profile_analysis)
+            # Mapear e validar dados
+            mapped_data = ToolInputMapper.map_analyze_profile_input(**answers)
+            validation = DataValidator.validate_onboarding_data(mapped_data)
             
-            # Encontrar template adequado
-            template_match = await self.template_matcher.find_best_template(
+            if not validation.is_valid:
+                logger.warning(f"Validação com warnings: {validation.errors}")
+            
+            # Analisar perfil
+            profile_analysis = await _profile_analyzer.analyze_responses(
+                user_id=user_id,
+                answers=mapped_data
+            )
+            
+            # Salvar no banco - OBRIGATÓRIO
+            try:
+                await _db_service.save_profile_analysis(
+                    user_id=user_id,
+                    analysis=profile_analysis
+                )
+                logger.info(f"✅ Análise de perfil salva para usuário {user_id}")
+            except Exception as db_error:
+                logger.error(f"❌ Erro crítico ao salvar análise de perfil: {str(db_error)}")
+                return {
+                    "success": False,
+                    "error": f"Falha ao persistir dados: {str(db_error)}"
+                }
+            
+            return {
+                "success": True,
+                "profile_analysis": profile_analysis.dict(),
+                "validation_warnings": validation.errors if validation.errors else None
+            }
+            
+        except Exception as e:
+            logger.error(f"Erro na análise de perfil: {str(e)}")
+            return {"success": False, "error": str(e)}
+    
+    async def _match_template(self, user_id: str, profile_analysis_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Passo 2: Match de template com tratamento robusto"""
+        try:
+            # Converter para ProfileAnalysis
+            analysis = ProfileAnalysis(**profile_analysis_data)
+            
+            # Encontrar template
+            template_match = await _template_matcher.find_best_template(
                 profile_analysis=analysis
             )
             
+            # Tratar template_match corretamente
+            template_id = None
+            if hasattr(template_match, 'template') and hasattr(template_match.template, 'id'):
+                template_id = template_match.template.id
+            elif hasattr(template_match, 'template') and isinstance(template_match.template, dict):
+                template_id = template_match.template.get('id')
+            elif isinstance(template_match, dict):
+                template_id = template_match.get('template_id') or template_match.get('id')
+            else:
+                # Fallback: usar o primeiro template disponível
+                templates_list = await _template_matcher.list_all_templates()
+                if templates_list:
+                    template_id = templates_list[0].template_id if hasattr(templates_list[0], 'template_id') else "balanced_template"
+                else:
+                    template_id = "balanced_template"  # Template padrão
+            
+            logger.info(f"Template selecionado: {template_id}")
+            
             return {
                 "success": True,
-                "message": "Template encontrado com sucesso",
                 "template_match": {
-                    "template_id": template_match.template.id,
-                    "match_score": template_match.match_score,
-                    "reasoning": template_match.reasoning,
-                    "customizations": template_match.customizations
-                },
-                "user_id": user_id,
-                "timestamp": datetime.now().isoformat()
+                    "template_id": template_id,
+                    "match_score": getattr(template_match, 'match_score', 0.0),
+                    "reasoning": getattr(template_match, 'reasoning', []),
+                    "customizations": getattr(template_match, 'customizations', {})
+                }
             }
             
         except Exception as e:
-            logger.error(f"Erro na ferramenta match_template_tool: {str(e)}")
-            return {
-                "success": False,
-                "error": str(e),
-                "user_id": user_id,
-                "timestamp": datetime.now().isoformat()
-            }
+            logger.error(f"Erro no match de template: {str(e)}")
+            return {"success": False, "error": str(e)}
     
-    @tool
-    async def generate_plan_tool(
-        self,
-        user_id: str,
-        profile_analysis: Dict[str, Any],
-        template_id: str,
-        customizations: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """
-        Gera um plano personalizado baseado no perfil e template
-        
-        Args:
-            user_id: ID do usuário
-            profile_analysis: Análise de perfil do usuário
-            template_id: ID do template selecionado
-            customizations: Customizações a serem aplicadas
-            
-        Returns:
-            Plano personalizado gerado
-        """
+    async def _generate_plan(self, user_id: str, profile_analysis_data: Dict[str, Any], template_match: Dict[str, Any]) -> Dict[str, Any]:
+        """Passo 3: Geração de plano"""
         try:
-            logger.info(f"Ferramenta: Gerando plano para usuário {user_id}")
+            # Converter dados
+            analysis = ProfileAnalysis(**profile_analysis_data)
+            template_id = template_match["template_id"]
+            customizations = template_match["customizations"]
             
-            # Converter dict para ProfileAnalysis
-            analysis = ProfileAnalysis(**profile_analysis)
+            # Obter template - CORRIGIDO: usar get_template
+            base_template = await _template_matcher.get_template(template_id)
             
-            # Obter template base
-            base_template = await self.template_matcher.get_template_by_id(template_id)
+            if not base_template:
+                logger.error(f"Template não encontrado: {template_id}")
+                return {
+                    "success": False,
+                    "error": f"Template não encontrado: {template_id}"
+                }
             
-            # Gerar plano personalizado
-            generated_plan = await self.plan_generator.generate_plan(
+            # Gerar plano
+            generated_plan = await _plan_generator.generate_plan(
                 user_id=user_id,
                 profile_analysis=analysis,
                 base_template=base_template,
@@ -174,260 +221,180 @@ class OnboardingTools:
             
             return {
                 "success": True,
-                "message": "Plano gerado com sucesso",
-                "generated_plan": generated_plan.dict(),
-                "user_id": user_id,
-                "timestamp": datetime.now().isoformat()
+                "generated_plan": generated_plan.dict()
             }
             
         except Exception as e:
-            logger.error(f"Erro na ferramenta generate_plan_tool: {str(e)}")
-            return {
-                "success": False,
-                "error": str(e),
-                "user_id": user_id,
-                "timestamp": datetime.now().isoformat()
-            }
+            logger.error(f"Erro na geração de plano: {str(e)}")
+            return {"success": False, "error": str(e)}
     
-    @tool
-    async def save_results_tool(
-        self,
-        user_id: str,
-        profile_analysis: Dict[str, Any],
-        generated_plan: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """
-        Salva os resultados do onboarding no banco de dados
-        
-        Args:
-            user_id: ID do usuário
-            profile_analysis: Análise de perfil
-            generated_plan: Plano gerado
-            
-        Returns:
-            Confirmação de salvamento
-        """
+    async def _save_results(self, user_id: str, profile_analysis_data: Dict[str, Any], generated_plan_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Passo 4: Salvar resultados - CRÍTICO"""
         try:
-            logger.info(f"Ferramenta: Salvando resultados para usuário {user_id}")
+            # Converter dados
+            analysis = ProfileAnalysis(**profile_analysis_data)
+            plan = GeneratedPlan(**generated_plan_data)
             
-            # Converter dicts para objetos
-            analysis = ProfileAnalysis(**profile_analysis)
-            plan = GeneratedPlan(**generated_plan)
+            # Salvar no banco - OBRIGATÓRIO
+            try:
+                await _db_service.save_profile_analysis(user_id=user_id, analysis=analysis)
+                await _db_service.save_user_plan(user_id=user_id, plan=plan)
+                logger.info(f"✅ Resultados salvos para usuário {user_id}")
+            except Exception as db_error:
+                logger.error(f"❌ Erro crítico ao salvar resultados: {str(db_error)}")
+                return {
+                    "success": False,
+                    "error": f"Falha ao persistir dados finais: {str(db_error)}"
+                }
             
-            # Salvar no banco de dados
-            await self.db_service.save_profile_analysis(
-                user_id=user_id,
-                analysis=analysis
-            )
-            
-            await self.db_service.save_user_plan(
-                user_id=user_id,
-                plan=plan
-            )
-            
-            return {
-                "success": True,
-                "message": "Resultados salvos com sucesso",
-                "user_id": user_id,
-                "saved_items": ["profile_analysis", "generated_plan"],
-                "timestamp": datetime.now().isoformat()
-            }
+            return {"success": True}
             
         except Exception as e:
-            logger.error(f"Erro na ferramenta save_results_tool: {str(e)}")
+            logger.error(f"Erro ao salvar resultados: {str(e)}")
+            return {"success": False, "error": str(e)}
+
+# Instância global do orquestrador
+_onboarding_orchestrator = OnboardingOrchestrator()
+
+@tool
+async def execute_onboarding_workflow(
+    user_id: str = Field(description="ID do usuário"),
+    concentration: Optional[str] = Field(default=None, description="Nível de concentração"),
+    lifestyle: Optional[str] = Field(default=None, description="Satisfação com estilo de vida"),
+    energy: Optional[str] = Field(default=None, description="Nível de energia"),
+    wakeup_time: Optional[str] = Field(default=None, description="Horário de acordar"),
+    sleep_time: Optional[str] = Field(default=None, description="Horário de dormir"),
+    personal_interests: Optional[Union[str, List[str]]] = Field(default=None, description="Interesses pessoais"),
+    financial_goals: Optional[Union[str, List[str]]] = Field(default=None, description="Objetivos financeiros"),
+    life_goals: Optional[Union[str, List[str]]] = Field(default=None, description="Objetivos de vida"),
+    monthly_income: Optional[Union[float, int]] = Field(default=None, description="Renda mensal"),
+    monthly_savings: Optional[Union[float, int]] = Field(default=None, description="Economia mensal"),
+    time_availability: Optional[Union[int, float]] = Field(default=None, description="Tempo disponível em horas"),
+    source: Optional[str] = Field(default=None, description="Fonte dos dados"),
+    investment_horizon: Optional[str] = Field(default=None, description="Horizonte de investimento"),
+    risk_tolerance: Optional[str] = Field(default=None, description="Tolerância ao risco"),
+    investment_capacity: Optional[str] = Field(default=None, description="Capacidade de investimento"),
+    business_interests: Optional[Union[str, List[str]]] = Field(default=None, description="Interesses de negócio"),
+    entrepreneur_profile: Optional[str] = Field(default=None, description="Perfil empreendedor"),
+    learning_areas: Optional[Union[str, List[str]]] = Field(default=None, description="Áreas de aprendizado"),
+    created_at: Optional[str] = Field(default=None, description="Data de criação")
+) -> Dict[str, Any]:
+    """
+    Executa o workflow completo de onboarding
+    
+    Esta ferramenta processa todas as respostas do onboarding e gera um plano personalizado
+    seguindo o fluxo: análise de perfil -> match de template -> geração de plano -> salvamento
+    
+    IMPORTANTE: Todos os dados são persistidos no banco de dados para garantir consistência.
+    """
+    try:
+        logger.info(f"Executando workflow completo para usuário {user_id}")
+        
+        # Validar user_id
+        if not user_id or not isinstance(user_id, str):
             return {
                 "success": False,
-                "error": str(e),
-                "user_id": user_id,
+                "error": "user_id deve ser uma string válida",
+                "user_id": str(user_id) if user_id else "invalid",
                 "timestamp": datetime.now().isoformat()
             }
-    
-    @tool
-    async def get_user_history_tool(
-        self,
-        user_id: str,
-        domain: Optional[str] = None,
-        limit: int = 10
-    ) -> Dict[str, Any]:
-        """
-        Obtém o histórico de interações do usuário
         
-        Args:
-            user_id: ID do usuário
-            domain: Domínio específico (opcional)
-            limit: Limite de registros
-            
-        Returns:
-            Histórico do usuário
-        """
-        try:
-            logger.info(f"Ferramenta: Obtendo histórico para usuário {user_id}")
-            
-            # Obter análise de perfil
-            profile_analysis = await self.db_service.get_profile_analysis(user_id)
-            
-            # Obter plano atual
-            current_plan = await self.db_service.get_user_plan(user_id)
-            
-            # Obter histórico de sessões
-            sessions = await self.db_service.get_user_sessions(
-                user_id=user_id,
-                limit=limit
-            )
-            
-            # Filtrar por domínio se especificado
-            if domain and profile_analysis:
-                domain_priorities = profile_analysis.domain_priorities
-                if domain in domain_priorities:
-                    domain_score = domain_priorities[domain]
-                else:
-                    domain_score = 0
+        # Preparar dados de resposta
+        answers = {
+            "user_id": user_id,
+            "concentration": concentration,
+            "lifestyle": lifestyle,
+            "energy": energy,
+            "wakeup_time": wakeup_time,
+            "sleep_time": sleep_time,
+            "personal_interests": personal_interests,
+            "financial_goals": financial_goals,
+            "life_goals": life_goals,
+            "monthly_income": monthly_income,
+            "monthly_savings": monthly_savings,
+            "time_availability": time_availability,
+            "source": source,
+            "investment_horizon": investment_horizon,
+            "risk_tolerance": risk_tolerance,
+            "investment_capacity": investment_capacity,
+            "business_interests": business_interests,
+            "entrepreneur_profile": entrepreneur_profile,
+            "learning_areas": learning_areas,
+            "created_at": created_at
+        }
+        
+        # Remover valores None
+        answers = {k: v for k, v in answers.items() if v is not None}
+        
+        # Executar workflow completo
+        result = await _onboarding_orchestrator.execute_full_onboarding(user_id, answers)
+        
+        return result
+        
+    except Exception as e:
+        logger.error(f"Erro no workflow de onboarding: {str(e)}")
+        return {
+            "success": False,
+            "error": str(e),
+            "user_id": str(user_id) if user_id else "unknown",
+            "timestamp": datetime.now().isoformat()
+        }
+
+@tool
+async def get_user_history_tool(
+    user_id: str = Field(description="ID do usuário"),
+    domain: Optional[str] = Field(default=None, description="Domínio específico"),
+    limit: int = Field(default=10, description="Limite de resultados")
+) -> Dict[str, Any]:
+    """
+    Obtém o histórico de interações do usuário
+    """
+    try:
+        logger.info(f"Ferramenta: Obtendo histórico para usuário {user_id}")
+        
+        if not _db_service:
+            raise Exception("Database service não inicializado")
+        
+        # Obter análise de perfil
+        profile_analysis = await _db_service.get_profile_analysis(user_id)
+        
+        # Obter plano atual
+        current_plan = await _db_service.get_user_plan(user_id)
+        
+        # Obter histórico de sessões
+        sessions = await _db_service.get_user_sessions(
+            user_id=user_id,
+            limit=limit
+        )
+        
+        # Filtrar por domínio se especificado
+        domain_score = None
+        if domain and profile_analysis:
+            domain_priorities = profile_analysis.domain_priorities
+            if domain in domain_priorities:
+                domain_score = domain_priorities[domain]
             else:
-                domain_score = None
-            
-            return {
-                "success": True,
-                "message": "Histórico obtido com sucesso",
-                "user_id": user_id,
-                "profile_analysis": profile_analysis.dict() if profile_analysis else None,
-                "current_plan": current_plan.dict() if current_plan else None,
-                "sessions": [session.dict() for session in sessions],
-                "domain_info": {
-                    "requested_domain": domain,
-                    "domain_score": domain_score
-                } if domain else None,
-                "timestamp": datetime.now().isoformat()
-            }
-            
-        except Exception as e:
-            logger.error(f"Erro na ferramenta get_user_history_tool: {str(e)}")
-            return {
-                "success": False,
-                "error": str(e),
-                "user_id": user_id,
-                "timestamp": datetime.now().isoformat()
-            }
-    
-    @tool
-    async def update_user_plan_tool(
-        self,
-        user_id: str,
-        updates: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """
-        Atualiza um plano existente do usuário
+                domain_score = 0
         
-        Args:
-            user_id: ID do usuário
-            updates: Atualizações a serem aplicadas
-            
-        Returns:
-            Plano atualizado
-        """
-        try:
-            logger.info(f"Ferramenta: Atualizando plano para usuário {user_id}")
-            
-            # Recuperar plano atual
-            current_plan = await self.db_service.get_user_plan(user_id)
-            if not current_plan:
-                return {
-                    "success": False,
-                    "error": f"Plano não encontrado para usuário {user_id}",
-                    "user_id": user_id,
-                    "timestamp": datetime.now().isoformat()
-                }
-            
-            # Aplicar atualizações
-            updated_plan = await self.plan_generator.update_plan(
-                current_plan=current_plan,
-                updates=updates
-            )
-            
-            # Salvar plano atualizado
-            await self.db_service.save_user_plan(
-                user_id=user_id,
-                plan=updated_plan
-            )
-            
-            return {
-                "success": True,
-                "message": "Plano atualizado com sucesso",
-                "updated_plan": updated_plan.dict(),
-                "user_id": user_id,
-                "timestamp": datetime.now().isoformat()
-            }
-            
-        except Exception as e:
-            logger.error(f"Erro na ferramenta update_user_plan_tool: {str(e)}")
-            return {
-                "success": False,
-                "error": str(e),
-                "user_id": user_id,
-                "timestamp": datetime.now().isoformat()
-            }
-    
-    @tool
-    async def get_recommendations_tool(
-        self,
-        user_id: str,
-        domain: Optional[str] = None
-    ) -> Dict[str, Any]:
-        """
-        Gera recomendações personalizadas para o usuário
+        return {
+            "success": True,
+            "message": "Histórico obtido com sucesso",
+            "user_id": user_id,
+            "profile_analysis": profile_analysis.dict() if profile_analysis else None,
+            "current_plan": current_plan.dict() if current_plan else None,
+            "sessions": [session.dict() for session in sessions],
+            "domain_info": {
+                "requested_domain": domain,
+                "domain_score": domain_score
+            } if domain else None,
+            "timestamp": datetime.now().isoformat()
+        }
         
-        Args:
-            user_id: ID do usuário
-            domain: Domínio específico (opcional)
-            
-        Returns:
-            Recomendações personalizadas
-        """
-        try:
-            logger.info(f"Ferramenta: Gerando recomendações para usuário {user_id}")
-            
-            # Recuperar análise de perfil
-            profile_analysis = await self.db_service.get_profile_analysis(user_id)
-            if not profile_analysis:
-                return {
-                    "success": False,
-                    "error": f"Análise de perfil não encontrada para usuário {user_id}",
-                    "user_id": user_id,
-                    "timestamp": datetime.now().isoformat()
-                }
-            
-            # Converter domínio se especificado
-            life_domain = None
-            if domain:
-                try:
-                    life_domain = LifeDomain(domain)
-                except ValueError:
-                    return {
-                        "success": False,
-                        "error": f"Domínio inválido: {domain}",
-                        "user_id": user_id,
-                        "timestamp": datetime.now().isoformat()
-                    }
-            
-            # Gerar recomendações
-            recommendations = await self.profile_analyzer.generate_recommendations(
-                profile_analysis=profile_analysis,
-                domain=life_domain
-            )
-            
-            return {
-                "success": True,
-                "message": "Recomendações geradas com sucesso",
-                "recommendations": recommendations,
-                "user_id": user_id,
-                "domain": domain,
-                "timestamp": datetime.now().isoformat()
-            }
-            
-        except Exception as e:
-            logger.error(f"Erro na ferramenta get_recommendations_tool: {str(e)}")
-            return {
-                "success": False,
-                "error": str(e),
-                "user_id": user_id,
-                "timestamp": datetime.now().isoformat()
-            }
+    except Exception as e:
+        logger.error(f"Erro na ferramenta get_user_history_tool: {str(e)}")
+        return {
+            "success": False,
+            "error": str(e),
+            "user_id": user_id,
+            "timestamp": datetime.now().isoformat()
+        }

@@ -229,6 +229,10 @@ class ProfileAnalyzer:
         energy_level = answers.get('energy_level', 5)
         stress_level = answers.get('stress_level', 5)
         
+        # Extrair horários
+        wakeup_time = answers.get('wakeup_time', '07:00')
+        sleep_time = answers.get('sleep_time', '23:00')
+        
         return UserProfile(
             user_id=user_id,
             profile_type=profile_type,
@@ -239,7 +243,9 @@ class ProfileAnalyzer:
             interests=interests,
             time_availability=time_availability,
             energy_level=energy_level,
-            stress_level=stress_level
+            stress_level=stress_level,
+            wakeup_time=wakeup_time,
+            sleep_time=sleep_time
         )
     
     async def _analyze_domain_priorities(self, answers: Dict[str, Any]) -> Dict[LifeDomain, float]:

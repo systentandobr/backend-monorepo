@@ -62,6 +62,8 @@ class LifeDomainData(BaseModel):
     routines: Optional[List[Routine]] = None
     custom_data: Optional[Dict[str, Any]] = None
 
+# ... existing code ...
+
 class UserProfile(BaseModel):
     """Perfil completo do usuário"""
     user_id: str
@@ -74,6 +76,9 @@ class UserProfile(BaseModel):
     time_availability: Optional[int] = None
     energy_level: Optional[int] = None
     stress_level: Optional[int] = None
+    # Adicionar campos de horário
+    wakeup_time: Optional[str] = None
+    sleep_time: Optional[str] = None
     created_at: datetime = Field(default_factory=datetime.now)
     updated_at: datetime = Field(default_factory=datetime.now)
 

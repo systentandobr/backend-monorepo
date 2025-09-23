@@ -2,66 +2,181 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ApiResponse } from '../../types';
-import { Game } from './schemas/game.schema';
-import { UserProgress } from './schemas/user-progress.schema';
+import { GamificationProfile, GamificationProfileDocument } from './schemas/gamification-profile.schema';
+import { PointsService } from './points.service';
+import { AchievementService } from './achievement.service';
 
 @Injectable()
 export class GamificationService {
   constructor(
-    @InjectModel(Game.name) private gameModel: Model<Game>,
-    @InjectModel(UserProgress.name) private userProgressModel: Model<UserProgress>,
+    @InjectModel(GamificationProfile.name)
+    private gamificationProfileModel: Model<GamificationProfileDocument>,
+    private pointsService: PointsService,
+    private achievementService: AchievementService,
   ) {}
 
-  async getGameStatus(): Promise<ApiResponse<any>> {
+  /**
+   * Obtém o perfil de gamificação do usuário
+   */
+  async getProfile(userId: string): Promise<ApiResponse<any>> {
     try {
-      const game = await this.gameModel.findOne().exec();
+      const result = await this.pointsService.getUserPointsStats(userId);
       
-      return {
-        success: true,
-        data: game || {},
-        timestamp: new Date().toISOString(),
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: 'Erro ao carregar status do jogo',
-        timestamp: new Date().toISOString(),
-      };
-    }
-  }
-
-  async getUserProgress(): Promise<ApiResponse<any>> {
-    try {
-      const progress = await this.userProgressModel.findOne().exec();
-      
-      return {
-        success: true,
-        data: progress || {},
-        timestamp: new Date().toISOString(),
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: 'Erro ao carregar progresso do usuário',
-        timestamp: new Date().toISOString(),
-      };
-    }
-  }
-
-  async earnPoints(pointsData: any): Promise<ApiResponse<any>> {
-    try {
-      const progress = await this.userProgressModel.findOne().exec();
-      
-      if (progress) {
-        progress.total_points += pointsData.points;
-        progress.weekly_points += pointsData.points;
-        progress.updatedAt = new Date();
-        await progress.save();
+      if (!result.success) {
+        return {
+          success: false,
+          error: result.error,
+          timestamp: new Date().toISOString(),
+        };
       }
 
       return {
         success: true,
-        data: progress,
+        data: result.data,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Erro ao carregar perfil de gamificação',
+        timestamp: new Date().toISOString(),
+      };
+    }
+  }
+
+  /**
+   * Obtém conquistas do usuário
+   */
+  async getAchievements(userId: string): Promise<ApiResponse<any>> {
+    try {
+      const result = await this.achievementService.getUserAchievements(userId);
+      
+      if (!result.success) {
+        return {
+          success: false,
+          error: result.error,
+          timestamp: new Date().toISOString(),
+        };
+      }
+
+      return {
+        success: true,
+        data: result.data,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Erro ao carregar conquistas',
+        timestamp: new Date().toISOString(),
+      };
+    }
+  }
+
+  /**
+   * Obtém ranking de usuários
+   */
+  async getLeaderboard(period: 'daily' | 'weekly' | 'monthly' | 'all' = 'all'): Promise<ApiResponse<any>> {
+    try {
+      let dateFilter = {};
+      
+      if (period !== 'all') {
+        const now = new Date();
+        let startDate: Date;
+        
+        switch (period) {
+          case 'daily':
+            startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            break;
+          case 'weekly':
+            startDate = new Date(now);
+            startDate.setDate(now.getDate() - 7);
+            break;
+          case 'monthly':
+            startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+            break;
+        }
+        
+        dateFilter = { updatedAt: { $gte: startDate } };
+      }
+
+      const leaderboard = await this.gamificationProfileModel
+        .find(dateFilter)
+        .sort({ totalPoints: -1 })
+        .limit(50)
+        .exec();
+
+      // Adicionar posição no ranking
+      const leaderboardWithPosition = leaderboard.map((profile, index) => ({
+        ...profile.toObject(),
+        position: index + 1,
+      }));
+
+      return {
+        success: true,
+        data: {
+          entries: leaderboardWithPosition,
+          totalUsers: await this.gamificationProfileModel.countDocuments(),
+          period,
+        },
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Erro ao carregar ranking',
+        timestamp: new Date().toISOString(),
+      };
+    }
+  }
+
+  /**
+   * Adiciona pontos para um usuário
+   */
+  async addPoints(
+    userId: string,
+    points: number,
+    sourceType: 'HABIT_COMPLETION' | 'ROUTINE_COMPLETION' | 'ACHIEVEMENT' | 'BONUS',
+    sourceId: string,
+    description: string,
+  ): Promise<ApiResponse<any>> {
+    try {
+      const result = await this.pointsService.addPoints(
+        userId,
+        points,
+        sourceType,
+        sourceId,
+        description,
+      );
+
+      if (!result.success) {
+        return {
+          success: false,
+          error: result.error,
+          timestamp: new Date().toISOString(),
+        };
+      }
+
+      // Verificar conquistas após adicionar pontos
+      const profile = result.data.profile;
+      const userStats = {
+        totalPoints: profile.totalPoints,
+        streak: 0, // TODO: Implementar cálculo de streak
+        habitsCompleted: 0, // TODO: Implementar contagem de hábitos
+        routinesCompleted: 0, // TODO: Implementar contagem de rotinas
+      };
+
+      const achievementsResult = await this.achievementService.checkAndUnlockAchievements(
+        userId,
+        userStats,
+      );
+
+      return {
+        success: true,
+        data: {
+          ...result.data,
+          newAchievements: achievementsResult.data || [],
+        },
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
@@ -73,40 +188,23 @@ export class GamificationService {
     }
   }
 
-  async getLeaderboard(): Promise<ApiResponse<any[]>> {
+  /**
+   * Inicializa conquistas padrão do sistema
+   */
+  async initializeDefaultAchievements(): Promise<ApiResponse<any>> {
     try {
-      const leaderboard = await this.userProgressModel
-        .find()
-        .sort({ total_points: -1 })
-        .limit(10)
-        .exec();
+      const result = await this.achievementService.createDefaultAchievements();
       
       return {
-        success: true,
-        data: leaderboard,
+        success: result.success,
+        data: result.data,
+        error: result.error,
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
       return {
         success: false,
-        error: 'Erro ao carregar leaderboard',
-        timestamp: new Date().toISOString(),
-      };
-    }
-  }
-
-  async getAchievements(): Promise<ApiResponse<any[]>> {
-    try {
-      // Implementação para achievements
-      return {
-        success: true,
-        data: [],
-        timestamp: new Date().toISOString(),
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: 'Erro ao carregar achievements',
+        error: 'Erro ao inicializar conquistas padrão',
         timestamp: new Date().toISOString(),
       };
     }

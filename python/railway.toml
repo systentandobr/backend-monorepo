@@ -26,3 +26,5 @@ PORT = "8000"
 # Adicionar variáveis de ambiente padrão
 OPENAI_API_KEY = "dummy_key_for_testing"
 DEBUG = "true"
+ENVIRONMENT = "production"
+ALLOWED_ORIGINS = "https://lifetracker.com,https://www.lifetracker.com,https://app.lifetracker.com"

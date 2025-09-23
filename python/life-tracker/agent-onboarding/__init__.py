@@ -9,7 +9,7 @@ __description__ = "Agente de onboarding inteligente usando Agno Framework"
 
 # Imports principais para facilitar o uso
 try:
-    from .agno_agent import onboarding_agent, LifeTrackerOnboardingAgent
+    from .agent_onboarding import onboarding_agent, LifeTrackerOnboardingAgent
     from .main_agno import app
     from .agno_config import get_config, validate_config
 except ImportError:

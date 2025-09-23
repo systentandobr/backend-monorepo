@@ -18,7 +18,7 @@ sys.path.append(str(Path(__file__).parent))
 from utils.path_config import setup_project_paths
 setup_project_paths(__file__)
 
-from core.agno_agent import AgnoOnboardingAgent
+from core.agent_onboarding import AgnoOnboardingAgent
 from core.agent import OnboardingAgent
 from models.schemas import OnboardingRequest
 
@@ -30,7 +30,7 @@ class AgnoImplementationTester:
     """Classe para testar a implementação do Agno"""
     
     def __init__(self):
-        self.agno_agent = AgnoOnboardingAgent()
+        self.agent_onboarding = AgnoOnboardingAgent()
         self.legacy_agent = OnboardingAgent()
         self.test_user_id = "test_user_agno_001"
         self.test_answers = {
@@ -51,21 +51,21 @@ class AgnoImplementationTester:
         logger.info("Configurando agentes para teste...")
         
         try:
-            await self.agno_agent.initialize()
+            await self.agent_onboarding.initialize()
             await self.legacy_agent.initialize()
             logger.info("✓ Agentes inicializados com sucesso")
         except Exception as e:
             logger.error(f"✗ Erro ao inicializar agentes: {str(e)}")
             raise
     
-    async def test_agno_agent_initialization(self):
+    async def test_agent_onboarding_initialization(self):
         """Testa inicialização do agente Agno"""
         logger.info("Testando inicialização do agente Agno...")
         
         try:
-            assert self.agno_agent.initialized == True
-            assert self.agno_agent.agno_agent is not None
-            assert self.agno_agent.memory is not None
+            assert self.agent_onboarding.initialized == True
+            assert self.agent_onboarding.agent_onboarding is not None
+            assert self.agent_onboarding.memory is not None
             logger.info("✓ Agente Agno inicializado corretamente")
             return True
         except Exception as e:
@@ -90,7 +90,7 @@ class AgnoImplementationTester:
         
         try:
             # Executar onboarding completo
-            result = await self.agno_agent.process_onboarding(
+            result = await self.agent_onboarding.process_onboarding(
                 user_id=self.test_user_id,
                 answers=self.test_answers
             )
@@ -146,7 +146,7 @@ class AgnoImplementationTester:
         
         try:
             # Analisar apenas perfil
-            profile_analysis = await self.agno_agent.analyze_profile_only(
+            profile_analysis = await self.agent_onboarding.analyze_profile_only(
                 user_id=f"{self.test_user_id}_profile",
                 answers=self.test_answers
             )
@@ -175,13 +175,13 @@ class AgnoImplementationTester:
         
         try:
             # Primeiro analisar perfil
-            profile_analysis = await self.agno_agent.analyze_profile_only(
+            profile_analysis = await self.agent_onboarding.analyze_profile_only(
                 user_id=f"{self.test_user_id}_plan",
                 answers=self.test_answers
             )
             
             # Gerar plano a partir da análise
-            generated_plan = await self.agno_agent.generate_plan_from_analysis(
+            generated_plan = await self.agent_onboarding.generate_plan_from_analysis(
                 user_id=f"{self.test_user_id}_plan",
                 profile_analysis=profile_analysis
             )
@@ -210,7 +210,7 @@ class AgnoImplementationTester:
         
         try:
             # Obter resumo da memória
-            memory_summary = await self.agno_agent.get_memory_summary(self.test_user_id)
+            memory_summary = await self.agent_onboarding.get_memory_summary(self.test_user_id)
             
             # Verificar resumo
             assert memory_summary["user_id"] == self.test_user_id
@@ -233,7 +233,7 @@ class AgnoImplementationTester:
         
         try:
             # Gerar recomendações
-            recommendations = await self.agno_agent.get_user_recommendations(
+            recommendations = await self.agent_onboarding.get_user_recommendations(
                 user_id=self.test_user_id
             )
             
@@ -259,7 +259,7 @@ class AgnoImplementationTester:
         
         try:
             # Verificar se as ferramentas estão disponíveis
-            tools = self.agno_agent.agno_agent.tools
+            tools = self.agent_onboarding.agent_onboarding.tools
             
             expected_tools = [
                 "TavilyTools",
@@ -296,7 +296,7 @@ class AgnoImplementationTester:
             await self.setup()
             
             # Testes de inicialização
-            test_results.append(await self.test_agno_agent_initialization())
+            test_results.append(await self.test_agent_onboarding_initialization())
             test_results.append(await self.test_legacy_agent_initialization())
             
             # Testes de funcionalidade

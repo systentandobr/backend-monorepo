@@ -101,10 +101,16 @@ class DatabaseService:
             if database_url.startswith('sqlite'):
                 # Para SQLite, usar aiosqlite
                 database_url = database_url.replace('sqlite:///', 'sqlite+aiosqlite:///')
+            elif database_url.startswith('mongodb://'):
+                # Para MongoDB, usar motor aiohttp
+                database_url = database_url.replace('mongodb://', 'mongodb+srv://')
             elif database_url.startswith('postgresql://'):
                 # Para PostgreSQL, usar asyncpg
                 database_url = database_url.replace('postgresql://', 'postgresql+asyncpg://')
             
+            logger.info(f"URL do banco de dados: {database_url}")
+
+
             self.engine = create_async_engine(
                 database_url,
                 echo=self.settings.debug,

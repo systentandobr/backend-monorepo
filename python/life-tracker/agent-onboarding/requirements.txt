@@ -1,7 +1,7 @@
 # Dependências principais
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
-pydantic==2.5.0
+pydantic>=2.10.0  # Atualizado para versão compatível
 python-dotenv==1.0.0
 
 # Agno Framework
@@ -13,6 +13,8 @@ openai==1.60.0
 langchain==0.0.350
 langchain-openai==0.0.2
 langchain-anthropic==0.0.1
+tavily-python
+groq
 
 # Banco de dados
 asyncpg==0.29.0
@@ -22,6 +24,8 @@ aiosqlite==0.21.0
 psycopg2-binary==2.9.9
 redis==5.0.1
 celery==5.3.4
+mongoengine==0.28.1
+pymongo==4.10.1
 
 
 # HTTP Client

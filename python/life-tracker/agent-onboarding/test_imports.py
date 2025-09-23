@@ -33,7 +33,7 @@ try:
     print("✓ agno.tools.tavily importado")
     
     # Testar imports locais
-    from core.agno_agent import AgnoOnboardingAgent
+    from core.agent_onboarding import AgnoOnboardingAgent
     print("✓ AgnoOnboardingAgent importado")
     
     print("\n🎉 Todos os imports estão funcionando!")
