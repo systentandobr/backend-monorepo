@@ -1,0 +1,56 @@
+description = "Iniciar uma nova funcionalidade do ecossistema Systentando criando especificação e branch. Considera código existente e integração com microserviços."
+
+prompt = """
+
+Iniciar uma nova funcionalidade do ecossistema Systentando seguindo Spec-Driven Development.
+
+Este é o primeiro passo no ciclo de vida Spec-Driven Development para o ecossistema Systentando.
+
+Dada a descrição da funcionalidade fornecida como argumento, faça isto:
+
+1. Execute o script `scripts/create-new-feature.sh --json "{{args}}"` da raiz do repo e analise sua saída JSON para BRANCH_NAME e SPEC_FILE. Todos os caminhos de arquivo devem ser absolutos.
+
+2. Analise o código existente do ecossistema Systentando:
+   - **Node.js APIs**: nodejs/apis/apps/ (Life Tracker, APIs Gateway, Sistemas Especializados)
+   - **Python Services**: python/ (Agente de Onboarding, Meu Nutri)
+   - **Golang Services**: golang/ (Invest Tracker, ZEN Launcher)
+   - Identifique funcionalidades já implementadas que podem ser reutilizadas
+
+3. Analise recursos existentes no backend-monorepo:
+   - **Módulos Node.js**: analytics, business, financial, gamification, habits, health, productivity, routines
+   - **Agente Python**: Agno Framework com 7 ferramentas especializadas
+   - **Serviços Golang**: Clean Architecture com Invest Tracker
+   - **SYS-SEGURANÇA API**: auth.systentando.com com JWT + RBAC
+   - **Sistema de Gamificação**: Pontos, conquistas, progresso, equity tokens
+   - **Bancos de Dados**: MongoDB (Node.js/Golang) + PostgreSQL (Python)
+   - **Client Libraries**: Python, Node.js, Golang para SYS-SEGURANÇA
+
+4. Carregue `templates/spec-template.md` e adapte para o contexto específico do ecossistema Systentando:
+   - Considere domínios: Life Tracker, ZEN Launcher, Meu Nutri, Invest Tracker, Rodada de Negócios
+   - Integração com SYS-SEGURANÇA API (auth.systentando.com)
+   - Backend multi-linguagem: NestJS + MongoDB, FastAPI + PostgreSQL, Gin + MongoDB
+   - Frontend Next.js 15 + React 19 + TypeScript já implementado
+   - Sistema de gamificação com equity tokens (SYS)
+
+5. Escreva a especificação para SPEC_FILE considerando:
+   - Código existente que pode ser reutilizado
+   - Recursos do backend-monorepo que podem ser aproveitados
+   - Integrações necessárias entre microserviços
+   - APIs que precisam ser implementadas ou estendidas
+   - Validações e contratos existentes
+   - Integração com sistema de gamificação
+
+6. Marque claramente:
+   - O que já existe e pode ser reutilizado (frontend e backend)
+   - Recursos do backend-monorepo que podem ser aproveitados
+   - O que precisa ser implementado em cada microserviço
+   - O que precisa ser implementado no frontend
+   - Integrações necessárias entre microserviços
+   - Contratos e validações existentes
+   - Integração com SYS-SEGURANÇA API
+   - Impacto no sistema de gamificação
+
+7. Reporte conclusão com nome da branch, caminho do arquivo de especificação, análise do código existente relevante e recursos do backend-monorepo identificados.
+
+Nota: O script cria e faz checkout da nova branch e inicializa o arquivo de especificação antes de escrever.
+"""

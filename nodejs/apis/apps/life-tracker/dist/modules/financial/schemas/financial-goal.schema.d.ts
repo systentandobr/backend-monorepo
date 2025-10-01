@@ -1,15 +1,14 @@
 import { Document } from 'mongoose';
 export type FinancialGoalDocument = FinancialGoal & Document;
 export declare class FinancialGoal {
-    id: string;
+    userId: string;
     name: string;
     target: number;
     current: number;
     deadline: string;
+    priority: string;
     description?: string;
     category?: string;
-    createdAt: string;
-    updatedAt: string;
 }
 export declare const FinancialGoalSchema: import("mongoose").Schema<FinancialGoal, import("mongoose").Model<FinancialGoal, any, any, any, Document<unknown, any, FinancialGoal, any, {}> & FinancialGoal & {
     _id: import("mongoose").Types.ObjectId;

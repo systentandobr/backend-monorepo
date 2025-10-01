@@ -1,0 +1,75 @@
+description = "Implementar funcionalidades baseadas em especificações, planos e tarefas geradas. Este é o quarto passo no ciclo de vida Spec-Driven Development para o ecossistema Systentando."
+
+prompt = """
+
+Implementar funcionalidades baseadas em especificações, planos e tarefas geradas.
+
+Este é o quarto passo no ciclo de vida Spec-Driven Development para o ecossistema Systentando.
+
+Dado o contexto fornecido como argumento, faça isto:
+
+1. Execute `scripts/check-implementation-prerequisites.sh --json` da raiz do repo e analise FEATURE_DIR, IMPL_PLAN, TASKS_FILE e lista AVAILABLE_DOCS. Todos os caminhos devem ser absolutos.
+
+2. Carregue e analise documentos de implementação:
+   - Sempre leia plan.md para stack tecnológico e arquitetura
+   - SEMPRE leia tasks.md para lista de tarefas ordenadas
+   - SE EXISTIR: Leia data-model.md para entidades
+   - SE EXISTIR: Leia contracts/ para endpoints de API
+   - SE EXISTIR: Leia research.md para decisões técnicas
+   - SE EXISTIR: Leia quickstart.md para cenários de teste
+
+3. Executar implementação seguindo TDD:
+   - **Fase 1**: Verificar código existente e implementar testes primeiro (devem falhar)
+   - **Fase 2**: Implementar/atualizar funcionalidades para fazer testes passarem
+   - **Fase 3**: Refatorar e otimizar código existente
+   - **Fase 4**: Validar integração e documentação
+
+4. Regras de implementação:
+   - Seguir ordem exata das tarefas em tasks.md
+   - Verificar código existente antes de implementar
+   - Implementar testes antes da funcionalidade (TDD)
+   - Atualizar código existente quando necessário
+   - Commitar após cada tarefa concluída
+   - Validar cada etapa antes de prosseguir
+   - Usar padrões estabelecidos no projeto
+   - Preservar funcionalidades existentes
+
+5. Estrutura de implementação para o ecossistema Systentando:
+   - **Frontend**: Next.js 15 + React 19 + TypeScript (✅ IMPLEMENTADO)
+   - **Node.js APIs**: NestJS + MongoDB + JWT (✅ IMPLEMENTADO)
+   - **Python Services**: FastAPI + PostgreSQL + Agno (✅ IMPLEMENTADO)
+   - **Golang Services**: Gin + MongoDB + Clean Architecture (✅ IMPLEMENTADO)
+   - **SYS-SEGURANÇA API**: auth.systentando.com + Client Libraries (❌ IMPLEMENTAR)
+   - **Sistema de Gamificação**: Pontos, conquistas, progresso, equity tokens (✅ IMPLEMENTADO)
+   - **Testes**: Jest + React Testing Library + MSW (❌ IMPLEMENTAR)
+
+6. Validação de implementação:
+   - Todos os testes passando
+   - Funcionalidade integrada com backend (quando aplicável)
+   - Integração com SYS-SEGURANÇA API funcionando
+   - Client libraries configuradas corretamente
+   - API Keys configuradas para serviços
+   - Código existente preservado e atualizado
+   - Documentação atualizada
+   - Performance dentro dos limites
+   - Código seguindo padrões do projeto
+   - Integração entre microserviços funcionando
+   - Sistema de gamificação integrado
+
+7. Relatório de implementação:
+   - Tarefas concluídas
+   - Funcionalidades implementadas/atualizadas
+   - Integração com SYS-SEGURANÇA API
+   - Client libraries configuradas
+   - API Keys implementadas
+   - Código existente verificado/preservado
+   - Testes criados/executados
+   - Problemas encontrados e soluções
+   - Próximos passos
+   - Integrações entre microserviços
+   - Sistema de gamificação
+
+Contexto para implementação: {{args}}
+
+A implementação deve seguir rigorosamente o TDD e os padrões estabelecidos no ecossistema Systentando.
+"""

@@ -238,7 +238,7 @@ MONGODB_DATABASE=invest_tracker
 MONGODB_TIMEOUT=10
 
 # API Configuration
-API_PORT=8080
+API_PORT=7777
 API_SECRET=your_secret_key_here
 API_CORS_ORIGIN=*
 
@@ -271,11 +271,11 @@ services:
       context: .
       dockerfile: deploy/docker/api/Dockerfile
     ports:
-      - \"8080:8080\"
+      - \"7777:7777\"
     environment:
       - MONGODB_URI=mongodb://mongodb:27017
       - MONGODB_DATABASE=invest_tracker
-      - API_PORT=8080
+      - API_PORT=7777
       - LOG_LEVEL=info
     depends_on:
       - mongodb

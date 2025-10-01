@@ -1,0 +1,72 @@
+description = "Planejar implementação de funcionalidade do ecossistema Systentando considerando código existente e integração com microserviços."
+
+prompt = """
+
+Planejar implementação de funcionalidade do ecossistema Systentando seguindo Spec-Driven Development.
+
+Este é o segundo passo no ciclo de vida Spec-Driven Development para o ecossistema Systentando.
+
+Dados os detalhes de implementação fornecidos como argumento, faça isto:
+
+1. Execute `scripts/setup-plan.sh --json` da raiz do repo e analise JSON para FEATURE_SPEC, IMPL_PLAN, SPECS_DIR, BRANCH. Todos os caminhos de arquivo futuros devem ser absolutos.
+
+2. Analise o estado atual do ecossistema Systentando:
+   - **Frontend implementado**: Next.js 15 + React 19 + TypeScript
+   - **Node.js APIs**: Life Tracker API com 8 módulos completos (analytics, business, financial, gamification, habits, health, productivity, routines)
+   - **Python Services**: Agente de Onboarding com Agno Framework + Meu Nutri
+   - **Golang Services**: Invest Tracker com Clean Architecture + ZEN Launcher
+   - **SYS-SEGURANÇA API**: auth.systentando.com com JWT + RBAC
+   - **Sistema de Gamificação**: Pontos, conquistas, progresso, equity tokens (SYS)
+   - **Bancos de Dados**: MongoDB (Node.js/Golang) + PostgreSQL (Python)
+
+3. Analise recursos existentes no backend-monorepo:
+   - **Módulos Node.js**: analytics, business, financial, gamification, habits, health, productivity, routines
+   - **Agente Python**: Agno Framework com 7 ferramentas especializadas
+   - **Serviços Golang**: Clean Architecture com Invest Tracker
+   - **SYS-SEGURANÇA API**: auth.systentando.com com JWT + RBAC
+   - **Sistema de Gamificação**: Pontos, conquistas, progresso, equity tokens
+   - **Client Libraries**: Python, Node.js, Golang para SYS-SEGURANÇA
+   - **Bancos de Dados**: MongoDB (Node.js/Golang) + PostgreSQL (Python)
+   - **APIs RESTful**: Swagger/OpenAPI, validação Zod, middleware de segurança
+
+4. Leia e analise a especificação da funcionalidade para entender:
+   - Requisitos funcionais e não-funcionais
+   - Código existente que pode ser reutilizado
+   - Recursos do backend-monorepo que podem ser aproveitados
+   - APIs que precisam ser implementadas ou estendidas em cada microserviço
+   - Componentes frontend que precisam ser criados/atualizados
+   - Integrações necessárias com SYS-SEGURANÇA API
+   - Validações e contratos existentes
+   - Impacto no sistema de gamificação
+
+5. Leia a constituição em `/memory/constitution.md` para entender requisitos constitucionais.
+
+6. Execute o template do plano de implementação:
+   - Carregue `/templates/plan-template.md` (já copiado para caminho IMPL_PLAN)
+   - Defina caminho de Entrada para FEATURE_SPEC
+   - Execute os passos 1-10 da função Fluxo de Execução (principal)
+   - Adapte o template para o contexto específico do ecossistema Systentando
+   - Considere integração com domínios: Life Tracker, ZEN Launcher, Meu Nutri, Invest Tracker, Rodada de Negócios
+   - Incorpore detalhes fornecidos pelo usuário dos argumentos no Contexto Técnico: {{args}}
+   - Atualize Rastreamento de Progresso conforme completa cada fase
+
+7. Gere artefatos específicos do ecossistema Systentando:
+   - Fase 0: research.md com decisões técnicas
+   - Fase 1: data-model.md, contracts/, quickstart.md
+   - Considere integração com backend multi-linguagem: NestJS + MongoDB, FastAPI + PostgreSQL, Gin + MongoDB
+   - Considere integração com SYS-SEGURANÇA API
+   - Considere integração com sistema de gamificação
+   - Documente recursos do backend-monorepo identificados
+
+8. Verifique execução completada:
+   - Verifique Rastreamento de Progresso mostra todas as fases completas
+   - Garanta que todos os artefatos obrigatórios foram gerados
+   - Confirme nenhum estado de ERRO na execução
+   - Valide que o plano considera código existente
+   - Valide que recursos do backend-monorepo foram considerados
+   - Valide que integrações entre microserviços foram consideradas
+
+9. Reporte resultados com nome da branch, caminhos de arquivo, artefatos gerados, análise do código existente e recursos do backend-monorepo identificados.
+
+Use caminhos absolutos com a raiz do repositório para todas as operações de arquivo para evitar problemas de caminho.
+"""

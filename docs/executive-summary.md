@@ -113,32 +113,43 @@ O Systentando é construído por uma equipe multidisciplinar com experiência em
 
 ## Diferencial Tecnológico
 
-- **Arquitetura Monorepo**: Facilitando desenvolvimento modular e reutilização de componentes
-- **Stack Moderna**: Next.js, TypeScript, NestJS, MongoDB
-- **Arquitetura Limpa**: Implementação de princípios SOLID e Domain-Driven Design
-- **Integração com IA**: Processamento de dados nutricionais, assistentes personalizados, recomendações de produtos
-- **E-commerce Avançado**: Sistema completo de catálogo, checkout em 5 steps, analytics em tempo real
-- **Extensibilidade**: APIs para integração terceirizada
+- **Backend Monorepo Multi-Linguagem**: Node.js (NestJS), Python (FastAPI), Golang (Gin) integrados
+- **Stack Moderna**: Next.js 15.2.2, React 19, TypeScript 5, NestJS 10, FastAPI, Gin
+- **Arquitetura Limpa**: Implementação de princípios SOLID e Clean Architecture
+- **IA Integrada**: Agno Framework para onboarding personalizado, OpenAI, Tavily
+- **Bancos de Dados Especializados**: MongoDB (dados não-relacionais), PostgreSQL (relacionais)
+- **Autenticação Centralizada**: SYS-SEGURANÇA API com JWT e RBAC
+- **Sistema de Gamificação**: Pontos, conquistas, progresso e equity tokens
+- **APIs RESTful**: Swagger/OpenAPI, validação Zod, middleware de segurança
 - **Performance**: Tempo de resposta < 200ms, suporte a 10k+ usuários simultâneos
 
 ## Infraestrutura e Escalabilidade
 
-### **Backend ViralKids**
-- **Arquitetura**: NestJS + MongoDB com princípios de Clean Architecture
-- **APIs Implementadas**: 
-  - Gestão de produtos com variações e avaliações
-  - Sistema de navegação e tracking de comportamento
-  - Checkout em 5 steps com validação
-  - Analytics e recomendações em tempo real
-  - FAQ e sistema de suporte integrado
-- **Performance**: 99.9% uptime, < 200ms response time
-- **Segurança**: Conformidade LGPD, validação de dados, rate limiting
+### **Backend Monorepo Implementado**
+- **Node.js APIs**: NestJS + MongoDB com módulos completos
+  - Life Tracker API: analytics, business, financial, gamification, habits, health, productivity, routines
+  - API Gateway: apis-monorepo com roteamento centralizado
+  - Sistemas Especializados: assistente-estudos, pagamentos, produtos
+- **Python Services**: FastAPI + PostgreSQL com Agno Framework
+  - Agente de Onboarding: IA personalizada com memória persistente
+  - Sistema de Nutrição: análise de refeições com IA
+- **Golang Services**: Gin + MongoDB com Clean Architecture
+  - Invest Tracker: coleta e análise de dados financeiros
+  - ZEN Launcher: sistema de bem-estar digital
 
-### **Sistema de Recomendações**
-- Algoritmos de IA para personalização de produtos
-- Machine learning para otimização de conversão
-- Feedback loop para melhoria contínua
-- Analytics avançado para insights de negócio
+### **Sistema de Gamificação**
+- Pontos de contribuição e experiência
+- Sistema de conquistas e distintivos
+- Progressão por níveis (1-10)
+- Equity tokens (SYS) para recompensas
+- Quadros de líderes e desafios
+
+### **Autenticação e Segurança**
+- SYS-SEGURANÇA API centralizada (auth.systentando.com)
+- JWT tokens com refresh automático
+- RBAC (Role-Based Access Control)
+- Client libraries para Python, Node.js, Golang
+- Rate limiting e auditoria completa
 
 ## Próximos Passos
 

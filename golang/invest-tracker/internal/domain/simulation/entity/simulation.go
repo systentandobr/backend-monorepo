@@ -2,6 +2,7 @@
 package entity
 
 import (
+	"math"
 	"time"
 
 	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/analysis/entity"
@@ -86,7 +87,8 @@ func (s *Simulation) AddResult(change, finalAmount, finalPrice float64) {
 	}
 	
 	// Fórmula para ROI anualizado: (1 + ROI total)^(1/anos) - 1
-	annualizedROI := ((finalAmount / s.InitialAmount) ^ (1 / years)) - 1
+	// Usando math.Pow para exponenciação
+	annualizedROI := math.Pow(finalAmount/s.InitialAmount, 1/years) - 1
 	
 	result := &SimulationResult{
 		ScenarioChange: change,

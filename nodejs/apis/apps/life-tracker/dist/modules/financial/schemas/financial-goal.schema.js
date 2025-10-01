@@ -12,21 +12,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.FinancialGoalSchema = exports.FinancialGoal = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 let FinancialGoal = class FinancialGoal {
-    id;
+    userId;
     name;
     target;
     current;
     deadline;
+    priority;
     description;
     category;
-    createdAt;
-    updatedAt;
 };
 exports.FinancialGoal = FinancialGoal;
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)({ required: true, index: true }),
     __metadata("design:type", String)
-], FinancialGoal.prototype, "id", void 0);
+], FinancialGoal.prototype, "userId", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
@@ -36,13 +35,17 @@ __decorate([
     __metadata("design:type", Number)
 ], FinancialGoal.prototype, "target", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)({ required: true, default: 0 }),
     __metadata("design:type", Number)
 ], FinancialGoal.prototype, "current", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], FinancialGoal.prototype, "deadline", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: true, default: 'medium' }),
+    __metadata("design:type", String)
+], FinancialGoal.prototype, "priority", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
@@ -51,14 +54,6 @@ __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], FinancialGoal.prototype, "category", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ required: true }),
-    __metadata("design:type", String)
-], FinancialGoal.prototype, "createdAt", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ required: true }),
-    __metadata("design:type", String)
-], FinancialGoal.prototype, "updatedAt", void 0);
 exports.FinancialGoal = FinancialGoal = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], FinancialGoal);

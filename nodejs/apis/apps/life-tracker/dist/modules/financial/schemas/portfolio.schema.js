@@ -12,38 +12,41 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PortfolioSchema = exports.Portfolio = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 let Portfolio = class Portfolio {
-    id;
-    total_value;
-    total_return;
+    userId;
+    totalValue;
+    totalInvested;
     assets;
-    createdAt;
-    updatedAt;
+    lastUpdated;
 };
 exports.Portfolio = Portfolio;
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)({ required: true, index: true }),
     __metadata("design:type", String)
-], Portfolio.prototype, "id", void 0);
+], Portfolio.prototype, "userId", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)({ required: true, default: 0 }),
     __metadata("design:type", Number)
-], Portfolio.prototype, "total_value", void 0);
+], Portfolio.prototype, "totalValue", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)({ required: true, default: 0 }),
     __metadata("design:type", Number)
-], Portfolio.prototype, "total_return", void 0);
+], Portfolio.prototype, "totalInvested", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: Array, required: true }),
+    (0, mongoose_1.Prop)({ type: [{
+                id: String,
+                symbol: String,
+                name: String,
+                quantity: Number,
+                averagePrice: Number,
+                currentPrice: Number,
+                lastUpdated: Date,
+            }], default: [] }),
     __metadata("design:type", Array)
 ], Portfolio.prototype, "assets", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
-    __metadata("design:type", String)
-], Portfolio.prototype, "createdAt", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ required: true }),
-    __metadata("design:type", String)
-], Portfolio.prototype, "updatedAt", void 0);
+    (0, mongoose_1.Prop)({ required: true, default: Date.now }),
+    __metadata("design:type", Date)
+], Portfolio.prototype, "lastUpdated", void 0);
 exports.Portfolio = Portfolio = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Portfolio);

@@ -9,14 +9,13 @@ import (
 	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/adapter/factory"
 	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/scheduler"
 	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/pkg/common/logger"
-	"github.com/systentandobr/toolkit/go/shared/infrastructure/persistence/mongodb"
 	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/pkg/infrastructure/telemetry"
 )
 
 // AppBootstrap handles application initialization and dependency wiring
 type AppBootstrap struct {
 	logger      logger.Logger
-	mongoClient *mongodb.Client
+	mongoClient interface{}
 	router      *gin.Engine
 	telemetry   *telemetry.Client
 	scheduler   *scheduler.JobScheduler
@@ -46,7 +45,7 @@ type AppConfig struct {
 func DefaultConfig() *AppConfig {
 	return &AppConfig{
 		Environment:   "development",
-		APIPort:       "8080",
+		APIPort:       "7777",
 		EnableSwagger: true,
 		EnableCORS:    true,
 		EnableJobs:    true,
@@ -58,7 +57,7 @@ func DefaultConfig() *AppConfig {
 // NewAppBootstrap creates a new application bootstrap instance
 func NewAppBootstrap(
 	logger logger.Logger,
-	mongoClient *mongodb.Client,
+	mongoClient interface{},
 	router *gin.Engine,
 	config *AppConfig,
 ) *AppBootstrap {

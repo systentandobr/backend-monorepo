@@ -1,5 +1,212 @@
 basePath: /api/v1
-host: localhost:8080
+definitions:
+  github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_analysis_entity.InvestmentStrategy:
+    enum:
+    - value
+    - growth
+    - dividend
+    - trend
+    - momentum
+    - dca
+    - swing
+    - diversification
+    type: string
+    x-enum-comments:
+      StrategyDCA: Dollar-cost averaging
+      StrategyDiversification: Diversificação
+      StrategyDividend: Investimento em dividendos
+      StrategyGrowth: Investimento em crescimento
+      StrategyMomentum: Análise de momentum
+      StrategySwingTrading: Swing trading
+      StrategyTrend: Análise de tendências
+      StrategyValue: Investimento em valor
+    x-enum-descriptions:
+    - Investimento em valor
+    - Investimento em crescimento
+    - Investimento em dividendos
+    - Análise de tendências
+    - Análise de momentum
+    - Dollar-cost averaging
+    - Swing trading
+    - Diversificação
+    x-enum-varnames:
+    - StrategyValue
+    - StrategyGrowth
+    - StrategyDividend
+    - StrategyTrend
+    - StrategyMomentum
+    - StrategyDCA
+    - StrategySwingTrading
+    - StrategyDiversification
+  github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_analysis_entity.MarketAnalysis:
+    properties:
+      createdAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_analysis_entity.Opportunity:
+    properties:
+      asset: {}
+      confidence:
+        type: number
+      created_at:
+        type: string
+      description:
+        type: string
+      expected_return:
+        type: number
+      expires_at:
+        type: string
+      id:
+        type: string
+      metadata:
+        additionalProperties: true
+        type: object
+      risk_level:
+        $ref: '#/definitions/github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_analysis_entity.RiskLevel'
+      status:
+        $ref: '#/definitions/github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_analysis_entity.OpportunityStatus'
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_analysis_entity.OpportunityStatus:
+    enum:
+    - active
+    - expired
+    - closed
+    type: string
+    x-enum-varnames:
+    - OpportunityStatusActive
+    - OpportunityStatusExpired
+    - OpportunityStatusClosed
+  github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_analysis_entity.RiskLevel:
+    enum:
+    - low
+    - medium
+    - high
+    type: string
+    x-enum-comments:
+      RiskHigh: Alto risco
+      RiskLow: Baixo risco
+      RiskMedium: Médio risco
+    x-enum-descriptions:
+    - Baixo risco
+    - Médio risco
+    - Alto risco
+    x-enum-varnames:
+    - RiskLow
+    - RiskMedium
+    - RiskHigh
+  github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_notification_entity.Notification:
+    properties:
+      createdAt:
+        type: string
+      data:
+        additionalProperties: true
+        type: object
+      id:
+        type: string
+      message:
+        type: string
+      read:
+        type: boolean
+      readAt:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+    type: object
+  github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_simulation_entity.Simulation:
+    properties:
+      asset: {}
+      completedAt:
+        type: string
+      createdAt:
+        type: string
+      entryPrice:
+        type: number
+      errorMessage:
+        type: string
+      id:
+        type: string
+      initialAmount:
+        type: number
+      name:
+        type: string
+      results:
+        items:
+          $ref: '#/definitions/github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_simulation_entity.SimulationResult'
+        type: array
+      scenarios:
+        description: Variações percentuais
+        items:
+          type: number
+        type: array
+      status:
+        $ref: '#/definitions/github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_simulation_entity.SimulationStatus'
+      stopLoss:
+        type: number
+      strategy:
+        $ref: '#/definitions/github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_analysis_entity.InvestmentStrategy'
+      targetPrice:
+        type: number
+      timeHorizon:
+        description: Em dias
+        type: integer
+    type: object
+  github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_simulation_entity.SimulationResult:
+    properties:
+      annualizedROI:
+        type: number
+      finalAmount:
+        type: number
+      finalPrice:
+        type: number
+      profitLoss:
+        type: number
+      profitLossPerc:
+        type: number
+      scenarioChange:
+        description: Percentual
+        type: number
+    type: object
+  github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_simulation_entity.SimulationStatus:
+    enum:
+    - pending
+    - running
+    - complete
+    - failed
+    type: string
+    x-enum-comments:
+      SimulationComplete: Simulação concluída
+      SimulationFailed: Simulação falhou
+      SimulationPending: Simulação pendente
+      SimulationRunning: Simulação em execução
+    x-enum-descriptions:
+    - Simulação pendente
+    - Simulação em execução
+    - Simulação concluída
+    - Simulação falhou
+    x-enum-varnames:
+    - SimulationPending
+    - SimulationRunning
+    - SimulationComplete
+    - SimulationFailed
+host: localhost:7777
 info:
   contact:
     email: support@systentando.com.br
@@ -12,7 +219,1009 @@ info:
   termsOfService: http://swagger.io/terms/
   title: Investment Tracker API
   version: "1.0"
-paths: {}
+paths:
+  /analysis/market:
+    get:
+      consumes:
+      - application/json
+      description: Get current market analysis and trends
+      parameters:
+      - default: daily
+        description: Analysis timeframe
+        enum:
+        - daily
+        - weekly
+        - monthly
+        - yearly
+        in: query
+        name: timeframe
+        type: string
+      - description: Asset type filter
+        in: query
+        name: asset_type
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Market analysis data
+          schema:
+            $ref: '#/definitions/github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_analysis_entity.MarketAnalysis'
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get market analysis
+      tags:
+      - analysis
+  /analysis/opportunities:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of investment opportunities
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Opportunity status
+        enum:
+        - active
+        - expired
+        - closed
+        in: query
+        name: status
+        type: string
+      - description: Risk level
+        enum:
+        - low
+        - medium
+        - high
+        in: query
+        name: risk_level
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of opportunities
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get investment opportunities
+      tags:
+      - analysis
+    post:
+      consumes:
+      - application/json
+      description: Create a new investment opportunity
+      parameters:
+      - description: Opportunity data
+        in: body
+        name: opportunity
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_analysis_entity.Opportunity'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created opportunity
+          schema:
+            $ref: '#/definitions/github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_analysis_entity.Opportunity'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create investment opportunity
+      tags:
+      - analysis
+  /analysis/opportunities/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an opportunity by ID
+      parameters:
+      - description: Opportunity ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Opportunity deleted successfully
+        "404":
+          description: Opportunity not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete opportunity
+      tags:
+      - analysis
+    get:
+      consumes:
+      - application/json
+      description: Get a specific opportunity by its ID
+      parameters:
+      - description: Opportunity ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Opportunity details
+          schema:
+            $ref: '#/definitions/github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_analysis_entity.Opportunity'
+        "404":
+          description: Opportunity not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get opportunity by ID
+      tags:
+      - analysis
+    put:
+      consumes:
+      - application/json
+      description: Update an existing opportunity
+      parameters:
+      - description: Opportunity ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Opportunity data
+        in: body
+        name: opportunity
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_analysis_entity.Opportunity'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated opportunity
+          schema:
+            $ref: '#/definitions/github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_analysis_entity.Opportunity'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Opportunity not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update opportunity
+      tags:
+      - analysis
+  /analysis/strategies:
+    get:
+      consumes:
+      - application/json
+      description: Get available analysis strategies
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of strategies
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get analysis strategies
+      tags:
+      - analysis
+  /analysis/strategies/analyze:
+    post:
+      consumes:
+      - application/json
+      description: Analyze a specific investment strategy
+      parameters:
+      - description: Strategy parameters
+        in: body
+        name: strategy
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Analysis results
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Analyze investment strategy
+      tags:
+      - analysis
+  /assets:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all assets
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Asset type (stock, crypto, bond, etc.)
+        in: query
+        name: type
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of assets
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all assets
+      tags:
+      - assets
+    post:
+      consumes:
+      - application/json
+      description: Create a new asset
+      parameters:
+      - description: Asset data
+        in: body
+        name: asset
+        required: true
+        schema: {}
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created asset
+          schema: {}
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create new asset
+      tags:
+      - assets
+  /assets/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an asset by ID
+      parameters:
+      - description: Asset ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Asset deleted successfully
+        "404":
+          description: Asset not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete asset
+      tags:
+      - assets
+    get:
+      consumes:
+      - application/json
+      description: Get a specific asset by its ID
+      parameters:
+      - description: Asset ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Asset details
+          schema: {}
+        "404":
+          description: Asset not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get asset by ID
+      tags:
+      - assets
+    put:
+      consumes:
+      - application/json
+      description: Update an existing asset
+      parameters:
+      - description: Asset ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Asset data
+        in: body
+        name: asset
+        required: true
+        schema: {}
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated asset
+          schema: {}
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Asset not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update asset
+      tags:
+      - assets
+  /assets/search:
+    get:
+      consumes:
+      - application/json
+      description: Search assets by query parameters
+      parameters:
+      - description: Search query
+        in: query
+        name: q
+        type: string
+      - description: Asset type
+        in: query
+        name: type
+        type: string
+      - description: Exchange
+        in: query
+        name: exchange
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Search results
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Search assets
+      tags:
+      - assets
+  /notifications:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all notifications
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Notification type
+        enum:
+        - alert
+        - reminder
+        - update
+        - system
+        in: query
+        name: type
+        type: string
+      - description: Notification status
+        enum:
+        - read
+        - unread
+        - all
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of notifications
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all notifications
+      tags:
+      - notifications
+    post:
+      consumes:
+      - application/json
+      description: Create a new notification
+      parameters:
+      - description: Notification data
+        in: body
+        name: notification
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_notification_entity.Notification'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created notification
+          schema:
+            $ref: '#/definitions/github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_notification_entity.Notification'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create new notification
+      tags:
+      - notifications
+  /notifications/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a notification by ID
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Notification deleted successfully
+        "404":
+          description: Notification not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete notification
+      tags:
+      - notifications
+    get:
+      consumes:
+      - application/json
+      description: Get a specific notification by its ID
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Notification details
+          schema:
+            $ref: '#/definitions/github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_notification_entity.Notification'
+        "404":
+          description: Notification not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get notification by ID
+      tags:
+      - notifications
+    put:
+      consumes:
+      - application/json
+      description: Update an existing notification
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Notification data
+        in: body
+        name: notification
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_notification_entity.Notification'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated notification
+          schema:
+            $ref: '#/definitions/github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_notification_entity.Notification'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Notification not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update notification
+      tags:
+      - notifications
+  /notifications/{id}/read:
+    put:
+      consumes:
+      - application/json
+      description: Mark a notification as read
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Notification marked as read
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Notification not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Mark notification as read
+      tags:
+      - notifications
+  /notifications/{id}/unread:
+    put:
+      consumes:
+      - application/json
+      description: Mark a notification as unread
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Notification marked as unread
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Notification not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Mark notification as unread
+      tags:
+      - notifications
+  /notifications/user/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get notifications for a specific user
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Notification status
+        enum:
+        - read
+        - unread
+        - all
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User notifications
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: User not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get user notifications
+      tags:
+      - notifications
+  /simulations:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all simulations
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Simulation status
+        enum:
+        - pending
+        - running
+        - completed
+        - failed
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of simulations
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all simulations
+      tags:
+      - simulations
+    post:
+      consumes:
+      - application/json
+      description: Create a new investment simulation
+      parameters:
+      - description: Simulation data
+        in: body
+        name: simulation
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_simulation_entity.Simulation'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created simulation
+          schema:
+            $ref: '#/definitions/github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_simulation_entity.Simulation'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create new simulation
+      tags:
+      - simulations
+  /simulations/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a simulation by ID
+      parameters:
+      - description: Simulation ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Simulation deleted successfully
+        "404":
+          description: Simulation not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete simulation
+      tags:
+      - simulations
+    get:
+      consumes:
+      - application/json
+      description: Get a specific simulation by its ID
+      parameters:
+      - description: Simulation ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Simulation details
+          schema:
+            $ref: '#/definitions/github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_simulation_entity.Simulation'
+        "404":
+          description: Simulation not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get simulation by ID
+      tags:
+      - simulations
+    put:
+      consumes:
+      - application/json
+      description: Update an existing simulation
+      parameters:
+      - description: Simulation ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Simulation data
+        in: body
+        name: simulation
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_simulation_entity.Simulation'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated simulation
+          schema:
+            $ref: '#/definitions/github_com_systentandobr_backend-monorepo_golang_invest-tracker_internal_domain_simulation_entity.Simulation'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Simulation not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update simulation
+      tags:
+      - simulations
+  /simulations/{id}/results:
+    get:
+      consumes:
+      - application/json
+      description: Get results of a specific simulation
+      parameters:
+      - description: Simulation ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Simulation results
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Simulation not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get simulation results
+      tags:
+      - simulations
+  /simulations/run:
+    post:
+      consumes:
+      - application/json
+      description: Execute a simulation with given parameters
+      parameters:
+      - description: Simulation parameters
+        in: body
+        name: simulation
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Simulation execution results
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Run simulation
+      tags:
+      - simulations
 schemes:
 - http
 - https
