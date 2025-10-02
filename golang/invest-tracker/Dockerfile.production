@@ -1,0 +1,63 @@
+# Dockerfile otimizado para produção
+# Usa binário já compilado (multi-stage build)
+
+# Estágio 1: Build
+FROM golang:1.23-alpine AS builder
+
+# Instalar dependências do sistema
+RUN apk add --no-cache git ca-certificates tzdata
+
+# Configurar diretório de trabalho
+WORKDIR /app
+
+# Copiar go.mod e go.sum
+COPY go.mod go.sum ./
+
+# Download dependências
+RUN go mod download
+
+# Copiar código fonte
+COPY . .
+
+# Build da aplicação com otimizações para produção
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+    -ldflags="-s -w -X main.version=$(git describe --tags --always --dirty 2>/dev/null || echo 'dev')" \
+    -trimpath \
+    -o /invest-tracker-api \
+    ./cmd/api
+
+# Estágio 2: Runtime (imagem mínima)
+FROM alpine:latest
+
+# Instalar dependências mínimas
+RUN apk --no-cache add ca-certificates tzdata curl
+
+# Criar usuário não-root para segurança
+RUN addgroup -g 1001 -S appgroup && \
+    adduser -S appuser -u 1001 -G appgroup
+
+# Configurar diretório de trabalho
+WORKDIR /app
+
+# Copiar binário compilado
+COPY --from=builder /invest-tracker-api .
+
+# Configurar permissões
+RUN chown -R appuser:appgroup /app
+
+# Mudar para usuário não-root
+USER appuser
+
+# Expor porta
+EXPOSE 7777
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:7777/health || exit 1
+
+# Variáveis de ambiente
+ENV PORT=7777
+ENV GIN_MODE=release
+
+# Comando de inicialização
+CMD ["./invest-tracker-api"]
