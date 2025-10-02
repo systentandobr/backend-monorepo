@@ -4,14 +4,14 @@ FROM golang:1.23-alpine AS builder
 # Set working directory
 WORKDIR /app
 
-# Copy go.mod and go.sum
-COPY go.mod go.sum* ./
+# Copy go.mod and go.sum from the golang/invest-tracker directory
+COPY golang/invest-tracker/go.mod golang/invest-tracker/go.sum* ./
 
 # Download dependencies
 RUN go mod download
 
-# Copy source code
-COPY . .
+# Copy source code from golang/invest-tracker directory
+COPY golang/invest-tracker/ .
 
 # Build the application
 RUN CGO_ENABLED=0 GOOS=linux go build -o /invest-tracker-api ./cmd/api
