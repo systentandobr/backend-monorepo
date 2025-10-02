@@ -1,0 +1,91 @@
+description = "Quebrar plano do ecossistema Systentando em tarefas executáveis considerando código existente e integração com microserviços."
+
+prompt = """
+
+Quebrar plano do ecossistema Systentando em tarefas executáveis seguindo Spec-Driven Development.
+
+Este é o terceiro passo no ciclo de vida Spec-Driven Development para o ecossistema Systentando.
+
+Dado o contexto fornecido como argumento, faça isto:
+
+1. Execute `scripts/check-task-prerequisites.sh --json` da raiz do repo e analise FEATURE_DIR e lista AVAILABLE_DOCS. Todos os caminhos devem ser absolutos.
+
+2. Analise o código existente do ecossistema Systentando:
+   - **Frontend**: Aplicações Next.js 15 + React 19 + TypeScript
+   - **Node.js APIs**: nodejs/apis/apps/ (Life Tracker, APIs Gateway, Sistemas Especializados)
+   - **Python Services**: python/ (Agente de Onboarding, Meu Nutri)
+   - **Golang Services**: golang/ (Invest Tracker, ZEN Launcher)
+   - Identifique funcionalidades já implementadas
+
+3. Analise recursos existentes no backend-monorepo:
+   - **Módulos Node.js**: analytics, business, financial, gamification, habits, health, productivity, routines
+   - **Agente Python**: Agno Framework com 7 ferramentas especializadas
+   - **Serviços Golang**: Clean Architecture com Invest Tracker
+   - **SYS-SEGURANÇA API**: auth.systentando.com com JWT + RBAC
+   - **Sistema de Gamificação**: Pontos, conquistas, progresso, equity tokens
+   - **Client Libraries**: Python, Node.js, Golang para SYS-SEGURANÇA
+   - **Bancos de Dados**: MongoDB (Node.js/Golang) + PostgreSQL (Python)
+   - **APIs RESTful**: Swagger/OpenAPI, validação Zod, middleware de segurança
+
+4. Carregue e analise documentos de design disponíveis:
+   - Sempre leia plan.md para stack tecnológico e bibliotecas
+   - SE EXISTIR: Leia data-model.md para entidades
+   - SE EXISTIR: Leia contracts/ para endpoints de API
+   - SE EXISTIR: Leia research.md para decisões técnicas
+   - SE EXISTIR: Leia quickstart.md para cenários de teste
+
+5. Gerar tarefas seguindo o template:
+   - Use `/templates/tasks-template.md` como base com contexto específico do ecossistema Systentando
+   - Substitua tarefas de exemplo com tarefas reais baseadas em:
+     * **Tarefas de Setup**: Verificar estrutura existente, configurar testes
+     * **Tarefas de Teste [P]**: Testes de contrato, testes de integração
+     * **Tarefas Core**: Atualizar stores Zustand, serviços, hooks, componentes
+     * **Tarefas de Integração**: Backend multi-linguagem, SYS-SEGURANÇA API, sistema de gamificação
+     * **Tarefas de Polimento [P]**: Testes unitários, performance, documentação
+
+6. Regras de geração de tarefas específicas do ecossistema Systentando:
+   - Cada arquivo de contrato → tarefa de teste de contrato marcada [P]
+   - Cada entidade em data-model → tarefa de atualização de store Zustand marcada [P]
+   - Cada endpoint → tarefa de implementação de serviço backend
+   - Cada componente existente → tarefa de atualização marcada [P]
+   - Cada componente novo → tarefa de criação marcada [P]
+   - Integração SYS-SEGURANÇA → tarefas de autenticação e middleware
+   - Recursos do backend-monorepo → tarefas de análise e reutilização
+   - Validações existentes → tarefas de extensão ou adaptação
+   - Sistema de gamificação → tarefas de integração com equity tokens
+   - Arquivos diferentes = podem ser paralelos [P]
+   - Mesmo arquivo = sequencial (sem [P])
+
+7. Ordenar tarefas por dependências:
+   - Setup e verificação antes de tudo
+   - Análise de recursos do backend-monorepo
+   - Testes antes da implementação (TDD)
+   - Backend antes de frontend (quando aplicável)
+   - Stores Zustand antes de serviços
+   - Serviços antes de hooks
+   - Hooks antes de componentes
+   - Componentes antes de páginas
+   - Integração SYS-SEGURANÇA antes de outras integrações
+   - Sistema de gamificação antes de outras integrações
+   - Tudo antes de polimento
+
+8. Incluir exemplos de execução paralela:
+   - Agrupar tarefas [P] que podem executar juntas
+   - Mostrar comandos reais do agente Task
+   - Considerar dependências entre frontend e backend
+   - Considerar análise de recursos do backend-monorepo
+   - Considerar integrações entre microserviços
+
+9. Criar FEATURE_DIR/tasks.md com:
+   - Nome correto da funcionalidade do plano de implementação
+   - Tarefas numeradas (T001, T002, etc.)
+   - Caminhos claros de arquivo para cada tarefa
+   - Notas de dependência específicas do ecossistema Systentando
+   - Orientação de execução paralela
+   - Consideração do código existente
+   - Consideração das integrações entre microserviços
+
+Contexto para geração de tarefas: {{args}}
+
+O tasks.md deve ser imediatamente executável - cada tarefa deve ser específica o suficiente para que um LLM possa completá-la sem contexto adicional, considerando o estado atual do ecossistema Systentando.
+"""

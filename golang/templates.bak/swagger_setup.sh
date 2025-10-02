@@ -53,7 +53,7 @@ echo -e "${BLUE}Generating Swagger documentation...${NC}"
 cd invest-tracker && swag init -g cmd/api/main.go -o ./docs
 
 echo -e "${GREEN}Swagger setup completed successfully!${NC}"
-echo "You can access the Swagger UI at http://localhost:8080/swagger/index.html when the server is running"
+echo "You can access the Swagger UI at http://localhost:7777/swagger/index.html when the server is running"
 echo ""
 echo "Don't forget to add Swagger annotations to your controller methods."
 echo "Example of controller annotation:"

@@ -16,7 +16,6 @@ import (
 	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/docs"
 	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/bootstrap"
 	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/pkg/common/logger"
-	"github.com/systentandobr/toolkit/go/shared/infrastructure/persistence/mongodb"
 	// "github.com/systentandobr/backend-monorepo/golang/invest-tracker/pkg/infrastructure/telemetry"
 )
 
@@ -32,7 +31,7 @@ import (
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host localhost:8080
+// @host localhost:7777
 // @BasePath /api/v1
 // @schemes http https
 
@@ -61,7 +60,7 @@ func LoadConfig(envFile string, log logger.Logger) (*AppConfig, error) {
 	// For this example, just returning default config
 	return &AppConfig{
 		Environment:   "development",
-		APIPort:       "8080",
+		APIPort:       "7777",
 		EnableSwagger: true,
 		EnableCORS:    true,
 		EnableJobs:    true,
@@ -102,16 +101,18 @@ func main() {
 	}
 	
 	// Initialize MongoDB client
-	mongoConfig := mongodb.DefaultConfig()
-	mongoConfig.URI = appConfig.Database.URI
-	mongoConfig.DatabaseName = appConfig.Database.Name
-	mongoConfig.ConnectTimeout = time.Duration(appConfig.Database.ConnectTimeout) * time.Second
-	mongoConfig.OperationTimeout = time.Duration(appConfig.Database.OperationTimeout) * time.Second
+	// TODO: Fix MongoDB client initialization
+	// mongoConfig := mongodb.DefaultConfig()
+	// mongoConfig.URI = appConfig.Database.URI
+	// mongoConfig.DatabaseName = appConfig.Database.Name
+	// mongoConfig.ConnectTimeout = time.Duration(appConfig.Database.ConnectTimeout) * time.Second
+	// mongoConfig.OperationTimeout = time.Duration(appConfig.Database.OperationTimeout) * time.Second
 	
-	mongoClient, err := mongodb.NewClient(mongoConfig, log)
-	if err != nil {
-		log.Fatal("Failed to connect to MongoDB", logger.Error(err))
-	}
+	// mongoClient, err := mongodb.NewClient(mongoConfig, log)
+	// if err != nil {
+	// 	log.Fatal("Failed to connect to MongoDB", logger.Error(err))
+	// }
+	var mongoClient interface{} = nil
 	
 	// Initialize Gin router
 	router := gin.New()
@@ -231,9 +232,10 @@ func main() {
 	}
 	
 	// Disconnect from MongoDB
-	if err := mongoClient.Disconnect(); err != nil {
-		log.Fatal("Failed to disconnect from MongoDB", logger.Error(err))
-	}
+	// TODO: Fix MongoDB disconnect
+	// if err := mongoClient.Disconnect(); err != nil {
+	// 	log.Fatal("Failed to disconnect from MongoDB", logger.Error(err))
+	// }
 	
 	log.Info("Server exited gracefully")
 }

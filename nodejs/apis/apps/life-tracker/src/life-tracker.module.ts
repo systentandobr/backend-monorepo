@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { HttpModule } from '@nestjs/axios';
 import { LifeTrackerController } from './life-tracker.controller';
 import { LifeTrackerService } from './life-tracker.service';
+import { JwtValidatorService } from './services/jwt-validator.service';
 
 // Módulos de domínio
 import { RoutinesModule } from './modules/routines/routines.module';
@@ -17,6 +19,10 @@ import { GamificationModule } from './modules/gamification/gamification.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ envFilePath: `.env` }),
+    HttpModule.register({
+      timeout: 5000,
+      maxRedirects: 5,
+    }),
     MongooseModule.forRoot(
       `mongodb+srv://${encodeURIComponent(
         process.env.USER_DB as string,
@@ -35,7 +41,7 @@ import { GamificationModule } from './modules/gamification/gamification.module';
     GamificationModule,
   ],
   controllers: [LifeTrackerController],
-  providers: [LifeTrackerService],
-  exports: [LifeTrackerService],
+  providers: [LifeTrackerService, JwtValidatorService],
+  exports: [LifeTrackerService, JwtValidatorService],
 })
 export class LifeTrackerModule {} 

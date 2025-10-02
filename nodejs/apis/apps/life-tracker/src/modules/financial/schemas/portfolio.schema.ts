@@ -5,29 +5,36 @@ export type PortfolioDocument = Portfolio & Document;
 
 @Schema({ timestamps: true })
 export class Portfolio {
-  @Prop({ required: true })
-  id: string;
+  @Prop({ required: true, index: true })
+  userId: string;
 
-  @Prop({ required: true })
-  total_value: number;
+  @Prop({ required: true, default: 0 })
+  totalValue: number;
 
-  @Prop({ required: true })
-  total_return: number;
+  @Prop({ required: true, default: 0 })
+  totalInvested: number;
 
-  @Prop({ type: Array, required: true })
+  @Prop({ type: [{
+    id: String,
+    symbol: String,
+    name: String,
+    quantity: Number,
+    averagePrice: Number,
+    currentPrice: Number,
+    lastUpdated: Date,
+  }], default: [] })
   assets: Array<{
     id: string;
+    symbol: string;
     name: string;
-    value: number;
-    return: number;
-    allocation: number;
+    quantity: number;
+    averagePrice: number;
+    currentPrice: number;
+    lastUpdated: Date;
   }>;
 
-  @Prop({ required: true })
-  createdAt: string;
-
-  @Prop({ required: true })
-  updatedAt: string;
+  @Prop({ required: true, default: Date.now })
+  lastUpdated: Date;
 }
 
 export const PortfolioSchema = SchemaFactory.createForClass(Portfolio); 

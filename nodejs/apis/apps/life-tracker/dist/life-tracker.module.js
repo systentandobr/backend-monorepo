@@ -10,8 +10,10 @@ exports.LifeTrackerModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const mongoose_1 = require("@nestjs/mongoose");
+const axios_1 = require("@nestjs/axios");
 const life_tracker_controller_1 = require("./life-tracker.controller");
 const life_tracker_service_1 = require("./life-tracker.service");
+const jwt_validator_service_1 = require("./services/jwt-validator.service");
 const routines_module_1 = require("./modules/routines/routines.module");
 const habits_module_1 = require("./modules/habits/habits.module");
 const health_module_1 = require("./modules/health/health.module");
@@ -27,6 +29,10 @@ exports.LifeTrackerModule = LifeTrackerModule = __decorate([
     (0, common_1.Module)({
         imports: [
             config_1.ConfigModule.forRoot({ envFilePath: `.env` }),
+            axios_1.HttpModule.register({
+                timeout: 5000,
+                maxRedirects: 5,
+            }),
             mongoose_1.MongooseModule.forRoot(`mongodb+srv://${encodeURIComponent(process.env.USER_DB)}:${encodeURIComponent(process.env.PASS_DB)}@${process.env.HOST_DB}/life-tracker`),
             routines_module_1.RoutinesModule,
             habits_module_1.HabitsModule,
@@ -38,8 +44,8 @@ exports.LifeTrackerModule = LifeTrackerModule = __decorate([
             gamification_module_1.GamificationModule,
         ],
         controllers: [life_tracker_controller_1.LifeTrackerController],
-        providers: [life_tracker_service_1.LifeTrackerService],
-        exports: [life_tracker_service_1.LifeTrackerService],
+        providers: [life_tracker_service_1.LifeTrackerService, jwt_validator_service_1.JwtValidatorService],
+        exports: [life_tracker_service_1.LifeTrackerService, jwt_validator_service_1.JwtValidatorService],
     })
 ], LifeTrackerModule);
 //# sourceMappingURL=life-tracker.module.js.map

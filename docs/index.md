@@ -10,6 +10,7 @@ Bem-vindo à documentação completa do ecossistema Systentando ONE. Este índic
 ## Arquitetura
 
 - [Arquitetura do Systentando ONE](./architecture/systentando-one-architecture.md) - Visão geral da arquitetura técnica
+- [Backend Monorepo](./architecture/backend-monorepo-architecture.md) - Arquitetura detalhada do backend multi-linguagem
 - [Modelo de Dados](./architecture/data-model.md) - Estrutura e relacionamentos dos dados
 - [Estrutura do Catálogo](./architecture/catalog-structure.md) - Detalhamento do catálogo de sistemas
 - [Diagrama de Arquitetura](./architecture/architecture-diagram.svg) - Representação visual da arquitetura
