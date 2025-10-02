@@ -9,7 +9,7 @@ Este projeto implementa uma arquitetura multi-service para o Railway, separando 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   Node.js APIs  │    │  Python APIs    │    │    Go APIs      │
-│   (Port 3000)   │    │   (Port 8000)   │    │   (Port 8080)   │
+│   (Port 3000)   │    │   (Port 8000)   │    │   (Port 7777)   │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
          │                       │                       │
          └───────────────────────┼───────────────────────┘

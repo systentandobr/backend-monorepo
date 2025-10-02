@@ -1,0 +1,614 @@
+# LLMs Full Documentation - Node.js Ecosystem
+# Systentando Backend Monorepo
+
+## Visão Geral do Domínio Node.js
+
+O ecossistema Node.js no Systentando é responsável por APIs RESTful, sistema de gamificação, e gerenciamento de dados não-relacionais. Utiliza NestJS como framework principal, MongoDB como banco de dados, e implementa princípios de Clean Architecture.
+
+## Stack Tecnológica
+
+### Framework e Linguagem
+- **Node.js**: 18+ (LTS)
+- **NestJS**: 10.x (Framework principal)
+- **TypeScript**: 5.x (Linguagem de desenvolvimento)
+- **Express**: (Base do NestJS)
+
+### Banco de Dados
+- **MongoDB**: 6.x+ (Banco principal)
+- **Mongoose**: 7.x+ (ODM)
+- **Redis**: 7.x+ (Cache e sessões)
+
+### Autenticação e Segurança
+- **JWT**: jsonwebtoken
+- **Passport**: Estratégias de autenticação
+- **bcrypt**: Hash de senhas
+- **class-validator**: Validação de dados
+- **class-transformer**: Transformação de objetos
+
+### Documentação e Testes
+- **Swagger/OpenAPI**: Documentação de APIs
+- **Jest**: Framework de testes
+- **Supertest**: Testes de integração
+- **ESLint**: Linting de código
+- **Prettier**: Formatação de código
+
+## Estrutura de Diretórios
+
+```
+nodejs/
+├── apis/                           # Aplicações NestJS
+│   ├── apps/
+│   │   ├── apis-monorepo/          # API Gateway principal
+│   │   │   ├── src/
+│   │   │   │   ├── modules/         # Módulos da aplicação
+│   │   │   │   │   ├── auth/        # Autenticação
+│   │   │   │   │   ├── users/       # Gerenciamento de usuários
+│   │   │   │   │   ├── health/     # Health checks
+│   │   │   │   │   └── gateway/     # Roteamento centralizado
+│   │   │   │   ├── common/          # Utilitários compartilhados
+│   │   │   │   │   ├── decorators/  # Decorators customizados
+│   │   │   │   │   ├── filters/     # Exception filters
+│   │   │   │   │   ├── guards/      # Guards de autenticação
+│   │   │   │   │   ├── interceptors/ # Interceptors
+│   │   │   │   │   └── pipes/       # Validation pipes
+│   │   │   │   ├── config/          # Configurações
+│   │   │   │   └── main.ts          # Entry point
+│   │   │   ├── test/                # Testes
+│   │   │   └── package.json
+│   │   ├── life-tracker/            # Life Tracker API
+│   │   │   ├── src/modules/        # Módulos implementados
+│   │   │   │   ├── analytics/      # Analytics e métricas
+│   │   │   │   │   ├── analytics.controller.ts
+│   │   │   │   │   ├── analytics.service.ts
+│   │   │   │   │   ├── analytics.module.ts
+│   │   │   │   │   └── dto/        # Data Transfer Objects
+│   │   │   │   ├── business/       # Oportunidades de negócio
+│   │   │   │   ├── financial/      # Dados financeiros
+│   │   │   │   ├── gamification/  # Sistema de gamificação
+│   │   │   │   ├── habits/         # Gerenciamento de hábitos
+│   │   │   │   ├── health/         # Dados de saúde
+│   │   │   │   ├── productivity/  # Metas de produtividade
+│   │   │   │   └── routines/      # Rotinas integradas
+│   │   │   ├── schemas/            # Schemas MongoDB
+│   │   │   │   ├── user.schema.ts
+│   │   │   │   ├── analytics.schema.ts
+│   │   │   │   ├── gamification.schema.ts
+│   │   │   │   └── ...
+│   │   │   └── tests/              # Testes de contrato
+│   │   ├── sys-assistente-estudos/ # Assistente de estudos
+│   │   ├── sys-pagamentos/         # Sistema de pagamentos
+│   │   └── sys-produtos/           # Catálogo de produtos
+│   └── libs/                       # Bibliotecas compartilhadas
+│       ├── common/                 # Utilitários comuns
+│       ├── database/               # Configuração de banco
+│       └── auth/                    # Autenticação compartilhada
+└── catalog-products/               # Catálogo de produtos
+    ├── src/
+    ├── tests/
+    └── package.json
+```
+
+## Módulos Implementados
+
+### 1. Analytics Module
+**Responsabilidade**: Coleta, processamento e análise de métricas de usuário
+
+**Funcionalidades**:
+- Métricas de produtividade
+- Análise de tendências
+- Relatórios personalizados
+- Dashboard de performance
+
+**Endpoints**:
+```typescript
+GET    /api/analytics/metrics
+GET    /api/analytics/trends
+GET    /api/analytics/reports
+POST   /api/analytics/track-event
+```
+
+**Schema MongoDB**:
+```typescript
+interface AnalyticsData {
+  userId: string;
+  eventType: string;
+  timestamp: Date;
+  metadata: Record<string, any>;
+  sessionId: string;
+}
+```
+
+### 2. Business Module
+**Responsabilidade**: Gerenciamento de oportunidades de negócio e projetos
+
+**Funcionalidades**:
+- Oportunidades de negócio
+- Projetos colaborativos
+- Networking entre desenvolvedores
+- Avaliação de ideias
+
+**Endpoints**:
+```typescript
+GET    /api/business/opportunities
+POST   /api/business/projects
+GET    /api/business/collaborations
+POST   /api/business/evaluate-idea
+```
+
+### 3. Financial Module
+**Responsabilidade**: Dados financeiros e portfólio de investimentos
+
+**Funcionalidades**:
+- Portfólio de investimentos
+- Transações financeiras
+- Metas financeiras
+- Análise de performance
+
+**Endpoints**:
+```typescript
+GET    /api/financial/portfolio
+POST   /api/financial/transactions
+GET    /api/financial/goals
+POST   /api/financial/analysis
+```
+
+### 4. Gamification Module
+**Responsabilidade**: Sistema de gamificação e recompensas
+
+**Funcionalidades**:
+- Pontos de contribuição (CP)
+- Pontos de experiência (XP)
+- Tokens de equity (ET)
+- Conquistas e distintivos
+- Desafios e missões
+- Quadros de líderes
+
+**Endpoints**:
+```typescript
+GET    /api/gamification/points
+GET    /api/gamification/achievements
+POST   /api/gamification/claim-reward
+GET    /api/gamification/leaderboard
+POST   /api/gamification/complete-challenge
+```
+
+**Sistema de Níveis**:
+```typescript
+interface UserLevel {
+  level: number;
+  xp: number;
+  xpToNext: number;
+  title: string;
+  benefits: string[];
+}
+```
+
+### 5. Habits Module
+**Responsabilidade**: Gerenciamento de hábitos e rotinas
+
+**Funcionalidades**:
+- Criação de hábitos
+- Tracking de progresso
+- Streaks e estatísticas
+- Integração com rotinas
+
+**Endpoints**:
+```typescript
+POST   /api/habits
+GET    /api/habits/user/{userId}
+PUT    /api/habits/{habitId}
+POST   /api/habits/{habitId}/track
+GET    /api/habits/{habitId}/stats
+```
+
+### 6. Health Module
+**Responsabilidade**: Dados de saúde e bem-estar
+
+**Funcionalidades**:
+- Tracking de saúde
+- Metas de bem-estar
+- Integração com wearables
+- Relatórios de saúde
+
+**Endpoints**:
+```typescript
+GET    /api/health/progress
+POST   /api/health/metrics
+GET    /api/health/goals
+POST   /api/health/wellness-check
+```
+
+### 7. Productivity Module
+**Responsabilidade**: Metas de produtividade e performance
+
+**Funcionalidades**:
+- Definição de metas
+- Tracking de progresso
+- Análise de produtividade
+- Recomendações de melhoria
+
+**Endpoints**:
+```typescript
+POST   /api/productivity/goals
+GET    /api/productivity/progress
+PUT    /api/productivity/goals/{goalId}
+GET    /api/productivity/recommendations
+```
+
+### 8. Routines Module
+**Responsabilidade**: Rotinas integradas e personalizadas
+
+**Funcionalidades**:
+- Criação de rotinas
+- Templates de rotinas
+- Integração com outros módulos
+- Automação de tarefas
+
+**Endpoints**:
+```typescript
+GET    /api/routines/integrated
+POST   /api/routines
+PUT    /api/routines/{routineId}
+POST   /api/routines/{routineId}/execute
+```
+
+## Padrões de Desenvolvimento
+
+### 1. Clean Architecture
+```typescript
+// Estrutura de camadas
+src/
+├── domain/           # Entidades de domínio
+├── application/      # Casos de uso
+├── infrastructure/   # Implementações
+└── presentation/     # Controllers e DTOs
+```
+
+### 2. SOLID Principles
+- **S**ingle Responsibility: Cada classe tem uma responsabilidade
+- **O**pen/Closed: Aberto para extensão, fechado para modificação
+- **L**iskov Substitution: Substituição de implementações
+- **I**nterface Segregation: Interfaces específicas
+- **D**ependency Inversion: Dependências abstraídas
+
+### 3. DTOs e Validation
+```typescript
+export class CreateHabitDto {
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @IsEnum(HabitType)
+  type: HabitType;
+
+  @IsNumber()
+  @Min(1)
+  @Max(7)
+  frequency: number;
+}
+```
+
+### 4. Error Handling
+```typescript
+@Catch()
+export class AllExceptionsFilter implements ExceptionFilter {
+  catch(exception: unknown, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse();
+    const request = ctx.getRequest();
+
+    const status = exception instanceof HttpException 
+      ? exception.getStatus() 
+      : HttpStatus.INTERNAL_SERVER_ERROR;
+
+    response.status(status).json({
+      statusCode: status,
+      timestamp: new Date().toISOString(),
+      path: request.url,
+      message: exception.message,
+    });
+  }
+}
+```
+
+## Configuração de Banco de Dados
+
+### MongoDB Connection
+```typescript
+@Module({
+  imports: [
+    MongooseModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        uri: configService.get<string>('MONGODB_URI'),
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      }),
+      inject: [ConfigService],
+    }),
+  ],
+})
+export class DatabaseModule {}
+```
+
+### Schemas MongoDB
+```typescript
+@Schema({ timestamps: true })
+export class User {
+  @Prop({ required: true, unique: true })
+  email: string;
+
+  @Prop({ required: true })
+  name: string;
+
+  @Prop({ default: 0 })
+  xp: number;
+
+  @Prop({ default: 1 })
+  level: number;
+
+  @Prop({ type: [String], default: [] })
+  achievements: string[];
+}
+
+export const UserSchema = SchemaFactory.createForClass(User);
+```
+
+## Autenticação e Segurança
+
+### JWT Strategy
+```typescript
+@Injectable()
+export class JwtStrategy extends PassportStrategy(Strategy) {
+  constructor(private userService: UserService) {
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false,
+      secretOrKey: process.env.JWT_SECRET,
+    });
+  }
+
+  async validate(payload: any) {
+    return { userId: payload.sub, email: payload.email };
+  }
+}
+```
+
+### Guards de Autorização
+```typescript
+@Injectable()
+export class JwtAuthGuard extends AuthGuard('jwt') {
+  canActivate(context: ExecutionContext) {
+    return super.canActivate(context);
+  }
+
+  handleRequest(err, user, info) {
+    if (err || !user) {
+      throw err || new UnauthorizedException();
+    }
+    return user;
+  }
+}
+```
+
+## Testes
+
+### Unit Tests
+```typescript
+describe('AnalyticsService', () => {
+  let service: AnalyticsService;
+  let model: Model<AnalyticsData>;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        AnalyticsService,
+        {
+          provide: getModelToken(AnalyticsData.name),
+          useValue: mockModel,
+        },
+      ],
+    }).compile();
+
+    service = module.get<AnalyticsService>(AnalyticsService);
+    model = module.get<Model<AnalyticsData>>(getModelToken(AnalyticsData.name));
+  });
+
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
+
+  it('should create analytics data', async () => {
+    const createDto = { eventType: 'page_view', metadata: {} };
+    const result = await service.create(createDto);
+    expect(result).toBeDefined();
+  });
+});
+```
+
+### Integration Tests
+```typescript
+describe('AnalyticsController (e2e)', () => {
+  let app: INestApplication;
+
+  beforeEach(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
+
+    app = moduleFixture.createNestApplication();
+    await app.init();
+  });
+
+  it('/api/analytics/metrics (GET)', () => {
+    return request(app.getHttpServer())
+      .get('/api/analytics/metrics')
+      .expect(200)
+      .expect((res) => {
+        expect(res.body).toHaveProperty('metrics');
+      });
+  });
+});
+```
+
+## Performance e Otimização
+
+### Caching Strategy
+```typescript
+@Injectable()
+export class AnalyticsService {
+  constructor(
+    @InjectModel(AnalyticsData.name) private analyticsModel: Model<AnalyticsData>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
+
+  async getMetrics(userId: string): Promise<any> {
+    const cacheKey = `metrics:${userId}`;
+    const cached = await this.cacheManager.get(cacheKey);
+    
+    if (cached) {
+      return cached;
+    }
+
+    const metrics = await this.calculateMetrics(userId);
+    await this.cacheManager.set(cacheKey, metrics, 300); // 5 min cache
+    
+    return metrics;
+  }
+}
+```
+
+### Database Indexing
+```typescript
+// Índices para performance
+@Schema({
+  indexes: [
+    { userId: 1, timestamp: -1 },
+    { eventType: 1, timestamp: -1 },
+    { sessionId: 1 },
+  ],
+})
+export class AnalyticsData {
+  // ... campos
+}
+```
+
+## Monitoramento e Logs
+
+### Structured Logging
+```typescript
+@Injectable()
+export class LoggerService {
+  private logger = new Logger('AnalyticsService');
+
+  logAnalyticsEvent(event: AnalyticsEvent) {
+    this.logger.log({
+      message: 'Analytics event tracked',
+      userId: event.userId,
+      eventType: event.eventType,
+      timestamp: event.timestamp,
+      metadata: event.metadata,
+    });
+  }
+}
+```
+
+### Health Checks
+```typescript
+@Controller('health')
+export class HealthController {
+  constructor(
+    @InjectConnection() private connection: Connection,
+    private redis: RedisService,
+  ) {}
+
+  @Get()
+  async check() {
+    const mongoStatus = this.connection.readyState === 1 ? 'up' : 'down';
+    const redisStatus = await this.redis.ping() === 'PONG' ? 'up' : 'down';
+
+    return {
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      services: {
+        mongodb: mongoStatus,
+        redis: redisStatus,
+      },
+    };
+  }
+}
+```
+
+## Deploy e Configuração
+
+### Environment Variables
+```bash
+# Database
+MONGODB_URI=mongodb://localhost:27017/systentando
+REDIS_URL=redis://localhost:6379
+
+# Authentication
+JWT_SECRET=your-jwt-secret
+JWT_EXPIRES_IN=15m
+REFRESH_TOKEN_SECRET=your-refresh-secret
+REFRESH_TOKEN_EXPIRES_IN=7d
+
+# External APIs
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_KEY=your-supabase-anon-key
+OPENAI_API_KEY=your-openai-api-key
+
+# Application
+NODE_ENV=development
+PORT=3000
+API_PREFIX=api
+```
+
+### Docker Configuration
+```dockerfile
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+
+FROM node:18-alpine AS runtime
+
+WORKDIR /app
+COPY --from=builder /app/node_modules ./node_modules
+COPY . .
+
+EXPOSE 3000
+CMD ["npm", "run", "start:prod"]
+```
+
+## Próximos Passos
+
+### Fase 1: Consolidação
+- [ ] Implementação completa de todos os módulos
+- [ ] Testes automatizados (cobertura 80%+)
+- [ ] Documentação de APIs com Swagger
+- [ ] Integração com SYS-SEGURANÇA API
+
+### Fase 2: Otimização
+- [ ] Cache distribuído com Redis
+- [ ] Otimização de queries MongoDB
+- [ ] Rate limiting e throttling
+- [ ] Monitoramento avançado
+
+### Fase 3: Escala
+- [ ] Microserviços independentes
+- [ ] Load balancing
+- [ ] Auto-scaling
+- [ ] Disaster recovery
+
+## Recursos Adicionais
+
+- [NestJS Documentation](https://docs.nestjs.com/)
+- [MongoDB Documentation](https://docs.mongodb.com/)
+- [Mongoose Documentation](https://mongoosejs.com/docs/)
+- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
+- [Jest Documentation](https://jestjs.io/docs/getting-started)

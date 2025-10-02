@@ -1,0 +1,947 @@
+# LLMs Full Documentation - Golang Ecosystem
+# Systentando Backend Monorepo
+
+## Visão Geral do Domínio Golang
+
+O ecossistema Golang no Systentando é responsável por serviços de alta performance, coleta de dados financeiros, e sistemas de bem-estar digital. Utiliza Gin como framework web, MongoDB como banco de dados, e implementa Clean Architecture com princípios SOLID para máxima manutenibilidade e performance.
+
+## Stack Tecnológica
+
+### Framework e Linguagem
+- **Go**: 1.21+ (Linguagem principal)
+- **Gin**: 1.9+ (Framework web)
+- **GORM**: 1.25+ (ORM opcional)
+- **MongoDB Driver**: 1.13+ (Driver oficial)
+
+### Banco de Dados
+- **MongoDB**: 6.x+ (Banco principal)
+- **Redis**: 7.x+ (Cache e sessões)
+- **InfluxDB**: (Métricas de performance)
+
+### Autenticação e Segurança
+- **JWT**: github.com/golang-jwt/jwt/v5
+- **bcrypt**: golang.org/x/crypto/bcrypt
+- **CORS**: github.com/gin-contrib/cors
+- **Rate Limiting**: github.com/ulule/limiter/v3
+
+### Testes e Qualidade
+- **Testify**: github.com/stretchr/testify
+- **Ginkgo**: github.com/onsi/ginkgo/v2 (BDD)
+- **Gomega**: github.com/onsi/gomega (Matchers)
+- **golangci-lint**: (Linting)
+- **go fmt**: (Formatação)
+
+## Estrutura de Diretórios
+
+```
+golang/
+├── invest-tracker/                  # Rastreador de Investimentos
+│   ├── cmd/                        # Aplicações
+│   │   ├── main.go                 # Entry point
+│   │   └── server/                 # Servidor HTTP
+│   │       ├── main.go
+│   │       └── config.go
+│   ├── internal/                    # Clean Architecture
+│   │   ├── domain/                 # Entidades de domínio
+│   │   │   ├── asset.go
+│   │   │   ├── portfolio.go
+│   │   │   ├── transaction.go
+│   │   │   └── user.go
+│   │   ├── usecase/                # Casos de uso
+│   │   │   ├── asset_usecase.go
+│   │   │   ├── portfolio_usecase.go
+│   │   │   └── transaction_usecase.go
+│   │   ├── repository/             # Repositórios
+│   │   │   ├── interfaces.go
+│   │   │   ├── asset_repository.go
+│   │   │   ├── portfolio_repository.go
+│   │   │   └── transaction_repository.go
+│   │   ├── handler/                # Handlers HTTP
+│   │   │   ├── asset_handler.go
+│   │   │   ├── portfolio_handler.go
+│   │   │   └── transaction_handler.go
+│   │   ├── service/                # Serviços de negócio
+│   │   │   ├── market_service.go
+│   │   │   ├── analysis_service.go
+│   │   │   └── notification_service.go
+│   │   └── middleware/              # Middleware
+│   │       ├── auth.go
+│   │       ├── cors.go
+│   │       ├── logging.go
+│   │       └── rate_limit.go
+│   ├── pkg/                        # Pacotes compartilhados
+│   │   ├── database/               # Configuração de banco
+│   │   │   ├── mongodb.go
+│   │   │   └── redis.go
+│   │   ├── auth/                   # Autenticação
+│   │   │   ├── jwt.go
+│   │   │   └── middleware.go
+│   │   ├── utils/                  # Utilitários
+│   │   │   ├── response.go
+│   │   │   ├── validation.go
+│   │   │   └── logger.go
+│   │   └── config/                  # Configurações
+│   │       ├── config.go
+│   │       └── env.go
+│   ├── tests/                      # Testes
+│   │   ├── unit/                   # Testes unitários
+│   │   ├── integration/            # Testes de integração
+│   │   └── e2e/                    # Testes end-to-end
+│   ├── go.mod                      # Dependências
+│   ├── go.sum                      # Checksums
+│   └── README.md
+├── zen-launcher/                   # Launcher de Bem-estar
+│   ├── cmd/
+│   ├── internal/
+│   ├── pkg/
+│   └── tests/
+├── catalog-structure/              # Estrutura do Catálogo
+│   ├── cmd/
+│   ├── internal/
+│   ├── pkg/
+│   └── tests/
+└── business/                       # Sistema de Negócios
+    ├── cmd/
+    ├── internal/
+    ├── pkg/
+    └── tests/
+```
+
+## Clean Architecture Implementation
+
+### Domain Layer (Entidades)
+```go
+// internal/domain/asset.go
+package domain
+
+import (
+    "time"
+    "go.mongodb.org/mongo-driver/bson/primitive"
+)
+
+type Asset struct {
+    ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+    Symbol      string             `bson:"symbol" json:"symbol"`
+    Name        string             `bson:"name" json:"name"`
+    Type        AssetType          `bson:"type" json:"type"`
+    Exchange    string             `bson:"exchange" json:"exchange"`
+    Currency    string             `bson:"currency" json:"currency"`
+    Price       float64            `bson:"price" json:"price"`
+    Change      float64            `bson:"change" json:"change"`
+    ChangePercent float64          `bson:"change_percent" json:"change_percent"`
+    Volume      int64              `bson:"volume" json:"volume"`
+    MarketCap   float64            `bson:"market_cap" json:"market_cap"`
+    UpdatedAt   time.Time          `bson:"updated_at" json:"updated_at"`
+    CreatedAt   time.Time          `bson:"created_at" json:"created_at"`
+}
+
+type AssetType string
+
+const (
+    AssetTypeStock    AssetType = "stock"
+    AssetTypeCrypto   AssetType = "crypto"
+    AssetTypeBond     AssetType = "bond"
+    AssetTypeETF      AssetType = "etf"
+    AssetTypeCommodity AssetType = "commodity"
+)
+
+// internal/domain/portfolio.go
+type Portfolio struct {
+    ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+    UserID      primitive.ObjectID `bson:"user_id" json:"user_id"`
+    Name        string             `bson:"name" json:"name"`
+    Description string             `bson:"description" json:"description"`
+    Assets      []PortfolioAsset   `bson:"assets" json:"assets"`
+    TotalValue  float64            `bson:"total_value" json:"total_value"`
+    TotalReturn float64            `bson:"total_return" json:"total_return"`
+    TotalReturnPercent float64     `bson:"total_return_percent" json:"total_return_percent"`
+    CreatedAt   time.Time          `bson:"created_at" json:"created_at"`
+    UpdatedAt   time.Time          `bson:"updated_at" json:"updated_at"`
+}
+
+type PortfolioAsset struct {
+    AssetID     primitive.ObjectID `bson:"asset_id" json:"asset_id"`
+    Symbol      string             `bson:"symbol" json:"symbol"`
+    Quantity    float64            `bson:"quantity" json:"quantity"`
+    AveragePrice float64           `bson:"average_price" json:"average_price"`
+    CurrentPrice float64           `bson:"current_price" json:"current_price"`
+    Value       float64            `bson:"value" json:"value"`
+    Return      float64            `bson:"return" json:"return"`
+    ReturnPercent float64          `bson:"return_percent" json:"return_percent"`
+}
+```
+
+### Use Case Layer (Casos de Uso)
+```go
+// internal/usecase/asset_usecase.go
+package usecase
+
+import (
+    "context"
+    "errors"
+    "time"
+)
+
+type AssetUseCase interface {
+    GetAsset(ctx context.Context, id string) (*domain.Asset, error)
+    GetAssets(ctx context.Context, filter AssetFilter) ([]*domain.Asset, error)
+    CreateAsset(ctx context.Context, asset *domain.Asset) error
+    UpdateAsset(ctx context.Context, id string, asset *domain.Asset) error
+    DeleteAsset(ctx context.Context, id string) error
+    GetAssetPrice(ctx context.Context, symbol string) (*domain.Asset, error)
+    GetMarketData(ctx context.Context, symbols []string) ([]*domain.Asset, error)
+}
+
+type AssetFilter struct {
+    Type     *domain.AssetType `json:"type,omitempty"`
+    Exchange *string           `json:"exchange,omitempty"`
+    Currency *string          `json:"currency,omitempty"`
+    Limit    int               `json:"limit"`
+    Offset   int               `json:"offset"`
+}
+
+type assetUseCase struct {
+    assetRepo    repository.AssetRepository
+    marketService service.MarketService
+    cacheService service.CacheService
+}
+
+func NewAssetUseCase(
+    assetRepo repository.AssetRepository,
+    marketService service.MarketService,
+    cacheService service.CacheService,
+) AssetUseCase {
+    return &assetUseCase{
+        assetRepo:    assetRepo,
+        marketService: marketService,
+        cacheService: cacheService,
+    }
+}
+
+func (uc *assetUseCase) GetAsset(ctx context.Context, id string) (*domain.Asset, error) {
+    // Verificar cache primeiro
+    cached, err := uc.cacheService.Get(ctx, "asset:"+id)
+    if err == nil && cached != nil {
+        var asset domain.Asset
+        if err := json.Unmarshal(cached, &asset); err == nil {
+            return &asset, nil
+        }
+    }
+    
+    // Buscar no banco de dados
+    asset, err := uc.assetRepo.GetByID(ctx, id)
+    if err != nil {
+        return nil, err
+    }
+    
+    // Atualizar cache
+    if assetData, err := json.Marshal(asset); err == nil {
+        uc.cacheService.Set(ctx, "asset:"+id, assetData, 5*time.Minute)
+    }
+    
+    return asset, nil
+}
+
+func (uc *assetUseCase) GetMarketData(ctx context.Context, symbols []string) ([]*domain.Asset, error) {
+    // Buscar dados de mercado em tempo real
+    marketData, err := uc.marketService.GetMarketData(ctx, symbols)
+    if err != nil {
+        return nil, err
+    }
+    
+    // Atualizar cache com dados mais recentes
+    for _, asset := range marketData {
+        if assetData, err := json.Marshal(asset); err == nil {
+            uc.cacheService.Set(ctx, "asset:"+asset.ID.Hex(), assetData, 1*time.Minute)
+        }
+    }
+    
+    return marketData, nil
+}
+```
+
+### Repository Layer (Repositórios)
+```go
+// internal/repository/interfaces.go
+package repository
+
+import (
+    "context"
+    "go.mongodb.org/mongo-driver/bson/primitive"
+)
+
+type AssetRepository interface {
+    GetByID(ctx context.Context, id string) (*domain.Asset, error)
+    GetBySymbol(ctx context.Context, symbol string) (*domain.Asset, error)
+    GetAll(ctx context.Context, filter AssetFilter) ([]*domain.Asset, error)
+    Create(ctx context.Context, asset *domain.Asset) error
+    Update(ctx context.Context, id string, asset *domain.Asset) error
+    Delete(ctx context.Context, id string) error
+    GetByType(ctx context.Context, assetType domain.AssetType) ([]*domain.Asset, error)
+    Search(ctx context.Context, query string) ([]*domain.Asset, error)
+}
+
+// internal/repository/asset_repository.go
+type assetRepository struct {
+    collection *mongo.Collection
+}
+
+func NewAssetRepository(db *mongo.Database) AssetRepository {
+    return &assetRepository{
+        collection: db.Collection("assets"),
+    }
+}
+
+func (r *assetRepository) GetByID(ctx context.Context, id string) (*domain.Asset, error) {
+    objectID, err := primitive.ObjectIDFromHex(id)
+    if err != nil {
+        return nil, errors.New("invalid asset ID")
+    }
+    
+    var asset domain.Asset
+    err = r.collection.FindOne(ctx, bson.M{"_id": objectID}).Decode(&asset)
+    if err != nil {
+        if err == mongo.ErrNoDocuments {
+            return nil, errors.New("asset not found")
+        }
+        return nil, err
+    }
+    
+    return &asset, nil
+}
+
+func (r *assetRepository) GetAll(ctx context.Context, filter AssetFilter) ([]*domain.Asset, error) {
+    query := bson.M{}
+    
+    if filter.Type != nil {
+        query["type"] = *filter.Type
+    }
+    
+    if filter.Exchange != nil {
+        query["exchange"] = *filter.Exchange
+    }
+    
+    if filter.Currency != nil {
+        query["currency"] = *filter.Currency
+    }
+    
+    options := options.Find()
+    if filter.Limit > 0 {
+        options.SetLimit(int64(filter.Limit))
+    }
+    if filter.Offset > 0 {
+        options.SetSkip(int64(filter.Offset))
+    }
+    
+    cursor, err := r.collection.Find(ctx, query, options)
+    if err != nil {
+        return nil, err
+    }
+    defer cursor.Close(ctx)
+    
+    var assets []*domain.Asset
+    for cursor.Next(ctx) {
+        var asset domain.Asset
+        if err := cursor.Decode(&asset); err != nil {
+            return nil, err
+        }
+        assets = append(assets, &asset)
+    }
+    
+    return assets, nil
+}
+```
+
+### Handler Layer (HTTP Handlers)
+```go
+// internal/handler/asset_handler.go
+package handler
+
+import (
+    "net/http"
+    "strconv"
+    
+    "github.com/gin-gonic/gin"
+    "github.com/systentando/backend-monorepo/golang/invest-tracker/internal/usecase"
+)
+
+type AssetHandler struct {
+    assetUseCase usecase.AssetUseCase
+}
+
+func NewAssetHandler(assetUseCase usecase.AssetUseCase) *AssetHandler {
+    return &AssetHandler{
+        assetUseCase: assetUseCase,
+    }
+}
+
+func (h *AssetHandler) GetAsset(c *gin.Context) {
+    id := c.Param("id")
+    if id == "" {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "asset ID is required"})
+        return
+    }
+    
+    asset, err := h.assetUseCase.GetAsset(c.Request.Context(), id)
+    if err != nil {
+        c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+        return
+    }
+    
+    c.JSON(http.StatusOK, gin.H{
+        "success": true,
+        "data":    asset,
+    })
+}
+
+func (h *AssetHandler) GetAssets(c *gin.Context) {
+    var filter usecase.AssetFilter
+    
+    // Parse query parameters
+    if assetType := c.Query("type"); assetType != "" {
+        filter.Type = (*domain.AssetType)(&assetType)
+    }
+    
+    if exchange := c.Query("exchange"); exchange != "" {
+        filter.Exchange = &exchange
+    }
+    
+    if currency := c.Query("currency"); currency != "" {
+        filter.Currency = &currency
+    }
+    
+    if limitStr := c.Query("limit"); limitStr != "" {
+        if limit, err := strconv.Atoi(limitStr); err == nil {
+            filter.Limit = limit
+        }
+    }
+    
+    if offsetStr := c.Query("offset"); offsetStr != "" {
+        if offset, err := strconv.Atoi(offsetStr); err == nil {
+            filter.Offset = offset
+        }
+    }
+    
+    assets, err := h.assetUseCase.GetAssets(c.Request.Context(), filter)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    
+    c.JSON(http.StatusOK, gin.H{
+        "success": true,
+        "data":    assets,
+        "count":   len(assets),
+    })
+}
+
+func (h *AssetHandler) GetMarketData(c *gin.Context) {
+    symbolsStr := c.Query("symbols")
+    if symbolsStr == "" {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "symbols parameter is required"})
+        return
+    }
+    
+    symbols := strings.Split(symbolsStr, ",")
+    if len(symbols) == 0 {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "at least one symbol is required"})
+        return
+    }
+    
+    assets, err := h.assetUseCase.GetMarketData(c.Request.Context(), symbols)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    
+    c.JSON(http.StatusOK, gin.H{
+        "success": true,
+        "data":    assets,
+        "count":   len(assets),
+    })
+}
+```
+
+## Invest Tracker - Sistema de Investimentos
+
+### Visão Geral
+O Invest Tracker é um sistema completo de rastreamento e análise de investimentos que coleta dados em tempo real, simula portfólios e fornece insights personalizados.
+
+### Funcionalidades Principais
+
+#### 1. Coleta de Dados em Tempo Real
+```go
+// internal/service/market_service.go
+type MarketService interface {
+    GetMarketData(ctx context.Context, symbols []string) ([]*domain.Asset, error)
+    GetAssetPrice(ctx context.Context, symbol string) (*domain.Asset, error)
+    GetHistoricalData(ctx context.Context, symbol string, period string) ([]*domain.PricePoint, error)
+    GetMarketStatus(ctx context.Context) (*domain.MarketStatus, error)
+}
+
+type marketService struct {
+    apiClient    MarketAPIClient
+    cacheService CacheService
+    logger       Logger
+}
+
+func (s *marketService) GetMarketData(ctx context.Context, symbols []string) ([]*domain.Asset, error) {
+    // Verificar cache primeiro
+    cachedData, err := s.cacheService.Get(ctx, "market:"+strings.Join(symbols, ","))
+    if err == nil && cachedData != nil {
+        var assets []*domain.Asset
+        if err := json.Unmarshal(cachedData, &assets); err == nil {
+            return assets, nil
+        }
+    }
+    
+    // Buscar dados da API
+    assets, err := s.apiClient.GetMarketData(ctx, symbols)
+    if err != nil {
+        return nil, err
+    }
+    
+    // Atualizar cache
+    if data, err := json.Marshal(assets); err == nil {
+        s.cacheService.Set(ctx, "market:"+strings.Join(symbols, ","), data, 1*time.Minute)
+    }
+    
+    return assets, nil
+}
+```
+
+#### 2. Análise de Portfólio
+```go
+// internal/service/analysis_service.go
+type AnalysisService interface {
+    AnalyzePortfolio(ctx context.Context, portfolio *domain.Portfolio) (*domain.PortfolioAnalysis, error)
+    CalculateRisk(ctx context.Context, portfolio *domain.Portfolio) (*domain.RiskAnalysis, error)
+    GenerateRecommendations(ctx context.Context, userID string) ([]*domain.Recommendation, error)
+    SimulatePortfolio(ctx context.Context, simulation *domain.PortfolioSimulation) (*domain.SimulationResult, error)
+}
+
+type PortfolioAnalysis struct {
+    TotalValue        float64                    `json:"total_value"`
+    TotalReturn       float64                    `json:"total_return"`
+    TotalReturnPercent float64                   `json:"total_return_percent"`
+    DailyReturn       float64                    `json:"daily_return"`
+    Volatility        float64                    `json:"volatility"`
+    SharpeRatio       float64                    `json:"sharpe_ratio"`
+    Beta              float64                    `json:"beta"`
+    AssetAllocation   map[string]float64         `json:"asset_allocation"`
+    TopPerformers     []*domain.Asset            `json:"top_performers"`
+    BottomPerformers  []*domain.Asset            `json:"bottom_performers"`
+    RiskMetrics       *domain.RiskAnalysis       `json:"risk_metrics"`
+    Recommendations   []*domain.Recommendation   `json:"recommendations"`
+}
+```
+
+#### 3. Sistema de Notificações
+```go
+// internal/service/notification_service.go
+type NotificationService interface {
+    CreateAlert(ctx context.Context, alert *domain.Alert) error
+    SendNotification(ctx context.Context, notification *domain.Notification) error
+    GetUserNotifications(ctx context.Context, userID string) ([]*domain.Notification, error)
+    MarkAsRead(ctx context.Context, notificationID string) error
+}
+
+type Alert struct {
+    ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+    UserID      primitive.ObjectID `bson:"user_id" json:"user_id"`
+    AssetID     primitive.ObjectID `bson:"asset_id" json:"asset_id"`
+    Symbol      string             `bson:"symbol" json:"symbol"`
+    Type        AlertType          `bson:"type" json:"type"`
+    Condition   string             `bson:"condition" json:"condition"`
+    Value       float64            `bson:"value" json:"value"`
+    IsActive    bool               `bson:"is_active" json:"is_active"`
+    CreatedAt   time.Time          `bson:"created_at" json:"created_at"`
+    TriggeredAt *time.Time         `bson:"triggered_at,omitempty" json:"triggered_at"`
+}
+
+type AlertType string
+
+const (
+    AlertTypePriceAbove AlertType = "price_above"
+    AlertTypePriceBelow AlertType = "price_below"
+    AlertTypeVolumeHigh AlertType = "volume_high"
+    AlertTypeVolumeLow  AlertType = "volume_low"
+    AlertTypeReturnHigh AlertType = "return_high"
+    AlertTypeReturnLow  AlertType = "return_low"
+)
+```
+
+## ZEN Launcher - Sistema de Bem-estar Digital
+
+### Visão Geral
+O ZEN Launcher é um sistema de bem-estar digital que ajuda usuários a reduzir o tempo de tela, combater a procrastinação e cultivar hábitos saudáveis.
+
+### Funcionalidades Principais
+
+#### 1. Gerenciamento de Tempo de Tela
+```go
+// internal/domain/screen_time.go
+type ScreenTime struct {
+    ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+    UserID      primitive.ObjectID `bson:"user_id" json:"user_id"`
+    Date        time.Time          `bson:"date" json:"date"`
+    TotalTime   int64              `bson:"total_time" json:"total_time"` // em minutos
+    AppUsage    []AppUsage         `bson:"app_usage" json:"app_usage"`
+    Goals       ScreenTimeGoals    `bson:"goals" json:"goals"`
+    Achievements []Achievement     `bson:"achievements" json:"achievements"`
+    CreatedAt   time.Time          `bson:"created_at" json:"created_at"`
+    UpdatedAt   time.Time          `bson:"updated_at" json:"updated_at"`
+}
+
+type AppUsage struct {
+    AppName     string  `bson:"app_name" json:"app_name"`
+    TimeSpent   int64   `bson:"time_spent" json:"time_spent"` // em minutos
+    Category    string  `bson:"category" json:"category"`
+    IsProductive bool   `bson:"is_productive" json:"is_productive"`
+}
+
+type ScreenTimeGoals struct {
+    DailyLimit    int64   `bson:"daily_limit" json:"daily_limit"`
+    WeeklyLimit   int64   `bson:"weekly_limit" json:"weekly_limit"`
+    BreakReminder int64   `bson:"break_reminder" json:"break_reminder"` // em minutos
+    FocusTime     int64   `bson:"focus_time" json:"focus_time"` // em minutos
+}
+```
+
+#### 2. Sistema de Foco e Produtividade
+```go
+// internal/domain/focus_session.go
+type FocusSession struct {
+    ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+    UserID      primitive.ObjectID `bson:"user_id" json:"user_id"`
+    Title       string             `bson:"title" json:"title"`
+    Description string             `bson:"description" json:"description"`
+    Duration    int64              `bson:"duration" json:"duration"` // em minutos
+    StartTime   time.Time          `bson:"start_time" json:"start_time"`
+    EndTime     *time.Time         `bson:"end_time,omitempty" json:"end_time"`
+    Status      SessionStatus      `bson:"status" json:"status"`
+    Category    string             `bson:"category" json:"category"`
+    Tags        []string           `bson:"tags" json:"tags"`
+    Notes       string             `bson:"notes" json:"notes"`
+    CreatedAt   time.Time          `bson:"created_at" json:"created_at"`
+}
+
+type SessionStatus string
+
+const (
+    SessionStatusPlanned  SessionStatus = "planned"
+    SessionStatusActive   SessionStatus = "active"
+    SessionStatusPaused   SessionStatus = "paused"
+    SessionStatusCompleted SessionStatus = "completed"
+    SessionStatusCancelled SessionStatus = "cancelled"
+)
+```
+
+#### 3. Sistema de Gamificação
+```go
+// internal/domain/wellness_achievement.go
+type WellnessAchievement struct {
+    ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+    UserID      primitive.ObjectID `bson:"user_id" json:"user_id"`
+    Type        AchievementType    `bson:"type" json:"type"`
+    Title       string             `bson:"title" json:"title"`
+    Description string             `bson:"description" json:"description"`
+    Points      int                `bson:"points" json:"points"`
+    Icon        string             `bson:"icon" json:"icon"`
+    UnlockedAt  time.Time          `bson:"unlocked_at" json:"unlocked_at"`
+    Progress    float64            `bson:"progress" json:"progress"` // 0.0 a 1.0
+}
+
+type AchievementType string
+
+const (
+    AchievementTypeScreenTime    AchievementType = "screen_time"
+    AchievementTypeFocus         AchievementType = "focus"
+    AchievementTypeBreak         AchievementType = "break"
+    AchievementTypeStreak         AchievementType = "streak"
+    AchievementTypeWellness      AchievementType = "wellness"
+    AchievementTypeProductivity  AchievementType = "productivity"
+)
+```
+
+## Configuração e Deploy
+
+### Environment Variables
+```bash
+# Database
+MONGODB_URI=mongodb://localhost:27017/systentando
+REDIS_URL=redis://localhost:6379
+
+# External APIs
+ALPHA_VANTAGE_API_KEY=your-alpha-vantage-key
+FINNHUB_API_KEY=your-finnhub-key
+POLYGON_API_KEY=your-polygon-key
+
+# Authentication
+JWT_SECRET=your-jwt-secret
+JWT_EXPIRE_HOURS=24
+
+# Application
+GIN_MODE=release
+PORT=8080
+LOG_LEVEL=info
+```
+
+### Docker Configuration
+```dockerfile
+FROM golang:1.21-alpine AS builder
+
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main cmd/main.go
+
+FROM alpine:latest
+
+RUN apk --no-cache add ca-certificates
+WORKDIR /root/
+
+COPY --from=builder /app/main .
+
+EXPOSE 8080
+CMD ["./main"]
+```
+
+### Go Modules
+```go
+// go.mod
+module github.com/systentando/backend-monorepo/golang/invest-tracker
+
+go 1.21
+
+require (
+    github.com/gin-gonic/gin v1.9.1
+    github.com/golang-jwt/jwt/v5 v5.2.0
+    github.com/gin-contrib/cors v1.5.0
+    github.com/ulule/limiter/v3 v3.11.2
+    go.mongodb.org/mongo-driver v1.13.1
+    github.com/go-redis/redis/v8 v8.11.5
+    github.com/stretchr/testify v1.8.4
+    github.com/onsi/ginkgo/v2 v2.15.0
+    github.com/onsi/gomega v1.31.1
+)
+```
+
+## Testes
+
+### Unit Tests
+```go
+// tests/unit/asset_usecase_test.go
+package unit
+
+import (
+    "context"
+    "testing"
+    "time"
+    
+    "github.com/stretchr/testify/assert"
+    "github.com/stretchr/testify/mock"
+    "github.com/systentando/backend-monorepo/golang/invest-tracker/internal/domain"
+    "github.com/systentando/backend-monorepo/golang/invest-tracker/internal/usecase"
+)
+
+type MockAssetRepository struct {
+    mock.Mock
+}
+
+func (m *MockAssetRepository) GetByID(ctx context.Context, id string) (*domain.Asset, error) {
+    args := m.Called(ctx, id)
+    return args.Get(0).(*domain.Asset), args.Error(1)
+}
+
+func TestAssetUseCase_GetAsset(t *testing.T) {
+    // Arrange
+    mockRepo := new(MockAssetRepository)
+    mockMarketService := new(MockMarketService)
+    mockCacheService := new(MockCacheService)
+    
+    assetUseCase := usecase.NewAssetUseCase(mockRepo, mockMarketService, mockCacheService)
+    
+    expectedAsset := &domain.Asset{
+        ID:     primitive.NewObjectID(),
+        Symbol: "AAPL",
+        Name:   "Apple Inc.",
+        Price:  150.00,
+    }
+    
+    mockRepo.On("GetByID", mock.Anything, "test-id").Return(expectedAsset, nil)
+    
+    // Act
+    result, err := assetUseCase.GetAsset(context.Background(), "test-id")
+    
+    // Assert
+    assert.NoError(t, err)
+    assert.Equal(t, expectedAsset, result)
+    mockRepo.AssertExpectations(t)
+}
+```
+
+### Integration Tests
+```go
+// tests/integration/asset_integration_test.go
+package integration
+
+import (
+    "context"
+    "testing"
+    "time"
+    
+    "github.com/stretchr/testify/assert"
+    "github.com/systentando/backend-monorepo/golang/invest-tracker/internal/domain"
+    "github.com/systentando/backend-monorepo/golang/invest-tracker/internal/repository"
+)
+
+func TestAssetRepository_Integration(t *testing.T) {
+    // Setup test database
+    db := setupTestDB(t)
+    defer cleanupTestDB(t, db)
+    
+    assetRepo := repository.NewAssetRepository(db)
+    
+    // Test data
+    asset := &domain.Asset{
+        Symbol: "AAPL",
+        Name:   "Apple Inc.",
+        Type:   domain.AssetTypeStock,
+        Price:  150.00,
+    }
+    
+    // Test Create
+    err := assetRepo.Create(context.Background(), asset)
+    assert.NoError(t, err)
+    assert.NotEmpty(t, asset.ID)
+    
+    // Test GetByID
+    retrieved, err := assetRepo.GetByID(context.Background(), asset.ID.Hex())
+    assert.NoError(t, err)
+    assert.Equal(t, asset.Symbol, retrieved.Symbol)
+    assert.Equal(t, asset.Name, retrieved.Name)
+}
+```
+
+## Monitoramento e Logs
+
+### Structured Logging
+```go
+// pkg/utils/logger.go
+package utils
+
+import (
+    "log/slog"
+    "os"
+    "time"
+)
+
+type Logger struct {
+    *slog.Logger
+}
+
+func NewLogger(level string) *Logger {
+    var logLevel slog.Level
+    switch level {
+    case "debug":
+        logLevel = slog.LevelDebug
+    case "info":
+        logLevel = slog.LevelInfo
+    case "warn":
+        logLevel = slog.LevelWarn
+    case "error":
+        logLevel = slog.LevelError
+    default:
+        logLevel = slog.LevelInfo
+    }
+    
+    handler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+        Level: logLevel,
+        AddSource: true,
+    })
+    
+    return &Logger{
+        Logger: slog.New(handler),
+    }
+}
+
+func (l *Logger) LogAssetAccess(ctx context.Context, assetID string, userID string) {
+    l.Info("Asset accessed",
+        "asset_id", assetID,
+        "user_id", userID,
+        "timestamp", time.Now(),
+    )
+}
+```
+
+### Health Checks
+```go
+// internal/handler/health_handler.go
+func (h *HealthHandler) HealthCheck(c *gin.Context) {
+    ctx := c.Request.Context()
+    
+    // Check database connection
+    dbStatus := "up"
+    if err := h.db.Ping(ctx); err != nil {
+        dbStatus = "down"
+    }
+    
+    // Check Redis connection
+    redisStatus := "up"
+    if err := h.redis.Ping(ctx).Err(); err != nil {
+        redisStatus = "down"
+    }
+    
+    // Check external APIs
+    apiStatus := "up"
+    if err := h.marketService.HealthCheck(ctx); err != nil {
+        apiStatus = "down"
+    }
+    
+    status := "healthy"
+    if dbStatus == "down" || redisStatus == "down" || apiStatus == "down" {
+        status = "unhealthy"
+    }
+    
+    c.JSON(http.StatusOK, gin.H{
+        "status":    status,
+        "timestamp": time.Now().UTC(),
+        "services": gin.H{
+            "database": dbStatus,
+            "redis":    redisStatus,
+            "apis":     apiStatus,
+        },
+    })
+}
+```
+
+## Próximos Passos
+
+### Fase 1: Consolidação
+- [ ] Implementação completa de todos os serviços
+- [ ] Testes automatizados (cobertura 80%+)
+- [ ] Documentação de APIs com Swagger
+- [ ] Integração com SYS-SEGURANÇA API
+
+### Fase 2: Otimização
+- [ ] Cache distribuído com Redis
+- [ ] Otimização de queries MongoDB
+- [ ] Rate limiting e throttling
+- [ ] Monitoramento avançado
+
+### Fase 3: Escala
+- [ ] Microserviços independentes
+- [ ] Load balancing
+- [ ] Auto-scaling
+- [ ] Disaster recovery
+
+## Recursos Adicionais
+
+- [Gin Documentation](https://gin-gonic.com/docs/)
+- [MongoDB Go Driver](https://docs.mongodb.com/drivers/go/)
+- [Go Testing](https://golang.org/pkg/testing/)
+- [Clean Architecture in Go](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
+- [Go Best Practices](https://golang.org/doc/effective_go.html)
