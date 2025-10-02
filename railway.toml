@@ -1,5 +1,7 @@
 [build]
 builder = "DOCKERFILE"
+dockerfilePath = "golang/invest-tracker/Dockerfile"
+context = "golang/invest-tracker"
 [deploy]
 healthcheckPath = "/debug/health"
 healthcheckTimeout = 300
