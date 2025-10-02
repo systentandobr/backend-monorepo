@@ -1,7 +1,6 @@
 [build]
 builder = "DOCKERFILE"
-dockerfilePath = "golang/invest-tracker/Dockerfile"
-context = "golang/invest-tracker" 
+dockerfilePath = "golang/invest-tracker/Dockerfile" 
 
 [deploy]
 healthcheckPath = "/health"
