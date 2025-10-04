@@ -5,8 +5,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/entity"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/valueobject"
+	"github.com/systentandobr/invest-tracker/internal/domain/asset/entity"
+	"github.com/systentandobr/invest-tracker/internal/domain/asset/valueobject"
 )
 
 // AssetRepository define as operações para manipulação de ativos

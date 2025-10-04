@@ -4,12 +4,12 @@ import (
 	"context"
 	"time"
 
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/analysis/entity"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/analysis/repository"
-	assetEntity "github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/entity"
-	assetRepository "github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/repository"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/pkg/common/errors"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/pkg/common/logger"
+	"github.com/systentandobr/invest-tracker/internal/domain/analysis/entity"
+	"github.com/systentandobr/invest-tracker/internal/domain/analysis/repository"
+	assetEntity "github.com/systentandobr/invest-tracker/internal/domain/asset/entity"
+	assetRepository "github.com/systentandobr/invest-tracker/internal/domain/asset/repository"
+	"github.com/systentandobr/invest-tracker/pkg/common/errors"
+	"github.com/systentandobr/invest-tracker/pkg/common/logger"
 )
 
 // OpportunityServiceImpl implements the OpportunityService interface

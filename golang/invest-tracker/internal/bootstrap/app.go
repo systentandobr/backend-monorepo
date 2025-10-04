@@ -6,10 +6,10 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/adapter/factory"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/scheduler"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/pkg/common/logger"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/pkg/infrastructure/telemetry"
+	"github.com/systentandobr/invest-tracker/internal/adapter/factory"
+	"github.com/systentandobr/invest-tracker/internal/scheduler"
+	"github.com/systentandobr/invest-tracker/pkg/common/logger"
+	"github.com/systentandobr/invest-tracker/pkg/infrastructure/telemetry"
 )
 
 // AppBootstrap handles application initialization and dependency wiring

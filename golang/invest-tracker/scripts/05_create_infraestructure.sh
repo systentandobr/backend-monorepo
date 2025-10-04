@@ -15,10 +15,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/entity"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/valueobject"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/pkg/common/errors"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/pkg/common/logger"
+	"github.com/systentandobr/invest-tracker/internal/domain/asset/entity"
+	"github.com/systentandobr/invest-tracker/internal/domain/asset/valueobject"
+	"github.com/systentandobr/invest-tracker/pkg/common/errors"
+	"github.com/systentandobr/invest-tracker/pkg/common/logger"
 	"github.com/systentandobr/toolkit/go/shared/infrastructure/http"
 )
 
@@ -290,8 +290,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/valueobject"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/pkg/common/logger"
+	"github.com/systentandobr/invest-tracker/internal/domain/asset/valueobject"
+	"github.com/systentandobr/invest-tracker/pkg/common/logger"
 	"github.com/systentandobr/toolkit/go/shared/infrastructure/persistence/mongodb"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -700,8 +700,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/entity"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/valueobject"
+	"github.com/systentandobr/invest-tracker/internal/domain/asset/entity"
+	"github.com/systentandobr/invest-tracker/internal/domain/asset/valueobject"
 )
 
 type AssetRepository interface {
@@ -756,7 +756,7 @@ package entity
 import (
 	"time"
 
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/entity"
+	"github.com/systentandobr/invest-tracker/internal/domain/asset/entity"
 )
 
 type InvestmentStrategy string
@@ -865,9 +865,9 @@ cat > $BASE_DIR/internal/domain/analysis/strategy/strategy.go << 'EOF'
 package strategy
 
 import (
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/analysis/entity"
-	assetEntity "github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/entity"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/valueobject"
+	"github.com/systentandobr/invest-tracker/internal/domain/analysis/entity"
+	assetEntity "github.com/systentandobr/invest-tracker/internal/domain/asset/entity"
+	"github.com/systentandobr/invest-tracker/internal/domain/asset/valueobject"
 )
 
 type InvestmentStrategyService interface {
@@ -902,8 +902,8 @@ package entity
 import (
 	"time"
 
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/analysis/entity"
-	assetEntity "github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/entity"
+	"github.com/systentandobr/invest-tracker/internal/domain/analysis/entity"
+	assetEntity "github.com/systentandobr/invest-tracker/internal/domain/asset/entity"
 )
 
 type SimulationStatus string
@@ -1037,9 +1037,9 @@ package strategy
 import (
 	"strings"
 
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/analysis/entity"
-	assetEntity "github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/entity"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/valueobject"
+	"github.com/systentandobr/invest-tracker/internal/domain/analysis/entity"
+	assetEntity "github.com/systentandobr/invest-tracker/internal/domain/asset/entity"
+	"github.com/systentandobr/invest-tracker/internal/domain/asset/valueobject"
 )
 
 // ValueInvestmentStrategy implements the Value Investment strategy
@@ -1261,9 +1261,9 @@ import (
 	"math"
 	"strings"
 	
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/analysis/entity"
-	assetEntity "github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/entity"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/valueobject"
+	"github.com/systentandobr/invest-tracker/internal/domain/analysis/entity"
+	assetEntity "github.com/systentandobr/invest-tracker/internal/domain/asset/entity"
+	"github.com/systentandobr/invest-tracker/internal/domain/asset/valueobject"
 )
 
 // MomentumInvestmentStrategy implements the Momentum Investment strategy

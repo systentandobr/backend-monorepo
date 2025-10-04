@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/analysis/entity"
+	"github.com/systentandobr/invest-tracker/internal/domain/analysis/entity"
 )
 
 // MarketAnalysisService defines the interface for MarketAnalysis business logic

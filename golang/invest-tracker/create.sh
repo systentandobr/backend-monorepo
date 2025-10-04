@@ -14,11 +14,11 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/docs"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/bootstrap"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/pkg/common/logger"
+	"github.com/systentandobr/invest-tracker/docs"
+	"github.com/systentandobr/invest-tracker/internal/bootstrap"
+	"github.com/systentandobr/invest-tracker/pkg/common/logger"
 	"github.com/systentandobr/toolkit/go/shared/infrastructure/persistence/mongodb"
-	// "github.com/systentandobr/backend-monorepo/golang/invest-tracker/pkg/infrastructure/telemetry"
+	// "github.com/systentandobr/invest-tracker/pkg/infrastructure/telemetry"
 )
 
 // @title Investment Tracker API

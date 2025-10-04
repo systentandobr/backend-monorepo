@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/simulation/entity"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/pkg/common/logger"
+	"github.com/systentandobr/invest-tracker/internal/domain/simulation/entity"
+	"github.com/systentandobr/invest-tracker/pkg/common/logger"
 )
 
 // SimulationController handles simulation-related HTTP requests

@@ -1,4 +1,4 @@
-module github.com/systentandobr/backend-monorepo/golang/invest-tracker
+module github.com/systentandobr/invest-tracker
 
 go 1.23.0
 

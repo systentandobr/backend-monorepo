@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/analysis/entity"
-	notificationEntity "github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/notification/entity"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/notification/repository"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/notification/service"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/pkg/common/errors"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/pkg/common/logger"
+	"github.com/systentandobr/invest-tracker/internal/domain/analysis/entity"
+	notificationEntity "github.com/systentandobr/invest-tracker/internal/domain/notification/entity"
+	"github.com/systentandobr/invest-tracker/internal/domain/notification/repository"
+	"github.com/systentandobr/invest-tracker/internal/domain/notification/service"
+	"github.com/systentandobr/invest-tracker/pkg/common/errors"
+	"github.com/systentandobr/invest-tracker/pkg/common/logger"
 )
 
 // NotificationServiceImpl implements service.NotificationService

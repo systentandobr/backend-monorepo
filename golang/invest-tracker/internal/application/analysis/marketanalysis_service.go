@@ -4,14 +4,14 @@ import (
 	"context"
 	"time"
 
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/analysis/entity"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/analysis/repository"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/analysis/strategy"
-	assetEntity "github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/entity"
-	assetRepository "github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/repository"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/valueobject"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/pkg/common/errors"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/pkg/common/logger"
+	"github.com/systentandobr/invest-tracker/internal/domain/analysis/entity"
+	"github.com/systentandobr/invest-tracker/internal/domain/analysis/repository"
+	"github.com/systentandobr/invest-tracker/internal/domain/analysis/strategy"
+	assetEntity "github.com/systentandobr/invest-tracker/internal/domain/asset/entity"
+	assetRepository "github.com/systentandobr/invest-tracker/internal/domain/asset/repository"
+	"github.com/systentandobr/invest-tracker/internal/domain/asset/valueobject"
+	"github.com/systentandobr/invest-tracker/pkg/common/errors"
+	"github.com/systentandobr/invest-tracker/pkg/common/logger"
 )
 
 // MarketAnalysisServiceImpl implements the MarketAnalysisService interface

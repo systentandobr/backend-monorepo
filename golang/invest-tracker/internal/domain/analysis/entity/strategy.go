@@ -4,7 +4,7 @@ package entity
 import (
 	"time"
 
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/entity"
+	"github.com/systentandobr/invest-tracker/internal/domain/asset/entity"
 )
 
 // InvestmentStrategy representa os diferentes tipos de estratégias de investimento

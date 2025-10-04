@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/analysis/entity"
+	"github.com/systentandobr/invest-tracker/internal/domain/analysis/entity"
 )
 
 // MarketAnalysisRepository defines the interface for MarketAnalysis data access

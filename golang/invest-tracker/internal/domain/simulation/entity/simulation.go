@@ -5,8 +5,8 @@ import (
 	"math"
 	"time"
 
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/analysis/entity"
-	assetEntity "github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/entity"
+	"github.com/systentandobr/invest-tracker/internal/domain/analysis/entity"
+	assetEntity "github.com/systentandobr/invest-tracker/internal/domain/asset/entity"
 )
 
 // SimulationStatus representa o status da simulação

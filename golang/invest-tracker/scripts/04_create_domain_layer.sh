@@ -262,8 +262,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/entity"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/valueobject"
+	"github.com/systentandobr/invest-tracker/internal/domain/asset/entity"
+	"github.com/systentandobr/invest-tracker/internal/domain/asset/valueobject"
 )
 
 type AssetRepository interface {
@@ -319,7 +319,7 @@ package entity
 import (
 	"time"
 
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/entity"
+	"github.com/systentandobr/invest-tracker/internal/domain/asset/entity"
 )
 
 type InvestmentStrategy string
@@ -430,9 +430,9 @@ cat > "$STRATEGY_FILE" << 'EOF'
 package strategy
 
 import (
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/analysis/entity"
-	assetEntity "github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/entity"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/valueobject"
+	"github.com/systentandobr/invest-tracker/internal/domain/analysis/entity"
+	assetEntity "github.com/systentandobr/invest-tracker/internal/domain/asset/entity"
+	"github.com/systentandobr/invest-tracker/internal/domain/asset/valueobject"
 )
 
 type InvestmentStrategyService interface {

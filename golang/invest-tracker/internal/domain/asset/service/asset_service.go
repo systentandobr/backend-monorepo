@@ -3,8 +3,8 @@ package service
 import (
 	"context"
     "time"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/entity"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/valueobject"
+	"github.com/systentandobr/invest-tracker/internal/domain/asset/entity"
+	"github.com/systentandobr/invest-tracker/internal/domain/asset/valueobject"
 )
 
 // AssetService defines the interface for asset business logic

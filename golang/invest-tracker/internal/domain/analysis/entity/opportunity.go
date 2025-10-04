@@ -2,7 +2,7 @@ package entity
 
 import (
 	"time"
-	assetEntity "github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/entity"
+	assetEntity "github.com/systentandobr/invest-tracker/internal/domain/asset/entity"
 )
 
 // OpportunityStatus represents the status of an investment opportunity

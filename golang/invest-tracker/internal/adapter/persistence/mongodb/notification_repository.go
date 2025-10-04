@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/notification/entity"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/notification/repository"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/pkg/common/logger"
+	"github.com/systentandobr/invest-tracker/internal/domain/notification/entity"
+	"github.com/systentandobr/invest-tracker/internal/domain/notification/repository"
+	"github.com/systentandobr/invest-tracker/pkg/common/logger"
 	"github.com/systentandobr/toolkit/go/shared/infrastructure/persistence/mongodb"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"

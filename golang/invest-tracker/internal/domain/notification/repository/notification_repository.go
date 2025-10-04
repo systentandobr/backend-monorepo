@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/notification/entity"
+	"github.com/systentandobr/invest-tracker/internal/domain/notification/entity"
 )
 
 // NotificationRepository defines the interface for notification data access

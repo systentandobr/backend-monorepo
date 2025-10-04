@@ -3,10 +3,10 @@ package jobs
 
 import (
 	"github.com/robfig/cron/v3"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/analysis/service"
-	assetService "github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/service" 
-	notificationService "github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/notification/service"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/pkg/common/logger"
+	"github.com/systentandobr/invest-tracker/internal/domain/analysis/service"
+	assetService "github.com/systentandobr/invest-tracker/internal/domain/asset/service" 
+	notificationService "github.com/systentandobr/invest-tracker/internal/domain/notification/service"
+	"github.com/systentandobr/invest-tracker/pkg/common/logger"
 )
 
 // AssetDataJob implements a job for collecting asset data

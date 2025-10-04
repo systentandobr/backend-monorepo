@@ -11,10 +11,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/entity"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/asset/valueobject"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/pkg/common/errors"
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/pkg/common/logger"
+	"github.com/systentandobr/invest-tracker/internal/domain/asset/entity"
+	"github.com/systentandobr/invest-tracker/internal/domain/asset/valueobject"
+	"github.com/systentandobr/invest-tracker/pkg/common/errors"
+	"github.com/systentandobr/invest-tracker/pkg/common/logger"
 	httpClient "github.com/systentandobr/toolkit/go/shared/infrastructure/http"
 )
 

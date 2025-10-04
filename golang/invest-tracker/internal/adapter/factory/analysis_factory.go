@@ -2,9 +2,9 @@ package factory
 
 import (
     "github.com/gin-gonic/gin"
-    "github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/adapter/controller"
-    "github.com/systentandobr/backend-monorepo/golang/invest-tracker/internal/domain/analysis/service"
-    "github.com/systentandobr/backend-monorepo/golang/invest-tracker/pkg/common/logger"
+    "github.com/systentandobr/invest-tracker/internal/adapter/controller"
+    "github.com/systentandobr/invest-tracker/internal/domain/analysis/service"
+    "github.com/systentandobr/invest-tracker/pkg/common/logger"
     "github.com/systentandobr/toolkit/go/shared/infrastructure/persistence/mongodb"
 )
 

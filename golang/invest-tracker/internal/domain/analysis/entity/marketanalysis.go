@@ -3,7 +3,7 @@ package entity
 import (
 	"time"
 
-	"github.com/systentandobr/backend-monorepo/golang/invest-tracker/pkg/common/errors"
+	"github.com/systentandobr/invest-tracker/pkg/common/errors"
 )
 
 // MarketAnalysis represents a marketanalysis in the system
