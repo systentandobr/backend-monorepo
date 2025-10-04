@@ -47,7 +47,11 @@ echo "🏷️  Versão: $VERSION"
 # Mostrar informações do binário
 echo "📊 Informações do binário:"
 ls -lh "$BUILD_DIR/$SERVICE_NAME"
-file "$BUILD_DIR/$SERVICE_NAME"
+if command -v file > /dev/null; then
+    file "$BUILD_DIR/$SERVICE_NAME"
+else
+    echo "⚠️  Comando 'file' não disponível, mostrando apenas informações básicas"
+fi
 
 echo "🎯 Pronto para deploy no Railway!"
 echo "💡 Execute: railway up"

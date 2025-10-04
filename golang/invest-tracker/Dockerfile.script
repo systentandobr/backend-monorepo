@@ -5,22 +5,26 @@
 FROM golang:1.23-alpine AS builder
 
 # Instalar dependências do sistema
-RUN apk add --no-cache git ca-certificates tzdata make bash
+RUN apk add --no-cache git ca-certificates tzdata make bash file
 
 # Configurar diretório de trabalho
 WORKDIR /app
 
+# colocar um step para mostrar o diretorio de trabalho
+RUN ls -la /app
+RUN pwd
+
 # Copiar go.mod e go.sum primeiro (para cache de dependências)
-COPY golang/invest-tracker/go.mod golang/invest-tracker/go.sum ./
+COPY go.mod go.sum ./
 
 # Download dependências
 RUN go mod download
 
 # Copiar código fonte
-COPY golang/invest-tracker/ .
+COPY . ./
 
 # Copiar e executar script de build
-COPY golang/invest-tracker/build-and-deploy.sh ./
+COPY build-and-deploy.sh ./
 RUN chmod +x ./build-and-deploy.sh
 
 # Executar script de build personalizado
