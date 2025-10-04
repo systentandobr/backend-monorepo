@@ -11,10 +11,13 @@ RUN apk add --no-cache git ca-certificates tzdata
 WORKDIR /app
 
 # Copiar go.mod e go.sum
-COPY golang/invest-tracker/go.mod golang/invest-tracker/go.sum ./
+COPY go.mod go.sum ./
 
 # Download dependências
-RUN cd golang/invest-tracker && go mod download
+RUN go mod download
+
+# Copiar código fonte
+COPY . ./
 
 # Build da aplicação com otimizações para produção
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
