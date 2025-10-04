@@ -15,11 +15,16 @@ VERSION=$(git describe --tags --always --dirty 2>/dev/null || echo "dev")
 
 # Limpar builds anteriores
 echo "🧹 Limpando builds anteriores..."
-make clean
+rm -rf $BUILD_DIR
+mkdir -p $BUILD_DIR
 
 # Gerar documentação Swagger (se necessário)
 echo "📚 Gerando documentação Swagger..."
-make swagger || echo "⚠️  Swagger generation failed, continuing..."
+if command -v swag > /dev/null; then
+    make swagger || echo "⚠️  Swagger generation failed, continuing..."
+else
+    echo "⚠️  Swagger not available, skipping..."
+fi
 
 # Gerar código (se necessário)
 echo "🔧 Gerando código..."

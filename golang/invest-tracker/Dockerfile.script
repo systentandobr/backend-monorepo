@@ -1,27 +1,33 @@
-# Dockerfile otimizado para produção
-# Usa binário já compilado (multi-stage build)
+# Dockerfile que executa script de build personalizado
+# Segue as melhores práticas do Go para produção
 
 # Estágio 1: Build
 FROM golang:1.23-alpine AS builder
 
 # Instalar dependências do sistema
-RUN apk add --no-cache git ca-certificates tzdata
+RUN apk add --no-cache git ca-certificates tzdata make bash
 
 # Configurar diretório de trabalho
 WORKDIR /app
 
-# Copiar go.mod e go.sum
+# Copiar go.mod e go.sum primeiro (para cache de dependências)
 COPY golang/invest-tracker/go.mod golang/invest-tracker/go.sum ./
 
 # Download dependências
-RUN cd golang/invest-tracker && go mod download
+RUN go mod download
 
-# Build da aplicação com otimizações para produção
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
-    -ldflags="-s -w -X main.version=$(git describe --tags --always --dirty 2>/dev/null || echo 'dev')" \
-    -trimpath \
-    -o /invest-tracker-api \
-    ./cmd/api
+# Copiar código fonte
+COPY golang/invest-tracker/ .
+
+# Copiar e executar script de build
+COPY golang/invest-tracker/build-and-deploy.sh ./
+RUN chmod +x ./build-and-deploy.sh
+
+# Executar script de build personalizado
+RUN ./build-and-deploy.sh
+
+# Copiar binário compilado para localização padrão
+RUN cp ./bin/api /invest-tracker-api
 
 # Estágio 2: Runtime (imagem mínima)
 FROM alpine:latest
@@ -37,10 +43,11 @@ RUN addgroup -g 1001 -S appgroup && \
 WORKDIR /app
 
 # Copiar binário compilado
-COPY --from=builder /invest-tracker-api ./bin/api
+COPY --from=builder /invest-tracker-api .
 
 # Configurar permissões
-RUN chown -R appuser:appgroup /app
+RUN chown -R appuser:appgroup /app && \
+    chmod +x ./invest-tracker-api
 
 # Mudar para usuário não-root
 USER appuser
