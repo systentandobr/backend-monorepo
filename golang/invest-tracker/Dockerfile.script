@@ -59,9 +59,9 @@ USER appuser
 # Expor porta
 EXPOSE 7777
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:7777/health || exit 1
+# Health check - Temporariamente desabilitado para debug
+# HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+#     CMD curl -f http://localhost:7777/health || exit 1
 
 # Variáveis de ambiente
 ENV PORT=7777
