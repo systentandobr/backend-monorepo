@@ -17,4 +17,4 @@ staticOutboundIp = true
 # Configurações específicas para Go
 [deploy.env]
 GIN_MODE = "release"
-PORT = "7777"
+PORT = "8888"

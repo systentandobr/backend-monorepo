@@ -31,7 +31,7 @@ import (
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host localhost:7777
+// @host localhost:8888
 // @BasePath /api/v1
 // @schemes http https
 
@@ -60,7 +60,7 @@ func LoadConfig(envFile string, log logger.Logger) (*AppConfig, error) {
 	// For this example, just returning default config
 	return &AppConfig{
 		Environment:   "development",
-		APIPort:       "7777",
+		APIPort:       "8888",
 		EnableSwagger: true,
 		EnableCORS:    true,
 		EnableJobs:    true,

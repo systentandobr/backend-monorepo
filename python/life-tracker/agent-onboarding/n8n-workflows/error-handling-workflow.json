@@ -1,0 +1,223 @@
+{
+  "name": "Error Handling and Validation Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// Validação de entrada para onboarding\nconst body = $input.first().json.body;\nconst errors = [];\nconst warnings = [];\n\n// Validar campos obrigatórios\nif (!body.user_id || typeof body.user_id !== 'string') {\n  errors.push('user_id é obrigatório e deve ser uma string');\n}\n\nif (!body.session_id || typeof body.session_id !== 'string') {\n  errors.push('session_id é obrigatório e deve ser uma string');\n}\n\nif (!body.questions_and_answers || !Array.isArray(body.questions_and_answers)) {\n  errors.push('questions_and_answers é obrigatório e deve ser um array');\n}\n\nif (!body.user_metadata || typeof body.user_metadata !== 'object') {\n  errors.push('user_metadata é obrigatório e deve ser um objeto');\n}\n\n// Validar questions_and_answers\nif (body.questions_and_answers) {\n  body.questions_and_answers.forEach((qa, index) => {\n    if (!qa.question_id) {\n      errors.push(`questions_and_answers[${index}].question_id é obrigatório`);\n    }\n    if (qa.answer === undefined || qa.answer === null) {\n      errors.push(`questions_and_answers[${index}].answer é obrigatório`);\n    }\n  });\n}\n\n// Validar user_metadata\nif (body.user_metadata) {\n  if (!body.user_metadata.source) {\n    warnings.push('user_metadata.source não fornecido');\n  }\n  if (!body.user_metadata.timestamp) {\n    warnings.push('user_metadata.timestamp não fornecido');\n  }\n}\n\n// Verificar se há campos críticos nas respostas\nif (body.questions_and_answers) {\n  const question_ids = body.questions_and_answers.map(qa => qa.question_id);\n  const critical_fields = ['concentration', 'lifestyle', 'energy'];\n  \n  critical_fields.forEach(field => {\n    if (!question_ids.includes(field)) {\n      warnings.push(`Campo crítico '${field}' não encontrado nas respostas`);\n    }\n  });\n}\n\nconst validation_result = {\n  is_valid: errors.length === 0,\n  errors: errors,\n  warnings: warnings,\n  validated_data: body\n};\n\nreturn {\n  json: validation_result\n};"
+      },
+      "id": "validate-input",
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "validation-check",
+              "leftValue": "={{ $json.is_valid }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equal"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "validation-switch",
+      "name": "Validation Switch",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"error\": \"Validation failed\", \"details\": $json.errors, \"warnings\": $json.warnings } }}",
+        "responseCode": 400,
+        "options": {}
+      },
+      "id": "validation-error-response",
+      "name": "Validation Error Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [680, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Tratamento de erros genérico\nconst error = $input.first().json.error || 'Erro desconhecido';\nconst context = $input.first().json.context || {};\nconst user_id = context.user_id || 'unknown';\n\n// Classificar tipo de erro\nlet error_type = 'unknown';\nlet status_code = 500;\nlet user_message = 'Erro interno do servidor';\n\nif (error.includes('Validation failed')) {\n  error_type = 'validation';\n  status_code = 400;\n  user_message = 'Dados de entrada inválidos';\n} else if (error.includes('Database') || error.includes('MongoDB')) {\n  error_type = 'database';\n  status_code = 503;\n  user_message = 'Erro de conexão com banco de dados';\n} else if (error.includes('Template not found')) {\n  error_type = 'template';\n  status_code = 404;\n  user_message = 'Template não encontrado';\n} else if (error.includes('Profile not found')) {\n  error_type = 'profile';\n  status_code = 404;\n  user_message = 'Perfil não encontrado';\n} else if (error.includes('Plan not found')) {\n  error_type = 'plan';\n  status_code = 404;\n  user_message = 'Plano não encontrado';\n}\n\n// Log do erro (em produção, isso seria enviado para um sistema de logging)\nconst error_log = {\n  timestamp: new Date().toISOString(),\n  user_id: user_id,\n  error_type: error_type,\n  error_message: error,\n  context: context,\n  status_code: status_code\n};\n\nconsole.log('Error logged:', JSON.stringify(error_log, null, 2));\n\nreturn {\n  json: {\n    error: user_message,\n    error_type: error_type,\n    status_code: status_code,\n    user_id: user_id,\n    timestamp: new Date().toISOString(),\n    request_id: context.request_id || 'unknown'\n  }\n};"
+      },
+      "id": "error-handler",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 500]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "responseCode": "={{ $json.status_code }}",
+        "options": {}
+      },
+      "id": "error-response",
+      "name": "Error Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [460, 500]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Monitoramento de performance e métricas\nconst start_time = $input.first().json.start_time || Date.now();\nconst end_time = Date.now();\nconst processing_time = end_time - start_time;\nconst user_id = $input.first().json.user_id || 'unknown';\nconst endpoint = $input.first().json.endpoint || 'unknown';\nconst success = $input.first().json.success !== false;\n\n// Métricas de performance\nconst metrics = {\n  user_id: user_id,\n  endpoint: endpoint,\n  processing_time_ms: processing_time,\n  success: success,\n  timestamp: new Date().toISOString(),\n  memory_usage: process.memoryUsage(),\n  cpu_usage: process.cpuUsage()\n};\n\n// Log de métricas (em produção, isso seria enviado para um sistema de monitoramento)\nconsole.log('Performance metrics:', JSON.stringify(metrics, null, 2));\n\n// Alertas de performance\nif (processing_time > 10000) { // 10 segundos\n  console.warn(`Slow request detected: ${processing_time}ms for user ${user_id} on ${endpoint}`);\n}\n\nif (!success) {\n  console.error(`Failed request: user ${user_id} on ${endpoint} took ${processing_time}ms`);\n}\n\nreturn {\n  json: {\n    ...$input.first().json,\n    metrics: metrics\n  }\n};"
+      },
+      "id": "performance-monitor",
+      "name": "Performance Monitor",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 700]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Rate limiting e throttling\nconst user_id = $input.first().json.user_id || 'anonymous';\nconst endpoint = $input.first().json.endpoint || 'unknown';\nconst timestamp = Date.now();\n\n// Simular rate limiting (em produção, isso seria feito com Redis ou similar)\nconst rate_limit_key = `${user_id}:${endpoint}`;\nconst rate_limit_window = 60000; // 1 minuto\nconst max_requests = 10; // máximo 10 requests por minuto\n\n// Em um sistema real, você consultaria um cache/banco para verificar o rate limit\n// Por simplicidade, vamos simular que sempre está dentro do limite\nconst is_rate_limited = false;\n\nif (is_rate_limited) {\n  return {\n    json: {\n      error: 'Rate limit exceeded',\n      error_type: 'rate_limit',\n      status_code: 429,\n      user_id: user_id,\n      retry_after: 60,\n      timestamp: new Date().toISOString()\n    }\n  };\n}\n\n// Adicionar timestamp de início para monitoramento\nreturn {\n  json: {\n    ...$input.first().json,\n    start_time: timestamp,\n    rate_limit_ok: true\n  }\n};"
+      },
+      "id": "rate-limiter",
+      "name": "Rate Limiter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 900]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "rate-limit-check",
+              "leftValue": "={{ $json.rate_limit_ok }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equal"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "rate-limit-switch",
+      "name": "Rate Limit Switch",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [460, 900]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "responseCode": "={{ $json.status_code }}",
+        "options": {
+          "responseHeaders": {
+            "Retry-After": "={{ $json.retry_after }}"
+          }
+        }
+      },
+      "id": "rate-limit-response",
+      "name": "Rate Limit Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [680, 800]
+    }
+  ],
+  "connections": {
+    "Validate Input": {
+      "main": [
+        [
+          {
+            "node": "Validation Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validation Switch": {
+      "main": [
+        [
+          {
+            "node": "Validation Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Handler": {
+      "main": [
+        [
+          {
+            "node": "Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Performance Monitor": {
+      "main": [
+        [
+          {
+            "node": "Rate Limiter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rate Limiter": {
+      "main": [
+        [
+          {
+            "node": "Rate Limit Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rate Limit Switch": {
+      "main": [
+        [
+          {
+            "node": "Rate Limit Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2024-01-15T10:30:00.000Z",
+  "versionId": "1"
+}

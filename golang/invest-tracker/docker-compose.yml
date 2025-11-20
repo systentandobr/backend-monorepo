@@ -7,7 +7,7 @@ services:
       context: .
       dockerfile: deploy/docker/api/Dockerfile
     ports:
-      - "${API_PORT:-7777}:7777"
+      - "${API_PORT:-8888}:8888"
     environment:
       - APP_ENV=${APP_ENV:-development}
       - MONGODB_URI=mongodb://mongodb:27017
@@ -27,7 +27,7 @@ services:
       - invest-tracker-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--spider", "http://localhost:7777/health"]
+      test: ["CMD", "wget", "--spider", "http://localhost:8888/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -146,7 +146,7 @@ services:
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     ports:
-      - "8090:7777"
+      - "8090:8888"
     environment:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092

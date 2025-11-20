@@ -1,0 +1,204 @@
+openapi: 3.0.3
+info:
+  title: ViralKids Backend API
+  version: 0.1.0
+servers:
+  - url: /api/v1
+paths:
+  /products:
+    get:
+      summary: List products
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 1 }
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1 }
+        - in: query
+          name: search
+          schema: { type: string }
+        - in: query
+          name: category
+          schema: { type: string }
+        - in: query
+          name: featured
+          schema: { type: string, enum: ["true","false"] }
+      responses:
+        '200':
+          description: OK
+  /products/{id}:
+    get:
+      summary: Get product by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: OK }
+  /inventory/availability:
+    get:
+      summary: Availability by unit
+      parameters:
+        - in: query
+          name: unitId
+          required: true
+          schema: { type: string }
+        - in: query
+          name: productIds
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: OK }
+  /inventory/replenish/plan:
+    post:
+      summary: Generate replenish plan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                unitId: { type: string }
+      responses:
+        '200': { description: OK }
+  /orders:
+    post:
+      summary: Create order reserve
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                unitId: { type: string }
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      productId: { type: string }
+                      sku: { type: string }
+                      quantity: { type: integer }
+                      unitPrice: { type: number }
+                totals:
+                  type: object
+                  properties:
+                    subtotal: { type: number }
+                    discount: { type: number }
+                    cashbackRedeem: { type: number }
+                    total: { type: number }
+                reserveTtlSeconds: { type: integer }
+      responses:
+        '200': { description: OK }
+  /orders/{id}:
+    get:
+      summary: Get order by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: OK }
+  /orders/{id}/cancel:
+    post:
+      summary: Cancel order
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: OK }
+  /delivery/quote:
+    post:
+      summary: Delivery quote
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                unitId: { type: string }
+                address: { type: object }
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      productId: { type: string }
+                      quantity: { type: integer }
+      responses:
+        '200': { description: OK }
+  /delivery/dispatch:
+    post:
+      summary: Dispatch delivery
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orderId: { type: string }
+                optionId: { type: string }
+      responses:
+        '200': { description: OK }
+  /promotions/preview:
+    post:
+      summary: Promotions preview
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                unitId: { type: string }
+                items: { type: array }
+      responses:
+        '200': { description: OK }
+  /wallet/balance:
+    get:
+      summary: Wallet balance
+      parameters:
+        - in: query
+          name: unitId
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: OK }
+  /cashback/preview:
+    post:
+      summary: Cashback preview
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                unitId: { type: string }
+                amount: { type: number }
+                subtotal: { type: number }
+      responses:
+        '200': { description: OK }
+  /cashback/redeem:
+    post:
+      summary: Cashback redeem
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orderId: { type: string }
+                amount: { type: number }
+      responses:
+        '200': { description: OK }

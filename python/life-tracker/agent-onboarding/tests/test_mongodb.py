@@ -88,7 +88,7 @@ def sample_session(sample_analysis, sample_plan):
         user_id="test_user_123",
         status="completed",
         current_step="plan_generated",
-        answers={"question1": "Sim", "question2": "Não"},
+        questionsAndAnswers={"question1": "Sim", "question2": "Não"},
         profile_analysis=sample_analysis,
         generated_plan=sample_plan,
         started_at=datetime.utcnow(),

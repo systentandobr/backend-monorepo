@@ -99,10 +99,10 @@ make run-api
 docker build -f Dockerfile.script -t invest-tracker .
 
 # Executar container
-docker run -p 7777:7777 invest-tracker
+docker run -p 8888:8888 invest-tracker
 
 # Testar health check
-curl http://localhost:7777/health
+curl http://localhost:8888/health
 ```
 
 ### **4. Deploy no Railway**
@@ -133,7 +133,7 @@ railway up
 
 ### **Variáveis de Ambiente**
 ```bash
-PORT=7777                    # Porta da aplicação
+PORT=8888                    # Porta da aplicação
 GIN_MODE=release             # Modo do Gin (release/debug)
 ENVIRONMENT=production       # Ambiente (development/production)
 ```

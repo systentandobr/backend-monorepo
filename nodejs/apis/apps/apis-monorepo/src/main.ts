@@ -58,6 +58,18 @@ async function bootstrap() {
     mkdirSync(publicDir, { recursive: true });
   }
 
+  // Exporta o OpenAPI JSON em modo não interativo quando sinalizado por env
+  if (process.env.SWAGGER_EXPORT === 'true') {
+    const outputPath = join(process.cwd(), 'openapi.json');
+    try {
+      require('fs').writeFileSync(outputPath, JSON.stringify(document, null, 2), 'utf-8');
+      // Não encerramos a aplicação aqui; o script pode optar por finalizar o processo
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Falha ao exportar openapi.json:', err);
+    }
+  }
+
   // Endpoint para servir o JSON do OpenAPI
   app.getHttpAdapter().get('/api-json', (req, res) => {
     res.setHeader('Content-Type', 'application/json');

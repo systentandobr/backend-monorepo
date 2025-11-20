@@ -1,0 +1,112 @@
+{
+    "user_id": "user_1759770070882_b5mirolpb",
+    "session_id": "session_1759770070882_pwdqizdtm",
+    "questions_and_answers": [
+        {
+            "question_id": "procrastinationChallenge",
+            "question_text": "Qual tarefa importante você tem procrastinado que, se resolvida, traria benefícios significativos?",
+            "question_type": "text",
+            "question_category": "general",
+            "answer": "health-routine",
+            "answered_at": "2025-10-06T17:01:10.882Z",
+            "context": {
+                "step": 9,
+                "required": true
+            }
+        },
+        {
+            "question_id": "dailyReflection",
+            "question_text": "Qual método de reflexão você se compromete a incorporar na sua rotina?",
+            "question_type": "text",
+            "question_category": "general",
+            "answer": "journal",
+            "answered_at": "2025-10-06T17:01:10.882Z",
+            "context": {
+                "step": 12,
+                "required": true
+            }
+        },
+        {
+            "question_id": "concentration",
+            "question_text": "Você acha difícil se concentrar em tarefas por longos períodos?",
+            "question_type": "text",
+            "question_category": "general",
+            "answer": "medium-focus",
+            "answered_at": "2025-10-06T17:01:10.882Z",
+            "context": {
+                "step": 15,
+                "required": true
+            }
+        },
+        {
+            "question_id": "lifestyle",
+            "question_text": "Quão satisfeito você está com seu estilo de vida atual?",
+            "question_type": "text",
+            "question_category": "general",
+            "answer": "not-satisfied",
+            "answered_at": "2025-10-06T17:01:10.882Z",
+            "context": {
+                "step": 16,
+                "required": true
+            }
+        },
+        {
+            "question_id": "energy",
+            "question_text": "Como é seu nível de energia ao longo do dia?",
+            "question_type": "text",
+            "question_category": "general",
+            "answer": "low-energy",
+            "answered_at": "2025-10-06T17:01:10.882Z",
+            "context": {
+                "step": 17,
+                "required": true
+            }
+        },
+        {
+            "question_id": "financialGoals",
+            "question_text": "Quais são seus principais objetivos financeiros?",
+            "question_type": "text",
+            "question_category": "general",
+            "answer": [
+                "specific-goal"
+            ],
+            "answered_at": "2025-10-06T17:01:10.882Z",
+            "context": {
+                "step": 19,
+                "required": true
+            }
+        },
+        {
+            "question_id": "lifeGoals",
+            "question_text": "Quais são seus principais objetivos de vida para os próximos anos?",
+            "question_type": "text",
+            "question_category": "general",
+            "answer": [
+                "own-business",
+                "travel",
+                "health"
+            ],
+            "answered_at": "2025-10-06T17:01:10.882Z",
+            "context": {
+                "step": 20,
+                "required": true
+            }
+        },
+        {
+            "question_id": "learningHabitCommitment",
+            "question_text": "Compromisso com Aprendizado Contínuo",
+            "question_type": "text",
+            "question_category": "general",
+            "answer": "Completar um curso online em 60 dias",
+            "answered_at": "2025-10-06T17:01:10.882Z",
+            "context": {
+                "step": 22,
+                "required": true
+            }
+        }
+    ],
+    "user_metadata": {
+        "source": "frontend-onboarding-enhanced",
+        "timestamp": "2025-10-06T17:01:10.882Z"
+    }
+}

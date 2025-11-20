@@ -226,7 +226,8 @@ class AgnoOnboardingAgent:
     async def process_onboarding(
         self, 
         user_id: str, 
-        answers: Dict[str, Any]
+        user_metadata: Dict[str, Any],
+        questionsAndAnswers: Dict[str, Any]
     ) -> OnboardingResponse:
         """Processa o onboarding completo usando workflow estruturado"""
         start_time = datetime.now()
@@ -239,10 +240,13 @@ class AgnoOnboardingAgent:
             Processe o onboarding para o usuário {user_id} seguindo este fluxo estruturado:
             
             Dados do usuário:
-            {answers}
+            {user_metadata} {user_id}
             
             FLUXO OBRIGATÓRIO:
-            1. Use execute_onboarding_workflow com user_id="{user_id}" e answers={answers}
+            1. Use execute_onboarding_workflow com user_id="{user_id}" e questions_and_answers=
+            ```json	
+            {questionsAndAnswers}
+            ```
             
             IMPORTANTE:
             - Use apenas a ferramenta execute_onboarding_workflow
@@ -252,7 +256,9 @@ class AgnoOnboardingAgent:
             
             Retorne um resumo do resultado do workflow.
             """
-            
+            response = prompt
+            logger.info(f"Onboarding iniciado para usuário {user_id} com dados: {response}")
+
             response = await self.agent_onboarding.arun(prompt)
             
             # Extrair resultados da resposta

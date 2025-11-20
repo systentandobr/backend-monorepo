@@ -54,36 +54,50 @@ class OnboardingOrchestrator:
     async def execute_full_onboarding(self, user_id: str, answers: Dict[str, Any]) -> Dict[str, Any]:
         """Executa o processo completo de onboarding com garantia de persistência"""
         try:
-            logger.info(f"Iniciando onboarding completo para usuário {user_id}")
+            logger.info(f"🎯 INICIANDO ONBOARDING COMPLETO para usuário {user_id}")
+            logger.info(f"📊 Dados recebidos: {list(answers.keys())}")
             
             # Passo 1: Análise de perfil
+            logger.info("🔍 PASSO 1: ANÁLISE DE PERFIL")
             profile_result = await self._analyze_profile(user_id, answers)
             if not profile_result["success"]:
+                logger.error(f"❌ FALHA NO PASSO 1: {profile_result.get('error', 'Erro desconhecido')}")
                 return profile_result
+            logger.info("✅ PASSO 1 CONCLUÍDO: Análise de perfil realizada com sucesso")
             
             # Passo 2: Match de template
+            logger.info("🎨 PASSO 2: MATCH DE TEMPLATE")
             template_result = await self._match_template(user_id, profile_result["profile_analysis"])
             if not template_result["success"]:
+                logger.error(f"❌ FALHA NO PASSO 2: {template_result.get('error', 'Erro desconhecido')}")
                 return template_result
+            logger.info("✅ PASSO 2 CONCLUÍDO: Template selecionado com sucesso")
             
             # Passo 3: Geração de plano
+            logger.info("📋 PASSO 3: GERAÇÃO DE PLANO")
             plan_result = await self._generate_plan(
                 user_id, 
                 profile_result["profile_analysis"], 
                 template_result["template_match"]
             )
             if not plan_result["success"]:
+                logger.error(f"❌ FALHA NO PASSO 3: {plan_result.get('error', 'Erro desconhecido')}")
                 return plan_result
+            logger.info("✅ PASSO 3 CONCLUÍDO: Plano gerado com sucesso")
             
             # Passo 4: Salvar resultados (CRÍTICO)
+            logger.info("💾 PASSO 4: SALVANDO RESULTADOS")
             save_result = await self._save_results(
                 user_id, 
                 profile_result["profile_analysis"], 
                 plan_result["generated_plan"]
             )
             if not save_result["success"]:
+                logger.error(f"❌ FALHA NO PASSO 4: {save_result.get('error', 'Erro desconhecido')}")
                 return save_result
+            logger.info("✅ PASSO 4 CONCLUÍDO: Resultados salvos com sucesso")
             
+            logger.info("🎉 ONBOARDING COMPLETO FINALIZADO COM SUCESSO!")
             return {
                 "success": True,
                 "message": "Onboarding completado com sucesso",
@@ -96,7 +110,7 @@ class OnboardingOrchestrator:
             }
             
         except Exception as e:
-            logger.error(f"Erro no onboarding completo: {str(e)}")
+            logger.error(f"💥 ERRO NO ONBOARDING COMPLETO: {str(e)}")
             return {
                 "success": False,
                 "error": str(e),
@@ -259,25 +273,9 @@ _onboarding_orchestrator = OnboardingOrchestrator()
 @tool
 async def execute_onboarding_workflow(
     user_id: str = Field(description="ID do usuário"),
-    concentration: Optional[str] = Field(default=None, description="Nível de concentração"),
-    lifestyle: Optional[str] = Field(default=None, description="Satisfação com estilo de vida"),
-    energy: Optional[str] = Field(default=None, description="Nível de energia"),
-    wakeup_time: Optional[str] = Field(default=None, description="Horário de acordar"),
-    sleep_time: Optional[str] = Field(default=None, description="Horário de dormir"),
-    personal_interests: Optional[Union[str, List[str]]] = Field(default=None, description="Interesses pessoais"),
-    financial_goals: Optional[Union[str, List[str]]] = Field(default=None, description="Objetivos financeiros"),
-    life_goals: Optional[Union[str, List[str]]] = Field(default=None, description="Objetivos de vida"),
-    monthly_income: Optional[Union[float, int]] = Field(default=None, description="Renda mensal"),
-    monthly_savings: Optional[Union[float, int]] = Field(default=None, description="Economia mensal"),
-    time_availability: Optional[Union[int, float]] = Field(default=None, description="Tempo disponível em horas"),
-    source: Optional[str] = Field(default=None, description="Fonte dos dados"),
-    investment_horizon: Optional[str] = Field(default=None, description="Horizonte de investimento"),
-    risk_tolerance: Optional[str] = Field(default=None, description="Tolerância ao risco"),
-    investment_capacity: Optional[str] = Field(default=None, description="Capacidade de investimento"),
-    business_interests: Optional[Union[str, List[str]]] = Field(default=None, description="Interesses de negócio"),
-    entrepreneur_profile: Optional[str] = Field(default=None, description="Perfil empreendedor"),
-    learning_areas: Optional[Union[str, List[str]]] = Field(default=None, description="Áreas de aprendizado"),
-    created_at: Optional[str] = Field(default=None, description="Data de criação")
+    questions_and_answers: Dict[str, Any] = Field(description="Perguntas e Respostas do questionário de onboarding"),
+    user_metadata: Optional[Dict[str, Any]] = Field(default=None, description="Metadados do usuário"),
+    session_id: Optional[str] = Field(default=None, description="ID da sessão")
 ) -> Dict[str, Any]:
     """
     Executa o workflow completo de onboarding
@@ -288,10 +286,12 @@ async def execute_onboarding_workflow(
     IMPORTANTE: Todos os dados são persistidos no banco de dados para garantir consistência.
     """
     try:
-        logger.info(f"Executando workflow completo para usuário {user_id}")
+        logger.info(f"🚀 INICIANDO WORKFLOW COMPLETO para usuário {user_id}")
+        logger.info(f"📊 Dados recebidos: {list(questions_and_answers.keys()) if questions_and_answers else 'Nenhum'}")
         
         # Validar user_id
         if not user_id or not isinstance(user_id, str):
+            logger.error(f"❌ user_id inválido: {user_id}")
             return {
                 "success": False,
                 "error": "user_id deve ser uma string válida",
@@ -299,46 +299,102 @@ async def execute_onboarding_workflow(
                 "timestamp": datetime.now().isoformat()
             }
         
-        # Preparar dados de resposta
-        answers = {
-            "user_id": user_id,
-            "concentration": concentration,
-            "lifestyle": lifestyle,
-            "energy": energy,
-            "wakeup_time": wakeup_time,
-            "sleep_time": sleep_time,
-            "personal_interests": personal_interests,
-            "financial_goals": financial_goals,
-            "life_goals": life_goals,
-            "monthly_income": monthly_income,
-            "monthly_savings": monthly_savings,
-            "time_availability": time_availability,
-            "source": source,
-            "investment_horizon": investment_horizon,
-            "risk_tolerance": risk_tolerance,
-            "investment_capacity": investment_capacity,
-            "business_interests": business_interests,
-            "entrepreneur_profile": entrepreneur_profile,
-            "learning_areas": learning_areas,
-            "created_at": created_at
-        }
+        # Processar questions_and_answers para extrair dados estruturados
+        logger.info("🔄 PROCESSANDO questions_and_answers...")
+        processed_data = _process_questions_and_answers(questions_and_answers)
+        logger.info(f"✅ Dados processados: {list(processed_data.keys())}")
         
-        # Remover valores None
-        answers = {k: v for k, v in answers.items() if v is not None}
+        # Adicionar metadados
+        processed_data["user_id"] = user_id
+        processed_data["session_id"] = session_id
+        processed_data["user_metadata"] = user_metadata or {}
+        processed_data["source"] = "agno-agent"
+        processed_data["created_at"] = datetime.now().isoformat()
+        
+        logger.info(f"📋 Dados finais para workflow: {list(processed_data.keys())}")
         
         # Executar workflow completo
-        result = await _onboarding_orchestrator.execute_full_onboarding(user_id, answers)
+        logger.info("🎯 EXECUTANDO WORKFLOW COMPLETO...")
+        result = await _onboarding_orchestrator.execute_full_onboarding(user_id, processed_data)
         
+        logger.info(f"🏁 WORKFLOW FINALIZADO: {result.get('success', False)}")
         return result
         
     except Exception as e:
-        logger.error(f"Erro no workflow de onboarding: {str(e)}")
+        logger.error(f"💥 ERRO NO WORKFLOW: {str(e)}")
         return {
             "success": False,
             "error": str(e),
             "user_id": str(user_id) if user_id else "unknown",
             "timestamp": datetime.now().isoformat()
         }
+
+def _process_questions_and_answers(questions_and_answers: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Processa questions_and_answers e extrai dados estruturados
+    
+    Args:
+        questions_and_answers: Dicionário com question_id -> answer
+        
+    Returns:
+        Dicionário com dados processados para o workflow
+    """
+    logger.info("🔍 PROCESSANDO questions_and_answers...")
+    
+    processed = {}
+    
+    # Mapeamento de campos conhecidos
+    field_mapping = {
+        "concentration": "concentration",
+        "lifestyle": "lifestyle", 
+        "energy": "energy",
+        "financialGoals": "financial_goals",
+        "lifeGoals": "life_goals",
+        "learningHabitCommitment": "learning_areas",
+        "procrastinationChallenge": "procrastination_challenge",
+        "dailyReflection": "daily_reflection"
+    }
+    
+    # Processar cada campo
+    for question_id, answer in questions_and_answers.items():
+        logger.info(f"  📝 Processando {question_id}: {answer}")
+        
+        # Mapear para campo conhecido ou usar question_id
+        field_name = field_mapping.get(question_id, question_id)
+        
+        # Tratar diferentes tipos de resposta
+        if isinstance(answer, list):
+            processed[field_name] = ", ".join(str(item) for item in answer)
+            logger.info(f"    ✅ Array convertido para string: {processed[field_name]}")
+        elif isinstance(answer, (str, int, float)):
+            processed[field_name] = str(answer)
+            logger.info(f"    ✅ Valor direto: {processed[field_name]}")
+        else:
+            processed[field_name] = str(answer)
+            logger.info(f"    ✅ Convertido para string: {processed[field_name]}")
+    
+    # Adicionar valores padrão para campos obrigatórios não encontrados
+    defaults = {
+        "wakeup_time": "06:00",
+        "sleep_time": "22:00", 
+        "personal_interests": "general",
+        "monthly_income": 0.0,
+        "monthly_savings": 0.0,
+        "time_availability": 0,
+        "investment_horizon": "",
+        "risk_tolerance": "",
+        "investment_capacity": "",
+        "business_interests": "",
+        "entrepreneur_profile": ""
+    }
+    
+    for field, default_value in defaults.items():
+        if field not in processed:
+            processed[field] = default_value
+            logger.info(f"  🔧 Campo padrão adicionado: {field} = {default_value}")
+    
+    logger.info(f"✅ PROCESSAMENTO CONCLUÍDO: {len(processed)} campos processados")
+    return processed
 
 @tool
 async def get_user_history_tool(

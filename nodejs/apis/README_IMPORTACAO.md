@@ -91,7 +91,7 @@ mongoimport --db life_tracker --host localhost:27017 --username user --password 
 
 ```bash
 mongoimport \
-  --uri "mongodb+srv://studies-for-devs-team-lead:kDwJ4lMIY32xu3yE@cluster0.heuaa2f.mongodb.net/life_tracker?retryWrites=true&w=majority" \
+  --uri "mongodb+srv://username:password@cluster0.heuaa2f.mongodb.net/life_tracker?retryWrites=true&w=majority" \
   --collection integratedroutines \
   --file integrated-plan-output.json \
 ```
@@ -100,7 +100,7 @@ mongoimport \
 
 ```bash
 # Conectar ao MongoDB
-mongosh "mongodb+srv://studies-for-devs-team-lead:kDwJ4lMIY32xu3yE@cluster0.heuaa2f.mongodb.net/life_tracker"
+mongosh "mongodb+srv://username:password@cluster0.heuaa2f.mongodb.net/life_tracker"
 
 # Verificar dados importados
 use life_tracker
@@ -247,7 +247,7 @@ Para reimportar dados, primeiro limpe os dados existentes:
 
 ```bash
 # Via MongoDB Compass ou mongosh
-mongosh "mongodb+srv://studies-for-devs-team-lead:kDwJ4lMIY32xu3yE@cluster0.heuaa2f.mongodb.net/life_tracker"
+mongosh "mongodb+srv://username:password@cluster0.heuaa2f.mongodb.net/life_tracker"
 
 # No shell do MongoDB
 use life_tracker

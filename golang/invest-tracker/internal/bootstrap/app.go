@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/systentandobr/invest-tracker/internal/adapter/controller"
 	"github.com/systentandobr/invest-tracker/internal/adapter/factory"
 	"github.com/systentandobr/invest-tracker/internal/scheduler"
 	"github.com/systentandobr/invest-tracker/pkg/common/logger"
@@ -26,6 +27,10 @@ type AppBootstrap struct {
 	simulationFactory   *factory.SimulationFactory
 	notificationFactory *factory.NotificationFactory
 	
+	// New controllers
+	portfolioController      *controller.PortfolioController
+	financialGoalController  *controller.FinancialGoalController
+	
 	// Configuration
 	config *AppConfig
 }
@@ -45,7 +50,7 @@ type AppConfig struct {
 func DefaultConfig() *AppConfig {
 	return &AppConfig{
 		Environment:   "development",
-		APIPort:       "7777",
+		APIPort:       "8888",
 		EnableSwagger: true,
 		EnableCORS:    true,
 		EnableJobs:    true,
@@ -166,6 +171,10 @@ func (b *AppBootstrap) initializeDomainFactories() error {
 	b.simulationFactory.Bootstrap()
 	b.notificationFactory.Bootstrap()
 	
+	// Initialize new controllers
+	b.portfolioController = controller.NewPortfolioController(b.logger)
+	b.financialGoalController = controller.NewFinancialGoalController(b.logger)
+	
 	return nil
 }
 
@@ -182,6 +191,10 @@ func (b *AppBootstrap) registerRoutes(router *gin.RouterGroup) {
 	
 	// Register Notification domain routes
 	b.notificationFactory.RegisterRoutes(router)
+	
+	// Register new controllers
+	b.portfolioController.RegisterRoutes(router)
+	b.financialGoalController.RegisterRoutes(router)
 }
 
 // startScheduledJobs registers and starts all scheduled jobs

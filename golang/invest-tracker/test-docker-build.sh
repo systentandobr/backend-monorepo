@@ -78,14 +78,14 @@ echo "======================================="
 
 # Testar execução do container production
 log_info "Testando container production..."
-if docker run --rm -d --name test-production -p 7777:7777 invest-tracker:test-production; then
+if docker run --rm -d --name test-production -p 8888:8888 invest-tracker:test-production; then
     log_success "✅ Container production iniciado com sucesso!"
     
     # Aguardar um pouco para o container inicializar
     sleep 5
     
     # Testar health check
-    if curl -f http://localhost:7777/health 2>/dev/null; then
+    if curl -f http://localhost:8888/health 2>/dev/null; then
         log_success "✅ Health check do container production funcionando!"
     else
         log_warning "⚠️  Health check do container production falhou (pode ser normal se não houver endpoint /health)"
@@ -99,7 +99,7 @@ fi
 
 # Testar execução do container script
 log_info "Testando container script..."
-if docker run --rm -d --name test-script -p 7778:7777 invest-tracker:test-script; then
+if docker run --rm -d --name test-script -p 7778:8888 invest-tracker:test-script; then
     log_success "✅ Container script iniciado com sucesso!"
     
     # Aguardar um pouco para o container inicializar
@@ -130,5 +130,5 @@ echo "docker rmi invest-tracker:test-production invest-tracker:test-script"
 
 echo ""
 log_info "💡 Para testar manualmente um container, execute:"
-echo "docker run --rm -p 7777:7777 invest-tracker:test-production"
-echo "docker run --rm -p 7777:7777 invest-tracker:test-script"
+echo "docker run --rm -p 8888:8888 invest-tracker:test-production"
+echo "docker run --rm -p 8888:8888 invest-tracker:test-script"

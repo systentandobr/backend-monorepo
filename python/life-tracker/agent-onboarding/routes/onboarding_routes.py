@@ -4,8 +4,9 @@ Implementação com suporte ao agente Agno
 """
 
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from datetime import datetime
+import json
 
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
 from pydantic import BaseModel
@@ -85,48 +86,59 @@ class MemoryQueryRequest(BaseModel):
     query: Optional[str] = None
     limit: int = 10
 
-# Rotas principais
+
+# Modelos para o formato de requisição que você está enviando
+class QuestionAnswer(BaseModel):
+    """Resposta individual de uma pergunta"""
+    question_id: str
+    question_text: str
+    question_type: str
+    question_category: str
+    answer: Any  # Pode ser string, lista, etc.
+    answered_at: str
+    context: Dict[str, Any]
+
+class UserMetadata(BaseModel):
+    """Metadados do usuário"""
+    source: str
+    timestamp: str
+
+class EnhancedOnboardingRequest(BaseModel):
+    """Requisição de onboarding no formato aprimorado"""
+    user_id: str
+    session_id: str
+    questions_and_answers: List[QuestionAnswer]
+    user_metadata: UserMetadata
+
 @router.post("/complete", response_model=OnboardingResponse)
-async def complete_onboarding_process(
-    request: OnboardingRequest,
+async def complete_onboarding_enhanced(
+    request: EnhancedOnboardingRequest,
     background_tasks: BackgroundTasks,
     agent_onboarding: AgnoOnboardingAgent = Depends(get_agent_onboarding),
     api_client: APIClient = Depends(get_api_client)
 ):
     """
-    Completa todo o processo de onboarding usando o agente Agno
+    Completa o processo de onboarding no formato aprimorado
     
-    Este endpoint executa o processo completo de onboarding:
-    1. Análise do perfil do usuário
-    2. Geração de plano personalizado
-    3. Envio para API principal (em background)
-    
-    **Parâmetros:**
-    - **request**: Dados do usuário e respostas do questionário
-    - **background_tasks**: Tarefas em background para envio de dados
-    
-    **Retorna:**
-    - **OnboardingResponse**: Resultado completo do processo
-    
-    **Exemplo de uso:**
-    ```json
-    {
-        "user_id": "user123",
-        "answers": {
-            "age": 30,
-            "goals": ["health", "productivity"],
-            "time_availability": 60
-        }
-    }
-    ```
+    Este endpoint aceita o formato de requisição com questions_and_answers
+    e converte para o formato esperado pelo agente Agno.
     """
     try:
-        logger.info(f"Completando onboarding com Agno para usuário: {request.user_id}")
+        logger.info(f"Completando onboarding aprimorado para usuário: {request.user_id}")
+    
+        answers_dict = {}
+        # Adicionar metadados
+        answers_dict["session_id"] = request.session_id
+        answers_dict["user_metadata"] = request.user_metadata.dict()
+        answers_dict["questionsAndAnswers"] = request.questions_and_answers
+        
+        logger.info(f"Respostas convertidas: {list(answers_dict.keys())}")
         
         # Executar processo completo usando o agente Agno
         result = await agent_onboarding.process_onboarding(
             user_id=request.user_id,
-            answers=request.answers
+            user_metadata=request.user_metadata.dict(),
+            questionsAndAnswers=answers_dict
         )
         
         # Enviar plano para API principal (background task)
@@ -140,8 +152,9 @@ async def complete_onboarding_process(
         return result
         
     except Exception as e:
-        logger.error(f"Erro no onboarding com Agno: {str(e)}")
+        logger.error(f"Erro no onboarding aprimorado: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.post("/complete-legacy", response_model=OnboardingResponse)
 async def complete_onboarding_process_legacy(
@@ -170,7 +183,8 @@ async def complete_onboarding_process_legacy(
         # Executar processo completo usando o agente legado
         result = await legacy_agent.process_onboarding(
             user_id=request.user_id,
-            answers=request.answers
+            user_metadata=request.user_metadata.dict(),
+            questionsAndAnswers=request.answers
         )
         
         # Enviar plano para API principal (background task)
@@ -234,7 +248,7 @@ async def analyze_user_profile(
         # Analisar perfil usando Agno
         profile_analysis = await agent_onboarding.analyze_profile_only(
             user_id=request.user_id,
-            answers=request.answers
+            questionsAndAnswers=request.answers
         )
         
         return profile_analysis
@@ -302,7 +316,7 @@ async def generate_personalized_plan(
         # Analisar perfil primeiro
         profile_analysis = await agent_onboarding.analyze_profile_only(
             user_id=request.user_id,
-            answers=request.answers
+            questionsAndAnswers=request.answers
         )
         
         # Gerar plano a partir da análise

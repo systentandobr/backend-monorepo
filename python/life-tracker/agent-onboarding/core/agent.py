@@ -78,7 +78,7 @@ class OnboardingAgent:
             logger.info("Etapa 1: Analisando perfil do usuário")
             profile_analysis = await self.profile_analyzer.analyze_responses(
                 user_id=user_id,
-                answers=answers
+                questionsAndAnswers=answers
             )
             
             # 2. Encontrar template mais adequado
@@ -150,7 +150,7 @@ class OnboardingAgent:
         
         return await self.profile_analyzer.analyze_responses(
             user_id=user_id,
-            answers=answers
+            questionsAndAnswers=answers
         )
     
     async def generate_plan_from_analysis(

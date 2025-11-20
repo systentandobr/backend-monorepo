@@ -33,7 +33,7 @@ warning() {
 DB_NAME="life_tracker"
 COLLECTION_NAME="integrated_routines"
 FILE_NAME="integrated-plan-output.json"
-MONGO_URI="mongodb+srv://studies-for-devs-team-lead:kDwJ4lMIY32xu3yE@cluster0.heuaa2f.mongodb.net/${DB_NAME}?retryWrites=true&w=majority"
+MONGO_URI="mongodb+srv://username:password@cluster0.heuaa2f.mongodb.net/${DB_NAME}?retryWrites=true&w=majority"
 
 log "🚀 Iniciando importação no MongoDB..."
 

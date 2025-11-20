@@ -47,7 +47,7 @@ swagger:
 		echo "Installing swag..."; \
 		go install github.com/swaggo/swag/cmd/swag@latest; \
 	fi
-	@cd cmd/api && swag init -g main.go -o ../../docs
+	@swag init -g cmd/api/main.go -o docs --parseDependency --parseInternal
 
 templates:
 	@echo "Setting up template generators..."

@@ -90,14 +90,14 @@ log_info "🧪 Testando execução do container Railway..."
 echo "============================================="
 
 # Testar execução
-if docker run --rm -d --name test-railway -p 7777:7777 invest-tracker:railway-test; then
+if docker run --rm -d --name test-railway -p 8888:8888 invest-tracker:railway-test; then
     log_success "✅ Container Railway iniciado com sucesso!"
     
     # Aguardar inicialização
     sleep 5
     
     # Testar health check
-    if curl -f http://localhost:7777/health 2>/dev/null; then
+    if curl -f http://localhost:8888/health 2>/dev/null; then
         log_success "✅ Health check funcionando!"
     else
         log_warning "⚠️  Health check falhou (pode ser normal se não houver endpoint /health)"

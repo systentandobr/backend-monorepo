@@ -373,7 +373,7 @@ class MongoDatabase:
                 user_id=document["user_id"],
                 status=document["status"],
                 current_step=document.get("current_step"),
-                answers=document["answers"],
+                questionsAndAnswers=document["answers"],
                 profile_analysis=profile_analysis,
                 generated_plan=generated_plan,
                 started_at=document["started_at"],

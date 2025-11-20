@@ -28,12 +28,12 @@ WORKDIR /app
 COPY --from=builder /invest-tracker-api .
 
 # Environment variables
-ENV PORT=7777
+ENV PORT=8888
 ENV MONGODB_URI=mongodb://mongodb:27017
 ENV MONGODB_DATABASE=invest_tracker
 
 # Expose port
-EXPOSE 7777
+EXPOSE 8888
 
 # Run the application
 CMD ["./invest-tracker-api"]

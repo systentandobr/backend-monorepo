@@ -1,0 +1,588 @@
+{
+  "name": "Life Tracker Onboarding Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "onboarding/complete",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-complete",
+      "name": "Webhook Complete Onboarding",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "onboarding-complete"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "onboarding/analyze-profile",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-analyze",
+      "name": "Webhook Analyze Profile",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 500],
+      "webhookId": "onboarding-analyze"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "onboarding/generate-plan",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-generate",
+      "name": "Webhook Generate Plan",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 700],
+      "webhookId": "onboarding-generate"
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "onboarding/templates",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-templates",
+      "name": "Webhook List Templates",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 900],
+      "webhookId": "onboarding-templates"
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "onboarding/user/:user_id/plan",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-user-plan",
+      "name": "Webhook Get User Plan",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 1100],
+      "webhookId": "onboarding-user-plan"
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "onboarding/user/:user_id/profile",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-user-profile",
+      "name": "Webhook Get User Profile",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 1300],
+      "webhookId": "onboarding-user-profile"
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "onboarding/status",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-status",
+      "name": "Webhook Service Status",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 1500],
+      "webhookId": "onboarding-status"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition-complete",
+              "leftValue": "={{ $json.path }}",
+              "rightValue": "/onboarding/complete",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "switch-route",
+      "name": "Route Switch",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Processar dados de onboarding completo\nconst body = $input.first().json.body;\nconst user_id = body.user_id;\nconst session_id = body.session_id;\nconst questions_and_answers = body.questions_and_answers;\nconst user_metadata = body.user_metadata;\n\n// Converter questions_and_answers para formato esperado\nconst answers_dict = {};\n\n// Processar cada pergunta e resposta\nquestions_and_answers.forEach(qa => {\n  const question_id = qa.question_id;\n  const answer = qa.answer;\n  \n  // Mapear question_id para campos conhecidos\n  const field_mapping = {\n    'concentration': 'concentration',\n    'lifestyle': 'lifestyle',\n    'energy': 'energy',\n    'financialGoals': 'financial_goals',\n    'lifeGoals': 'life_goals',\n    'learningHabitCommitment': 'learning_areas',\n    'procrastinationChallenge': 'procrastination_challenge',\n    'dailyReflection': 'daily_reflection'\n  };\n  \n  const field_name = field_mapping[question_id] || question_id;\n  \n  // Tratar diferentes tipos de resposta\n  if (Array.isArray(answer)) {\n    answers_dict[field_name] = answer.join(', ');\n  } else {\n    answers_dict[field_name] = String(answer);\n  }\n});\n\n// Adicionar valores padrão\nconst defaults = {\n  'wakeup_time': '06:00',\n  'sleep_time': '22:00',\n  'personal_interests': 'general',\n  'monthly_income': 0.0,\n  'monthly_savings': 0.0,\n  'time_availability': 0,\n  'investment_horizon': '',\n  'risk_tolerance': '',\n  'investment_capacity': '',\n  'business_interests': '',\n  'entrepreneur_profile': ''\n};\n\nObject.keys(defaults).forEach(key => {\n  if (!(key in answers_dict)) {\n    answers_dict[key] = defaults[key];\n  }\n});\n\n// Adicionar metadados\nanswers_dict['user_id'] = user_id;\nanswers_dict['session_id'] = session_id;\nanswers_dict['user_metadata'] = user_metadata;\nanswers_dict['source'] = 'n8n-workflow';\nanswers_dict['created_at'] = new Date().toISOString();\n\nreturn {\n  json: {\n    user_id: user_id,\n    processed_data: answers_dict,\n    original_request: body\n  }\n};"
+      },
+      "id": "process-complete-data",
+      "name": "Process Complete Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Análise de perfil usando lógica similar ao ProfileAnalyzer\nconst data = $input.first().json.processed_data;\nconst user_id = data.user_id;\n\n// Determinar tipo de perfil baseado nas respostas\nlet profile_type = 'balanced';\nlet domain_priorities = {\n  healthness: 50.0,\n  finances: 50.0,\n  business: 50.0,\n  productivity: 50.0,\n  learning: 50.0,\n  spirituality: 50.0,\n  relationships: 50.0\n};\n\n// Analisar concentração\nif (data.concentration === 'high-focus') {\n  domain_priorities.productivity += 20;\n} else if (data.concentration === 'low-focus') {\n  domain_priorities.productivity -= 20;\n}\n\n// Analisar estilo de vida\nif (data.lifestyle === 'not-satisfied') {\n  domain_priorities.healthness += 30;\n  profile_type = 'health_focused';\n}\n\n// Analisar energia\nif (data.energy === 'low-energy') {\n  domain_priorities.healthness += 25;\n  profile_type = 'health_focused';\n} else if (data.energy === 'high-energy') {\n  domain_priorities.productivity += 15;\n  domain_priorities.business += 15;\n}\n\n// Analisar objetivos financeiros\nif (data.financial_goals && data.financial_goals.includes('specific-goal')) {\n  domain_priorities.finances += 30;\n  profile_type = 'financial_focused';\n}\n\n// Analisar objetivos de vida\nif (data.life_goals && data.life_goals.includes('own-business')) {\n  domain_priorities.business += 40;\n  domain_priorities.finances += 20;\n  profile_type = 'business_focused';\n}\n\n// Normalizar prioridades (0-100)\nObject.keys(domain_priorities).forEach(key => {\n  domain_priorities[key] = Math.max(0, Math.min(100, domain_priorities[key]));\n});\n\n// Gerar insights\nconst key_insights = [];\nif (domain_priorities.healthness > 70) {\n  key_insights.push('Usuário com foco em saúde e bem-estar');\n}\nif (domain_priorities.finances > 70) {\n  key_insights.push('Interesse em desenvolvimento financeiro');\n}\nif (domain_priorities.business > 70) {\n  key_insights.push('Perfil empreendedor identificado');\n}\nif (domain_priorities.productivity > 70) {\n  key_insights.push('Foco em produtividade e organização');\n}\n\n// Calcular score de análise\nconst analysis_score = Object.values(domain_priorities).reduce((sum, val) => sum + val, 0) / Object.keys(domain_priorities).length;\n\n// Criar análise de perfil\nconst profile_analysis = {\n  user_id: user_id,\n  profile: {\n    user_id: user_id,\n    profile_type: profile_type,\n    age: null,\n    gender: null,\n    life_stage: null,\n    primary_concerns: [],\n    interests: [],\n    time_availability: data.time_availability || 0,\n    energy_level: data.energy === 'high-energy' ? 8 : data.energy === 'medium-energy' ? 5 : 3,\n    stress_level: data.lifestyle === 'not-satisfied' ? 7 : data.lifestyle === 'somewhat-satisfied' ? 5 : 3,\n    wakeup_time: data.wakeup_time || '07:00',\n    sleep_time: data.sleep_time || '23:00',\n    created_at: new Date().toISOString(),\n    updated_at: new Date().toISOString()\n  },\n  domain_priorities: domain_priorities,\n  key_insights: key_insights,\n  recommended_focus: Object.keys(domain_priorities)\n    .filter(key => domain_priorities[key] > 60)\n    .slice(0, 3),\n  risk_factors: [],\n  opportunities: [],\n  analysis_score: analysis_score,\n  confidence_level: 90.0,\n  created_at: new Date().toISOString()\n};\n\nreturn {\n  json: {\n    user_id: user_id,\n    profile_analysis: profile_analysis,\n    processed_data: data\n  }\n};"
+      },
+      "id": "analyze-profile",
+      "name": "Analyze Profile",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Match de template baseado na análise de perfil\nconst data = $input.first().json;\nconst profile_analysis = data.profile_analysis;\nconst user_id = data.user_id;\n\n// Templates disponíveis\nconst templates = {\n  'balanced_template': {\n    id: 'balanced_template',\n    name: 'Equilibrado',\n    description: 'Template para usuários com interesses equilibrados',\n    domains: {\n      healthness: {\n        goals: [{ id: 'maintain_health', label: 'Manter saúde equilibrada', priority: 7 }],\n        habits: [{ id: 'regular_exercise', name: 'Exercício regular', target: '3x por semana' }]\n      },\n      finances: {\n        goals: [{ id: 'financial_stability', label: 'Estabilidade financeira', priority: 7 }],\n        habits: [{ id: 'monthly_budget', name: 'Orçamento mensal', target: 'Mensal' }]\n      },\n      productivity: {\n        goals: [{ id: 'work_life_balance', label: 'Equilíbrio trabalho-vida', priority: 8 }],\n        habits: [{ id: 'time_management', name: 'Gestão do tempo', target: 'Diário' }]\n      },\n      learning: {\n        goals: [{ id: 'continuous_learning', label: 'Aprendizado contínuo', priority: 6 }],\n        habits: [{ id: 'daily_learning', name: 'Aprendizado diário', target: '30 minutos' }]\n      }\n    },\n    daily_schedule: [\n      { time: '07:00', activity: 'Café da manhã e planejamento do dia', domain: 'productivity' },\n      { time: '12:00', activity: 'Almoço e pausa', domain: 'healthness' },\n      { time: '18:00', activity: 'Exercício ou aprendizado', domain: 'healthness' },\n      { time: '20:00', activity: 'Tempo com família/amigos', domain: 'relationships' },\n      { time: '22:00', activity: 'Reflexão e preparação para dormir', domain: 'productivity' }\n    ]\n  },\n  'health_focused_template': {\n    id: 'health_focused_template',\n    name: 'Foco em Saúde',\n    description: 'Template para melhorar saúde e bem-estar',\n    domains: {\n      healthness: {\n        goals: [{ id: 'improve_health', label: 'Melhorar saúde geral', priority: 9 }],\n        habits: [{ id: 'daily_exercise', name: 'Exercício diário', target: 'Diário' }]\n      },\n      productivity: {\n        goals: [{ id: 'healthy_routine', label: 'Rotina saudável', priority: 8 }],\n        habits: [{ id: 'morning_routine', name: 'Rotina matinal', target: 'Diário' }]\n      }\n    },\n    daily_schedule: [\n      { time: '06:00', activity: 'Exercício matinal', domain: 'healthness' },\n      { time: '07:00', activity: 'Café da manhã saudável', domain: 'healthness' },\n      { time: '12:00', activity: 'Almoço nutritivo', domain: 'healthness' },\n      { time: '18:00', activity: 'Atividade física', domain: 'healthness' },\n      { time: '21:00', activity: 'Relaxamento e preparação para dormir', domain: 'healthness' }\n    ]\n  },\n  'financial_focused_template': {\n    id: 'financial_focused_template',\n    name: 'Foco em Finanças',\n    description: 'Template para organização financeira',\n    domains: {\n      finances: {\n        goals: [{ id: 'financial_freedom', label: 'Liberdade financeira', priority: 9 }],\n        habits: [{ id: 'daily_budget_tracking', name: 'Controle diário de gastos', target: 'Diário' }]\n      },\n      productivity: {\n        goals: [{ id: 'financial_planning', label: 'Planejamento financeiro', priority: 8 }],\n        habits: [{ id: 'weekly_financial_review', name: 'Revisão financeira semanal', target: 'Semanal' }]\n      }\n    },\n    daily_schedule: [\n      { time: '07:00', activity: 'Revisão de gastos do dia anterior', domain: 'finances' },\n      { time: '12:00', activity: 'Almoço e pausa', domain: 'healthness' },\n      { time: '18:00', activity: 'Planejamento financeiro', domain: 'finances' },\n      { time: '20:00', activity: 'Educação financeira', domain: 'learning' },\n      { time: '22:00', activity: 'Reflexão sobre objetivos financeiros', domain: 'finances' }\n    ]\n  }\n};\n\n// Selecionar template baseado no perfil\nlet selected_template_id = 'balanced_template';\nlet match_score = 70.0;\n\nif (profile_analysis.profile.profile_type === 'health_focused') {\n  selected_template_id = 'health_focused_template';\n  match_score = 95.0;\n} else if (profile_analysis.profile.profile_type === 'financial_focused') {\n  selected_template_id = 'financial_focused_template';\n  match_score = 95.0;\n} else if (profile_analysis.profile.profile_type === 'business_focused') {\n  selected_template_id = 'financial_focused_template'; // Usar template financeiro para negócios\n  match_score = 85.0;\n}\n\nconst selected_template = templates[selected_template_id];\n\n// Customizações baseadas no perfil\nconst customizations = {\n  user_specific: {},\n  domain_adjustments: {},\n  difficulty_adjustments: {},\n  schedule_adjustments: {}\n};\n\n// Ajustar domínios baseado nas prioridades\nObject.keys(profile_analysis.domain_priorities).forEach(domain => {\n  const priority = profile_analysis.domain_priorities[domain];\n  if (priority > 70) {\n    customizations.domain_adjustments[domain] = {\n      increase_focus: true,\n      add_specific_goals: true\n    };\n  } else if (priority < 30) {\n    customizations.domain_adjustments[domain] = {\n      reduce_focus: true,\n      simplify_goals: true\n    };\n  }\n});\n\nconst template_match = {\n  template_id: selected_template_id,\n  template_name: selected_template.name,\n  match_score: match_score,\n  template: selected_template,\n  customizations: customizations,\n  reasoning: [`Template selecionado baseado no perfil: ${profile_analysis.profile.profile_type}`]\n};\n\nreturn {\n  json: {\n    user_id: user_id,\n    profile_analysis: profile_analysis,\n    template_match: template_match,\n    processed_data: data.processed_data\n  }\n};"
+      },
+      "id": "match-template",
+      "name": "Match Template",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Gerar plano personalizado baseado no template e perfil\nconst data = $input.first().json;\nconst user_id = data.user_id;\nconst profile_analysis = data.profile_analysis;\nconst template_match = data.template_match;\nconst processed_data = data.processed_data;\n\n// Gerar ID único para o plano\nconst plan_id = 'plan_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);\n\n// Criar domínios personalizados baseado no template e customizações\nconst domains = {};\nconst template = template_match.template;\nconst customizations = template_match.customizations;\n\n// Processar cada domínio do template\nObject.keys(template.domains).forEach(domain_key => {\n  const domain_template = template.domains[domain_key];\n  const domain_priority = profile_analysis.domain_priorities[domain_key] || 50.0;\n  \n  // Aplicar customizações se existirem\n  const domain_customization = customizations.domain_adjustments[domain_key] || {};\n  \n  // Criar objetivos\n  const goals = domain_template.goals.map(goal => ({\n    id: goal.id,\n    label: goal.label,\n    priority: domain_customization.increase_focus ? Math.min(10, goal.priority + 1) : goal.priority,\n    description: null,\n    target_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 dias\n    progress: 0.0\n  }));\n  \n  // Criar hábitos\n  const habits = domain_template.habits.map(habit => ({\n    id: habit.id,\n    name: habit.name,\n    icon: 'circle',\n    color: '#3498DB',\n    description: '',\n    target: habit.target,\n    timeOfDay: 'all',\n    difficulty: 5,\n    category: domain_key\n  }));\n  \n  domains[domain_key] = {\n    goals: goals,\n    habits: habits,\n    routines: [],\n    custom_data: {\n      priority: domain_priority,\n      focus_level: domain_priority > 70 ? 'high' : domain_priority > 40 ? 'medium' : 'low'\n    }\n  };\n});\n\n// Criar metas integradas\nconst integrated_goals = [{\n  id: 'life_balance',\n  name: 'Equilíbrio de Vida',\n  domains: Object.keys(domains),\n  description: 'Manter equilíbrio entre diferentes áreas da vida',\n  progress: 0,\n  target_date: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(), // 90 dias\n  key_metrics: ['Consistência em rotinas', 'Progresso em objetivos']\n}];\n\n// Criar cronograma diário personalizado\nconst daily_schedule = template.daily_schedule.map(schedule_item => ({\n  time: schedule_item.time,\n  activity: schedule_item.activity,\n  domain: schedule_item.domain,\n  duration_minutes: 30\n}));\n\n// Criar metas semanais\nconst weekly_goals = [];\nObject.keys(domains).forEach(domain => {\n  if (domains[domain].custom_data.priority > 50) {\n    weekly_goals.push({\n      id: `${domain}_habits_week`,\n      name: `Implementar hábitos de ${domain}`,\n      domain: domain,\n      target: 1,\n      current: 0,\n      deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 dias\n    });\n    \n    weekly_goals.push({\n      id: `${domain}_goals_week`,\n      name: `Progresso em objetivos de ${domain}`,\n      domain: domain,\n      target: 25,\n      current: 0,\n      deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 dias\n    });\n  }\n});\n\n// Criar plano final\nconst generated_plan = {\n  user_id: user_id,\n  plan_id: plan_id,\n  template_match: {\n    template_id: template_match.template_id,\n    template_name: template_match.template_name,\n    match_score: template_match.match_score,\n    template: template,\n    customizations: customizations,\n    reasoning: template_match.reasoning\n  },\n  domains: domains,\n  integrated_goals: integrated_goals,\n  daily_schedule: daily_schedule,\n  weekly_goals: weekly_goals,\n  customizations: {\n    user_specific: customizations.user_specific,\n    domain_adjustments: customizations.domain_adjustments,\n    difficulty_adjustments: customizations.difficulty_adjustments,\n    schedule_adjustments: customizations.schedule_adjustments,\n    user_profile: {\n      profile_type: profile_analysis.profile.profile_type,\n      energy_level: profile_analysis.profile.energy_level,\n      time_availability: profile_analysis.profile.time_availability,\n      stress_level: profile_analysis.profile.stress_level\n    },\n    monitoring: {\n      weekly_review: true,\n      daily_check_in: true,\n      progress_tracking: true,\n      adjustment_frequency: 'weekly'\n    },\n    notifications: {\n      morning_reminder: true,\n      evening_review: true,\n      weekly_summary: true,\n      goal_reminders: true\n    }\n  },\n  metadata: {\n    generated_at: new Date().toISOString(),\n    profile_analysis_id: user_id,\n    template_match_score: template_match.match_score,\n    total_domains: Object.keys(domains).length,\n    priority_domains: profile_analysis.recommended_focus,\n    estimated_duration_weeks: 12,\n    difficulty_level: 5,\n    success_probability: 70.0\n  },\n  created_at: new Date().toISOString(),\n  expires_at: null\n};\n\nreturn {\n  json: {\n    user_id: user_id,\n    profile_analysis: profile_analysis,\n    template_match: template_match,\n    generated_plan: generated_plan,\n    success: true,\n    message: 'Onboarding completado com sucesso',\n    saved: true,\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "id": "generate-plan",
+      "name": "Generate Plan",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1340, 200]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "collection": "profile_analyses",
+        "fields": "profile_analysis",
+        "options": {}
+      },
+      "id": "save-profile-mongodb",
+      "name": "Save Profile to MongoDB",
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1,
+      "position": [1560, 100]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "collection": "user_plans",
+        "fields": "generated_plan",
+        "options": {}
+      },
+      "id": "save-plan-mongodb",
+      "name": "Save Plan to MongoDB",
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1,
+      "position": [1560, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "response-complete",
+      "name": "Response Complete",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1780, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Processar dados para análise de perfil apenas\nconst body = $input.first().json.body;\nconst user_id = body.user_id;\nconst answers = body.answers;\n\n// Converter answers para formato esperado\nconst processed_data = {\n  user_id: user_id,\n  ...answers,\n  source: 'n8n-workflow',\n  created_at: new Date().toISOString()\n};\n\nreturn {\n  json: {\n    user_id: user_id,\n    processed_data: processed_data,\n    original_request: body\n  }\n};"
+      },
+      "id": "process-analyze-data",
+      "name": "Process Analyze Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.profile_analysis }}",
+        "options": {}
+      },
+      "id": "response-analyze",
+      "name": "Response Analyze",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [900, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Processar dados para geração de plano\nconst body = $input.first().json.body;\nconst user_id = body.user_id;\nconst answers = body.answers;\n\n// Converter answers para formato esperado\nconst processed_data = {\n  user_id: user_id,\n  ...answers,\n  source: 'n8n-workflow',\n  created_at: new Date().toISOString()\n};\n\nreturn {\n  json: {\n    user_id: user_id,\n    processed_data: processed_data,\n    original_request: body\n  }\n};"
+      },
+      "id": "process-generate-data",
+      "name": "Process Generate Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 600]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.generated_plan }}",
+        "options": {}
+      },
+      "id": "response-generate",
+      "name": "Response Generate",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1340, 600]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Retornar templates disponíveis\nconst templates = [\n  {\n    id: 'balanced_template',\n    name: 'Equilibrado',\n    description: 'Template para usuários com interesses equilibrados',\n    domains: ['healthness', 'finances', 'productivity', 'learning']\n  },\n  {\n    id: 'health_focused_template',\n    name: 'Foco em Saúde',\n    description: 'Template para melhorar saúde e bem-estar',\n    domains: ['healthness', 'productivity']\n  },\n  {\n    id: 'financial_focused_template',\n    name: 'Foco em Finanças',\n    description: 'Template para organização financeira',\n    domains: ['finances', 'productivity']\n  }\n];\n\nreturn {\n  json: {\n    templates: templates,\n    count: templates.length\n  }\n};"
+      },
+      "id": "list-templates",
+      "name": "List Templates",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 800]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "response-templates",
+      "name": "Response Templates",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [680, 800]
+    },
+    {
+      "parameters": {
+        "operation": "find",
+        "collection": "user_plans",
+        "query": "={{ { \"user_id\": $json.path.split('/')[3] } }}",
+        "options": {
+          "limit": 1
+        }
+      },
+      "id": "get-user-plan-mongodb",
+      "name": "Get User Plan from MongoDB",
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1,
+      "position": [460, 1000]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json[0] || { \"error\": \"Plano não encontrado\" } }}",
+        "options": {}
+      },
+      "id": "response-user-plan",
+      "name": "Response User Plan",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [680, 1000]
+    },
+    {
+      "parameters": {
+        "operation": "find",
+        "collection": "profile_analyses",
+        "query": "={{ { \"user_id\": $json.path.split('/')[3] } }}",
+        "options": {
+          "limit": 1
+        }
+      },
+      "id": "get-user-profile-mongodb",
+      "name": "Get User Profile from MongoDB",
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1,
+      "position": [460, 1200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json[0] || { \"error\": \"Perfil não encontrado\" } }}",
+        "options": {}
+      },
+      "id": "response-user-profile",
+      "name": "Response User Profile",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [680, 1200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Retornar status do serviço\nreturn {\n  json: {\n    service: 'onboarding-agent',\n    version: '1.0.0',\n    status: 'operational',\n    features: {\n      agent_onboarding: true,\n      legacy_agent: false,\n      memory: false,\n      mongodb: true\n    },\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "id": "service-status",
+      "name": "Service Status",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 1400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "response-status",
+      "name": "Response Status",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [680, 1400]
+    }
+  ],
+  "connections": {
+    "Webhook Complete Onboarding": {
+      "main": [
+        [
+          {
+            "node": "Route Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Analyze Profile": {
+      "main": [
+        [
+          {
+            "node": "Process Analyze Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Generate Plan": {
+      "main": [
+        [
+          {
+            "node": "Process Generate Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook List Templates": {
+      "main": [
+        [
+          {
+            "node": "List Templates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Get User Plan": {
+      "main": [
+        [
+          {
+            "node": "Get User Plan from MongoDB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Get User Profile": {
+      "main": [
+        [
+          {
+            "node": "Get User Profile from MongoDB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Service Status": {
+      "main": [
+        [
+          {
+            "node": "Service Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Switch": {
+      "main": [
+        [
+          {
+            "node": "Process Complete Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Complete Data": {
+      "main": [
+        [
+          {
+            "node": "Analyze Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Profile": {
+      "main": [
+        [
+          {
+            "node": "Match Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match Template": {
+      "main": [
+        [
+          {
+            "node": "Generate Plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Plan": {
+      "main": [
+        [
+          {
+            "node": "Save Profile to MongoDB",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Save Plan to MongoDB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Profile to MongoDB": {
+      "main": [
+        [
+          {
+            "node": "Response Complete",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Plan to MongoDB": {
+      "main": [
+        [
+          {
+            "node": "Response Complete",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Analyze Data": {
+      "main": [
+        [
+          {
+            "node": "Analyze Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Generate Data": {
+      "main": [
+        [
+          {
+            "node": "Analyze Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Templates": {
+      "main": [
+        [
+          {
+            "node": "Response Templates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get User Plan from MongoDB": {
+      "main": [
+        [
+          {
+            "node": "Response User Plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get User Profile from MongoDB": {
+      "main": [
+        [
+          {
+            "node": "Response User Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Service Status": {
+      "main": [
+        [
+          {
+            "node": "Response Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 7,
+  "updatedAt": "2024-01-15T10:30:00.000Z",
+  "versionId": "1"
+}

@@ -92,7 +92,8 @@ class AgnoImplementationTester:
             # Executar onboarding completo
             result = await self.agent_onboarding.process_onboarding(
                 user_id=self.test_user_id,
-                answers=self.test_answers
+                user_metadata=self.test_user_metadata,
+                questionsAndAnswers=self.test_answers
             )
             
             # Verificar resultado
@@ -120,7 +121,7 @@ class AgnoImplementationTester:
             # Executar onboarding completo
             result = await self.legacy_agent.process_onboarding(
                 user_id=f"{self.test_user_id}_legacy",
-                answers=self.test_answers
+                questionsAndAnswers=self.test_answers
             )
             
             # Verificar resultado
@@ -148,7 +149,7 @@ class AgnoImplementationTester:
             # Analisar apenas perfil
             profile_analysis = await self.agent_onboarding.analyze_profile_only(
                 user_id=f"{self.test_user_id}_profile",
-                answers=self.test_answers
+                questionsAndAnswers=self.test_answers
             )
             
             # Verificar análise
@@ -177,7 +178,7 @@ class AgnoImplementationTester:
             # Primeiro analisar perfil
             profile_analysis = await self.agent_onboarding.analyze_profile_only(
                 user_id=f"{self.test_user_id}_plan",
-                answers=self.test_answers
+                questionsAndAnswers=self.test_answers
             )
             
             # Gerar plano a partir da análise
