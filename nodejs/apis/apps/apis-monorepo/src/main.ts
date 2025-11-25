@@ -6,12 +6,75 @@ import { resolve } from 'path';
 import { readFileSync, existsSync, mkdirSync } from 'fs';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { join } from 'path';
+import { EnvironmentConfig } from './config/environment.config';
+
+/**
+ * Busca origens permitidas do MongoDB dinamicamente
+ * Consulta a coleção de aplicações para obter allowedOrigins
+ */
+async function getAllowedOriginsFromMongoDB(): Promise<string[]> {
+  const origins: string[] = [];
+  
+  try {
+    const mongoUri = EnvironmentConfig.database.uri;
+    const mongoose = require('mongoose');
+    
+    // Criar conexão temporária
+    const connection = await mongoose.createConnection(mongoUri).asPromise();
+    const db = connection.db;
+    const applicationsCollection = db.collection('applications');
+    
+    // Buscar todas as aplicações ativas
+    const applications = await applicationsCollection
+      .find({ isActive: true })
+      .toArray();
+    
+    // Extrair todas as origens permitidas
+    applications.forEach((app: any) => {
+      if (app.allowedOrigins && Array.isArray(app.allowedOrigins)) {
+        app.allowedOrigins.forEach((origin: string) => {
+          if (origin && !origins.includes(origin)) {
+            origins.push(origin);
+          }
+        });
+      }
+    });
+    
+    console.log(`📦 Origens encontradas no MongoDB: ${origins.length}`);
+    
+    // Fechar conexão temporária
+    await connection.close();
+  } catch (error: any) {
+    console.warn('⚠️ Erro ao buscar origens do MongoDB:', error?.message || error);
+    console.log('📋 Usando apenas origens hardcoded');
+  }
+  
+  return origins;
+}
+
+/**
+ * Verifica se uma origem corresponde a um padrão com wildcard
+ * Ex: https://*.viralkids.com.br corresponde a https://app.viralkids.com.br
+ */
+function matchesWildcardPattern(origin: string, pattern: string): boolean {
+  if (!pattern.includes('*')) {
+    return origin === pattern;
+  }
+  
+  // Converter wildcard para regex
+  const regexPattern = pattern
+    .replace(/\./g, '\\.')
+    .replace(/\*/g, '.*');
+  
+  const regex = new RegExp(`^${regexPattern}$`);
+  return regex.test(origin);
+}
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
 
-  // Lista de origens permitidas
-  const allowedOrigins = [
+  // Lista base de origens permitidas (desenvolvimento)
+  const baseAllowedOrigins = [
     'http://localhost:3000',
     'http://localhost:3001',
     'http://localhost:5173',
@@ -24,6 +87,31 @@ async function bootstrap() {
     'http://127.0.0.1:8081',
   ];
 
+  // URLs de produção (hardcoded como fallback)
+  const productionOrigins = [
+    'https://app.viralkids.com.br',
+    'https://viralkids-wine.vercel.app',
+    'https://*.viralkids.com.br', // Wildcard para subdomínios
+  ];
+
+  // Buscar origens do MongoDB em produção
+  let mongoOrigins: string[] = [];
+  if (process.env.NODE_ENV === 'production') {
+    try {
+      mongoOrigins = await getAllowedOriginsFromMongoDB();
+      console.log(`✅ ${mongoOrigins.length} origens carregadas do MongoDB`);
+    } catch (error) {
+      console.warn('⚠️ Falha ao carregar origens do MongoDB, usando fallback');
+    }
+  }
+
+  // Combinar todas as origens
+  const allowedOrigins = [
+    ...baseAllowedOrigins,
+    ...productionOrigins,
+    ...mongoOrigins,
+  ];
+
   // Configuração do CORS com função de callback para debug
   app.enableCors({
     origin: (origin, callback) => {
@@ -32,16 +120,22 @@ async function bootstrap() {
         return callback(null, true);
       }
 
-      // Verificar se a origem está na lista permitida
+      // Verificar se a origem está na lista permitida (exata)
       if (allowedOrigins.includes(origin)) {
         console.log(`✅ CORS permitido para origem: ${origin}`);
         return callback(null, true);
       }
 
-      // Log para debug
-      console.warn(`⚠️ CORS bloqueado para origem: ${origin}`);
-      console.log(`📋 Origens permitidas: ${allowedOrigins.join(', ')}`);
+      // Verificar padrões com wildcard
+      const matchesWildcard = allowedOrigins.some(pattern => 
+        pattern.includes('*') && matchesWildcardPattern(origin, pattern)
+      );
       
+      if (matchesWildcard) {
+        console.log(`✅ CORS permitido para origem (wildcard): ${origin}`);
+        return callback(null, true);
+      }
+
       // Em desenvolvimento, permitir todas as origens locais
       if (process.env.NODE_ENV !== 'production') {
         if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
@@ -49,6 +143,10 @@ async function bootstrap() {
           return callback(null, true);
         }
       }
+
+      // Log para debug
+      console.warn(`⚠️ CORS bloqueado para origem: ${origin}`);
+      console.log(`📋 Origens permitidas: ${allowedOrigins.join(', ')}`);
 
       callback(new Error('Não permitido pelo CORS'));
     },
@@ -82,9 +180,21 @@ async function bootstrap() {
   expressApp.use((req: any, res: any, next: any) => {
     const origin = req.headers.origin;
     
-    if (origin && (allowedOrigins.includes(origin) || origin.includes('localhost') || origin.includes('127.0.0.1'))) {
-      res.setHeader('Access-Control-Allow-Origin', origin);
-      res.setHeader('Access-Control-Allow-Credentials', 'true');
+    if (origin) {
+      // Verificar origem exata
+      const isExactMatch = allowedOrigins.includes(origin);
+      // Verificar wildcards
+      const matchesWildcard = allowedOrigins.some(pattern => 
+        pattern.includes('*') && matchesWildcardPattern(origin, pattern)
+      );
+      // Verificar localhost em desenvolvimento
+      const isLocalhost = process.env.NODE_ENV !== 'production' && 
+        (origin.includes('localhost') || origin.includes('127.0.0.1'));
+      
+      if (isExactMatch || matchesWildcard || isLocalhost) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+      }
     }
     
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD');
