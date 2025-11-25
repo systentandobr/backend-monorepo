@@ -71,7 +71,7 @@ export class JwtValidatorService {
 
       return responseData.data;
     } catch (error) {
-      console.error('Erro ao validar token com SYS-SEGURANÇA:', error);
+      console.error('Erro ao validar token com SYS-SEGURANÇA:', JSON.stringify(error, null, 2));
       
       if (error.response?.status === 401) {
         throw new UnauthorizedException('Token inválido ou expirado');
