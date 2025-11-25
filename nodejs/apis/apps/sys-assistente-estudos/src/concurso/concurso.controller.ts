@@ -1,7 +1,9 @@
 import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { ConcursoService } from './concurso.service';
 import { Concurso } from './model/concurso.schema';
 
+@ApiTags('sys-assistente-estudos')
 @Controller('concursos')
 export class ConcursoController {
   constructor(private readonly concursoService: ConcursoService) { }

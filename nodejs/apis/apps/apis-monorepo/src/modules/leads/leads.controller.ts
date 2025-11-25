@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { LeadsService } from './leads.service';
 import { CreateLeadDto } from './dto/create-lead.dto';
 import { UpdateLeadDto } from './dto/update-lead.dto';
@@ -17,6 +18,7 @@ import { LeadFiltersDto } from './dto/lead-response.dto';
 import { UnitScope } from '../../decorators/unit-scope.decorator';
 import { CurrentUser, CurrentUserShape } from '../../decorators/current-user.decorator';
 
+@ApiTags('leads')
 @Controller('leads')
 @UnitScope()
 export class LeadsController {

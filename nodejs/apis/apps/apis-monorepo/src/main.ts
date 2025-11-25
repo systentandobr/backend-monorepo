@@ -8,21 +8,51 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { join } from 'path';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: true });
 
-  // Configuração do CORS
+  // Lista de origens permitidas
+  const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:5173',
+    'http://localhost:8080',
+    'http://localhost:8081',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:3001',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:8080',
+    'http://127.0.0.1:8081',
+  ];
+
+  // Configuração do CORS com função de callback para debug
   app.enableCors({
-    origin: [
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'http://localhost:5173',
-      'http://localhost:8080',
-      'http://127.0.0.1:3000',
-      'http://127.0.0.1:3001',
-      'http://127.0.0.1:5173',
-      'http://127.0.0.1:8080',
-    ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    origin: (origin, callback) => {
+      // Permitir requisições sem origem (ex: Postman, mobile apps)
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      // Verificar se a origem está na lista permitida
+      if (allowedOrigins.includes(origin)) {
+        console.log(`✅ CORS permitido para origem: ${origin}`);
+        return callback(null, true);
+      }
+
+      // Log para debug
+      console.warn(`⚠️ CORS bloqueado para origem: ${origin}`);
+      console.log(`📋 Origens permitidas: ${allowedOrigins.join(', ')}`);
+      
+      // Em desenvolvimento, permitir todas as origens locais
+      if (process.env.NODE_ENV !== 'production') {
+        if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+          console.log(`🔓 Permitindo origem local em desenvolvimento: ${origin}`);
+          return callback(null, true);
+        }
+      }
+
+      callback(new Error('Não permitido pelo CORS'));
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
     allowedHeaders: [
       'Origin',
       'X-Requested-With',
@@ -31,11 +61,49 @@ async function bootstrap() {
       'Authorization',
       'Cache-Control',
       'Pragma',
+      'Expires',
       'x-api-key',
+      'x-domain',
+      'Access-Control-Allow-Origin',
+      'Access-Control-Allow-Headers',
+      'Access-Control-Allow-Methods',
+      'If-None-Match',
+      'If-Modified-Since',
     ],
+    exposedHeaders: ['X-Total-Count', 'X-Rate-Limit-Remaining'],
     credentials: true,
     preflightContinue: false,
     optionsSuccessStatus: 204,
+    maxAge: 86400, // 24 horas
+  });
+
+  // Middleware adicional para garantir CORS e desabilitar cache em desenvolvimento
+  const expressApp = app.getHttpAdapter().getInstance();
+  expressApp.use((req: any, res: any, next: any) => {
+    const origin = req.headers.origin;
+    
+    if (origin && (allowedOrigins.includes(origin) || origin.includes('localhost') || origin.includes('127.0.0.1'))) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
+    
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD');
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control, Pragma, Expires, x-api-key, x-domain, If-None-Match, If-Modified-Since');
+    res.setHeader('Access-Control-Max-Age', '86400');
+    
+    // Desabilitar cache em desenvolvimento para evitar 304 Not Modified
+    if (process.env.NODE_ENV !== 'production') {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    }
+    
+    // Responder imediatamente para requisições OPTIONS
+    if (req.method === 'OPTIONS') {
+      return res.status(204).send();
+    }
+    
+    next();
   });
 
   // BEGIN SWAGGER CONFIG ---------------------------------------
@@ -43,14 +111,29 @@ async function bootstrap() {
   const pkg = JSON.parse(readFileSync(packageFile).toString());
   
   const config = new DocumentBuilder()
-    .setTitle(`${String(pkg.name).toUpperCase()} documentation`)
-    .setDescription(pkg.description)
+    .setTitle(`${String(pkg.name).toUpperCase()} - Monorepo API Documentation`)
+    .setDescription(`${pkg.description}\n\nEste monorepo inclui todas as APIs do sistema Systentando.`)
     .setVersion('1.0')
-    .addTag('APIs', 'Endpoints principais do sistema')
+    .addTag('produtos', 'Sistema de Produtos - Gestão de produtos, variantes e estoque')
+    .addTag('affiliate-products', 'Produtos Afiliados - Gestão de produtos de afiliados')
+    .addTag('categories', 'Categorias - Gestão de categorias de produtos')
+    .addTag('sys-assistente-estudos', 'Sistema Assistente de Estudos - Questões, concursos e simulações')
+    .addTag('sys-pagamentos', 'Sistema de Pagamentos - Gestão de pagamentos')
+    .addTag('life-tracker', 'Life Tracker - Rastreamento de vida e produtividade')
+    .addTag('customers', 'Clientes - Gestão de clientes')
+    .addTag('orders', 'Pedidos - Gestão de pedidos')
+    .addTag('franchises', 'Franquias - Gestão de franquias')
+    .addTag('leads', 'Leads - Gestão de leads')
+    .addTag('notifications', 'Notificações - Sistema de notificações')
+    .addTag('debug', 'Debug - Endpoints de debug e desenvolvimento')
     .addBearerAuth()
     .build();
 
-  const document = SwaggerModule.createDocument(app, config);
+  // Criar documento Swagger incluindo todos os módulos do AppModule
+  const document = SwaggerModule.createDocument(app, config, {
+    include: [AppModule],
+    deepScanRoutes: true,
+  });
   
   // Criar diretório public se não existir
   const publicDir = join(process.cwd(), 'public');
@@ -89,13 +172,22 @@ async function bootstrap() {
   //END SWAGGER CONFIG ------------------------------------
   
   const logger = new ConsoleLogger();
-  const port = process.env.PORT || 3000;
+  const port = process.env.PORT || 9090;
   
   logger.log(
     `${clc.magentaBright('🚀')} ${clc.green(
       'Application ready on port',
     )} ${clc.yellow(port.toString())}`,
   );
+  
+  logger.log(
+    `${clc.cyanBright('🌐')} ${clc.green(
+      'CORS configurado para as seguintes origens:',
+    )}`,
+  );
+  allowedOrigins.forEach(origin => {
+    logger.log(`   ${clc.cyanBright('-')} ${clc.yellow(origin)}`);
+  });
   
   logger.log(
     `${clc.cyanBright('📚')} ${clc.green(

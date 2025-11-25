@@ -10,6 +10,7 @@ import {
   UseInterceptors,
   Get,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { QuestionService } from './question.service';
 import { diskStorage, Multer } from 'multer';
@@ -24,6 +25,7 @@ import {
 } from './model/question.dto';
 import { handlerImportFileErrorMessage } from './handlers';
 
+@ApiTags('sys-assistente-estudos')
 @Controller('questions')
 export class QuestionController {
   constructor(private readonly questionService: QuestionService) { }

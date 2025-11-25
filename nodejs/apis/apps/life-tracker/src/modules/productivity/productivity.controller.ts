@@ -1,7 +1,9 @@
 import { Controller, Get, Post, Put, Body, Param } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { ProductivityService } from './productivity.service';
 import { ApiResponse } from '../../types';
 
+@ApiTags('life-tracker')
 @Controller('productivity')
 export class ProductivityController {
   constructor(private readonly productivityService: ProductivityService) {}

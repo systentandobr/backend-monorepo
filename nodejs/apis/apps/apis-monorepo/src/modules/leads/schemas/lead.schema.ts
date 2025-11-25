@@ -1,7 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-export type LeadDocument = Lead & Document;
+export type LeadDocument = Lead & Document & {
+  createdAt?: Date;
+  updatedAt?: Date;
+};
 
 export enum LeadStatus {
   NEW = 'new',

@@ -7,9 +7,21 @@ export class JwtAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
+    
+    // Permitir requisições OPTIONS (preflight CORS) sem autenticação
+    if (request.method === 'OPTIONS') {
+      return true;
+    }
+    
     const token = this.extractTokenFromHeader(request);
     
     if (!token) {
+      console.error('[JwtAuthGuard] Token não encontrado. Headers recebidos:', {
+        authorization: request.headers?.authorization ? 'Presente' : 'Ausente',
+        method: request.method,
+        url: request.url,
+        allHeaders: Object.keys(request.headers || {})
+      });
       throw new UnauthorizedException('Token de acesso não fornecido');
     }
 

@@ -186,10 +186,11 @@ export class FranchisesService {
       const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
       const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
       
-      const lastMonthOrders = orders.filter(o => 
+      const lastMonthOrdersArray = orders.filter(o => 
         o.orderDate >= lastMonthStart && o.orderDate <= lastMonthEnd
       );
-      const lastMonthSales = lastMonthOrders
+      const lastMonthOrders = lastMonthOrdersArray.length;
+      const lastMonthSales = lastMonthOrdersArray
         .filter(o => o.status !== 'cancelado')
         .reduce((sum, o) => sum + o.total, 0);
       const lastMonthLeads = Math.floor(totalLeads * 0.1); // TODO: Buscar do módulo de leads

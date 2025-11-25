@@ -46,6 +46,10 @@ export class JwtValidatorService {
    */
   async validateToken(token: string): Promise<JwtValidationResult> {
     try {
+      console.log('Validando token com SYS-SEGURANÇA' + this.sysSegurancaUrl);
+      console.log('Token' + token);
+      console.log('Sys Seguranca Api Key' + EnvironmentConfig.sysSeguranca.apiKey);
+      console.log('Sys Seguranca Timeout' + EnvironmentConfig.sysSeguranca.timeout);
       const response = await firstValueFrom(
         this.httpService.post(
           `${this.sysSegurancaUrl}/api/v1/auth/validate`,
@@ -126,6 +130,7 @@ export class JwtValidatorService {
   async validateTokenWithFallback(token: string): Promise<JwtValidationResult> {
     try {
       // Tentar validar com SYS-SEGURANÇA primeiro
+      console.log('Fallback SYS-SEGURANÇA validando token' + token);
       return await this.validateToken(token);
     } catch (error) {
       console.warn('SYS-SEGURANÇA indisponível, usando validação local:', error.message);

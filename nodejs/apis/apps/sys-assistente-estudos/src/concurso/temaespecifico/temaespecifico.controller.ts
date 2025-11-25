@@ -1,7 +1,9 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { TemaespecificoService } from './temaespecifico.service';
 import { TemaEspecifico } from './model/temaEspecifico.schema';
 
+@ApiTags('sys-assistente-estudos')
 @Controller('temas-especificos')
 export class TemaespecificoController {
   constructor(private readonly temaEspecificoService: TemaespecificoService) { }

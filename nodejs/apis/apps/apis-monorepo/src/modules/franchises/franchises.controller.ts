@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { FranchisesService } from './franchises.service';
 import { CreateFranchiseDto } from './dto/create-franchise.dto';
 import { UpdateFranchiseDto } from './dto/update-franchise.dto';
@@ -17,6 +18,7 @@ import { FranchiseFiltersDto } from './dto/franchise-response.dto';
 import { UnitScope } from '../../decorators/unit-scope.decorator';
 import { CurrentUser, CurrentUserShape } from '../../decorators/current-user.decorator';
 
+@ApiTags('franchises')
 @Controller('franchises')
 export class FranchisesController {
   constructor(private readonly franchisesService: FranchisesService) {}

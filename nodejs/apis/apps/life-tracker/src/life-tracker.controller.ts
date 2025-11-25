@@ -1,6 +1,8 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { LifeTrackerService } from './life-tracker.service';
 
+@ApiTags('life-tracker')
 @Controller('life-tracker')
 export class LifeTrackerController {
   constructor(private readonly lifeTrackerService: LifeTrackerService) {}

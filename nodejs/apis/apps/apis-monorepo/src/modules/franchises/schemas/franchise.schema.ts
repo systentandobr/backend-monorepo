@@ -1,7 +1,29 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 
-export type FranchiseDocument = Franchise & Document;
+export type FranchiseDocument = Franchise & Document & {
+  createdAt?: Date;
+  updatedAt?: Date;
+};
+
+// Sub-schema para location
+const LocationSchema = new MongooseSchema({
+  lat: { type: Number, required: true },
+  lng: { type: Number, required: true },
+  address: { type: String, required: true },
+  city: { type: String, required: true },
+  state: { type: String, required: true },
+  zipCode: { type: String, required: true },
+  type: { type: String, enum: ['physical', 'digital'], required: true },
+}, { _id: false });
+
+// Sub-schema para territory
+const TerritorySchema = new MongooseSchema({
+  city: { type: String, required: true },
+  state: { type: String, required: true },
+  exclusive: { type: Boolean, default: true },
+  radius: { type: Number },
+}, { _id: false });
 
 @Schema({
   timestamps: true,
@@ -29,18 +51,7 @@ export class Franchise {
   @Prop()
   ownerPhone?: string;
 
-  @Prop({
-    type: {
-      lat: { type: Number, required: true },
-      lng: { type: Number, required: true },
-      address: { type: String, required: true },
-      city: { type: String, required: true },
-      state: { type: String, required: true },
-      zipCode: { type: String, required: true },
-      type: { type: String, enum: ['physical', 'digital'], required: true },
-    },
-    required: true,
-  })
+  @Prop({ type: LocationSchema, required: true })
   location: {
     lat: number;
     lng: number;
@@ -65,14 +76,7 @@ export class Franchise {
   })
   type: 'standard' | 'premium' | 'express';
 
-  @Prop({
-    type: {
-      city: { type: String, required: true },
-      state: { type: String, required: true },
-      exclusive: { type: Boolean, default: true },
-      radius: { type: Number }, // em km
-    },
-  })
+  @Prop({ type: TerritorySchema })
   territory?: {
     city: string;
     state: string;

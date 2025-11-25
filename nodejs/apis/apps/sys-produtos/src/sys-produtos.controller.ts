@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { SysProdutosService } from './sys-produtos.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser, CurrentUserShape } from './decorators/current-user.decorator';
@@ -8,6 +9,8 @@ import { QueryProdutoDto } from './dto/query-produto.dto';
 import { AdjustStockDeltaDto, AdjustStockDto, CreateVariantDto, UpdateVariantDto } from './dto/variant.dto';
 import { CategoryDto, ImageDto, UpdateProdutoMetadataDto } from './dto/produto-metadata.dto';
 
+@ApiTags('produtos')
+@ApiBearerAuth()
 @Controller('produtos')
 export class SysProdutosController {
   constructor(private readonly sysProdutosService: SysProdutosService) {}

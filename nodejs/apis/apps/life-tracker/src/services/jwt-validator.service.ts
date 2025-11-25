@@ -116,6 +116,7 @@ export class JwtValidatorService {
   async validateTokenWithFallback(token: string): Promise<JwtValidationResult> {
     try {
       // Tentar validar com SYS-SEGURANÇA primeiro
+      console.log('Fallback SYS-SEGURANÇA validando token' + token);
       return await this.validateToken(token);
     } catch (error) {
       console.warn('SYS-SEGURANÇA indisponível, usando validação local:', error.message);

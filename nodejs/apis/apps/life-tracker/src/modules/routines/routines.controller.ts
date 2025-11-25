@@ -1,7 +1,9 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { RoutinesService } from './routines.service';
 import { ApiResponse, IntegratedRoutine, CreateHabitDto, UpdateHabitDto, CompleteHabitDto } from '../../types';
 
+@ApiTags('life-tracker')
 @Controller('routines')
 export class RoutinesController {
   constructor(private readonly routinesService: RoutinesService) {}

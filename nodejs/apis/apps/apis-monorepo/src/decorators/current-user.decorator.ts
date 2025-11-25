@@ -5,6 +5,13 @@ export interface CurrentUserShape {
   username?: string;
   email?: string;
   unitId?: string;
+  profile?: {
+    unitId?: string;
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    [key: string]: any;
+  };
   roles?: any[];
   permissions?: string[];
   isEmailVerified?: boolean;

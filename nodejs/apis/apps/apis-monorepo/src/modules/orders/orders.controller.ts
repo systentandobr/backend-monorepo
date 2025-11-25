@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order.dto';
@@ -17,6 +18,7 @@ import { OrderFiltersDto } from './dto/order-response.dto';
 import { UnitScope } from '../../decorators/unit-scope.decorator';
 import { CurrentUser, CurrentUserShape } from '../../decorators/current-user.decorator';
 
+@ApiTags('orders')
 @Controller('orders')
 @UnitScope()
 export class OrdersController {

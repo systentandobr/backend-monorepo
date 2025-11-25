@@ -1,7 +1,9 @@
 import { Controller, Get, Post, Put, Body, Param, Query } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { HealthService } from './health.service';
 import { ApiResponse } from '../../types';
 
+@ApiTags('life-tracker')
 @Controller('health')
 export class HealthController {
   constructor(private readonly healthService: HealthService) {}

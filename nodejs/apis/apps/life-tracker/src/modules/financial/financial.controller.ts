@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Put, Patch, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { FinancialService } from './financial.service';
 import { ApiResponse } from '../../types';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
@@ -35,6 +36,7 @@ export interface MarketDataRequestDto {
   symbols: string[];
 }
 
+@ApiTags('life-tracker')
 @Controller('financial')
 @UseGuards(JwtAuthGuard)
 export class FinancialController {

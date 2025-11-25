@@ -1,8 +1,10 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query } from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
 import { HabitsService } from "./habits.service";
 import { ApiResponse, CreateHabitDto, UpdateHabitDto } from "../../types";
 import { HabitDto, UpdateCategoryDto } from "../../types/dtos/definitions";
 
+@ApiTags('life-tracker')
 @Controller("habits")
 export class HabitsController {
   constructor(private readonly habitsService: HabitsService) {}

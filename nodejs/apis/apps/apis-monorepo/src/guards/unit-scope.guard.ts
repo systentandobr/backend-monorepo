@@ -2,7 +2,7 @@ import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@
 
 @Injectable()
 export class UnitScopeGuard implements CanActivate {
-  constructor(private readonly paramKey: string = 'unitId') {}
+  private readonly paramKey: string = 'unitId';
 
   canActivate(context: ExecutionContext): boolean {
     const req = context.switchToHttp().getRequest();

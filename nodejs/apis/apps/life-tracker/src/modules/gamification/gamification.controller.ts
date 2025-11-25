@@ -1,7 +1,9 @@
 import { Controller, Get, Post, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { GamificationService } from './gamification.service';
 import { ApiResponse } from '../../types';
 
+@ApiTags('life-tracker')
 @Controller('gamification')
 export class GamificationController {
   constructor(private readonly gamificationService: GamificationService) {}

@@ -7,9 +7,11 @@ import {
   Delete,
   Put,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { SimulacaoService } from './simulacao.service';
 import { Simulacao } from './model/simulacao.schema';
 
+@ApiTags('sys-assistente-estudos')
 @Controller('simulacoes')
 export class SimulacaoController {
   constructor(private readonly simulacaoService: SimulacaoService) { }

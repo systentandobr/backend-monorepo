@@ -1,7 +1,30 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 
-export type OrderDocument = Order & Document;
+export type OrderDocument = Order & Document & {
+  createdAt?: Date;
+  updatedAt?: Date;
+};
+
+// Sub-schema para OrderItem
+const OrderItemSchema = new MongooseSchema({
+  productId: { type: String, required: true },
+  productName: { type: String, required: true },
+  quantity: { type: Number, required: true },
+  price: { type: Number, required: true },
+  total: { type: Number, required: true },
+}, { _id: false });
+
+// Sub-schema para ShippingAddress
+const ShippingAddressSchema = new MongooseSchema({
+  street: { type: String, required: true },
+  number: { type: String, required: true },
+  complement: { type: String },
+  neighborhood: { type: String, required: true },
+  city: { type: String, required: true },
+  state: { type: String, required: true },
+  zipCode: { type: String, required: true },
+}, { _id: false });
 
 @Schema({
   timestamps: true,
@@ -29,16 +52,7 @@ export class Order {
   @Prop()
   customerPhone?: string;
 
-  @Prop({
-    type: [{
-      productId: { type: String, required: true },
-      productName: { type: String, required: true },
-      quantity: { type: Number, required: true },
-      price: { type: Number, required: true },
-      total: { type: Number, required: true },
-    }],
-    default: [],
-  })
+  @Prop({ type: [OrderItemSchema], default: [] })
   items: Array<{
     productId: string;
     productName: string;
@@ -72,7 +86,7 @@ export class Order {
   @Prop()
   trackingNumber?: string;
 
-  @Prop({ type: Object })
+  @Prop({ type: ShippingAddressSchema })
   shippingAddress?: {
     street: string;
     number: string;

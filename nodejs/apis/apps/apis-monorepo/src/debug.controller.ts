@@ -1,6 +1,8 @@
 import { Controller, Get } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 
+@ApiTags('debug')
 @Controller('debug')
 export class DebugController {
   constructor(private configService: ConfigService) {}

@@ -7,10 +7,12 @@ import {
   Put,
   Post,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { EstatisticaService } from './estatistica.service';
 import { Estatistica } from './model/estatistica.schema';
 import { EstatisticaDto } from './model/estatistica.dto';
 
+@ApiTags('sys-assistente-estudos')
 @Controller('estatisticas')
 export class EstatisticaController {
   constructor(private readonly estatisticaService: EstatisticaService) {}
