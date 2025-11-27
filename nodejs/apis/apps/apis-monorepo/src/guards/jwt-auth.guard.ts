@@ -26,14 +26,30 @@ export class JwtAuthGuard implements CanActivate {
     }
 
     try {
+      console.log(`🔒 [JwtAuthGuard] Validando autenticação para ${request.method} ${request.url}`);
+      
       // Validar token usando SYS-SEGURANÇA com fallback local
       const validationResult = await this.jwtValidatorService.validateTokenWithFallback(token);
       
-      if (!validationResult.isValid) {
+      console.log(`📋 [JwtAuthGuard] Resultado da validação:`, {
+        isValid: validationResult.isValid,
+        hasUser: !!validationResult.user,
+        userId: validationResult.user?.id,
+        username: validationResult.user?.username,
+        email: validationResult.user?.email,
+      });
+      
+      if (!validationResult || !validationResult.isValid) {
+        console.error('❌ [JwtAuthGuard] Resultado de validação inválido:', validationResult);
         throw new UnauthorizedException('Token inválido');
       }
 
       const u = validationResult.user || ({} as any);
+      
+      if (!u.id) {
+        console.error('❌ [JwtAuthGuard] Usuário não encontrado no resultado de validação:', validationResult);
+        throw new UnauthorizedException('Dados do usuário não encontrados');
+      }
       
       // Extrair unitId do payload ou do user profile
       // O unitId pode vir do payload (quando vem do JWT) ou do user.profile (quando vem da API de segurança)
@@ -42,12 +58,18 @@ export class JwtAuthGuard implements CanActivate {
         || u.profile?.unitId 
         || u.unitId;
 
-      // Adicionar informações do usuário à requisição incluindo unitId
+      // Extrair domain do profile do usuário (crítico para multi-tenancy)
+      const domain = u.profile?.domain 
+        || validationResult.payload?.profile?.domain
+        || validationResult.payload?.domain;
+
+      // Adicionar informações do usuário à requisição incluindo unitId e domain
       request.user = {
         id: u.id,
         username: u.username,
         email: u.email,
         unitId: unitId, // Crítico para escopo por unidade/franquia
+        domain: domain, // Crítico para filtro por domínio (multi-tenancy)
         profile: u.profile || validationResult.payload?.profile,
         roles: u.roles || [],
         permissions: u.permissions || [],
@@ -56,8 +78,20 @@ export class JwtAuthGuard implements CanActivate {
         payload: validationResult.payload,
       };
       
+      console.log(`✅ [JwtAuthGuard] Autenticação bem-sucedida para usuário: ${u.username || u.email || u.id}`);
+      console.log(`   UnitId: ${unitId || 'não informado'}`);
+      console.log(`   Domain: ${domain || 'não informado'}`);
+      console.log(`   Roles: ${(u.roles || []).map((r: any) => r.name || r).join(', ') || 'nenhum'}`);
+      
       return true;
-    } catch (error) {
+    } catch (error: any) {
+      console.error(`❌ [JwtAuthGuard] Erro na validação:`, {
+        message: error.message,
+        status: error.status,
+        isUnauthorized: error instanceof UnauthorizedException,
+        stack: error.stack,
+      });
+      
       if (error instanceof UnauthorizedException) {
         throw error;
       }

@@ -45,14 +45,17 @@ export class JwtValidatorService {
    * Valida um token JWT consultando o SYS-SEGURANÇA
    */
   async validateToken(token: string): Promise<JwtValidationResult> {
+    const url = `${this.sysSegurancaUrl}/api/v1/auth/validate`;
+    
     try {
-      console.log('Validando token com SYS-SEGURANÇA' + this.sysSegurancaUrl);
-      console.log('Token' + token);
-      console.log('Sys Seguranca Api Key' + EnvironmentConfig.sysSeguranca.apiKey);
-      console.log('Sys Seguranca Timeout' + EnvironmentConfig.sysSeguranca.timeout);
+      console.log('🔐 Validando token com SYS-SEGURANÇA');
+      console.log(`   URL: ${this.sysSegurancaUrl}`);
+      console.log(`   API Key: ${EnvironmentConfig.sysSeguranca.apiKey ? '***' + EnvironmentConfig.sysSeguranca.apiKey.slice(-4) : 'não configurada'}`);
+      console.log(`   Timeout: ${EnvironmentConfig.sysSeguranca.timeout}ms`);
+      
       const response = await firstValueFrom(
         this.httpService.post(
-          `${this.sysSegurancaUrl}/api/v1/auth/validate`,
+          url,
           { accessToken: token },
           {
             headers: {
@@ -65,20 +68,106 @@ export class JwtValidatorService {
       );
 
       const responseData = response.data as any;
-      if (!responseData.success) {
+      
+      // Log da resposta completa para debug
+      console.log('📥 Resposta recebida do SYS-SEGURANÇA:', JSON.stringify(responseData, null, 2));
+      
+      // O endpoint pode retornar diferentes formatos:
+      // 1. { success: true, data: { isValid, user, payload, expiresAt } }
+      // 2. { isValid, user, payload, expiresAt } (formato direto)
+      // 3. Apenas o objeto user (quando retornado pelo controller)
+      
+      let validationResult: JwtValidationResult;
+      
+      if (responseData.success === false) {
+        console.error('❌ Resposta do SYS-SEGURANÇA indicou falha:', responseData);
         throw new UnauthorizedException('Token inválido');
       }
-
-      return responseData.data;
-    } catch (error) {
-      console.error('Erro ao validar token com SYS-SEGURANÇA:', JSON.stringify(error, null, 2));
       
-      if (error.response?.status === 401) {
-        throw new UnauthorizedException('Token inválido ou expirado');
+      // Se tem success: true e data, usar data
+      if (responseData.success === true && responseData.data) {
+        validationResult = responseData.data as JwtValidationResult;
+      }
+      // Se tem isValid, é o formato direto
+      else if (responseData.isValid !== undefined) {
+        validationResult = responseData as JwtValidationResult;
+      }
+      // Se tem user mas não tem isValid, pode ser apenas o user (formato do controller)
+      else if (responseData.user || responseData.id) {
+        // Normalizar para o formato esperado
+        validationResult = {
+          isValid: true,
+          user: responseData.user || {
+            id: responseData.id,
+            username: responseData.username,
+            email: responseData.email,
+            unitId: responseData.unitId || responseData.profile?.unitId,
+            profile: responseData.profile,
+            roles: responseData.roles || [],
+            permissions: responseData.permissions || [],
+            isEmailVerified: responseData.isEmailVerified || false,
+            isActive: responseData.isActive !== false,
+          },
+          payload: responseData.payload || responseData,
+          expiresAt: responseData.expiresAt ? new Date(responseData.expiresAt) : new Date(Date.now() + 3600000), // Default 1h se não informado
+        };
+      }
+      // Formato desconhecido
+      else {
+        console.error('❌ Formato de resposta desconhecido do SYS-SEGURANÇA:', responseData);
+        throw new UnauthorizedException('Formato de resposta inválido do serviço de autenticação');
       }
       
-      if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
-        throw new UnauthorizedException('Serviço de autenticação indisponível');
+      // Garantir que isValid está definido como true se chegou até aqui
+      if (validationResult.isValid !== true) {
+        validationResult.isValid = true;
+      }
+      
+      // Validar se o resultado tem a estrutura mínima esperada
+      if (!validationResult.user || !validationResult.user.id) {
+        console.error('❌ Resposta do SYS-SEGURANÇA não contém dados do usuário:', validationResult);
+        throw new UnauthorizedException('Resposta inválida do serviço de autenticação');
+      }
+      
+      // Verificar se o usuário está ativo
+      if (!validationResult.user.isActive) {
+        console.error('❌ Usuário não está ativo:', validationResult.user);
+        throw new UnauthorizedException('User is not active');
+      }
+      
+      console.log('✅ Token validado com sucesso pelo SYS-SEGURANÇA');
+      console.log(`   Usuário: ${validationResult.user.username || validationResult.user.email || validationResult.user.id}`);
+      console.log(`   UnitId: ${validationResult.user.unitId || validationResult.user.profile?.unitId || 'não informado'}`);
+      
+      return validationResult;
+    } catch (error: any) {
+      // Log detalhado do erro para debug
+      if (error?.response) {
+        console.error('❌ Erro na resposta do SYS-SEGURANÇA:', {
+          status: error.response.status,
+          statusText: error.response.statusText,
+          data: error.response.data,
+          url,
+        });
+        
+        if (error.response.status === 401) {
+          throw new UnauthorizedException('Token inválido ou expirado');
+        }
+      } else if (error?.code) {
+        console.error('❌ Erro de conexão com SYS-SEGURANÇA:', {
+          code: error.code,
+          message: error.message,
+          url,
+        });
+        
+        if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+          throw new UnauthorizedException('Serviço de autenticação indisponível');
+        }
+      } else if (error instanceof UnauthorizedException) {
+        // Se já é UnauthorizedException, apenas relançar
+        throw error;
+      } else {
+        console.error('❌ Erro desconhecido na validação do token:', error.message || error);
       }
       
       throw new UnauthorizedException('Erro na validação do token');
@@ -130,13 +219,25 @@ export class JwtValidatorService {
   async validateTokenWithFallback(token: string): Promise<JwtValidationResult> {
     try {
       // Tentar validar com SYS-SEGURANÇA primeiro
-      console.log('Fallback SYS-SEGURANÇA validando token' + token);
-      return await this.validateToken(token);
-    } catch (error) {
-      console.warn('SYS-SEGURANÇA indisponível, usando validação local:', error.message);
+      console.log('🔄 [JwtValidatorService] Tentando validar token com SYS-SEGURANÇA...');
+      const result = await this.validateToken(token);
+      console.log('✅ [JwtValidatorService] Validação com SYS-SEGURANÇA bem-sucedida');
+      return result;
+    } catch (error: any) {
+      console.warn('⚠️ [JwtValidatorService] SYS-SEGURANÇA indisponível ou falhou, usando validação local:', {
+        message: error.message,
+        status: error.status,
+      });
       
       // Fallback para validação local
-      return await this.validateTokenLocally(token);
+      try {
+        const localResult = await this.validateTokenLocally(token);
+        console.log('✅ [JwtValidatorService] Validação local bem-sucedida');
+        return localResult;
+      } catch (localError: any) {
+        console.error('❌ [JwtValidatorService] Validação local também falhou:', localError.message);
+        throw localError;
+      }
     }
   }
 }

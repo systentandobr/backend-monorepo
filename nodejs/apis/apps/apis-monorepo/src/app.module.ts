@@ -13,6 +13,7 @@ import { OrdersModule } from './modules/orders/orders.module';
 import { FranchisesModule } from './modules/franchises/franchises.module';
 import { LeadsModule } from './modules/leads/leads.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     FranchisesModule,
     LeadsModule,
     NotificationsModule,
+    UsersModule,
   ],
   controllers: [AppController, DebugController],
   providers: [AppService],

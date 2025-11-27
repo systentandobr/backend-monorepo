@@ -5,11 +5,13 @@ export interface CurrentUserShape {
   username?: string;
   email?: string;
   unitId?: string;
+  domain?: string; // Domain do usuário para multi-tenancy
   profile?: {
     unitId?: string;
     firstName?: string;
     lastName?: string;
     phone?: string;
+    domain?: string; // Domain pode estar no profile
     [key: string]: any;
   };
   roles?: any[];
