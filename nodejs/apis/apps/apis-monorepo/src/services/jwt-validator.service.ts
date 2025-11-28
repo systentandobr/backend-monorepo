@@ -95,18 +95,37 @@ export class JwtValidatorService {
       // Se tem user mas não tem isValid, pode ser apenas o user (formato do controller)
       else if (responseData.user || responseData.id) {
         // Normalizar para o formato esperado
+        const userData = responseData.user || {
+          id: responseData.id,
+          username: responseData.username,
+          email: responseData.email,
+          unitId: responseData.unitId || responseData.profile?.unitId,
+          profile: responseData.profile,
+          roles: responseData.roles || [],
+          permissions: responseData.permissions || [],
+          isEmailVerified: responseData.isEmailVerified || false,
+          isActive: responseData.isActive !== false,
+        };
+        
+        // Garantir que roles está no formato correto (array de objetos com 'name')
+        let roles = userData.roles || [];
+        if (Array.isArray(roles)) {
+          roles = roles.map((role: any) => {
+            if (typeof role === 'object' && role.name) {
+              return role;
+            }
+            if (typeof role === 'string') {
+              return { name: role };
+            }
+            return role;
+          });
+        }
+        
         validationResult = {
           isValid: true,
-          user: responseData.user || {
-            id: responseData.id,
-            username: responseData.username,
-            email: responseData.email,
-            unitId: responseData.unitId || responseData.profile?.unitId,
-            profile: responseData.profile,
-            roles: responseData.roles || [],
-            permissions: responseData.permissions || [],
-            isEmailVerified: responseData.isEmailVerified || false,
-            isActive: responseData.isActive !== false,
+          user: {
+            ...userData,
+            roles: roles,
           },
           payload: responseData.payload || responseData,
           expiresAt: responseData.expiresAt ? new Date(responseData.expiresAt) : new Date(Date.now() + 3600000), // Default 1h se não informado
@@ -135,9 +154,24 @@ export class JwtValidatorService {
         throw new UnauthorizedException('User is not active');
       }
       
+      // Garantir que roles está no formato correto
+      if (validationResult.user.roles && Array.isArray(validationResult.user.roles)) {
+        validationResult.user.roles = validationResult.user.roles.map((role: any) => {
+          if (typeof role === 'object' && role.name) {
+            return role;
+          }
+          if (typeof role === 'string') {
+            return { name: role };
+          }
+          return role;
+        });
+      }
+      
       console.log('✅ Token validado com sucesso pelo SYS-SEGURANÇA');
       console.log(`   Usuário: ${validationResult.user.username || validationResult.user.email || validationResult.user.id}`);
       console.log(`   UnitId: ${validationResult.user.unitId || validationResult.user.profile?.unitId || 'não informado'}`);
+      console.log(`   Roles: ${(validationResult.user.roles || []).map((r: any) => r.name || r).join(', ') || 'nenhum'}`);
+      console.log(`   Roles (raw):`, JSON.stringify(validationResult.user.roles));
       
       return validationResult;
     } catch (error: any) {
@@ -187,10 +221,40 @@ export class JwtValidatorService {
 
       const payload = await jwtService.verifyAsync(token);
       
+      console.log('🔍 [JwtValidatorService] Payload do token JWT:', {
+        sub: payload.sub,
+        username: payload.username,
+        email: payload.email,
+        roles: payload.roles,
+        rolesType: typeof payload.roles,
+        rolesIsArray: Array.isArray(payload.roles),
+      });
+      
       // Verificar se o token não expirou
       if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
         throw new UnauthorizedException('Token expirado');
       }
+
+      // Extrair roles corretamente do payload
+      // O payload pode ter roles como array de objetos { name: "system" } ou array de strings
+      let roles = [];
+      if (payload.roles) {
+        if (Array.isArray(payload.roles)) {
+          roles = payload.roles.map((role: any) => {
+            // Se role é um objeto com propriedade 'name', usar o objeto completo
+            if (typeof role === 'object' && role.name) {
+              return role;
+            }
+            // Se role é uma string, criar objeto básico
+            if (typeof role === 'string') {
+              return { name: role };
+            }
+            return role;
+          });
+        }
+      }
+
+      console.log('✅ [JwtValidatorService] Roles extraídas:', roles.map((r: any) => r.name || r));
 
       return {
         isValid: true,
@@ -200,7 +264,7 @@ export class JwtValidatorService {
           email: payload.email,
           profile: payload.profile,
           unitId: payload.unitId || payload.profile?.unitId,
-          roles: payload.roles || [],
+          roles: roles,
           permissions: payload.permissions || [],
           isEmailVerified: payload.isEmailVerified || false,
           isActive: payload.isActive !== false,

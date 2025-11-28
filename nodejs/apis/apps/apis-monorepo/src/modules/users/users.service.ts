@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { EnvironmentConfig } from '../../config/environment.config';
+import { CurrentUserShape } from '../../decorators/current-user.decorator';
 
 export interface User {
   id: string;
@@ -462,6 +463,188 @@ export class UsersService {
       }
 
       throw new Error(`Erro ao buscar usuários por unitId: ${error.message}`);
+    }
+  }
+
+  /**
+   * Cria um novo usuário no SYS-SEGURANÇA
+   */
+  async createUser(
+    createUserDto: {
+      email: string;
+      username: string;
+      password: string;
+      firstName: string;
+      lastName: string;
+      country: string;
+      state: string;
+      zipCode: string;
+      localNumber: string;
+      unitName: string;
+      address: string;
+      complement: string;
+      neighborhood: string;
+      city: string;
+      latitude: number;
+      longitude: number;
+      unitId?: string;
+    },
+    token: string,
+    domain: string,
+    user: CurrentUserShape,
+  ): Promise<User> {
+    try {
+      console.log(`➕ [UsersService] Criando novo usuário: ${createUserDto.email}`);
+      console.log(`   Domain: ${domain}`);
+
+      // Preparar payload para o SYS-SEGURANÇA
+      // O SYS-SEGURANÇA espera firstName, lastName e campos de endereço separados
+      const payload = {
+        email: createUserDto.email,
+        username: createUserDto.username,
+        password: createUserDto.password,
+        firstName: createUserDto.firstName,
+        lastName: createUserDto.lastName,
+        country: createUserDto.country,
+        state: createUserDto.state,
+        zipCode: createUserDto.zipCode,
+        localNumber: createUserDto.localNumber,
+        unitName: createUserDto.unitName,
+        address: createUserDto.address,
+        complement: createUserDto.complement,
+        neighborhood: createUserDto.neighborhood,
+        city: createUserDto.city,
+        latitude: createUserDto.latitude,
+        longitude: createUserDto.longitude,
+        domain: domain,
+      };
+
+      // Log do token sendo enviado (apenas primeiros e últimos caracteres para segurança)
+      const tokenPreview = token.length > 20 
+        ? `${token.substring(0, 10)}...${token.substring(token.length - 10)}`
+        : '***';
+      
+      console.log(`📤 [UsersService] Enviando requisição para SYS-SEGURANÇA:`, {
+        url: `${this.sysSegurancaUrl}/api/v1/auth/register`,
+        tokenPreview,
+        domain,
+        payloadKeys: Object.keys({
+          ...payload,
+          roles: user.roles,
+          permissions: user.permissions,
+          isEmailVerified: user.isEmailVerified,
+          isActive: user.isActive,
+        }),
+      });
+
+      const response = await firstValueFrom(
+        this.httpService.post(
+          `${this.sysSegurancaUrl}/api/v1/auth/register`,
+          payload,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+              'x-api-key': EnvironmentConfig.sysSeguranca.apiKey,
+              'x-domain': domain,
+            },
+            timeout: EnvironmentConfig.sysSeguranca.timeout,
+          }
+        )
+      );
+
+      const responseData = response.data;
+
+      if (responseData.success === false) {
+        console.error('❌ Resposta do SYS-SEGURANÇA indicou falha:', responseData);
+        throw new Error(responseData.message || 'Erro ao criar usuário');
+      }
+
+      // O SYS-SEGURANÇA retorna o usuário criado
+      const createdUser = responseData.user || responseData.data || responseData;
+
+      // Se o usuário foi criado com sucesso e tem unitId, atualizar o unitId
+      if (createUserDto.unitId && createdUser.id) {
+        try {
+          await this.updateUserUnit(
+            createdUser.id,
+            createUserDto.unitId,
+            token,
+            domain,
+          );
+        } catch (unitError) {
+          console.warn('⚠️ [UsersService] Erro ao atualizar unitId após criação:', unitError);
+          // Não falhar a criação se o unitId não puder ser atualizado
+        }
+      }
+
+      console.log(`✅ [UsersService] Usuário criado com sucesso: ${createdUser.id}`);
+
+      return createdUser;
+    } catch (error: any) {
+      console.error('❌ [UsersService] Erro ao criar usuário:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+      });
+
+      // Tratar erros HTTP específicos e propagar com status code correto
+      if (error.response?.status === 400) {
+        const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Dados inválidos';
+        // Se a mensagem é um array, juntar as mensagens
+        const message = Array.isArray(errorMessage) 
+          ? errorMessage.join(', ') 
+          : errorMessage;
+        throw new HttpException(
+          { message: `Erro na criação do usuário: ${message}`, error: 'Bad Request' },
+          HttpStatus.BAD_REQUEST
+        );
+      }
+
+      if (error.response?.status === 409) {
+        // Extrair mensagem do SYS-SEGURANÇA - pode vir em diferentes formatos
+        const responseData = error.response?.data;
+        let errorMessage = 'Username ou email já existem';
+        
+        if (responseData) {
+          if (typeof responseData === 'string') {
+            errorMessage = responseData;
+          } else if (responseData.message) {
+            // Se message é array, juntar; se string, usar diretamente
+            errorMessage = Array.isArray(responseData.message) 
+              ? responseData.message.join(', ')
+              : responseData.message;
+          } else if (responseData.error) {
+            errorMessage = responseData.error;
+          }
+        }
+        
+        throw new HttpException(
+          { message: errorMessage, error: 'Conflict' },
+          HttpStatus.CONFLICT
+        );
+      }
+
+      if (error.response?.status === 401) {
+        throw new HttpException(
+          { message: 'Não autorizado para criar usuário', error: 'Unauthorized' },
+          HttpStatus.UNAUTHORIZED
+        );
+      }
+
+      if (error.response?.status === 403) {
+        throw new HttpException(
+          { message: 'Acesso negado para criar usuário', error: 'Forbidden' },
+          HttpStatus.FORBIDDEN
+        );
+      }
+
+      // Para outros erros, usar status 500 mas manter a mensagem original
+      const errorMessage = error.response?.data?.message || error.message || 'Erro ao criar usuário';
+      throw new HttpException(
+        { message: errorMessage, error: 'Internal Server Error' },
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
   }
 }

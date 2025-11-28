@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Post,
   Patch,
   Body,
   Query,
@@ -8,6 +9,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  HttpException,
   Req,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiBody, ApiParam } from '@nestjs/swagger';
@@ -15,12 +17,142 @@ import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { CurrentUser, CurrentUserShape } from '../../decorators/current-user.decorator';
 import { UpdateUserUnitDto } from './dto/update-user-unit.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @ApiTags('users')
 @Controller('users')
 @UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: 'Cria um novo usuário',
+    description: 'Cria um novo usuário no sistema SYS-SEGURANÇA com o mesmo domain do usuário autenticado'
+  })
+  @ApiBody({
+    type: CreateUserDto,
+    description: 'Dados do usuário a ser criado',
+    examples: {
+      example1: {
+        value: {
+          email: 'joao.silva@example.com',
+          username: 'joao.silva',
+          password: 'SenhaSegura123!',
+          firstName: 'João',
+          lastName: 'Silva',
+          country: 'BR',
+          state: 'RN',
+          zipCode: '59000-000',
+          localNumber: '123',
+          unitName: 'Franquia Centro',
+          address: 'Rua das Flores',
+          complement: 'N/A',
+          neighborhood: 'Centro',
+          city: 'Natal',
+          latitude: -5.7793,
+          longitude: -35.2009,
+        },
+        summary: 'Exemplo de criação de usuário franqueado',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Usuário criado com sucesso',
+    schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'string' },
+        username: { type: 'string' },
+        email: { type: 'string' },
+        profile: { type: 'object' },
+        roles: { type: 'array' },
+        isActive: { type: 'boolean' },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: 'Dados inválidos' })
+  @ApiResponse({ status: 401, description: 'Não autorizado' })
+  @ApiResponse({ status: 403, description: 'Acesso negado' })
+  @ApiResponse({ status: 409, description: 'Email ou username já está em uso' })
+  async createUser(
+    @Body() createUserDto: CreateUserDto,
+    @CurrentUser() user: CurrentUserShape,
+    @Req() request: any,
+  ) {
+    const domain = user.domain || user.profile?.domain;
+
+    if (!domain) {
+      throw new HttpException(
+        { message: 'Domain não encontrado no contexto do usuário. Usuários devem ter um domain configurado.', error: 'Bad Request' },
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
+    // Extrair token do header Authorization
+    const authHeader = request.headers?.authorization || '';
+    const token = authHeader.replace('Bearer ', '');
+
+    if (!token) {
+      throw new HttpException(
+        { message: 'Token de autenticação não encontrado', error: 'Unauthorized' },
+        HttpStatus.UNAUTHORIZED
+      );
+    }
+
+    // Verificar se o token extraído corresponde ao usuário autenticado
+    // O token já foi validado pelo JwtAuthGuard, então request.user deve ter os dados corretos
+    console.log(`🔑 [UsersController] Token extraído do header:`, {
+      tokenLength: token.length,
+      tokenPreview: token.length > 20 ? `${token.substring(0, 10)}...${token.substring(token.length - 10)}` : '***',
+      userFromGuard: {
+        id: user.id,
+        username: user.username,
+        roles: user.roles,
+      },
+    });
+
+    console.log(`➕ [UsersController] Criando novo usuário`);
+    console.log(`   Email: ${createUserDto.email}`);
+    console.log(`   Domain: ${domain}`);
+    console.log(`   Usuário autenticado (do JwtAuthGuard):`, {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      roles: user.roles?.map((r: any) => r.name || r) || [],
+      rolesRaw: user.roles,
+      domain: user.domain || user.profile?.domain,
+      payload: user.payload ? {
+        ...user.payload,
+        sub: user.payload.user?.sub,
+        username: user.payload.user?.username,
+        roles: user.payload.user?.roles,
+      } : undefined,
+    });
+
+    try {
+      const createdUser = await this.usersService.createUser(
+        createUserDto,
+        token,
+        domain,
+        user,
+      );
+
+      return createdUser;
+    } catch (error) {
+      // Re-throw HttpException para manter o status code e mensagem
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      // Se não for HttpException, converter para 500
+      throw new HttpException(
+        { message: error.message || 'Erro ao criar usuário', error: 'Internal Server Error' },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 
   @Get('available')
   @HttpCode(HttpStatus.OK)
