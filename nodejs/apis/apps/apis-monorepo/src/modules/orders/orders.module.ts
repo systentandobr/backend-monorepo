@@ -3,7 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { OrdersService } from './orders.service';
 import { OrdersController } from './orders.controller';
 import { Order, OrderSchema } from './schemas/order.schema';
-import { NotificationsModule } from '../notifications/notifications.module';
+import { NotificationsModule } from '../../../../notifications/src/notifications.module';
 
 @Module({
   imports: [

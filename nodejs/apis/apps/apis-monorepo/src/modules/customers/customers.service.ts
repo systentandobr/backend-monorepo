@@ -6,7 +6,7 @@ import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { CustomerFiltersDto } from './dto/customer-filters.dto';
 import { CustomerResponseDto, CustomerStatsDto } from './dto/customer-response.dto';
-import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationsService } from '../../../../notifications/src/notifications.service';
 
 @Injectable()
 export class CustomersService {

@@ -5,7 +5,7 @@ import { Lead, LeadDocument, LeadStatus } from './schemas/lead.schema';
 import { CreateLeadDto } from './dto/create-lead.dto';
 import { UpdateLeadDto } from './dto/update-lead.dto';
 import { LeadFiltersDto, LeadResponseDto, LeadPipelineStatsDto } from './dto/lead-response.dto';
-import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationsService } from '../../../../notifications/src/notifications.service';
 
 @Injectable()
 export class LeadsService {

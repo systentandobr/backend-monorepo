@@ -127,4 +127,12 @@ export class SysProdutosController {
   removeCategory(@Param('id') id: string, @Body() body: CategoryDto) {
     return this.sysProdutosService.removeCategory(id, body.category as string);
   }
+
+  // ===== Produtos Relacionados =====
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/related')
+  getRelatedProducts(@Param('id') id: string, @Query('limit') limit?: number) {
+    const limitNum = limit ? parseInt(limit.toString(), 10) : 10;
+    return this.sysProdutosService.findRelated(id, limitNum);
+  }
 }

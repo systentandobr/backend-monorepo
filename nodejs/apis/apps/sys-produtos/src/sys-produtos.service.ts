@@ -16,28 +16,74 @@ export class SysProdutosService {
 
   async list(unitId: string | undefined, query: QueryProdutoDto = {}) {
     const filter: FilterQuery<Product> = {};
+    
+    // Filtro de busca por texto
     if (query.search) {
       filter.$or = [
         { name: { $regex: query.search, $options: 'i' } },
         { slug: { $regex: query.search, $options: 'i' } },
         { tags: query.search },
+        { brand: { $regex: query.search, $options: 'i' } },
+        { description: { $regex: query.search, $options: 'i' } },
       ];
     }
+    
+    // Filtros específicos
     if (query.category) filter.categories = query.category;
     if (query.tag) filter.tags = query.tag;
+    if (query.brand) filter.brand = query.brand;
     if (query.featured === 'true') filter.featured = true;
     if (query.featured === 'false') filter.featured = false;
+    if (query.rating !== undefined) filter.rating = { $gte: query.rating };
+    
+    // Filtro de preço (busca na primeira variante ativa)
+    if (query.priceMin !== undefined || query.priceMax !== undefined) {
+      filter['variants.price'] = {};
+      if (query.priceMin !== undefined) filter['variants.price'].$gte = query.priceMin;
+      if (query.priceMax !== undefined) filter['variants.price'].$lte = query.priceMax;
+    }
+    
+    // Filtro de estoque
+    if (query.inStock === 'true' && unitId) {
+      filter[`variants.stockByUnit.${unitId}.quantity`] = { $gt: 0 };
+    }
 
     const page = Number(query.page || 1);
     const limit = Number(query.limit || 20);
     const skip = (page - 1) * limit;
+
+    // Ordenação
+    const sort: any = {};
+    if (query.sortBy) {
+      switch (query.sortBy) {
+        case 'price_asc':
+          sort['variants.price'] = 1;
+          break;
+        case 'price_desc':
+          sort['variants.price'] = -1;
+          break;
+        case 'rating_desc':
+          sort.rating = -1;
+          break;
+        case 'newest':
+          sort.createdAt = -1;
+          break;
+        case 'popular':
+          sort.reviewCount = -1;
+          break;
+        default:
+          sort.createdAt = -1;
+      }
+    } else {
+      sort.createdAt = -1;
+    }
 
     const [items, total] = await Promise.all([
       this.productModel
         .find(filter)
         .skip(skip)
         .limit(limit)
-        .sort({ createdAt: -1 })
+        .sort(sort)
         .lean(),
       this.productModel.countDocuments(filter),
     ]);
@@ -65,6 +111,7 @@ export class SysProdutosService {
       slug,
       description: dto.description,
       images: [],
+      thumbnail: dto.thumbnail,
       categories: [],
       tags: dto.tags ?? [],
       attributesTemplate: undefined,
@@ -72,7 +119,10 @@ export class SysProdutosService {
         {
           sku: `SKU-${Date.now()}`,
           price: dto.price,
+          originalPrice: dto.price, // Inicialmente o preço original é o mesmo do preço
           promotionalPrice: undefined,
+          costPrice: dto.costPrice,
+          currency: 'BRL',
           attributes: {},
           active: dto.active ?? true,
           stockByUnit: unitId ? { [unitId]: { quantity: 0, reserved: 0 } } : {},
@@ -80,6 +130,25 @@ export class SysProdutosService {
       ],
       featured: false,
       active: dto.active ?? true,
+      // Campos adicionais migrados
+      brand: dto.brand,
+      productModel: dto.productModel,
+      color: dto.color,
+      dimensions: dto.dimensions,
+      rating: dto.rating,
+      reviewCount: dto.reviewCount ?? 0,
+      materials: dto.materials ?? [],
+      careInstructions: dto.careInstructions ?? [],
+      warranty: dto.warranty,
+      ncm: dto.ncm,
+      ean13: dto.ean13,
+      unitOfMeasurement: dto.unitOfMeasurement,
+      supplierID: dto.supplierID,
+      recommendedAge: dto.recommendedAge,
+      specifications: dto.specifications,
+      url: dto.url,
+      affiliateUrl: dto.affiliateUrl,
+      taxInformation: dto.taxInformation,
     });
     return created.toObject();
   }
@@ -102,9 +171,17 @@ export class SysProdutosService {
 
   // ===== Variantes =====
   async addVariant(productId: string, dto: CreateVariantDto) {
+    const variantData: any = {
+      ...dto,
+      stockByUnit: {},
+      currency: dto.currency || 'BRL',
+      // Se não especificar originalPrice, usar price como originalPrice
+      originalPrice: dto.originalPrice ?? dto.price,
+    };
+    
     const update = await this.productModel.findByIdAndUpdate(
       productId,
-      { $push: { variants: { ...dto, stockByUnit: {} } } },
+      { $push: { variants: variantData } },
       { new: true },
     ).lean();
     if (!update) throw new NotFoundException('Produto não encontrado');
@@ -112,16 +189,24 @@ export class SysProdutosService {
   }
 
   async updateVariant(productId: string, sku: string, dto: UpdateVariantDto) {
+    const setOps: any = {};
+    
+    if (dto.price !== undefined) setOps['variants.$.price'] = dto.price;
+    if (dto.originalPrice !== undefined) setOps['variants.$.originalPrice'] = dto.originalPrice;
+    if (dto.promotionalPrice !== undefined) setOps['variants.$.promotionalPrice'] = dto.promotionalPrice;
+    if (dto.costPrice !== undefined) setOps['variants.$.costPrice'] = dto.costPrice;
+    if (dto.discount !== undefined) setOps['variants.$.discount'] = dto.discount;
+    if (dto.discountEvent !== undefined) setOps['variants.$.discountEvent'] = dto.discountEvent;
+    if (dto.discountType !== undefined) setOps['variants.$.discountType'] = dto.discountType;
+    if (dto.currency !== undefined) setOps['variants.$.currency'] = dto.currency;
+    if (dto.comissionPerTransaction !== undefined) setOps['variants.$.comissionPerTransaction'] = dto.comissionPerTransaction;
+    if (dto.taxes !== undefined) setOps['variants.$.taxes'] = dto.taxes;
+    if (dto.attributes !== undefined) setOps['variants.$.attributes'] = dto.attributes;
+    if (dto.active !== undefined) setOps['variants.$.active'] = dto.active;
+
     const doc = await this.productModel.findOneAndUpdate(
       { _id: productId, 'variants.sku': sku },
-      {
-        $set: {
-          'variants.$.price': dto.price,
-          'variants.$.promotionalPrice': dto.promotionalPrice,
-          'variants.$.attributes': dto.attributes,
-          'variants.$.active': dto.active,
-        },
-      },
+      { $set: setOps },
       { new: true },
     ).lean();
     if (!doc) throw new NotFoundException('Produto/variante não encontrado');
@@ -236,6 +321,29 @@ export class SysProdutosService {
     ).lean();
     if (!doc) throw new NotFoundException('Produto não encontrado');
     return doc;
+  }
+
+  /**
+   * Busca produtos relacionados baseado na mesma categoria
+   */
+  async findRelated(productId: string, limit: number = 10): Promise<Product[]> {
+    const product = await this.productModel.findById(productId).lean();
+    if (!product) {
+      return [];
+    }
+
+    // Buscar produtos da mesma categoria, excluindo o produto atual
+    const relatedProducts = await this.productModel
+      .find({
+        _id: { $ne: productId },
+        active: true,
+        categories: { $in: product.categories },
+      })
+      .limit(limit)
+      .sort({ rating: -1, reviewCount: -1 })
+      .lean();
+
+    return relatedProducts as Product[];
   }
 
   private slugify(s: string) {

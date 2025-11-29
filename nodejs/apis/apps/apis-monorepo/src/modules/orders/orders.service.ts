@@ -5,7 +5,7 @@ import { Order, OrderDocument } from './schemas/order.schema';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order.dto';
 import { OrderFiltersDto, OrderResponseDto, OrderStatsDto } from './dto/order-response.dto';
-import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationsService } from '../../../../notifications/src/notifications.service';
 
 @Injectable()
 export class OrdersService {

@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import { IsBoolean, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, Min } from 'class-validator';
+import { IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, Min, Max } from 'class-validator';
+import { DiscountEvent, DiscountType } from '../schemas/product.schema';
 
 export class CreateVariantDto {
   @ApiProperty()
@@ -10,13 +11,60 @@ export class CreateVariantDto {
   @ApiProperty()
   @IsNumber()
   @Min(0)
-  price: number;
+  price: number; // Preço original/preço de venda
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsNumber()
   @Min(0)
-  promotionalPrice?: number;
+  originalPrice?: number; // Preço original antes de qualquer desconto
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  promotionalPrice?: number; // Preço promocional (já com desconto aplicado)
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  costPrice?: number; // Preço de custo
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  discount?: number; // Valor do desconto (percentual ou fixo)
+
+  @ApiPropertyOptional({ enum: DiscountEvent })
+  @IsOptional()
+  @IsEnum(DiscountEvent)
+  discountEvent?: DiscountEvent; // Tipo de evento de desconto
+
+  @ApiPropertyOptional({ enum: DiscountType })
+  @IsOptional()
+  @IsEnum(DiscountType)
+  discountType?: DiscountType; // Tipo de desconto (percentual ou fixo)
+
+  @ApiPropertyOptional({ enum: ['BRL'], default: 'BRL' })
+  @IsOptional()
+  @IsEnum(['BRL'])
+  currency?: 'BRL'; // Moeda (padrão BRL)
+
+  @ApiPropertyOptional({ description: 'Comissão por transação (%)' })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(100)
+  comissionPerTransaction?: number; // Comissão por transação (percentual)
+
+  @ApiPropertyOptional({ description: 'Impostos (%) - pode ser calculado dinamicamente' })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(100)
+  taxes?: number; // Impostos (percentual)
 
   @ApiPropertyOptional({ type: Object })
   @IsOptional()

@@ -2,13 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
-
-export interface NotificationPayload {
-  title: string;
-  message: string;
-  type?: 'info' | 'success' | 'warning' | 'error';
-  metadata?: Record<string, any>;
-}
+import { EmailConfig, NotificationPayload } from './types/config';
+import nodemailer, { Transporter } from 'nodemailer';
 
 @Injectable()
 export class NotificationsService {
@@ -16,6 +11,7 @@ export class NotificationsService {
   private readonly telegramBotToken: string;
   private readonly telegramChatId: string;
   private readonly discordWebhookUrl: string;
+  private readonly emailConfig: EmailConfig;
 
   constructor(
     private readonly httpService: HttpService,
@@ -24,6 +20,13 @@ export class NotificationsService {
     this.telegramBotToken = this.configService.get<string>('TELEGRAM_BOT_TOKEN') || '';
     this.telegramChatId = this.configService.get<string>('TELEGRAM_CHAT_ID') || '';
     this.discordWebhookUrl = this.configService.get<string>('DISCORD_WEBHOOK_URL') || '';
+    this.emailConfig = {
+      host: this.configService.get<string>('EMAIL_HOST') || '',
+      port: this.configService.get<number>('EMAIL_PORT') || 587,
+      username: this.configService.get<string>('EMAIL_USERNAME') || '',
+      password: this.configService.get<string>('EMAIL_PASSWORD') || '',
+      from: this.configService.get<string>('EMAIL_FROM') || '',
+    };
   }
 
   /**
@@ -109,16 +112,62 @@ export class NotificationsService {
   async sendNotification(payload: NotificationPayload): Promise<{
     telegram: boolean;
     discord: boolean;
+    email: boolean;
   }> {
-    const [telegramResult, discordResult] = await Promise.allSettled([
+    const [telegramResult, discordResult, emailResult] = await Promise.allSettled([
       this.sendTelegramNotification(payload),
       this.sendDiscordNotification(payload),
+      this.sendEmailNotification(payload),
     ]);
 
     return {
       telegram: telegramResult.status === 'fulfilled' ? telegramResult.value : false,
       discord: discordResult.status === 'fulfilled' ? discordResult.value : false,
+      email: emailResult.status === 'fulfilled' ? emailResult.value : false,
     };
+  }
+
+  /**
+   * Envia notificação para email
+   */
+  async sendEmailNotification(payload: NotificationPayload): Promise<boolean> {
+    if (!this.emailConfig.host || !this.emailConfig.port || !this.emailConfig.username || !this.emailConfig.password || !this.emailConfig.from) {
+      this.logger.warn('Email config não configurada');
+      return false;
+    }
+
+    let transporter: Transporter | null = null;
+
+    try {
+      transporter = nodemailer.createTransport({
+        host: this.emailConfig.host,
+        port: this.emailConfig.port,
+        secure: false,
+        auth: {
+          user: this.emailConfig.username,
+          pass: this.emailConfig.password,
+        },
+      });
+
+      const mailOptions = {
+        from: this.emailConfig.from,
+        to: payload.metadata.Email,
+        subject: payload.title,
+        text: payload.message,
+      };
+
+      await transporter.sendMail(mailOptions);
+
+      this.logger.log('Notificação enviada para email com sucesso');
+      return true;
+    } catch (error) {
+      this.logger.error(`Erro ao enviar notificação para email: ${error.message}`);
+      return false;
+    }
+    finally {
+      await transporter?.close();
+      this.logger.log('Conexão com o servidor de email fechada');
+    }
   }
 
   /**

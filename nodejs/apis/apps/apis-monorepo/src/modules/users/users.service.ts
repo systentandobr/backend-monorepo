@@ -517,6 +517,10 @@ export class UsersService {
         latitude: createUserDto.latitude,
         longitude: createUserDto.longitude,
         domain: domain,
+        roles: user?.roles,
+        permissions: user?.permissions,
+        isEmailVerified: user?.isEmailVerified,
+        isActive: user?.isActive,
       };
 
       // Log do token sendo enviado (apenas primeiros e últimos caracteres para segurança)
@@ -530,10 +534,10 @@ export class UsersService {
         domain,
         payloadKeys: Object.keys({
           ...payload,
-          roles: user.roles,
-          permissions: user.permissions,
-          isEmailVerified: user.isEmailVerified,
-          isActive: user.isActive,
+          roles: user?.roles,
+          permissions: user?.permissions,
+          isEmailVerified: user?.isEmailVerified,
+          isActive: user?.isActive,
         }),
       });
 

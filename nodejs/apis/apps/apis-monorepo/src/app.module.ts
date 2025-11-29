@@ -12,7 +12,7 @@ import { CustomersModule } from './modules/customers/customers.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { FranchisesModule } from './modules/franchises/franchises.module';
 import { LeadsModule } from './modules/leads/leads.module';
-import { NotificationsModule } from './modules/notifications/notifications.module';
+import { NotificationsModule } from 'apps/notifications/src/notifications.module';
 import { UsersModule } from './modules/users/users.module';
 
 @Module({
