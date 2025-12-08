@@ -40,11 +40,21 @@ export class JwtAuthGuard implements CanActivate {
         throw new UnauthorizedException('Dados do usuário não encontrados');
       }
 
+      // Extrair unitId de múltiplas fontes possíveis (prioridade: user.profile.unitId)
+      const unitId = u.unitId || 
+                     validationResult.payload?.user?.profile?.unitId ||
+                     validationResult.payload?.user?.profile?.unit_id ||
+                     validationResult.payload?.user?.unitId ||
+                     validationResult.payload?.user?.unit_id ||
+                     validationResult.payload?.unitId || 
+                     validationResult.payload?.profile?.unitId ||
+                     validationResult.payload?.profile?.unit_id;
+
       request.user = {
         id: u.id,
         username: u.username,
         email: u.email,
-        unitId: u.unitId,
+        unitId: unitId,
         roles: u.roles || [],
         permissions: u.permissions || [],
         isEmailVerified: u.isEmailVerified ?? false,
@@ -52,7 +62,12 @@ export class JwtAuthGuard implements CanActivate {
         payload: validationResult.payload,
       };
 
-      console.log(`✅ Autenticação bem-sucedida para usuário: ${u.username || u.email || u.id}`);
+      if (!unitId) {
+        console.warn(`⚠️ unitId não encontrado para usuário: ${u.username || u.email || u.id}`);
+        console.warn('   Payload completo:', JSON.stringify(validationResult.payload, null, 2));
+      }
+
+      console.log(`✅ Autenticação bem-sucedida para usuário: ${u.username || u.email || u.id}${unitId ? ` (unitId: ${unitId})` : ' (sem unitId)'}`);
       return true;
     } catch (error: any) {
       // Se já é UnauthorizedException, apenas relançar

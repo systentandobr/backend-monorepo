@@ -1,4 +1,4 @@
-import { Schema, SchemaTypes, Document } from 'mongoose';
+import { Schema, Document } from 'mongoose';
 
 export interface Catalog extends Document {
   unitId: string; // Multi-tenancy: ID da unidade/franquia
@@ -24,6 +24,20 @@ export const CatalogSchema = new Schema<Catalog>(
   },
   { timestamps: true, versionKey: false },
 );
+
+// Virtual para retornar _id como id (compatibilidade com frontend)
+CatalogSchema.virtual('id').get(function() {
+  return this._id.toString();
+});
+
+// Garantir que o virtual seja incluído no JSON
+CatalogSchema.set('toJSON', {
+  virtuals: true,
+  transform: function(doc, ret) {
+    delete ret._id;
+    return ret;
+  },
+});
 
 // Índices compostos
 CatalogSchema.index({ unitId: 1, isDeleted: 1 });

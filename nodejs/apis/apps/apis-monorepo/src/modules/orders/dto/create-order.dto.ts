@@ -77,5 +77,9 @@ export class CreateOrderDto {
   @ValidateNested()
   @Type(() => ShippingAddressDto)
   shippingAddress?: ShippingAddressDto;
+
+  @IsOptional()
+  @IsString()
+  referralCode?: string; // Código de indicação usado no checkout
 }
 

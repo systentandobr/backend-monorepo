@@ -10,7 +10,7 @@ export class CatalogService {
     @InjectModel(CATALOG_COLLECTION) private readonly catalogModel: Model<Catalog>,
   ) {}
 
-  async create(unitId: string, ownerId: string, dto: CreateCatalogDto): Promise<Catalog> {
+  async create(unitId: string, ownerId: string, dto: CreateCatalogDto): Promise<Catalog & { id: string; _id?: any }> {
     const catalog = await this.catalogModel.create({
       unitId,
       ownerId,
@@ -20,7 +20,13 @@ export class CatalogService {
       isPublic: dto.isPublic ?? false,
     });
 
-    return catalog.toObject();
+    const catalogJson = catalog.toJSON() as Catalog;
+    // Garantir que sempre tenha id e _id acessíveis
+    return {
+      ...catalogJson,
+      id: (catalogJson as any).id || catalog._id.toString(),
+      _id: catalog._id,
+    } as Catalog & { id: string; _id?: any };
   }
 
   async list(unitId: string, userId: string, query: QueryCatalogDto = {}): Promise<Catalog[]> {
@@ -52,7 +58,11 @@ export class CatalogService {
     }
 
     const catalogs = await this.catalogModel.find(filter).sort({ createdAt: -1 }).lean();
-    return catalogs as Catalog[];
+    // Adicionar id virtual aos objetos lean
+    return catalogs.map(cat => ({
+      ...cat,
+      id: cat._id.toString(),
+    })) as Catalog[];
   }
 
   async getById(id: string, unitId: string, userId: string): Promise<Catalog> {
@@ -73,7 +83,10 @@ export class CatalogService {
       throw new ForbiddenException('Você não tem permissão para acessar este catálogo');
     }
 
-    return catalog as Catalog;
+    return {
+      ...catalog,
+      id: catalog._id.toString(),
+    } as Catalog;
   }
 
   async update(
@@ -97,7 +110,10 @@ export class CatalogService {
       .findByIdAndUpdate(id, dto, { new: true })
       .lean();
 
-    return updated as Catalog;
+    return {
+      ...updated,
+      id: updated?._id?.toString(),
+    } as Catalog;
   }
 
   async delete(id: string, unitId: string, userId: string): Promise<void> {
@@ -137,7 +153,7 @@ export class CatalogService {
       await catalog.save();
     }
 
-    return catalog.toObject();
+    return catalog.toJSON() as Catalog;
   }
 
   async removeProduct(
@@ -160,7 +176,43 @@ export class CatalogService {
     catalog.productIds = catalog.productIds.filter((id) => id !== productId);
     await catalog.save();
 
-    return catalog.toObject();
+    return catalog.toJSON() as Catalog;
+  }
+
+  /**
+   * Buscar ou criar catálogo padrão para um unitId
+   */
+  async findOrCreateDefaultCatalog(unitId: string, userId: string): Promise<Catalog & { id: string; _id?: any }> {
+    // Buscar catálogo padrão (nome "Catálogo Principal" ou primeiro catálogo do usuário)
+    const existingCatalog = await this.catalogModel
+      .findOne({
+        unitId,
+        ownerId: userId,
+        isDeleted: { $ne: true },
+      })
+      .sort({ createdAt: 1 })
+      .lean();
+
+    // Se não encontrou, criar um novo
+    if (!existingCatalog) {
+      return await this.create(unitId, userId, {
+        name: 'Catálogo Principal',
+        description: 'Catálogo padrão de produtos',
+        isPublic: false,
+      });
+    }
+
+    // Adicionar id virtual ao objeto lean e garantir _id também
+    const catalogId = existingCatalog._id?.toString();
+    if (!catalogId) {
+      throw new Error('Não foi possível obter o ID do catálogo existente');
+    }
+    
+    return {
+      ...existingCatalog,
+      id: catalogId,
+      _id: existingCatalog._id,
+    } as Catalog & { id: string; _id?: any };
   }
 }
 

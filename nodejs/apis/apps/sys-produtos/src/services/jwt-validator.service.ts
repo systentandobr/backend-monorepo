@@ -88,20 +88,49 @@ export class JwtValidatorService {
       }
       // Se tem user mas não tem isValid, pode ser apenas o user (formato do controller)
       else if (responseData.user || responseData.id) {
+        // Tentar extrair unitId de múltiplas fontes possíveis (prioridade: user.profile.unitId)
+        const unitId = responseData.user?.profile?.unitId ||
+                       responseData.user?.profile?.unit_id ||
+                       responseData.user?.unitId ||
+                       responseData.user?.unit_id ||
+                       responseData.unitId || 
+                       responseData.unit_id ||
+                       responseData.profile?.unitId ||
+                       responseData.profile?.unit_id ||
+                       responseData.payload?.unitId ||
+                       responseData.payload?.unit_id;
+
+        if (!unitId) {
+          console.warn('⚠️ unitId não encontrado na resposta do SYS-SEGURANÇA');
+          console.warn('   Chaves disponíveis:', Object.keys(responseData));
+          if (responseData.user) {
+            console.warn('   Chaves em user:', Object.keys(responseData.user));
+            if (responseData.user.profile) {
+              console.warn('   Chaves em user.profile:', Object.keys(responseData.user.profile));
+            }
+          }
+        } else {
+          console.log(`✅ unitId encontrado: ${unitId}`);
+        }
+
         // Normalizar para o formato esperado
+        const userData = responseData.user || {
+          id: responseData.id,
+          username: responseData.username,
+          email: responseData.email,
+          roles: responseData.roles || [],
+          permissions: responseData.permissions || [],
+          isEmailVerified: responseData.isEmailVerified || false,
+          isActive: responseData.isActive !== false,
+        };
+
         validationResult = {
           isValid: true,
-          user: responseData.user || {
-            id: responseData.id,
-            username: responseData.username,
-            email: responseData.email,
-            unitId: responseData.unitId || responseData.profile?.unitId,
-            roles: responseData.roles || [],
-            permissions: responseData.permissions || [],
-            isEmailVerified: responseData.isEmailVerified || false,
-            isActive: responseData.isActive !== false,
+          user: {
+            ...userData,
+            unitId: unitId,
           },
-          payload: responseData.payload || {},
+          payload: responseData.payload || responseData,
           expiresAt: responseData.expiresAt ? new Date(responseData.expiresAt) : undefined,
         };
       }
@@ -161,13 +190,37 @@ export class JwtValidatorService {
         throw new UnauthorizedException('Token expirado');
       }
 
+      // Tentar extrair unitId de múltiplas fontes possíveis no payload (prioridade: user.profile.unitId)
+      const unitId = payload.user?.profile?.unitId ||
+                     payload.user?.profile?.unit_id ||
+                     payload.user?.unitId ||
+                     payload.user?.unit_id ||
+                     payload.profile?.unitId ||
+                     payload.profile?.unit_id ||
+                     payload.unitId || 
+                     payload.unit_id;
+
+      if (!unitId) {
+        console.warn('⚠️ unitId não encontrado no payload do token JWT');
+        console.warn('   Chaves disponíveis no payload:', Object.keys(payload));
+        if (payload.user) {
+          console.warn('   Chaves em payload.user:', Object.keys(payload.user));
+          if (payload.user.profile) {
+            console.warn('   Chaves em payload.user.profile:', Object.keys(payload.user.profile));
+          }
+        }
+        console.warn('   Payload completo:', JSON.stringify(payload, null, 2));
+      } else {
+        console.log(`✅ unitId encontrado no payload: ${unitId}`);
+      }
+
       return {
         isValid: true,
         user: {
-          id: payload.sub,
+          id: payload.sub || payload.userId || payload.id,
           username: payload.username,
           email: payload.email,
-          unitId: payload.unitId,
+          unitId: unitId,
           roles: payload.roles || [],
           permissions: payload.permissions || [],
           isEmailVerified: payload.isEmailVerified || false,
@@ -176,7 +229,8 @@ export class JwtValidatorService {
         payload,
         expiresAt: payload.exp ? new Date(payload.exp * 1000) : undefined,
       };
-    } catch {
+    } catch (error: any) {
+      console.error('❌ Erro na validação local do token:', error.message);
       throw new UnauthorizedException('Token inválido');
     }
   }

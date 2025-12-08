@@ -285,17 +285,18 @@ export class UsersService {
    */
   async updateUserUnit(
     userId: string,
-    unitId: string,
+    unitId: string | null | undefined,
     token: string,
     domain?: string,
   ): Promise<User> {
     try {
-      console.log(`🔄 [UsersService] Atualizando unitId do usuário ${userId} para ${unitId}`);
+      const unitIdValue = unitId === null || unitId === undefined ? '' : unitId;
+      console.log(`🔄 [UsersService] Atualizando unitId do usuário ${userId} para ${unitIdValue || '(removendo)'}`);
 
       const response = await firstValueFrom(
         this.httpService.patch(
           `${this.sysSegurancaUrl}/api/v1/users/${userId}/unit`,
-          { unitId },
+          { unitId: unitIdValue },
           {
             headers: {
               'Content-Type': 'application/json',
@@ -355,6 +356,7 @@ export class UsersService {
     search?: string,
     page: number = 1,
     limit: number = 50,
+    currentUser?: any, // Usuário atual para verificação de permissões (opcional)
   ): Promise<UsersListResponse> {
     // Decodificar unitId se vier URL encoded (ex: %23BR%23RN...)
     const decodedUnitId = decodeURIComponent(unitId);
@@ -499,6 +501,8 @@ export class UsersService {
 
       // Preparar payload para o SYS-SEGURANÇA
       // O SYS-SEGURANÇA espera firstName, lastName e campos de endereço separados
+      // NÃO incluir roles, permissions, isEmailVerified, isActive, unitId - esses campos não são permitidos no CreateUserDto
+      // O unitId será atualizado após a criação do usuário através do endpoint PATCH /users/:id/unit
       const payload = {
         email: createUserDto.email,
         username: createUserDto.username,
@@ -517,10 +521,6 @@ export class UsersService {
         latitude: createUserDto.latitude,
         longitude: createUserDto.longitude,
         domain: domain,
-        roles: user?.roles,
-        permissions: user?.permissions,
-        isEmailVerified: user?.isEmailVerified,
-        isActive: user?.isActive,
       };
 
       // Log do token sendo enviado (apenas primeiros e últimos caracteres para segurança)
@@ -532,13 +532,7 @@ export class UsersService {
         url: `${this.sysSegurancaUrl}/api/v1/auth/register`,
         tokenPreview,
         domain,
-        payloadKeys: Object.keys({
-          ...payload,
-          roles: user?.roles,
-          permissions: user?.permissions,
-          isEmailVerified: user?.isEmailVerified,
-          isActive: user?.isActive,
-        }),
+        payloadKeys: Object.keys(payload),
       });
 
       const response = await firstValueFrom(
@@ -648,6 +642,134 @@ export class UsersService {
       throw new HttpException(
         { message: errorMessage, error: 'Internal Server Error' },
         error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  /**
+   * Atualiza roles e permissões de um usuário
+   */
+  async updateUserRoles(
+    userId: string,
+    token: string,
+    roles?: string[],
+    permissions?: string[],
+    domain?: string,
+  ): Promise<User> {
+    try {
+      console.log(`🔄 [UsersService] Atualizando roles e permissões do usuário ${userId}`);
+      console.log(`   Roles: ${roles?.join(', ') || 'não informado'}`);
+      console.log(`   Permissions: ${permissions?.join(', ') || 'não informado'}`);
+
+      const payload: any = {};
+      if (roles !== undefined) {
+        payload.roles = roles;
+      }
+      if (permissions !== undefined) {
+        payload.permissions = permissions;
+      }
+
+      // Usar o endpoint específico para atualização de roles e permissões
+      const response = await firstValueFrom(
+        this.httpService.patch(
+          `${this.sysSegurancaUrl}/api/v1/users/${userId}/roles`,
+          payload,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+              'x-api-key': EnvironmentConfig.sysSeguranca.apiKey,
+              ...(domain ? { 'x-domain': domain } : {}),
+            },
+            timeout: EnvironmentConfig.sysSeguranca.timeout,
+          }
+        )
+      );
+
+      const responseData = response.data;
+
+      if (responseData.success === false) {
+        console.error('❌ Resposta do SYS-SEGURANÇA indicou falha:', responseData);
+        throw new Error(responseData.message || 'Erro ao atualizar roles e permissões do usuário');
+      }
+
+      // Retornar o usuário atualizado
+      const updatedUser = responseData.data || responseData.user || responseData;
+      
+      console.log(`✅ [UsersService] Roles e permissões atualizados com sucesso para usuário ${userId}`);
+
+      return updatedUser;
+    } catch (error: any) {
+      console.error('❌ [UsersService] Erro ao atualizar roles e permissões do usuário:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        url: error.config?.url,
+      });
+
+      // Verificar se é erro 404 - pode ser rota não encontrada ou usuário não encontrado
+      if (error.response?.status === 404) {
+        const errorMessage = error.response?.data?.message || '';
+        
+        // Se a mensagem indica que a rota não foi encontrada (Cannot PATCH), 
+        // isso significa que o endpoint não existe na API de segurança
+        if (errorMessage.includes('Cannot PATCH') || errorMessage.includes('Not Found')) {
+          throw new HttpException(
+            {
+              message: 'Endpoint de atualização de roles não está disponível na API de segurança. Verifique se a API de segurança está atualizada.',
+              error: 'Endpoint Not Found',
+            },
+            HttpStatus.NOT_FOUND
+          );
+        }
+        
+        // Caso contrário, é usuário não encontrado
+        throw new HttpException(
+          {
+            message: 'Usuário não encontrado ou não pertence ao domain',
+            error: 'Not Found',
+          },
+          HttpStatus.NOT_FOUND
+        );
+      }
+
+      if (error.response?.status === 401) {
+        throw new HttpException(
+          {
+            message: 'Não autorizado para atualizar usuário',
+            error: 'Unauthorized',
+          },
+          HttpStatus.UNAUTHORIZED
+        );
+      }
+
+      if (error.response?.status === 403) {
+        throw new HttpException(
+          {
+            message: 'Acesso negado para atualizar usuário',
+            error: 'Forbidden',
+          },
+          HttpStatus.FORBIDDEN
+        );
+      }
+
+      if (error.response?.status === 400) {
+        throw new HttpException(
+          {
+            message: error.response?.data?.message || 'Dados inválidos',
+            error: 'Bad Request',
+          },
+          HttpStatus.BAD_REQUEST
+        );
+      }
+
+      const errorMessage = error.response?.data?.message || error.message;
+      throw new HttpException(
+        {
+          message: `Erro ao atualizar roles e permissões do usuário: ${errorMessage}`,
+          error: 'Internal Server Error',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }

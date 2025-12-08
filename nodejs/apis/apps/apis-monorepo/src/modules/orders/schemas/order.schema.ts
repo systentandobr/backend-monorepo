@@ -97,6 +97,12 @@ export class Order {
     zipCode: string;
   };
 
+  @Prop()
+  referralCode?: string; // Código de indicação usado no checkout
+
+  @Prop({ type: Types.ObjectId, ref: 'Referral', required: false })
+  referralId?: Types.ObjectId; // Referência à indicação quando completada
+
   @Prop({ type: Object })
   metadata?: Record<string, any>;
 }
@@ -108,4 +114,6 @@ OrderSchema.index({ unitId: 1, orderDate: -1 });
 OrderSchema.index({ unitId: 1, status: 1 });
 OrderSchema.index({ unitId: 1, customerId: 1 });
 OrderSchema.index({ orderNumber: 1 }, { unique: true });
+OrderSchema.index({ referralCode: 1 });
+OrderSchema.index({ referralId: 1 });
 

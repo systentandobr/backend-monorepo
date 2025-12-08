@@ -14,6 +14,9 @@ import { FranchisesModule } from './modules/franchises/franchises.module';
 import { LeadsModule } from './modules/leads/leads.module';
 import { NotificationsModule } from 'apps/notifications/src/notifications.module';
 import { UsersModule } from './modules/users/users.module';
+import { ReferralCampaignsModule } from './modules/referral-campaigns/referral-campaigns.module';
+import { ReferralsModule } from './modules/referrals/referrals.module';
+import { RewardsModule } from './modules/rewards/rewards.module';
 
 @Module({
   imports: [
@@ -29,6 +32,9 @@ import { UsersModule } from './modules/users/users.module';
     LeadsModule,
     NotificationsModule,
     UsersModule,
+    ReferralCampaignsModule,
+    ReferralsModule,
+    RewardsModule,
   ],
   controllers: [AppController, DebugController],
   providers: [AppService],

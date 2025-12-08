@@ -6,6 +6,9 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order.dto';
 import { OrderFiltersDto, OrderResponseDto, OrderStatsDto } from './dto/order-response.dto';
 import { NotificationsService } from '../../../../notifications/src/notifications.service';
+import { ReferralsService } from '../referrals/referrals.service';
+import { RewardsService } from '../rewards/rewards.service';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class OrdersService {
@@ -15,17 +18,36 @@ export class OrdersService {
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
     @Inject(forwardRef(() => NotificationsService))
     private readonly notificationsService: NotificationsService,
+    @Inject(forwardRef(() => ReferralsService))
+    private readonly referralsService: ReferralsService,
+    @Inject(forwardRef(() => RewardsService))
+    private readonly rewardsService: RewardsService,
   ) {}
 
   async create(createOrderDto: CreateOrderDto, unitId: string): Promise<OrderResponseDto> {
     // Gerar número do pedido único
     const orderNumber = await this.generateOrderNumber(unitId);
 
+    let referralId: Types.ObjectId | undefined;
+
+    // Validar código de indicação se fornecido
+    if (createOrderDto.referralCode) {
+      try {
+        const referral = await this.referralsService.validateCode(createOrderDto.referralCode);
+        referralId = new Types.ObjectId(referral.id);
+      } catch (error) {
+        this.logger.warn(`Código de indicação inválido: ${createOrderDto.referralCode}`, error.message);
+        // Não bloqueia a criação do pedido, apenas loga o erro
+      }
+    }
+
     const order = new this.orderModel({
       ...createOrderDto,
       unitId,
       orderNumber,
       orderDate: new Date(),
+      referralCode: createOrderDto.referralCode,
+      referralId,
     });
 
     const saved = await order.save();
@@ -129,6 +151,37 @@ export class OrdersService {
       throw new NotFoundException('Pedido não encontrado');
     }
 
+    // Processar indicação quando pedido é confirmado (status = 'entregue')
+    if (updateDto.status === 'entregue' && order.referralId && order.customerId) {
+      try {
+        // Completar indicação
+        await this.referralsService.completeReferral(
+          order.referralId.toString(),
+          order._id.toString(),
+          order.customerId.toString(),
+        );
+
+        // Processar recompensas
+        await this.rewardsService.processReward({
+          referralId: order.referralId.toString(),
+          userId: order.customerId.toString(),
+        });
+      } catch (error) {
+        this.logger.error(`Erro ao processar indicação do pedido ${id}:`, error.message);
+        // Não bloqueia a atualização do pedido
+      }
+    }
+
+    // Cancelar recompensas se pedido for cancelado
+    if (updateDto.status === 'cancelado' && order.referralId) {
+      try {
+        // TODO: Implementar cancelamento de recompensas quando necessário
+        this.logger.debug(`Pedido ${id} cancelado, recompensas devem ser canceladas`);
+      } catch (error) {
+        this.logger.error(`Erro ao cancelar recompensas do pedido ${id}:`, error.message);
+      }
+    }
+
     return this.toResponseDto(order);
   }
 
@@ -199,6 +252,8 @@ export class OrdersService {
       cancelledAt: order.cancelledAt,
       trackingNumber: order.trackingNumber,
       shippingAddress: order.shippingAddress,
+      referralCode: order.referralCode,
+      referralId: order.referralId?.toString(),
       createdAt: order.createdAt || new Date(),
       updatedAt: order.updatedAt || new Date(),
     };

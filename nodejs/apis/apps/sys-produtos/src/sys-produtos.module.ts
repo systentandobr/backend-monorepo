@@ -7,6 +7,7 @@ import { CategoryController } from './category.controller';
 import { TaxCalculationController } from './controllers/tax-calculation.controller';
 import { CatalogController } from './controllers/catalog.controller';
 import { NavigationController } from './controllers/navigation.controller';
+import { InventoryController } from './controllers/inventory.controller';
 import { SysProdutosService } from './sys-produtos.service';
 import { JwtValidatorService } from './services/jwt-validator.service';
 import { PRODUCT_COLLECTION, ProductSchema } from './schemas/product.schema';
@@ -26,11 +27,17 @@ import { CategoryService } from './services/category.service';
 import { CatalogService } from './services/catalog.service';
 import { NavigationService } from './services/navigation.service';
 import { TaxCalculationService, TributacaoICMS, TributacaoICMSCSt } from './services/tax-calculation.service';
+import { InventoryService } from './services/inventory.service';
+import { CatalogProductController } from './controllers/catalog-product.controller';
+import { ProductImageController } from './controllers/product-image.controller';
+import { CatalogProductService } from './services/catalog-product.service';
+import { ProductImageService } from './services/product-image.service';
+import { PRODUCT_IMAGE_COLLECTION, ProductImageSchema } from './schemas/product-image.schema';
 
 @Module({
   imports: [
     HttpModule,
-    MongooseModule.forRoot(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/sys_produtos'),
+    MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/sys_produtos'),
     MongooseModule.forFeature([
       { name: PRODUCT_COLLECTION, schema: ProductSchema },
       { name: AFFILIATE_PRODUCT_COLLECTION, schema: AffiliateProductSchema },
@@ -39,6 +46,7 @@ import { TaxCalculationService, TributacaoICMS, TributacaoICMSCSt } from './serv
       { name: NAVIGATION_SESSION_COLLECTION, schema: NavigationSessionSchema },
       { name: VISITED_PRODUCT_COLLECTION, schema: VisitedProductSchema },
       { name: SEARCH_HISTORY_COLLECTION, schema: SearchHistorySchema },
+      { name: PRODUCT_IMAGE_COLLECTION, schema: ProductImageSchema },
     ]),
   ],
   controllers: [
@@ -48,6 +56,9 @@ import { TaxCalculationService, TributacaoICMS, TributacaoICMSCSt } from './serv
     TaxCalculationController,
     CatalogController,
     NavigationController,
+    InventoryController,
+    CatalogProductController,
+    ProductImageController,
   ],
   providers: [
     SysProdutosService,
@@ -59,6 +70,9 @@ import { TaxCalculationService, TributacaoICMS, TributacaoICMSCSt } from './serv
     TaxCalculationService,
     TributacaoICMS,
     TributacaoICMSCSt,
+    InventoryService,
+    CatalogProductService,
+    ProductImageService,
   ],
   exports: [
     SysProdutosService,
@@ -67,6 +81,9 @@ import { TaxCalculationService, TributacaoICMS, TributacaoICMSCSt } from './serv
     CatalogService,
     NavigationService,
     TaxCalculationService,
+    InventoryService,
+    CatalogProductService,
+    ProductImageService,
   ],
 })
 export class SysProdutosModule {}

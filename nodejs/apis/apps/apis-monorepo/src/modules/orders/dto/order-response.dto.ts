@@ -31,6 +31,8 @@ export class OrderResponseDto {
     state: string;
     zipCode: string;
   };
+  referralCode?: string;
+  referralId?: string;
   createdAt: Date;
   updatedAt: Date;
 }

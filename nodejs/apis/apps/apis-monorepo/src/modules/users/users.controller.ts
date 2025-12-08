@@ -18,6 +18,7 @@ import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { CurrentUser, CurrentUserShape } from '../../decorators/current-user.decorator';
 import { UpdateUserUnitDto } from './dto/update-user-unit.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserRolesDto } from './dto/update-user-roles.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -157,8 +158,8 @@ export class UsersController {
   @Get('available')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ 
-    summary: 'Lista usuários disponíveis filtrados por domain',
-    description: 'Retorna lista de usuários do mesmo domain do usuário autenticado. Filtra automaticamente pelo domain do usuário logado.'
+    summary: 'Lista usuários disponíveis filtrados por domain e unitId',
+    description: 'Retorna lista de usuários do mesmo domain do usuário autenticado. Se o usuário tiver unitId, filtra também por unitId (retorna apenas usuários com mesmo unitId ou sem unitId).'
   })
   @ApiQuery({ 
     name: 'search', 
@@ -219,6 +220,9 @@ export class UsersController {
       throw new Error('Domain não encontrado no contexto do usuário. Usuários devem ter um domain configurado.');
     }
 
+    // Extrair unitId do usuário autenticado
+    const userUnitId = user.unitId || user.profile?.unitId;
+
     // Extrair token do header Authorization
     const authHeader = request.headers?.authorization || '';
     const token = authHeader.replace('Bearer ', '');
@@ -229,19 +233,43 @@ export class UsersController {
 
     console.log(`📋 [UsersController] Buscando usuários disponíveis para domain: ${domain}`);
     console.log(`   Usuário autenticado: ${user.username || user.email || user.id}`);
+    console.log(`   UnitId do usuário: ${userUnitId || 'não informado'}`);
     console.log(`   Search: ${search || 'não informado'}`);
 
     const pageNumber = page ? parseInt(String(page), 10) : 1;
     const limitNumber = limit ? parseInt(String(limit), 10) : 50;
 
-    // Usar getAllUsersByDomain que é o endpoint específico para buscar por domain
-    return await this.usersService.getAllUsersByDomain(
+    // Buscar usuários por domain
+    const response = await this.usersService.getAllUsersByDomain(
       domain,
       token,
       search,
       pageNumber,
       limitNumber,
     );
+
+    // Se o usuário tem unitId, filtrar resultados para incluir apenas:
+    // - Usuários com o mesmo unitId
+    // - Usuários sem unitId (disponíveis para alocação)
+    if (userUnitId) {
+      const filteredUsers = response.data.filter((u: any) => {
+        const userUnitIdValue = u.unitId || u.profile?.unitId;
+        // Incluir se não tem unitId (disponível para alocação) ou tem o mesmo unitId
+        return !userUnitIdValue || userUnitIdValue === userUnitId;
+      });
+
+      console.log(`   Filtrado por unitId: ${filteredUsers.length} de ${response.data.length} usuários`);
+
+      return {
+        data: filteredUsers,
+        total: filteredUsers.length,
+        page: response.page,
+        limit: response.limit,
+      };
+    }
+
+    // Se não tem unitId, retornar todos os usuários do domain
+    return response;
   }
 
   @Get('by-unit')
@@ -325,8 +353,59 @@ export class UsersController {
       throw new Error('Token de autenticação não encontrado');
     }
 
+    // Verificar se o usuário tem permissão para consultar este unitId
+    // Roles permitidas: admin, moderator, system podem consultar qualquer unitId
+    // Roles franqueado e gerente só podem consultar sua própria unitId
+    const userRoles = user.roles || [];
+    const roleNames = userRoles.map((r: any) => {
+      // Se role é um objeto com propriedade name, usar name; caso contrário, usar o valor direto
+      if (typeof r === 'object' && r !== null && 'name' in r) {
+        return r.name;
+      }
+      return r;
+    }).filter(Boolean);
+    
+    const adminRoles = ['admin', 'moderator', 'system', 'sistema'];
+    const franchiseRoles = ['franqueado', 'franchisee', 'franquia', 'gerente', 'manager', 'parceiro', 'partner'];
+    
+    const isAdmin = adminRoles.some(role => roleNames.includes(role));
+    const isFranchiseeOrManager = franchiseRoles.some(role => roleNames.includes(role));
+
+    // Se é franqueado ou gerente, verificar se está consultando sua própria unitId
+    if (isFranchiseeOrManager && !isAdmin) {
+      const userUnitId = user.unitId || user.profile?.unitId;
+      
+      if (!userUnitId) {
+        throw new HttpException(
+          { 
+            message: 'Usuário não possui unitId associado. Apenas usuários com unitId podem consultar usuários da franquia.', 
+            error: 'Forbidden' 
+          },
+          HttpStatus.FORBIDDEN
+        );
+      }
+
+      // Decodificar ambos os unitIds para comparação
+      const decodedRequestUnitId = decodeURIComponent(unitId);
+      const decodedUserUnitId = decodeURIComponent(userUnitId);
+
+      if (decodedRequestUnitId !== decodedUserUnitId) {
+        throw new HttpException(
+          { 
+            message: `Acesso negado. Você só pode consultar usuários da sua própria franquia (unitId: ${decodedUserUnitId}).`, 
+            error: 'Forbidden' 
+          },
+          HttpStatus.FORBIDDEN
+        );
+      }
+    }
+
     console.log(`📋 [UsersController] Buscando usuários por unitId: ${unitId}`);
     console.log(`   Domain: ${domain || 'não informado'}`);
+    console.log(`   User Roles: ${roleNames.join(', ') || 'não informado'}`);
+    console.log(`   Is Admin: ${isAdmin}`);
+    console.log(`   Is Franchisee/Manager: ${isFranchiseeOrManager}`);
+    console.log(`   User UnitId: ${user.unitId || user.profile?.unitId || 'não informado'}`);
     console.log(`   Search: ${search || 'não informado'}`);
 
     const pageNumber = page ? parseInt(String(page), 10) : 1;
@@ -339,6 +418,7 @@ export class UsersController {
       search,
       pageNumber,
       limitNumber,
+      user, // Passar usuário para possível uso futuro no service
     );
   }
 
@@ -405,7 +485,7 @@ export class UsersController {
 
     const updatedUser = await this.usersService.updateUserUnit(
       id,
-      updateUserUnitDto.unitId,
+      updateUserUnitDto.unitId ?? null,
       token,
       domain,
     );
@@ -444,6 +524,102 @@ export class UsersController {
     }
 
     return foundUser;
+  }
+
+  @Patch(':id/roles')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ 
+    summary: 'Atualiza roles e permissões de um usuário',
+    description: 'Atualiza os roles e permissões de um usuário específico do mesmo domain. Apenas admins podem executar esta ação.'
+  })
+  @ApiParam({ 
+    name: 'id', 
+    description: 'ID do usuário a ser atualizado',
+    type: String 
+  })
+  @ApiBody({ 
+    type: UpdateUserRolesDto,
+    description: 'Dados para atualização de roles e permissões',
+    examples: {
+      example1: {
+        value: { 
+          roles: ['franqueado', 'gerente'],
+          permissions: ['users:read', 'users:create']
+        },
+        summary: 'Exemplo de atualização de roles e permissões',
+      },
+    },
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Roles e permissões atualizados com sucesso',
+    schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'string' },
+        username: { type: 'string' },
+        email: { type: 'string' },
+        roles: { type: 'array' },
+        permissions: { type: 'array' },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: 'Dados inválidos' })
+  @ApiResponse({ status: 401, description: 'Não autorizado' })
+  @ApiResponse({ status: 403, description: 'Acesso negado' })
+  @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
+  async updateUserRoles(
+    @Param('id') id: string,
+    @Body() updateUserRolesDto: UpdateUserRolesDto,
+    @CurrentUser() user: CurrentUserShape,
+    @Req() request: any,
+  ) {
+    const domain = user.domain || user.profile?.domain;
+    
+    // Verificar se o usuário tem permissão para atualizar roles
+    const userRoles = user.roles || [];
+    const roleNames = userRoles.map((r: any) => {
+      if (typeof r === 'object' && r !== null && 'name' in r) {
+        return r.name;
+      }
+      return r;
+    }).filter(Boolean);
+    
+    const adminRoles = ['admin', 'moderator', 'system', 'sistema'];
+    const isAdmin = adminRoles.some(role => roleNames.includes(role));
+
+    if (!isAdmin) {
+      throw new HttpException(
+        { 
+          message: 'Acesso negado. Apenas administradores podem atualizar roles e permissões de usuários.', 
+          error: 'Forbidden' 
+        },
+        HttpStatus.FORBIDDEN
+      );
+    }
+    
+    // Extrair token do header Authorization
+    const authHeader = request.headers?.authorization || '';
+    const token = authHeader.replace('Bearer ', '');
+
+    if (!token) {
+      throw new Error('Token de autenticação não encontrado');
+    }
+
+    console.log(`📋 [UsersController] Atualizando roles e permissões do usuário ${id}`);
+    console.log(`   Roles: ${updateUserRolesDto.roles?.join(', ') || 'não informado'}`);
+    console.log(`   Permissions: ${updateUserRolesDto.permissions?.join(', ') || 'não informado'}`);
+    console.log(`   Domain: ${domain || 'não informado'}`);
+
+    const updatedUser = await this.usersService.updateUserRoles(
+      id,
+      token,
+      updateUserRolesDto.roles,
+      updateUserRolesDto.permissions,
+      domain,
+    );
+
+    return updatedUser;
   }
 }
 

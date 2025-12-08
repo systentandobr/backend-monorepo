@@ -33,6 +33,14 @@ export interface ProductVariant {
   stockByUnit: Record<string, StockByUnit>; // unitId -> estoque
 }
 
+export interface ProductImageReference {
+  hashId: string;
+  url: string;
+  thumbnailUrl?: string;
+  isThumbnail: boolean;
+  order: number;
+}
+
 export interface ProductDimensions {
   weight: number; // em kg
   height: number; // em cm
@@ -66,8 +74,8 @@ export interface Product extends Document {
   name: string;
   slug: string;
   description?: string;
-  images: string[];
-  thumbnail?: string; // Imagem principal/miniatura
+  images: ProductImageReference[]; // Array de referências de imagens com hashId
+  thumbnail?: string; // HashId da imagem principal/miniatura (compatibilidade)
   categories: string[];
   tags: string[];
   attributesTemplate?: Record<string, any>;
@@ -147,6 +155,17 @@ const ProductDimensionsSchema = new Schema<ProductDimensions, Document>(
   { _id: false },
 );
 
+const ProductImageReferenceSchema = new Schema<ProductImageReference, Document>(
+  {
+    hashId: { type: String, required: true },
+    url: { type: String, required: true },
+    thumbnailUrl: { type: String },
+    isThumbnail: { type: Boolean, default: false },
+    order: { type: Number, required: true, default: 0 },
+  },
+  { _id: false },
+);
+
 const TaxInformationSchema = new Schema<TaxInformation, Document>(
   {
     cest: { type: String },
@@ -181,8 +200,8 @@ export const ProductSchema = new Schema<Product>(
     name: { type: String, required: true, trim: true, index: true },
     slug: { type: String, required: true, trim: true, unique: true, index: true },
     description: { type: String },
-    images: { type: [String], default: [] },
-    thumbnail: { type: String },
+    images: { type: [ProductImageReferenceSchema], default: [] },
+    thumbnail: { type: String }, // HashId da imagem principal (compatibilidade)
     categories: { type: [String], index: true, default: [] },
     tags: { type: [String], index: true, default: [] },
     attributesTemplate: { type: SchemaTypes.Mixed },
