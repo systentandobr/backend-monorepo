@@ -17,6 +17,7 @@ import {
 } from './dto/referral-response.dto';
 import { Types } from 'mongoose';
 import { ReferralCampaignsService } from '../referral-campaigns/referral-campaigns.service';
+import { RewardsService } from '../rewards/rewards.service';
 
 @Injectable()
 export class ReferralsService {
@@ -27,6 +28,8 @@ export class ReferralsService {
     private referralModel: Model<ReferralDocument>,
     @Inject(forwardRef(() => ReferralCampaignsService))
     private readonly campaignsService: ReferralCampaignsService,
+    @Inject(forwardRef(() => RewardsService))
+    private readonly rewardsService: RewardsService,
   ) {}
 
   /**
@@ -138,14 +141,14 @@ export class ReferralsService {
       referralCode,
       status: 'pending',
       referrerReward: {
-        rewardType: campaign.referrerReward.type,
+        type: campaign.referrerReward.type,
         value: campaign.referrerReward.value,
         currency: campaign.referrerReward.currency,
         status: 'pending',
       },
       refereeReward: campaign.refereeReward
         ? {
-            rewardType: campaign.refereeReward.type,
+            type: campaign.refereeReward.type,
             value: campaign.refereeReward.value,
             currency: campaign.refereeReward.currency,
             status: 'pending',
@@ -403,7 +406,7 @@ export class ReferralsService {
       shortLink: referral.shortLink,
       status: referral.status,
       referrerReward: {
-        type: (referral.referrerReward as any).rewardType || (referral.referrerReward as any).type,
+        type: referral.referrerReward.type,
         value: referral.referrerReward.value,
         currency: referral.referrerReward.currency,
         status: referral.referrerReward.status,
@@ -412,7 +415,7 @@ export class ReferralsService {
       },
       refereeReward: referral.refereeReward
         ? {
-            type: (referral.refereeReward as any).rewardType || (referral.refereeReward as any).type,
+            type: referral.refereeReward.type,
             value: referral.refereeReward.value,
             currency: referral.refereeReward.currency,
             status: referral.refereeReward.status,

@@ -17,6 +17,11 @@ import { UsersModule } from './modules/users/users.module';
 import { ReferralCampaignsModule } from './modules/referral-campaigns/referral-campaigns.module';
 import { ReferralsModule } from './modules/referrals/referrals.module';
 import { RewardsModule } from './modules/rewards/rewards.module';
+import { TaskTemplatesModule } from './modules/task-templates/task-templates.module';
+import { FranchiseTasksModule } from './modules/franchise-tasks/franchise-tasks.module';
+import { TrainingsModule } from './modules/trainings/trainings.module';
+
+
 
 @Module({
   imports: [
@@ -35,8 +40,11 @@ import { RewardsModule } from './modules/rewards/rewards.module';
     ReferralCampaignsModule,
     ReferralsModule,
     RewardsModule,
+    TaskTemplatesModule,
+    FranchiseTasksModule,
+    TrainingsModule,
   ],
   controllers: [AppController, DebugController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

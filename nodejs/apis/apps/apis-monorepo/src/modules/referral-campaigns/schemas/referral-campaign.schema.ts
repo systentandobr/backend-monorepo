@@ -8,7 +8,7 @@ export type ReferralCampaignDocument = ReferralCampaign & Document & {
 
 // Sub-schema para Reward
 const RewardSchema = new MongooseSchema({
-  rewardType: { type: String, enum: ['cashback', 'discount', 'points', 'physical'], required: true },
+  type: { type: String, enum: ['cashback', 'discount', 'points', 'physical'], required: true },
   value: { type: Number, required: true },
   currency: { type: String, required: false },
   productId: { type: Types.ObjectId, ref: 'Product', required: false },
@@ -72,7 +72,7 @@ export class ReferralCampaign {
     required: true,
   })
   referrerReward: {
-    rewardType: 'cashback' | 'discount' | 'points' | 'physical';
+    type: 'cashback' | 'discount' | 'points' | 'physical';
     value: number;
     currency?: string;
     productId?: Types.ObjectId;
@@ -83,7 +83,7 @@ export class ReferralCampaign {
     required: false,
   })
   refereeReward?: {
-    rewardType: 'cashback' | 'discount' | 'points' | 'physical';
+    type: 'cashback' | 'discount' | 'points' | 'physical';
     value: number;
     currency?: string;
     productId?: Types.ObjectId;

@@ -67,7 +67,7 @@ export class ReferralCampaignsService {
       endDate,
       createdBy: new Types.ObjectId(userId),
       referrerReward: {
-        rewardType: createCampaignDto.referrerReward.type,
+        type: createCampaignDto.referrerReward.type,
         value: createCampaignDto.referrerReward.value,
         currency: createCampaignDto.referrerReward.currency,
         productId: createCampaignDto.referrerReward.productId
@@ -76,7 +76,7 @@ export class ReferralCampaignsService {
       },
       refereeReward: createCampaignDto.refereeReward
         ? {
-            rewardType: createCampaignDto.refereeReward.type,
+            type: createCampaignDto.refereeReward.type,
             value: createCampaignDto.refereeReward.value,
             currency: createCampaignDto.refereeReward.currency,
             productId: createCampaignDto.refereeReward.productId
@@ -276,7 +276,7 @@ export class ReferralCampaignsService {
     // Converter referrerReward se fornecido
     if (updateCampaignDto.referrerReward) {
       updateData.referrerReward = {
-        rewardType: updateCampaignDto.referrerReward.type,
+        type: updateCampaignDto.referrerReward.type,
         value: updateCampaignDto.referrerReward.value,
         currency: updateCampaignDto.referrerReward.currency,
         productId: updateCampaignDto.referrerReward.productId
@@ -288,7 +288,7 @@ export class ReferralCampaignsService {
     // Converter refereeReward se fornecido
     if (updateCampaignDto.refereeReward) {
       updateData.refereeReward = {
-        rewardType: updateCampaignDto.refereeReward.type,
+        type: updateCampaignDto.refereeReward.type,
         value: updateCampaignDto.refereeReward.value,
         currency: updateCampaignDto.refereeReward.currency,
         productId: updateCampaignDto.refereeReward.productId
@@ -400,14 +400,14 @@ export class ReferralCampaignsService {
       type: campaign.type,
       rewardTypes: campaign.rewardTypes,
       referrerReward: {
-        type: (campaign.referrerReward as any).rewardType || (campaign.referrerReward as any).type,
+        type: campaign.referrerReward.type,
         value: campaign.referrerReward.value,
         currency: campaign.referrerReward.currency,
         productId: campaign.referrerReward.productId?.toString(),
       },
       refereeReward: campaign.refereeReward
         ? {
-            type: (campaign.refereeReward as any).rewardType || (campaign.refereeReward as any).type,
+            type: campaign.refereeReward.type,
             value: campaign.refereeReward.value,
             currency: campaign.refereeReward.currency,
             productId: campaign.refereeReward.productId?.toString(),

@@ -91,8 +91,8 @@ export class UsersService {
 
       // Se tem success: true e data, usar data
       if (responseData.success === true && responseData.data) {
-        users = Array.isArray(responseData.data) 
-          ? responseData.data 
+        users = Array.isArray(responseData.data)
+          ? responseData.data
           : responseData.data.users || [];
         total = responseData.total || responseData.data.total || users.length;
       }
@@ -197,8 +197,8 @@ export class UsersService {
 
       // Se tem success: true e data, usar data
       if (responseData.success === true && responseData.data) {
-        users = Array.isArray(responseData.data) 
-          ? responseData.data 
+        users = Array.isArray(responseData.data)
+          ? responseData.data
           : responseData.data.users || [];
         total = responseData.total || responseData.data.total || users.length;
       }
@@ -252,7 +252,7 @@ export class UsersService {
    */
   async findUserById(userId: string, token: string, domain?: string): Promise<User | null> {
     try {
-        const response = await firstValueFrom(
+      const response = await firstValueFrom(
         this.httpService.get(`${this.sysSegurancaUrl}/api/v1/users/${userId}`, {
           headers: {
             'Content-Type': 'application/json',
@@ -318,7 +318,7 @@ export class UsersService {
 
       // Retornar o usuário atualizado
       const updatedUser = responseData.data || responseData;
-      
+
       console.log(`✅ [UsersService] unitId atualizado com sucesso para usuário ${userId}`);
 
       return updatedUser;
@@ -360,7 +360,7 @@ export class UsersService {
   ): Promise<UsersListResponse> {
     // Decodificar unitId se vier URL encoded (ex: %23BR%23RN...)
     const decodedUnitId = decodeURIComponent(unitId);
-    
+
     try {
       console.log(`🔍 [UsersService] Buscando usuários por unitId: ${decodedUnitId}`);
       console.log(`   UnitId original (URL encoded): ${unitId}`);
@@ -399,13 +399,13 @@ export class UsersService {
 
       if (responseData.success === false) {
         console.error('❌ Resposta do SYS-SEGURANÇA indicou falha:', responseData);
-        throw new Error(responseData.message || 'Erro ao buscar usuários por unitId');
+        throw new Error(responseData.message || 'Default errorMessage ao buscar usuários por unitId');
       }
 
       // Se tem success: true e data, usar data
       if (responseData.success === true && responseData.data) {
-        users = Array.isArray(responseData.data) 
-          ? responseData.data 
+        users = Array.isArray(responseData.data)
+          ? responseData.data
           : responseData.data.users || [];
         total = responseData.total || responseData.data.total || users.length;
       }
@@ -524,10 +524,10 @@ export class UsersService {
       };
 
       // Log do token sendo enviado (apenas primeiros e últimos caracteres para segurança)
-      const tokenPreview = token.length > 20 
+      const tokenPreview = token.length > 20
         ? `${token.substring(0, 10)}...${token.substring(token.length - 10)}`
         : '***';
-      
+
       console.log(`📤 [UsersService] Enviando requisição para SYS-SEGURANÇA:`, {
         url: `${this.sysSegurancaUrl}/api/v1/auth/register`,
         tokenPreview,
@@ -590,8 +590,8 @@ export class UsersService {
       if (error.response?.status === 400) {
         const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Dados inválidos';
         // Se a mensagem é um array, juntar as mensagens
-        const message = Array.isArray(errorMessage) 
-          ? errorMessage.join(', ') 
+        const message = Array.isArray(errorMessage)
+          ? errorMessage.join(', ')
           : errorMessage;
         throw new HttpException(
           { message: `Erro na criação do usuário: ${message}`, error: 'Bad Request' },
@@ -603,20 +603,20 @@ export class UsersService {
         // Extrair mensagem do SYS-SEGURANÇA - pode vir em diferentes formatos
         const responseData = error.response?.data;
         let errorMessage = 'Username ou email já existem';
-        
+
         if (responseData) {
           if (typeof responseData === 'string') {
             errorMessage = responseData;
           } else if (responseData.message) {
             // Se message é array, juntar; se string, usar diretamente
-            errorMessage = Array.isArray(responseData.message) 
+            errorMessage = Array.isArray(responseData.message)
               ? responseData.message.join(', ')
               : responseData.message;
           } else if (responseData.error) {
             errorMessage = responseData.error;
           }
         }
-        
+
         throw new HttpException(
           { message: errorMessage, error: 'Conflict' },
           HttpStatus.CONFLICT
@@ -695,7 +695,7 @@ export class UsersService {
 
       // Retornar o usuário atualizado
       const updatedUser = responseData.data || responseData.user || responseData;
-      
+
       console.log(`✅ [UsersService] Roles e permissões atualizados com sucesso para usuário ${userId}`);
 
       return updatedUser;
@@ -710,7 +710,7 @@ export class UsersService {
       // Verificar se é erro 404 - pode ser rota não encontrada ou usuário não encontrado
       if (error.response?.status === 404) {
         const errorMessage = error.response?.data?.message || '';
-        
+
         // Se a mensagem indica que a rota não foi encontrada (Cannot PATCH), 
         // isso significa que o endpoint não existe na API de segurança
         if (errorMessage.includes('Cannot PATCH') || errorMessage.includes('Not Found')) {
@@ -722,7 +722,7 @@ export class UsersService {
             HttpStatus.NOT_FOUND
           );
         }
-        
+
         // Caso contrário, é usuário não encontrado
         throw new HttpException(
           {
