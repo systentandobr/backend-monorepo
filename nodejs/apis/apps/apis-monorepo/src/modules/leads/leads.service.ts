@@ -15,7 +15,7 @@ export class LeadsService {
     @InjectModel(Lead.name) private leadModel: Model<LeadDocument>,
     @Inject(forwardRef(() => NotificationsService))
     private readonly notificationsService: NotificationsService,
-  ) {}
+  ) { }
 
   async create(createLeadDto: CreateLeadDto, unitId: string): Promise<LeadResponseDto> {
     // Verificar se já existe lead com mesmo email na mesma unidade
@@ -47,7 +47,7 @@ export class LeadsService {
 
     const saved = await lead.save();
     const responseDto = this.toResponseDto(saved);
-    
+
     // Enviar notificação sobre novo lead
     this.notificationsService.notifyNewLead({
       id: responseDto.id,
@@ -61,7 +61,7 @@ export class LeadsService {
     }).catch(err => {
       this.logger.error(`Erro ao enviar notificação de novo lead: ${err.message}`);
     });
-    
+
     return responseDto;
   }
 
@@ -71,7 +71,10 @@ export class LeadsService {
     page: number;
     limit: number;
   }> {
-    const query: any = { unitId };
+    const defaultUnitId = process.env.DEFAULT_UNIT_ID || '#BR#SP#SYSTEM#0001';
+    const query: any = {
+      unitId: { $in: [unitId, defaultUnitId] }
+    };
 
     // Aplicar filtros
     if (filters.status) {
@@ -124,8 +127,12 @@ export class LeadsService {
   }
 
   async findOne(id: string, unitId: string): Promise<LeadResponseDto> {
-    const lead = await this.leadModel.findOne({ _id: id, unitId }).exec();
-    
+    const defaultUnitId = process.env.DEFAULT_UNIT_ID || '#BR#SP#SYSTEM#0001';
+    const lead = await this.leadModel.findOne({
+      _id: id,
+      unitId: { $in: [unitId, defaultUnitId] }
+    }).exec();
+
     if (!lead) {
       throw new NotFoundException('Lead não encontrado');
     }
@@ -134,24 +141,28 @@ export class LeadsService {
   }
 
   async update(id: string, updateLeadDto: UpdateLeadDto, unitId: string): Promise<LeadResponseDto> {
-    const lead = await this.leadModel.findOne({ _id: id, unitId }).exec();
-    
+    const defaultUnitId = process.env.DEFAULT_UNIT_ID || '#BR#SP#SYSTEM#0001';
+    const lead = await this.leadModel.findOne({
+      _id: id,
+      unitId: { $in: [unitId, defaultUnitId] }
+    }).exec();
+
     if (!lead) {
       throw new NotFoundException('Lead não encontrado');
     }
 
     // Atualizar pipeline se status mudou
     const updateData: any = { ...updateLeadDto };
-    
+
     if (updateLeadDto.status && updateLeadDto.status !== lead.status) {
       updateData[`${updateLeadDto.status}At`] = new Date();
-      
+
       // Atualizar histórico do pipeline
       const currentStage = lead.pipeline?.stageHistory[lead.pipeline.stageHistory.length - 1];
       if (currentStage && !currentStage.exitedAt) {
         currentStage.exitedAt = new Date();
       }
-      
+
       updateData.pipeline = {
         stage: this.getPipelineStage(updateLeadDto.status),
         stageHistory: [
@@ -176,7 +187,7 @@ export class LeadsService {
     }
 
     const updated = await this.leadModel.findOneAndUpdate(
-      { _id: id, unitId },
+      { _id: id, unitId: { $in: [unitId, defaultUnitId] } },
       { ...updateData, updatedAt: new Date() },
       { new: true },
     ).exec();
@@ -185,8 +196,9 @@ export class LeadsService {
   }
 
   async convertToCustomer(id: string, unitId: string, customerId: string): Promise<LeadResponseDto> {
+    const defaultUnitId = process.env.DEFAULT_UNIT_ID || '#BR#SP#SYSTEM#0001';
     const lead = await this.leadModel.findOneAndUpdate(
-      { _id: id, unitId },
+      { _id: id, unitId: { $in: [unitId, defaultUnitId] } },
       {
         status: LeadStatus.CUSTOMER,
         customerId,
@@ -201,7 +213,7 @@ export class LeadsService {
     }
 
     const responseDto = this.toResponseDto(lead);
-    
+
     // Enviar notificação sobre conversão
     this.notificationsService.notifyLeadConverted({
       id: responseDto.id,
@@ -212,28 +224,35 @@ export class LeadsService {
     }).catch(err => {
       this.logger.error(`Erro ao enviar notificação de conversão: ${err.message}`);
     });
-    
+
     return responseDto;
   }
 
   async remove(id: string, unitId: string): Promise<void> {
-    const result = await this.leadModel.deleteOne({ _id: id, unitId }).exec();
-    
+    const defaultUnitId = process.env.DEFAULT_UNIT_ID || '#BR#SP#SYSTEM#0001';
+    const result = await this.leadModel.deleteOne({
+      _id: id,
+      unitId: { $in: [unitId, defaultUnitId] }
+    }).exec();
+
     if (result.deletedCount === 0) {
       throw new NotFoundException('Lead não encontrado');
     }
   }
 
   async getPipelineStats(unitId: string): Promise<LeadPipelineStatsDto> {
-    const leads = await this.leadModel.find({ unitId }).exec();
-    
+    const defaultUnitId = process.env.DEFAULT_UNIT_ID || '#BR#SP#SYSTEM#0001';
+    const leads = await this.leadModel.find({
+      unitId: { $in: [unitId, defaultUnitId] }
+    }).exec();
+
     const newCount = leads.filter(l => l.status === LeadStatus.NEW).length;
     const contactedCount = leads.filter(l => l.status === LeadStatus.CONTACTED).length;
     const qualifiedCount = leads.filter(l => l.status === LeadStatus.QUALIFIED).length;
     const convertedCount = leads.filter(l => l.status === LeadStatus.CONVERTED || l.status === LeadStatus.CUSTOMER).length;
     const lostCount = leads.filter(l => l.status === LeadStatus.LOST).length;
     const total = leads.length;
-    
+
     const conversionRate = total > 0 ? (convertedCount / total) * 100 : 0;
 
     return {

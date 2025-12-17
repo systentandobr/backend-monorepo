@@ -24,7 +24,7 @@ load_dotenv()
 
 # Criar aplicação FastAPI
 app = FastAPI(
-    title="Viral Kids Chatbot API",
+    title="TaDeVolta Chatbot API",
     description="API do agente inteligente de chatbot usando Agno",
     version="1.0.0"
 )
@@ -111,5 +111,5 @@ async def get_session_history(session_id: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=7002)
+    uvicorn.run(app, host="0.0.0.0", port=7001)
 

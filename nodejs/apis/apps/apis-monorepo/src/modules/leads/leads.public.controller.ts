@@ -19,8 +19,8 @@ export class LeadsPublicController {
     private readonly logger = new Logger(LeadsPublicController.name);
 
     // Fallback para Unit ID do sistema se não houver variável de ambiente
-    // #BR#SP#SYSTEM#0001 é um ID fictício de exemplo para HQ
-    private readonly DEFAULT_UNIT_ID = process.env.DEFAULT_UNIT_ID || '#BR#SP#SYSTEM#0001';
+    // #BR#ALL#SYSTEM#0001 é um ID fictício de exemplo para HQ
+    private readonly DEFAULT_UNIT_ID = process.env.DEFAULT_UNIT_ID || '#BR#ALL#SYSTEM#0001';
 
     constructor(private readonly leadsService: LeadsService) { }
 
@@ -31,10 +31,10 @@ export class LeadsPublicController {
     create(@Body() createLeadDto: any) { // Usando any para permitir unitId extra se necessário, ou extender o DTO
         this.logger.log(`Recebendo novo lead público: ${createLeadDto.email}`);
 
-        // Força a origem como 'website' ou 'referral' se não especificado
+        // Força a origem como 'website' ou 'landing-page' se não especificado
         if (!createLeadDto.source) {
             // @ts-ignore
-            createLeadDto.source = 'website';
+            createLeadDto.source = 'landing-page';
         }
 
         const targetUnitId = createLeadDto.unitId || this.DEFAULT_UNIT_ID;
