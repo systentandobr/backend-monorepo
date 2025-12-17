@@ -18,11 +18,28 @@ import { MongooseModule } from '@nestjs/mongoose';
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGODB_URI'),
-      }),
+      useFactory: async (configService: ConfigService) => {
+        const uri = configService.get<string>('MONGODB_URI');
+        if (uri) return { uri };
+
+        const user = configService.get<string>('USER_DB');
+        const pass = configService.get<string>('PASS_DB');
+        const host = configService.get<string>('HOST_DB');
+
+        if (user && pass && host) {
+          return {
+            uri: `mongodb+srv://${encodeURIComponent(user)}:${encodeURIComponent(
+              pass,
+            )}@${host}/sys-assistente-estudos`,
+          };
+        }
+
+        return {
+          uri: 'mongodb://127.0.0.1:27017/sys-assistente-estudos',
+        };
+      },
       inject: [ConfigService],
-    }), 
+    }),
     QuestionModule,
     ConcursoModule,
     SimulacaoModule,
@@ -31,4 +48,4 @@ import { MongooseModule } from '@nestjs/mongoose';
   controllers: [SysAssistenteEstudosController],
   providers: [SysAssistenteEstudosService],
 })
-export class SysAssistenteEstudosModule {}
+export class SysAssistenteEstudosModule { }

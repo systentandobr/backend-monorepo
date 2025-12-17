@@ -14,9 +14,17 @@ const TaskStepSchema = new MongooseSchema({
 }, { _id: false });
 
 const ResourceSchema = new MongooseSchema({
-    type: { type: String, enum: ['video', 'pdf', 'link'], required: true },
+    type: { type: String, enum: ['video', 'pdf', 'link', 'template', 'document'], required: true },
     url: { type: String, required: true },
     title: { type: String, required: true },
+    description: { type: String },
+}, { _id: false });
+
+const ValidationSchema = new MongooseSchema({
+    type: { type: String, enum: ['link', 'upload', 'text', 'none'], default: 'none' },
+    required: { type: Boolean, default: false },
+    instructions: { type: String },
+    acceptedFormats: { type: [String], default: [] },
 }, { _id: false });
 
 @Schema({
@@ -28,22 +36,51 @@ export class TaskTemplate {
     id?: string;
 
     @Prop({ required: true })
-    name: string;
+    name: string; // Equivalent to 'title' in frontend mock
 
     @Prop({ required: true })
     description: string;
 
     @Prop({
         required: true,
-        enum: ['automation', 'whatsapp', 'social-media', 'training', 'onboarding', 'other'],
+        enum: ['setup', 'automation', 'whatsapp', 'social_media', 'marketing', 'sales', 'training', 'onboarding', 'other'],
     })
-    category: 'automation' | 'whatsapp' | 'social-media' | 'training' | 'onboarding' | 'other';
+    category: string;
 
     @Prop({
         required: true,
-        enum: ['single', 'multi-step', 'form', 'video'],
+        default: 'single'
     })
-    type: 'single' | 'multi-step' | 'form' | 'video';
+    type: string;
+
+    @Prop({
+        enum: ['easy', 'medium', 'hard'],
+        default: 'medium'
+    })
+    difficulty: string;
+
+    @Prop({ default: 0 })
+    points: number;
+
+    @Prop({ default: [] })
+    dependencies: string[]; // List of Task IDs (strings)
+
+    @Prop()
+    instructions: string;
+
+    @Prop()
+    icon: string; // Icon name
+
+    @Prop()
+    color: string; // CSS color string
+
+    @Prop({ type: ValidationSchema, default: {} })
+    validation: {
+        type: 'link' | 'upload' | 'text' | 'none';
+        required: boolean;
+        instructions: string;
+        acceptedFormats?: string[];
+    };
 
     @Prop({ type: [TaskStepSchema], default: [] })
     steps: {
@@ -61,9 +98,10 @@ export class TaskTemplate {
 
     @Prop({ type: [ResourceSchema], default: [] })
     resources: {
-        type: 'video' | 'pdf' | 'link';
+        type: string;
         url: string;
         title: string;
+        description?: string;
     }[];
 
     @Prop({ required: true, default: 0 })

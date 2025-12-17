@@ -1,4 +1,4 @@
-import { IsString, IsEnum, IsNumber, IsBoolean, IsOptional, IsArray, ValidateNested, IsObject, Min } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsEnum, IsBoolean, IsNumber, IsArray, ValidateNested, IsObject } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class TaskStepDto {
@@ -6,62 +6,118 @@ class TaskStepDto {
     order: number;
 
     @IsString()
-    title: number;
+    @IsNotEmpty()
+    title: string;
 
     @IsString()
     description: string;
 
     @IsBoolean()
-    required: boolean;
+    @IsOptional()
+    required?: boolean;
 }
 
 class ResourceDto {
-    @IsEnum(['video', 'pdf', 'link'])
-    type: 'video' | 'pdf' | 'link';
+    @IsString()
+    type: string;
 
     @IsString()
     url: string;
 
     @IsString()
     title: string;
+
+    @IsString()
+    @IsOptional()
+    description?: string;
+}
+
+class ValidationDto {
+    @IsString()
+    @IsOptional()
+    type?: string;
+
+    @IsBoolean()
+    @IsOptional()
+    required?: boolean;
+
+    @IsString()
+    @IsOptional()
+    instructions?: string;
+
+    @IsArray()
+    @IsOptional()
+    acceptedFormats?: string[];
 }
 
 export class CreateTaskTemplateDto {
     @IsString()
+    @IsNotEmpty()
     name: string;
 
     @IsString()
+    @IsNotEmpty()
     description: string;
 
-    @IsEnum(['automation', 'whatsapp', 'social-media', 'training', 'onboarding', 'other'])
-    category: 'automation' | 'whatsapp' | 'social-media' | 'training' | 'onboarding' | 'other';
+    @IsString()
+    @IsNotEmpty()
+    category: string;
 
-    @IsEnum(['single', 'multi-step', 'form', 'video'])
-    type: 'single' | 'multi-step' | 'form' | 'video';
+    @IsString()
+    @IsOptional()
+    type?: string;
+
+    @IsString()
+    @IsOptional()
+    difficulty?: string;
+
+    @IsNumber()
+    @IsOptional()
+    points?: number;
+
+    @IsArray()
+    @IsOptional()
+    dependencies?: string[];
+
+    @IsString()
+    @IsOptional()
+    instructions?: string;
+
+    @IsString()
+    @IsOptional()
+    icon?: string;
+
+    @IsString()
+    @IsOptional()
+    color?: string;
+
+    @IsObject()
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => ValidationDto)
+    validation?: ValidationDto;
 
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => TaskStepDto)
-    @IsOptional()
-    steps?: TaskStepDto[];
+    steps: TaskStepDto[];
 
-    @IsObject()
     @IsOptional()
-    formTemplate?: Record<string, any>;
+    formTemplate?: any;
 
     @IsString()
     @IsOptional()
     videoUrl?: string;
 
     @IsArray()
+    @IsOptional()
     @ValidateNested({ each: true })
     @Type(() => ResourceDto)
-    @IsOptional()
     resources?: ResourceDto[];
 
     @IsNumber()
-    @Min(0)
-    estimatedTime: number;
+    @IsOptional()
+    estimatedTime?: number;
 
     @IsBoolean()
     @IsOptional()
@@ -73,5 +129,5 @@ export class CreateTaskTemplateDto {
 
     @IsObject()
     @IsOptional()
-    metadata?: Record<string, any>;
+    metadata?: any;
 }
