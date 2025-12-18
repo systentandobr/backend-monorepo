@@ -38,41 +38,6 @@ export class RagInstructionsController {
     return this.ragInstructionsService.create(createDto, unitId);
   }
 
-  @Get(':unitId')
-  @ApiOperation({ summary: 'Buscar instruções RAG por unidade' })
-  @ApiResponse({ status: 200, type: RagInstructionResponseDto })
-  findByUnitId(
-    @Param('unitId') unitId: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
-    const userUnitId = user.unitId || user.profile?.unitId;
-    if (!userUnitId) {
-      throw new Error('unitId não encontrado no contexto do usuário');
-    }
-    // Validar que o usuário está acessando sua própria unidade
-    if (unitId !== userUnitId) {
-      throw new Error('Acesso negado: unitId não corresponde ao usuário');
-    }
-    return this.ragInstructionsService.findByUnitId(unitId);
-  }
-
-  @Get(':unitId/context')
-  @ApiOperation({ summary: 'Obter contexto adicional das instruções RAG' })
-  @ApiResponse({ status: 200 })
-  getContext(
-    @Param('unitId') unitId: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
-    const userUnitId = user.unitId || user.profile?.unitId;
-    if (!userUnitId) {
-      throw new Error('unitId não encontrado no contexto do usuário');
-    }
-    if (unitId !== userUnitId) {
-      throw new Error('Acesso negado: unitId não corresponde ao usuário');
-    }
-    return this.ragInstructionsService.getContext(unitId);
-  }
-
   @Get()
   @ApiOperation({ summary: 'Listar todas as instruções RAG da unidade' })
   @ApiResponse({ status: 200, type: [RagInstructionResponseDto] })
@@ -96,6 +61,41 @@ export class RagInstructionsController {
       throw new Error('unitId não encontrado no contexto do usuário');
     }
     return this.ragInstructionsService.findOne(id, unitId);
+  }
+
+  @Get(':unitId/context')
+  @ApiOperation({ summary: 'Obter contexto adicional das instruções RAG' })
+  @ApiResponse({ status: 200 })
+  getContext(
+    @Param('unitId') unitId: string,
+    @CurrentUser() user: CurrentUserShape,
+  ) {
+    const userUnitId = user.unitId || user.profile?.unitId;
+    if (!userUnitId) {
+      throw new Error('unitId não encontrado no contexto do usuário');
+    }
+    if (unitId !== userUnitId) {
+      throw new Error('Acesso negado: unitId não corresponde ao usuário');
+    }
+    return this.ragInstructionsService.getContext(unitId);
+  }
+
+  @Get(':unitId')
+  @ApiOperation({ summary: 'Buscar instruções RAG por unidade' })
+  @ApiResponse({ status: 200, type: RagInstructionResponseDto })
+  findByUnitId(
+    @Param('unitId') unitId: string,
+    @CurrentUser() user: CurrentUserShape,
+  ) {
+    const userUnitId = user.unitId || user.profile?.unitId;
+    if (!userUnitId) {
+      throw new Error('unitId não encontrado no contexto do usuário');
+    }
+    // Validar que o usuário está acessando sua própria unidade
+    if (unitId !== userUnitId) {
+      throw new Error('Acesso negado: unitId não corresponde ao usuário');
+    }
+    return this.ragInstructionsService.findByUnitId(unitId);
   }
 
   @Put(':id')
