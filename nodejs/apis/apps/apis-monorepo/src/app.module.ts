@@ -20,6 +20,7 @@ import { RewardsModule } from './modules/rewards/rewards.module';
 import { TaskTemplatesModule } from './modules/task-templates/task-templates.module';
 import { FranchiseTasksModule } from './modules/franchise-tasks/franchise-tasks.module';
 import { TrainingsModule } from './modules/trainings/trainings.module';
+import { RagInstructionsModule } from './modules/rag-instructions/rag-instructions.module';
 
 
 
@@ -43,6 +44,7 @@ import { TrainingsModule } from './modules/trainings/trainings.module';
     TaskTemplatesModule,
     FranchiseTasksModule,
     TrainingsModule,
+    RagInstructionsModule,
   ],
   controllers: [AppController, DebugController],
   providers: [AppService],
