@@ -85,6 +85,7 @@ async function bootstrap() {
     'http://127.0.0.1:5173',
     'http://127.0.0.1:8080',
     'http://127.0.0.1:8081',
+    'http://127.0.0.1:7001',
   ];
 
   // URLs de produção (hardcoded como fallback)
@@ -92,6 +93,8 @@ async function bootstrap() {
     'https://app.viralkids.com.br',
     'https://viralkids-wine.vercel.app',
     'https://*.viralkids.com.br', // Wildcard para subdomínios
+    'https://*.tadevolta.com.br', // Wildcard para subdomínios
+    'https://*.systentando.com', // Wildcard para subdomínios
   ];
 
   // Buscar origens do MongoDB em produção
