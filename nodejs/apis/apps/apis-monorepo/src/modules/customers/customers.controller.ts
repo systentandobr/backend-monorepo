@@ -95,5 +95,17 @@ export class CustomersController {
     }
     return this.customersService.remove(id, unitId);
   }
+
+  @Get(':id/conversations')
+  async getCustomerConversations(
+    @Param('id') id: string,
+    @CurrentUser() user: CurrentUserShape,
+  ) {
+    const unitId = user.unitId || user.profile?.unitId;
+    if (!unitId) {
+      throw new Error('unitId não encontrado no contexto do usuário');
+    }
+    return this.customersService.getConversations(id, unitId);
+  }
 }
 

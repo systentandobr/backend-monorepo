@@ -14,6 +14,24 @@ export class RagInstructionResponseDto {
   instructions: string[];
 
   @ApiPropertyOptional({ 
+    description: 'Tipo de fonte do conteúdo',
+    enum: ['text', 'url', 'pdf']
+  })
+  sourceType?: 'text' | 'url' | 'pdf';
+
+  @ApiPropertyOptional({ description: 'URL de origem' })
+  sourceUrl?: string;
+
+  @ApiPropertyOptional({ description: 'Nome do arquivo' })
+  sourceFileName?: string;
+
+  @ApiPropertyOptional({ description: 'ID do arquivo armazenado' })
+  sourceFileId?: string;
+
+  @ApiPropertyOptional({ description: 'Conteúdo bruto extraído' })
+  rawContent?: string;
+
+  @ApiPropertyOptional({ 
     description: 'Contexto adicional com dados específicos da unidade'
   })
   context?: {

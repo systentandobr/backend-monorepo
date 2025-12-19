@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, ConflictException, Logger, Inject, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import axios from 'axios';
 import { Customer, CustomerDocument } from './schemas/customer.schema';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
@@ -146,6 +147,80 @@ export class CustomersService {
       new: newCustomers,
       averageTicket,
     };
+  }
+
+  async getConversations(customerId: string, unitId: string): Promise<{
+    sessions: Array<{
+      sessionId: string;
+      firstMessageAt: string;
+      lastMessageAt: string;
+      messageCount: number;
+      history: Array<{
+        role: string;
+        content: string;
+        timestamp?: string;
+      }>;
+    }>;
+  }> {
+    // Verificar se customer existe
+    const customer = await this.findOne(customerId, unitId);
+    
+    const pythonApiUrl = process.env.PYTHON_CHATBOT_API_URL || process.env.PYTHON_RAG_API_URL || 'http://localhost:7001';
+    
+    try {
+      // Buscar sessões associadas ao customer
+      const response = await axios.get(
+        `${pythonApiUrl}/sessions/unit/${unitId}`,
+        {
+          params: {
+            customer_id: customerId,
+            limit: 100,
+          },
+          timeout: 10000,
+        }
+      );
+
+      const sessions = response.data.sessions || [];
+      
+      // Para cada sessão, buscar histórico completo
+      const sessionsWithHistory = await Promise.all(
+        sessions.map(async (session: any) => {
+          try {
+            const historyResponse = await axios.get(
+              `${pythonApiUrl}/sessions/${session.sessionId}/history`,
+              { timeout: 10000 }
+            );
+            
+            return {
+              sessionId: session.sessionId,
+              firstMessageAt: session.firstMessageAt,
+              lastMessageAt: session.lastMessageAt,
+              messageCount: session.messageCount,
+              history: historyResponse.data.messages || [],
+            };
+          } catch (error: any) {
+            this.logger.warn(`Erro ao buscar histórico da sessão ${session.sessionId}: ${error.message}`);
+            return {
+              sessionId: session.sessionId,
+              firstMessageAt: session.firstMessageAt,
+              lastMessageAt: session.lastMessageAt,
+              messageCount: session.messageCount,
+              history: [],
+            };
+          }
+        })
+      );
+
+      return {
+        sessions: sessionsWithHistory,
+      };
+    } catch (error: any) {
+      this.logger.error(`Erro ao buscar conversas do customer ${customerId}: ${error.message}`);
+      // Retornar vazio em caso de erro (degradação graciosa)
+      return {
+        sessions: [],
+      };
+    }
   }
 
   private toResponseDto(customer: CustomerDocument): CustomerResponseDto {

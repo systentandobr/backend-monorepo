@@ -8,12 +8,19 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags, ApiOperation, ApiResponse, ApiConsumes } from '@nestjs/swagger';
+import type { Multer } from 'multer';
 import { RagInstructionsService } from './rag-instructions.service';
 import { CreateRagInstructionDto } from './dto/create-rag-instruction.dto';
 import { UpdateRagInstructionDto } from './dto/update-rag-instruction.dto';
 import { RagInstructionResponseDto } from './dto/rag-instruction-response.dto';
+import { CreateRagInstructionFromTextDto } from './dto/create-rag-instruction-from-text.dto';
+import { CreateRagInstructionFromUrlDto } from './dto/create-rag-instruction-from-url.dto';
+import { CreateRagInstructionFromPdfDto } from './dto/create-rag-instruction-from-pdf.dto';
 import { UnitScope } from '../../decorators/unit-scope.decorator';
 import { CurrentUser, CurrentUserShape } from '../../decorators/current-user.decorator';
 
@@ -36,6 +43,83 @@ export class RagInstructionsController {
       throw new Error('unitId não encontrado no contexto do usuário');
     }
     return this.ragInstructionsService.create(createDto, unitId);
+  }
+
+  @Post('from-text')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Criar instruções RAG a partir de texto' })
+  @ApiResponse({ status: 201, type: RagInstructionResponseDto })
+  createFromText(
+    @Body() createDto: CreateRagInstructionFromTextDto,
+    @CurrentUser() user: CurrentUserShape,
+  ) {
+    const unitId = user.unitId || user.profile?.unitId;
+    if (!unitId) {
+      throw new Error('unitId não encontrado no contexto do usuário');
+    }
+    return this.ragInstructionsService.createFromText(createDto, unitId);
+  }
+
+  @Post('from-url')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Criar instruções RAG a partir de URL' })
+  @ApiResponse({ status: 201, type: RagInstructionResponseDto })
+  createFromUrl(
+    @Body() createDto: CreateRagInstructionFromUrlDto,
+    @CurrentUser() user: CurrentUserShape,
+  ) {
+    const unitId = user.unitId || user.profile?.unitId;
+    if (!unitId) {
+      throw new Error('unitId não encontrado no contexto do usuário');
+    }
+    return this.ragInstructionsService.createFromUrl(createDto, unitId);
+  }
+
+  @Post('from-pdf')
+  @HttpCode(HttpStatus.CREATED)
+  @UseInterceptors(FileInterceptor('file', {
+    limits: {
+      fileSize: 10 * 1024 * 1024, // 10MB
+    },
+    fileFilter: (req, file, cb) => {
+      if (file.mimetype === 'application/pdf') {
+        cb(null, true);
+      } else {
+        cb(new Error('Apenas arquivos PDF são permitidos'), false);
+      }
+    },
+  }))
+  @ApiOperation({ summary: 'Criar instruções RAG a partir de PDF' })
+  @ApiConsumes('multipart/form-data')
+  @ApiResponse({ status: 201, type: RagInstructionResponseDto })
+  createFromPdf(
+    @UploadedFile() file: Multer.File,
+    @Body() createDto: CreateRagInstructionFromPdfDto,
+    @CurrentUser() user: CurrentUserShape,
+  ) {
+    const unitId = user.unitId || user.profile?.unitId;
+    if (!unitId) {
+      throw new Error('unitId não encontrado no contexto do usuário');
+    }
+    if (!file) {
+      throw new Error('Arquivo PDF é obrigatório');
+    }
+    return this.ragInstructionsService.createFromPdf(createDto, file, unitId);
+  }
+
+  @Post(':id/reindex')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Reindexar instrução RAG no sistema de busca' })
+  @ApiResponse({ status: 200, type: RagInstructionResponseDto })
+  reindex(
+    @Param('id') id: string,
+    @CurrentUser() user: CurrentUserShape,
+  ) {
+    const unitId = user.unitId || user.profile?.unitId;
+    if (!unitId) {
+      throw new Error('unitId não encontrado no contexto do usuário');
+    }
+    return this.ragInstructionsService.reindex(id, unitId);
   }
 
   @Get()

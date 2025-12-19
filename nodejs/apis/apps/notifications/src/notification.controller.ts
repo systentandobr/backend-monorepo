@@ -8,10 +8,10 @@ import { ApiResponse, ApiOperation, ApiBody } from "@nestjs/swagger";
  */
 @Controller('notifications')
 export class NotificationController {
-  constructor(private readonly notificationsService: NotificationsService) {}
+  constructor(private readonly notificationsService: NotificationsService) { }
 
   @Post('send')
-  @ApiOperation({ summary: 'Send notification' } )
+  @ApiOperation({ summary: 'Send notification' })
   @ApiBody({
     description: 'Payload para envio de notificação',
     examples: {
@@ -53,7 +53,7 @@ export class NotificationController {
       }
     }
   })
-  @ApiResponse({ status: 200, description: 'Notification sent'})   
+  @ApiResponse({ status: 200, description: 'Notification sent' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
   async sendNotification(@Body() payload: NotificationPayload): Promise<{
@@ -61,6 +61,50 @@ export class NotificationController {
     discord: boolean;
     email: boolean;
   }> {
+    return this.notificationsService.sendNotification(payload);
+  }
+
+  @Post('trigger/lead-welcome')
+  @ApiOperation({ summary: 'Trigger welcome notification for a lead' })
+  @ApiResponse({ status: 200, description: 'Welcome notification sent' })
+  async sendLeadWelcome(@Body() body: { leadId: string; unitId: string; name?: string }) {
+    const payload: NotificationPayload = {
+      title: '👋 Bem-vindo ao TaDeVolta!',
+      message: `Olá ${body.name || 'Visitante'}, ficamos felizes com seu interesse. Em breve um consultor entrará em contato.`,
+      type: 'info',
+      metadata: {
+        leadId: body.leadId,
+        unitId: body.unitId,
+        trigger: 'lead-welcome'
+      }
+    };
+    return this.notificationsService.sendNotification(payload);
+  }
+
+  @Post('trigger/chat-link')
+  @ApiOperation({ summary: 'Generate and send chat link notification' })
+  @ApiResponse({ status: 200, description: 'Chat link notification sent' })
+  async sendChatLink(@Body() body: { leadId: string; unitId: string; stage?: string }) {
+    // Generate the chat URL (using the same logic as frontend for consistency, but server-side)
+    const baseUrl = 'https://chat.tadevolta.com.br';
+    const params = new URLSearchParams({
+      leadId: body.leadId,
+      unitId: body.unitId,
+      stage: body.stage || 'initial'
+    });
+    const chatUrl = `${baseUrl}/?${params.toString()}`;
+
+    const payload: NotificationPayload = {
+      title: '💬 Seu Link de Atendimento',
+      message: `Acesse seu chat exclusivo aqui para falar com nosso time: ${chatUrl}`,
+      type: 'success',
+      metadata: {
+        leadId: body.leadId,
+        unitId: body.unitId,
+        chatUrl: chatUrl,
+        trigger: 'chat-link'
+      }
+    };
     return this.notificationsService.sendNotification(payload);
   }
 }

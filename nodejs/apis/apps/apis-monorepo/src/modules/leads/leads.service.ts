@@ -1,11 +1,19 @@
 import { Injectable, NotFoundException, ConflictException, Logger, Inject, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import axios from 'axios';
+import { randomUUID } from 'crypto';
 import { Lead, LeadDocument, LeadStatus } from './schemas/lead.schema';
 import { CreateLeadDto } from './dto/create-lead.dto';
 import { UpdateLeadDto } from './dto/update-lead.dto';
 import { LeadFiltersDto, LeadResponseDto, LeadPipelineStatsDto } from './dto/lead-response.dto';
 import { NotificationsService } from '../../../../notifications/src/notifications.service';
+
+// axios.interceptors.request.use((config) => {
+//   config.headers['Authorization'] = `Bearer ${process.env.PYTHON_CHATBOT_API_TOKEN}`;
+//   console.log('axios.interceptors.request.use', config);
+//   return config;
+// });
 
 @Injectable()
 export class LeadsService {
@@ -134,7 +142,7 @@ export class LeadsService {
     }).exec();
 
     if (!lead) {
-      throw new NotFoundException('Lead não encontrado');
+      throw new NotFoundException('Lead não encontrado ==> ' + id + ' unitId:' + unitId);
     }
 
     return this.toResponseDto(lead);
@@ -294,6 +302,233 @@ export class LeadsService {
       [LeadStatus.LOST]: 'lost',
     };
     return stageMap[status] || 'new';
+  }
+
+  private generateSessionId(): string {
+    return randomUUID();
+  }
+
+  private async findOrCreateSession(
+    leadId: string,
+    unitId: string,
+    userId: string,
+    customerId?: string
+  ): Promise<string> {
+    /**
+     * Busca uma sessão existente ou cria uma nova
+     * Prioridade: lead_id > customer_id > user_id
+     */
+    const pythonApiUrl = process.env.PYTHON_CHATBOT_API_URL || process.env.PYTHON_RAG_API_URL || 'http://localhost:7001';
+
+    try {
+      // Tentar buscar sessão existente
+      const findParams = new URLSearchParams({
+        unit_id: unitId,
+      });
+
+      if (leadId) {
+        findParams.append('lead_id', leadId);
+      } else if (customerId) {
+        findParams.append('customer_id', customerId);
+      } else if (userId) {
+        findParams.append('user_id', userId);
+      }
+
+      const findResponse = await axios.get(
+        `${pythonApiUrl}/sessions/find?${findParams.toString()}`,
+        { timeout: 5000 }
+      );
+
+      if (findResponse.data?.found && findResponse.data?.session_id) {
+        this.logger.log(`Sessão existente encontrada: ${findResponse.data.session_id}`);
+        return findResponse.data.session_id;
+      }
+    } catch (error) {
+      // Se houver erro ao buscar, continuar e criar nova sessão
+      this.logger.warn(`Erro ao buscar sessão existente: ${error.message}`);
+    }
+
+    // Se não encontrou, gerar novo session_id
+    return this.generateSessionId();
+  }
+
+  async createConversation(leadId: string, unitId: string, userId: string, customerId?: string, stage?: LeadStatus): Promise<any> {
+    const lead = await this.findOne(leadId, unitId);
+
+    // Configurar URL base (idealmente via variáveis de ambiente)
+    const baseUrl = process.env.CHAT_BASE_URL || 'https://chat.tadevolta.com.br';
+
+    // Determinar o estágio inicial baseado no status do lead
+    let startStage = 'sales';
+    if (lead.status === LeadStatus.CUSTOMER || stage === LeadStatus.CUSTOMER) startStage = 'post-sales';
+    if (lead.status === LeadStatus.NEW || stage === LeadStatus.NEW) startStage = 'capture';
+
+
+    const pythonApiUrl = process.env.PYTHON_CHATBOT_API_URL || process.env.PYTHON_RAG_API_URL || 'http://localhost:7001';
+
+    try {
+      // Buscar sessão existente ou criar nova
+      const sessionId = await this.findOrCreateSession(leadId, unitId, userId, customerId);
+
+      // Chamar API Python para inicializar a conversa
+      this.logger.log('Chamando API Python para inicializar conversa', {
+        pythonApiUrl,
+        leadId,
+        unitId,
+        userId,
+        sessionId,
+        startStage,
+        domain: 'viralkids-web'
+      });
+
+      const response = await axios.post(`${pythonApiUrl}/chat`, {
+        session_id: sessionId,
+        lead_id: leadId,
+        unit_id: unitId,
+        user_id: userId,
+        customer_id: customerId,
+        stage: startStage,
+        domain: 'viralkids-web',
+        message: 'init_conversation'
+      });
+
+      // Usar session_id da resposta se disponível, senão usar o que foi gerado/buscado
+      const finalSessionId = response?.data?.session_id || sessionId;
+
+      const params = new URLSearchParams({
+        leadId: leadId,
+        unitId: unitId,
+        stage: startStage,
+        sessionId: finalSessionId,
+      });
+
+      const chatUrl = `${baseUrl}/?${params.toString()}`;
+
+      return { chatUrl, data: response.data };
+    } catch (error) {
+      this.logger.error(`Erro ao criar conversa do lead ${leadId}: ${error.message}`);
+    }
+    return null;
+  }
+
+  async getConversations(leadId: string, unitId: string, customerId?: string, userId?: string): Promise<{
+    sessions: Array<{
+      sessionId: string;
+      firstMessageAt: string;
+      lastMessageAt: string;
+      messageCount: number;
+      history: Array<{
+        role: string;
+        content: string;
+        timestamp?: string;
+      }>;
+    }>;
+  }> {
+    // #region agent log
+    fetch('http://127.0.0.1:7245/ingest/2c2ef524-2985-45e5-aeb9-914704297ab1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'leads.service.ts:414',message:'getConversations entry',data:{leadId,unitId,customerId,userId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
+
+    const pythonApiUrl = process.env.PYTHON_CHATBOT_API_URL || process.env.PYTHON_RAG_API_URL || 'http://localhost:7001';
+
+    // #region agent log
+    fetch('http://127.0.0.1:7245/ingest/2c2ef524-2985-45e5-aeb9-914704297ab1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'leads.service.ts:428',message:'Python API URL',data:{pythonApiUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
+
+    try {
+      // Buscar sessões associadas ao lead
+      const requestUrl = `${pythonApiUrl}/sessions/unit/${encodeURIComponent(unitId)}`;
+      const requestParams = {
+        lead_id: leadId,
+        customer_id: customerId,
+        user_id: userId,
+        limit: 100,
+        offset: 0
+      };
+
+      // #region agent log
+      fetch('http://127.0.0.1:7245/ingest/2c2ef524-2985-45e5-aeb9-914704297ab1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'leads.service.ts:440',message:'Before sessions API call',data:{requestUrl,requestParams},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+      // #endregion
+
+      const response = await axios.get(requestUrl, { params: requestParams });
+
+      // #region agent log
+      fetch('http://127.0.0.1:7245/ingest/2c2ef524-2985-45e5-aeb9-914704297ab1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'leads.service.ts:447',message:'After sessions API call',data:{status:response.status,hasData:!!response.data,sessionsCount:response.data?.sessions?.length,sessions:response.data?.sessions},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+      // #endregion
+
+      console.log('getConversations:: ', {
+        unitId,
+        leadId,
+        data: response.data.sessions
+      })
+      const sessions = response.data.sessions || [];
+
+      // #region agent log
+      fetch('http://127.0.0.1:7245/ingest/2c2ef524-2985-45e5-aeb9-914704297ab1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'leads.service.ts:455',message:'Before history fetch loop',data:{sessionsCount:sessions.length,sessionIds:sessions.map((s:any)=>s.sessionId)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+      // #endregion
+
+      // Para cada sessão, buscar histórico completo
+      const sessionsWithHistory = await Promise.all(
+        sessions.map(async (session: any) => {
+          // #region agent log
+          fetch('http://127.0.0.1:7245/ingest/2c2ef524-2985-45e5-aeb9-914704297ab1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'leads.service.ts:461',message:'Before history API call',data:{sessionId:session.sessionId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+          // #endregion
+
+          try {
+            const historyUrl = `${pythonApiUrl}/sessions/${session.sessionId}/history`;
+            
+            // #region agent log
+            fetch('http://127.0.0.1:7245/ingest/2c2ef524-2985-45e5-aeb9-914704297ab1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'leads.service.ts:466',message:'History URL',data:{historyUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+            // #endregion
+
+            const historyResponse = await axios.get(historyUrl, { timeout: 10000 });
+
+            // #region agent log
+            fetch('http://127.0.0.1:7245/ingest/2c2ef524-2985-45e5-aeb9-914704297ab1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'leads.service.ts:472',message:'After history API call success',data:{sessionId:session.sessionId,status:historyResponse.status,hasMessages:!!historyResponse.data.messages,messagesCount:historyResponse.data?.messages?.length,responseData:historyResponse.data},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+            // #endregion
+
+            return {
+              sessionId: session.sessionId,
+              firstMessageAt: session.firstMessageAt,
+              lastMessageAt: session.lastMessageAt,
+              messageCount: session.messageCount,
+              metadata: session.metadata,
+              history: historyResponse.data.messages || [],
+            };
+          } catch (error: any) {
+            // #region agent log
+            fetch('http://127.0.0.1:7245/ingest/2c2ef524-2985-45e5-aeb9-914704297ab1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'leads.service.ts:487',message:'History API call error',data:{sessionId:session.sessionId,errorMessage:error.message,errorCode:error.code,errorResponse:error.response?.data,errorStatus:error.response?.status},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+            // #endregion
+
+            this.logger.warn(`Erro ao buscar histórico da sessão ${session.sessionId}: ${error.message}`);
+            return {
+              sessionId: session.sessionId,
+              firstMessageAt: session.firstMessageAt,
+              lastMessageAt: session.lastMessageAt,
+              messageCount: session.messageCount,
+              history: [],
+            };
+          }
+        })
+      );
+
+      // #region agent log
+      fetch('http://127.0.0.1:7245/ingest/2c2ef524-2985-45e5-aeb9-914704297ab1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'leads.service.ts:503',message:'Before return',data:{sessionsWithHistoryCount:sessionsWithHistory.length,historiesWithMessages:sessionsWithHistory.filter((s:any)=>s.history?.length>0).length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+      // #endregion
+
+      return {
+        sessions: sessionsWithHistory,
+      };
+    } catch (error: any) {
+      // #region agent log
+      fetch('http://127.0.0.1:7245/ingest/2c2ef524-2985-45e5-aeb9-914704297ab1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'leads.service.ts:510',message:'Main catch error',data:{errorMessage:error.message,errorCode:error.code,errorResponse:error.response?.data,errorStatus:error.response?.status},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+      // #endregion
+
+      this.logger.error(`Erro ao buscar conversas do lead ${leadId}: ${error.message}`);
+      // Retornar vazio em caso de erro (degradação graciosa)
+      return {
+        sessions: [],
+      };
+    }
   }
 
   private toResponseDto(lead: LeadDocument): LeadResponseDto {

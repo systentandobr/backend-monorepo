@@ -20,6 +20,21 @@ export class RagInstruction {
   @Prop({ type: [String], required: true, default: [] })
   instructions: string[];
 
+  @Prop({ type: String, enum: ['text', 'url', 'pdf'], default: 'text' })
+  sourceType: 'text' | 'url' | 'pdf';
+
+  @Prop({ type: String })
+  sourceUrl?: string;
+
+  @Prop({ type: String })
+  sourceFileName?: string;
+
+  @Prop({ type: String })
+  sourceFileId?: string;
+
+  @Prop({ type: String })
+  rawContent?: string;
+
   @Prop({ type: Object, default: {} })
   context?: {
     products?: any[];
@@ -35,6 +50,11 @@ export class RagInstruction {
     author?: string;
     description?: string;
     tags?: string[];
+    processedAt?: Date;
+    processingStatus?: 'pending' | 'processing' | 'completed' | 'failed';
+    processingError?: string;
+    indexedInRAG?: boolean;
+    ragIndexedAt?: Date;
     [key: string]: any;
   };
 

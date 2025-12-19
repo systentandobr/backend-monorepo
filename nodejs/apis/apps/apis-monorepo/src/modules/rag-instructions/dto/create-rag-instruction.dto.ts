@@ -2,7 +2,8 @@ import { IsString, IsArray, IsObject, IsBoolean, IsOptional, ArrayMinSize } from
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateRagInstructionDto {
-  @ApiProperty({ description: 'Identificador da unidade' })
+  @ApiPropertyOptional({ description: 'Identificador da unidade (opcional, será extraído do contexto do usuário)' })
+  @IsOptional()
   @IsString()
   unitId: string;
 
@@ -18,6 +19,35 @@ export class CreateRagInstructionDto {
   @ArrayMinSize(1)
   @IsString({ each: true })
   instructions: string[];
+
+  @ApiPropertyOptional({ 
+    description: 'Tipo de fonte do conteúdo',
+    enum: ['text', 'url', 'pdf'],
+    default: 'text'
+  })
+  @IsOptional()
+  @IsString()
+  sourceType?: 'text' | 'url' | 'pdf';
+
+  @ApiPropertyOptional({ description: 'URL de origem (quando sourceType é url)' })
+  @IsOptional()
+  @IsString()
+  sourceUrl?: string;
+
+  @ApiPropertyOptional({ description: 'Nome do arquivo (quando sourceType é pdf)' })
+  @IsOptional()
+  @IsString()
+  sourceFileName?: string;
+
+  @ApiPropertyOptional({ description: 'ID do arquivo armazenado (quando sourceType é pdf)' })
+  @IsOptional()
+  @IsString()
+  sourceFileId?: string;
+
+  @ApiPropertyOptional({ description: 'Conteúdo bruto extraído' })
+  @IsOptional()
+  @IsString()
+  rawContent?: string;
 
   @ApiPropertyOptional({ 
     description: 'Contexto adicional com dados específicos da unidade',

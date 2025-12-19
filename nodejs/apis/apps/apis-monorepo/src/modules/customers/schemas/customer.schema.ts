@@ -49,7 +49,10 @@ export class Customer {
   isActive: boolean;
 
   @Prop({ type: Object })
-  metadata?: Record<string, any>;
+  metadata?: {
+    chatbotSessionIds?: string[];
+    [key: string]: any;
+  };
 }
 
 export const CustomerSchema = SchemaFactory.createForClass(Customer);
