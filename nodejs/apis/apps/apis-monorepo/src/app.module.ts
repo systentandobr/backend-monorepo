@@ -21,6 +21,7 @@ import { TaskTemplatesModule } from './modules/task-templates/task-templates.mod
 import { FranchiseTasksModule } from './modules/franchise-tasks/franchise-tasks.module';
 import { TrainingsModule } from './modules/trainings/trainings.module';
 import { RagInstructionsModule } from './modules/rag-instructions/rag-instructions.module';
+import { SettingsModule } from './modules/settings/settings.module';
 
 
 
@@ -45,6 +46,7 @@ import { RagInstructionsModule } from './modules/rag-instructions/rag-instructio
     FranchiseTasksModule,
     TrainingsModule,
     RagInstructionsModule,
+    SettingsModule,
   ],
   controllers: [AppController, DebugController],
   providers: [AppService],

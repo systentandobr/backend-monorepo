@@ -1,7 +1,8 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
 import { NotificationsService } from './notifications.service';
+import { SettingsModule } from '../../apis-monorepo/src/modules/settings/settings.module';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { NotificationsService } from './notifications.service';
       maxRedirects: 5,
     }),
     ConfigModule,
+    forwardRef(() => SettingsModule),
   ],
   providers: [NotificationsService],
   exports: [NotificationsService],

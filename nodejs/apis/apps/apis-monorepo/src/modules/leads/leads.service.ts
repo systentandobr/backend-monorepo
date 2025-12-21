@@ -336,7 +336,9 @@ export class LeadsService {
 
       const findResponse = await axios.get(
         `${pythonApiUrl}/sessions/find?${findParams.toString()}`,
-        { timeout: 5000 }
+        { 
+          timeout: parseInt(process.env.PYTHON_CHATBOT_FIND_TIMEOUT || '10000', 10) // 10 segundos padrão
+        }
       );
 
       if (findResponse.data?.found && findResponse.data?.session_id) {
@@ -378,19 +380,32 @@ export class LeadsService {
         userId,
         sessionId,
         startStage,
-        domain: 'viralkids-web'
+        domain: 'systentando-web'
       });
 
-      const response = await axios.post(`${pythonApiUrl}/chat`, {
-        session_id: sessionId,
-        lead_id: leadId,
-        unit_id: unitId,
-        user_id: userId,
-        customer_id: customerId,
-        stage: startStage,
-        domain: 'viralkids-web',
-        message: 'init_conversation'
-      });
+      // Timeout aumentado para inicialização da conversa (pode demorar mais devido à inicialização do agente e busca de dados)
+      const initTimeout = parseInt(process.env.PYTHON_CHATBOT_INIT_TIMEOUT || '30000', 10); // 30 segundos padrão
+      
+      const response = await axios.post(
+        `${pythonApiUrl}/chat`,
+        {
+          session_id: sessionId,
+          lead_id: leadId,
+          unit_id: unitId,
+          user_id: userId,
+          customer_id: customerId,
+          stage: startStage,
+          domain: 'systentando-web',
+          message: 'init_conversation'
+        },
+        {
+          timeout: initTimeout,
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+     
 
       // Usar session_id da resposta se disponível, senão usar o que foi gerado/buscado
       const finalSessionId = response?.data?.session_id || sessionId;
@@ -403,6 +418,21 @@ export class LeadsService {
       });
 
       const chatUrl = `${baseUrl}/?${params.toString()}`;
+
+      this.notificationsService.notifyNewConversation({
+        id: leadId,
+        name: lead.name,
+        email: lead.email,
+        phone: lead.phone,
+        city: lead.city,
+        source: lead.source,
+        score: lead.score,
+        unitId: lead.unitId,
+        chatUrl: chatUrl || '',
+        mensagem: response?.data?.message || '',
+      }).catch(err => {
+        this.logger.error(`Erro ao enviar notificação de novo lead: ${err.message}`);
+      });
 
       return { chatUrl, data: response.data };
     } catch (error) {
@@ -480,7 +510,12 @@ export class LeadsService {
             fetch('http://127.0.0.1:7245/ingest/2c2ef524-2985-45e5-aeb9-914704297ab1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'leads.service.ts:466',message:'History URL',data:{historyUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
             // #endregion
 
-            const historyResponse = await axios.get(historyUrl, { timeout: 10000 });
+            const historyResponse = await axios.get(
+              historyUrl, 
+              { 
+                timeout: parseInt(process.env.PYTHON_CHATBOT_HISTORY_TIMEOUT || '15000', 10) // 15 segundos padrão
+              }
+            );
 
             // #region agent log
             fetch('http://127.0.0.1:7245/ingest/2c2ef524-2985-45e5-aeb9-914704297ab1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'leads.service.ts:472',message:'After history API call success',data:{sessionId:session.sessionId,status:historyResponse.status,hasMessages:!!historyResponse.data.messages,messagesCount:historyResponse.data?.messages?.length,responseData:historyResponse.data},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});

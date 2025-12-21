@@ -56,12 +56,13 @@ export class NotificationController {
   @ApiResponse({ status: 200, description: 'Notification sent' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
-  async sendNotification(@Body() payload: NotificationPayload): Promise<{
+  async sendNotification(@Body() payload: NotificationPayload & { unitId?: string }): Promise<{
     telegram: boolean;
     discord: boolean;
     email: boolean;
   }> {
-    return this.notificationsService.sendNotification(payload);
+    const unitId = payload.unitId || payload.metadata?.unitId || payload.metadata?.['ID Unidade'];
+    return this.notificationsService.sendNotification(payload, unitId);
   }
 
   @Post('trigger/lead-welcome')
@@ -78,7 +79,7 @@ export class NotificationController {
         trigger: 'lead-welcome'
       }
     };
-    return this.notificationsService.sendNotification(payload);
+    return this.notificationsService.sendNotification(payload, body.unitId);
   }
 
   @Post('trigger/chat-link')
@@ -105,6 +106,6 @@ export class NotificationController {
         trigger: 'chat-link'
       }
     };
-    return this.notificationsService.sendNotification(payload);
+    return this.notificationsService.sendNotification(payload, body.unitId);
   }
 }

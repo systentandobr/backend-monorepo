@@ -19,7 +19,7 @@ export class CategoryController {
     return this.categoryService.create(dto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   @Get()
   @ApiOperation({ summary: 'Listar categorias' })
   @ApiResponse({ status: 200, description: 'Lista de categorias' })
