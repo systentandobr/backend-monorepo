@@ -250,7 +250,7 @@ export class UsersService {
   /**
    * Busca um usuário por ID
    */
-  async findUserById(userId: string, token: string, domain?: string): Promise<User | null> {
+  async findUserById(userId: string, token: string): Promise<User | null> {
     try {
       const response = await firstValueFrom(
         this.httpService.get(`${this.sysSegurancaUrl}/api/v1/users/${userId}`, {
@@ -258,7 +258,7 @@ export class UsersService {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
             'x-api-key': EnvironmentConfig.sysSeguranca.apiKey,
-            'x-domain': domain,
+            'x-domain': 'viralkids-web',
           },
           timeout: EnvironmentConfig.sysSeguranca.timeout,
         })

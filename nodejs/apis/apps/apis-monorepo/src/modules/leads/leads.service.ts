@@ -34,7 +34,22 @@ export class LeadsService {
 
     if (existing) {
       // Atualizar lead existente ao invés de criar duplicado
-      return this.update(existing._id.toString(), createLeadDto, unitId);
+      const response = await this.update(existing._id.toString(), createLeadDto, unitId);
+      // Enviar notificação sobre atualização de lead
+      this.notificationsService.notifyLeadUpdated({
+        id: response.id,
+        name: response.name,
+        email: response.email,
+        phone: response.phone,
+        city: response.city,
+        source: response.source,
+        score: response.score,
+        unitId: response.unitId,
+      }).catch(err => {
+        this.logger.error(`Erro ao enviar notificação de novo lead: ${err.message}`);
+      });
+
+      return response;
     }
 
     // Calcular score inicial baseado nos dados
@@ -479,7 +494,10 @@ export class LeadsService {
       fetch('http://127.0.0.1:7245/ingest/2c2ef524-2985-45e5-aeb9-914704297ab1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'leads.service.ts:440',message:'Before sessions API call',data:{requestUrl,requestParams},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
       // #endregion
 
-      const response = await axios.get(requestUrl, { params: requestParams });
+      const response = await axios.get(requestUrl, { 
+        params: requestParams,
+        timeout: parseInt(process.env.PYTHON_CHATBOT_TIMEOUT || '10000', 10) // 10 segundos para buscar sessões
+      });
 
       // #region agent log
       fetch('http://127.0.0.1:7245/ingest/2c2ef524-2985-45e5-aeb9-914704297ab1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'leads.service.ts:447',message:'After sessions API call',data:{status:response.status,hasData:!!response.data,sessionsCount:response.data?.sessions?.length,sessions:response.data?.sessions},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
@@ -513,7 +531,9 @@ export class LeadsService {
             const historyResponse = await axios.get(
               historyUrl, 
               { 
-                timeout: parseInt(process.env.PYTHON_CHATBOT_HISTORY_TIMEOUT || '15000', 10) // 15 segundos padrão
+                timeout: parseInt(process.env.PYTHON_CHATBOT_HISTORY_TIMEOUT || '15000', 10), // 15 segundos (reduzido de 30)
+                // Desabilitar retries automáticos do axios para evitar loops
+                validateStatus: (status) => status < 500, // Não retry em erros 5xx
               }
             );
 

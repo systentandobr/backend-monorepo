@@ -152,7 +152,7 @@ export class JwtValidatorService {
     } catch (error: any) {
       // Log detalhado do erro para debug
       if (error?.response) {
-        console.error('❌ Erro na resposta do SYS-SEGURANÇA:', {
+        console.error('❌JWT ValidateToken Erro na resposta do SYS-SEGURANÇA:', {
           status: error.response.status,
           statusText: error.response.statusText,
           data: error.response.data,

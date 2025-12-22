@@ -177,7 +177,7 @@ export class JwtValidatorService {
     } catch (error: any) {
       // Log detalhado do erro para debug
       if (error?.response) {
-        console.error('❌ Erro na resposta do SYS-SEGURANÇA:', {
+        console.error('❌JWT ValidateToken Erro na resposta do SYS-SEGURANÇA:', {
           status: error.response.status,
           statusText: error.response.statusText,
           data: error.response.data,
@@ -284,6 +284,7 @@ export class JwtValidatorService {
     try {
       // Tentar validar com SYS-SEGURANÇA primeiro
       console.log('🔄 [JwtValidatorService] Tentando validar token com SYS-SEGURANÇA...');
+      console.log('🔄 [JwtValidatorService] Token:', token);
       const result = await this.validateToken(token);
       console.log('✅ [JwtValidatorService] Validação com SYS-SEGURANÇA bem-sucedida');
       return result;

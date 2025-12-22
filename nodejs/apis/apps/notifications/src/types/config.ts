@@ -12,3 +12,10 @@ export interface EmailConfig {
     password: string;
     from: string;
   }
+
+  export interface ToReceivers {
+    
+    sendToAdmins: boolean,
+    sendToClients: boolean,
+    
+  }

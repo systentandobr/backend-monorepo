@@ -507,8 +507,7 @@ export class UsersController {
     @CurrentUser() user: CurrentUserShape,
     @Req() request: any,
   ) {
-    const domain = user.domain || user.profile?.domain;
-    
+   
     // Extrair token do header Authorization
     const authHeader = request.headers?.authorization || '';
     const token = authHeader.replace('Bearer ', '');
@@ -517,7 +516,7 @@ export class UsersController {
       throw new Error('Token de autenticação não encontrado');
     }
     
-    const foundUser = await this.usersService.findUserById(id, token, domain);
+    const foundUser = await this.usersService.findUserById(id, token);
     
     if (!foundUser) {
       throw new Error('Usuário não encontrado');

@@ -2,7 +2,7 @@ import { Injectable, Logger, Inject, Optional, forwardRef } from '@nestjs/common
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
-import { EmailConfig, NotificationPayload } from './types/config';
+import { EmailConfig, NotificationPayload, ToReceivers } from './types/config';
 import * as nodemailerModule from 'nodemailer';
 import { Transporter } from 'nodemailer';
 import { SettingsService } from '../../apis-monorepo/src/modules/settings/settings.service';
@@ -176,18 +176,20 @@ export class NotificationsService {
     }
   }
 
+  
+
   /**
    * Envia notificação para ambos os canais
    */
-  async sendNotification(payload: NotificationPayload, unitId?: string): Promise<{
+  async sendNotification(payload: NotificationPayload, unitId?: string, toSend?: ToReceivers): Promise<{
     telegram: boolean;
     discord: boolean;
     email: boolean;
   }> {
     const [telegramResult, discordResult, emailResult] = await Promise.allSettled([
-      this.sendTelegramNotification(payload, unitId),
-      this.sendDiscordNotification(payload, unitId),
-      this.sendEmailNotification(payload, unitId),
+      toSend?.sendToAdmins ? this.sendTelegramNotification(payload, unitId) : Promise.resolve(false),
+      toSend?.sendToAdmins ? this.sendDiscordNotification(payload, unitId) : Promise.resolve(false),
+      toSend?.sendToClients ? this.sendEmailNotification(payload, unitId) : Promise.resolve(false),
     ]);
 
     return {
@@ -374,7 +376,39 @@ export class NotificationsService {
       },
     };
 
-    await this.sendNotification(payload, lead.unitId);
+    await this.sendNotification(payload, lead.unitId, { sendToAdmins: true, sendToClients: false });
+  }
+
+  /**
+   * Notifica sobre novo lead
+   */
+  async notifyLeadUpdated(lead: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    city?: string;
+    source: string;
+    score: number;
+    unitId: string;
+  }): Promise<void> {
+    const payload: NotificationPayload = {
+      title: '🎯 O Lead Atualizado',
+      message: `O Lead está enviando novamente os dados pela landing page`,
+      type: 'success',
+      metadata: {
+        Nome: lead.name,
+        Email: lead.email,
+        Telefone: lead.phone,
+        Cidade: lead.city || 'Não informado',
+        Origem: lead.source,
+        Score: `${lead.score}/100`,
+        'ID Lead': lead.id,
+        'ID Unidade': lead.unitId,
+      },
+    };
+
+    await this.sendNotification(payload, lead.unitId, { sendToAdmins: true, sendToClients: false });
   }
 
   /**
@@ -400,7 +434,7 @@ export class NotificationsService {
       },
     };
 
-    await this.sendNotification(payload, lead.unitId);
+    await this.sendNotification(payload, lead.unitId, { sendToAdmins: false, sendToClients: true });
   }
 
   /**
@@ -426,7 +460,7 @@ export class NotificationsService {
       },
     };
 
-    await this.sendNotification(payload, customer.unitId);
+    await this.sendNotification(payload, customer.unitId, { sendToAdmins: true, sendToClients: false });
   }
 
   async notifyNewConversation(conversation: {
@@ -459,7 +493,7 @@ export class NotificationsService {
       },
     };
 
-    await this.sendNotification(payload, conversation.unitId);
+    await this.sendNotification(payload, conversation.unitId, { sendToAdmins: false, sendToClients: true });
   }
 
   /**
@@ -485,7 +519,7 @@ export class NotificationsService {
       },
     };
 
-    await this.sendNotification(payload, order.unitId);
+    await this.sendNotification(payload, order.unitId, { sendToAdmins: true, sendToClients: true });
   }
 
   private getEmojiForType(type?: string): string {

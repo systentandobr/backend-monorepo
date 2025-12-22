@@ -170,13 +170,13 @@ export class CustomersService {
     try {
       // Buscar sessões associadas ao customer
       const response = await axios.get(
-        `${pythonApiUrl}/sessions/unit/${unitId}`,
+        `${pythonApiUrl}/sessions/unit/${encodeURIComponent(unitId)}`,
         {
           params: {
             customer_id: customerId,
             limit: 100,
           },
-          timeout: 10000,
+          timeout: parseInt(process.env.PYTHON_CHATBOT_TIMEOUT || '10000', 10), // 10 segundos
         }
       );
 
@@ -188,7 +188,9 @@ export class CustomersService {
           try {
             const historyResponse = await axios.get(
               `${pythonApiUrl}/sessions/${session.sessionId}/history`,
-              { timeout: 10000 }
+              { 
+                timeout: parseInt(process.env.PYTHON_CHATBOT_HISTORY_TIMEOUT || '15000', 10) // 15 segundos (reduzido de 30)
+              }
             );
             
             return {

@@ -37,6 +37,7 @@ export class JwtAuthGuard implements CanActivate {
         userId: validationResult.user?.id,
         username: validationResult.user?.username,
         email: validationResult.user?.email,
+        profile: validationResult.user?.profile,
       });
       
       if (!validationResult || !validationResult.isValid) {
