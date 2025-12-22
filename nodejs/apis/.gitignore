@@ -15,6 +15,7 @@ lerna-debug.log*
 
 *.turbo
 *.turbo*
+python/*
 
 # OS
 .DS_Store
