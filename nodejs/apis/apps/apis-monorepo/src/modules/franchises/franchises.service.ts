@@ -128,6 +128,14 @@ export class FranchisesService {
     return { ...this.toResponseDto(franchise), metrics };
   }
 
+  async getMarketSegments(unitId: string): Promise<('restaurant' | 'delivery' | 'retail' | 'ecommerce' | 'hybrid')[]> {
+    const franchise = await this.franchiseModel.findOne({ unitId }).select('marketSegments').exec();
+    if (!franchise) {
+      return [];
+    }
+    return (franchise.marketSegments || []) as ('restaurant' | 'delivery' | 'retail' | 'ecommerce' | 'hybrid')[];
+  }
+
   async update(id: string, updateFranchiseDto: UpdateFranchiseDto, userUnitId?: string, isAdmin: boolean = false): Promise<FranchiseResponseDto> {
     const query: any = { _id: id };
     
@@ -319,6 +327,7 @@ export class FranchisesService {
       status: franchise.status,
       type: franchise.type,
       territory: franchise.territory,
+      marketSegments: (franchise.marketSegments || []) as ('restaurant' | 'delivery' | 'retail' | 'ecommerce' | 'hybrid')[],
       createdAt: franchise.createdAt || new Date(),
       updatedAt: franchise.updatedAt || new Date(),
     };

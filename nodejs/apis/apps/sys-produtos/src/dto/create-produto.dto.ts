@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsArray, IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Min, Max, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import { ProductType, DishComposition } from '../schemas/product.schema';
 
 export class ProductDimensionsDto {
   @ApiPropertyOptional()
@@ -214,6 +215,17 @@ export class CreateProdutoDto {
   @ValidateNested()
   @Type(() => TaxInformationDto)
   taxInformation?: TaxInformationDto;
+
+  @ApiPropertyOptional({ enum: ['product', 'dish'], default: 'product' })
+  @IsOptional()
+  @IsEnum(['product', 'dish'])
+  type?: ProductType;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => Object)
+  dishComposition?: DishComposition;
 }
 
 

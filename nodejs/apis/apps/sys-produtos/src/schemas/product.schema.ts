@@ -69,6 +69,24 @@ export interface TaxInformation {
   };
 }
 
+export enum ProductType {
+  PRODUCT = 'product',
+  DISH = 'dish',
+}
+
+export interface DishIngredient {
+  ingredientId: string; // ID do ingrediente
+  quantity: number; // Quantidade necessária
+  unit: string; // Unidade de medida (KG, G, L, ML, UN, etc.)
+}
+
+export interface DishComposition {
+  ingredients: DishIngredient[]; // Lista de ingredientes do prato
+  pricingMode: 'auto' | 'manual'; // Modo de cálculo de preço
+  manualPrice?: number; // Preço manual (quando pricingMode='manual')
+  margin?: number; // Margem percentual quando pricingMode='auto'
+}
+
 export interface Product extends Document {
   unitId?: string; // opcional no nível do produto (estoque é por unidade dentro da variante)
   name: string;
@@ -82,6 +100,8 @@ export interface Product extends Document {
   variants: ProductVariant[];
   featured: boolean;
   active: boolean;
+  type?: ProductType; // Tipo do produto: 'product' ou 'dish' (prato)
+  dishComposition?: DishComposition; // Composição do prato (apenas quando type='dish')
   
   // Campos adicionais migrados do projeto antigo
   brand?: string; // Marca do produto
@@ -194,6 +214,25 @@ const TaxInformationSchema = new Schema<TaxInformation, Document>(
   { _id: false },
 );
 
+const DishIngredientSchema = new Schema<DishIngredient, Document>(
+  {
+    ingredientId: { type: String, required: true },
+    quantity: { type: Number, required: true, min: 0 },
+    unit: { type: String, required: true },
+  },
+  { _id: false },
+);
+
+const DishCompositionSchema = new Schema<DishComposition, Document>(
+  {
+    ingredients: { type: [DishIngredientSchema], default: [] },
+    pricingMode: { type: String, enum: ['auto', 'manual'], required: true },
+    manualPrice: { type: Number, min: 0 },
+    margin: { type: Number, min: 0, max: 100 }, // Margem percentual (0-100)
+  },
+  { _id: false },
+);
+
 export const ProductSchema = new Schema<Product>(
   {
     unitId: { type: String, index: true },
@@ -208,6 +247,8 @@ export const ProductSchema = new Schema<Product>(
     variants: { type: [ProductVariantSchema], default: [] },
     featured: { type: Boolean, default: false, index: true },
     active: { type: Boolean, default: true, index: true },
+    type: { type: String, enum: ['product', 'dish'], default: 'product', index: true },
+    dishComposition: { type: DishCompositionSchema, required: false },
     
     // Campos adicionais migrados do projeto antigo
     brand: { type: String, index: true },

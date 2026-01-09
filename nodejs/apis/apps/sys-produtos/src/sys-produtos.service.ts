@@ -1,17 +1,19 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, FilterQuery } from 'mongoose';
-import { PRODUCT_COLLECTION, Product } from './schemas/product.schema';
+import { PRODUCT_COLLECTION, Product, ProductType } from './schemas/product.schema';
 import { UpdateProdutoDto } from './dto/update-produto.dto';
 import { QueryProdutoDto } from './dto/query-produto.dto';
 import { CreateVariantDto, UpdateVariantDto, AdjustStockDto, AdjustStockDeltaDto } from './dto/variant.dto';
 import { UpdateProdutoMetadataDto } from './dto/produto-metadata.dto';
+import { IngredientsService } from './services/ingredients.service';
 
 @Injectable()
 export class SysProdutosService {
   constructor(
     @InjectModel(PRODUCT_COLLECTION) private readonly productModel: Model<Product>,
+    private readonly ingredientsService: IngredientsService,
   ) {}
 
   async list(unitId: string | undefined, query: QueryProdutoDto = {}) {
@@ -103,8 +105,89 @@ export class SysProdutosService {
     return doc;
   }
 
+  /**
+   * Calcula o preço automático de um prato baseado nos ingredientes
+   */
+  private async calculateDishPrice(
+    dishComposition: any,
+    unitId: string,
+  ): Promise<{ costPrice: number; price: number }> {
+    if (!dishComposition || !dishComposition.ingredients || dishComposition.ingredients.length === 0) {
+      throw new BadRequestException('Prato deve ter pelo menos um ingrediente');
+    }
+
+    // Buscar todos os ingredientes
+    const ingredientIds = dishComposition.ingredients.map((ing: any) => ing.ingredientId);
+    const ingredients = await this.ingredientsService.findByIds(ingredientIds, unitId);
+
+    if (ingredients.length !== ingredientIds.length) {
+      throw new BadRequestException('Um ou mais ingredientes não foram encontrados');
+    }
+
+    // Calcular custo total
+    let totalCost = 0;
+    for (const dishIngredient of dishComposition.ingredients) {
+      const ingredient = ingredients.find((ing) => ing._id.toString() === dishIngredient.ingredientId);
+      if (!ingredient) {
+        throw new BadRequestException(`Ingrediente ${dishIngredient.ingredientId} não encontrado`);
+      }
+
+      // Converter quantidade para a unidade do ingrediente se necessário
+      // Por enquanto, assumimos que a unidade já está correta
+      const ingredientCost = ingredient.costPrice * dishIngredient.quantity;
+      totalCost += ingredientCost;
+    }
+
+    // Calcular preço de venda
+    let price: number;
+    if (dishComposition.pricingMode === 'auto') {
+      // Preço automático: custo + margem percentual
+      const margin = dishComposition.margin || 0;
+      price = totalCost * (1 + margin / 100);
+    } else {
+      // Preço manual
+      price = dishComposition.manualPrice || totalCost;
+      // Validar que o preço manual não é menor que o custo
+      if (price < totalCost) {
+        throw new BadRequestException(
+          `Preço manual (${price}) não pode ser menor que o custo total dos ingredientes (${totalCost})`,
+        );
+      }
+    }
+
+    return { costPrice: totalCost, price };
+  }
+
   async create(unitId: string | undefined, dto: CreateProdutoDto) {
     const slug = this.slugify(dto.name);
+    const productType = dto.type || ProductType.PRODUCT;
+
+    // Se for um prato, calcular preço automaticamente se necessário
+    let finalPrice = dto.price;
+    let finalCostPrice = dto.costPrice;
+    
+    if (productType === ProductType.DISH && dto.dishComposition) {
+      if (!unitId) {
+        throw new BadRequestException('unitId é obrigatório para criar pratos');
+      }
+
+      const calculatedPrices = await this.calculateDishPrice(dto.dishComposition, unitId);
+      finalCostPrice = calculatedPrices.costPrice;
+      
+      // Se o preço não foi fornecido ou se o modo é automático, usar o preço calculado
+      if (!dto.price || dto.dishComposition.pricingMode === 'auto') {
+        finalPrice = calculatedPrices.price;
+      } else {
+        // Preço manual fornecido, validar que não é menor que o custo
+        if (dto.price < calculatedPrices.costPrice) {
+          throw new BadRequestException(
+            `Preço (${dto.price}) não pode ser menor que o custo total dos ingredientes (${calculatedPrices.costPrice})`,
+          );
+        }
+        finalPrice = dto.price;
+      }
+    }
+
     const created = await this.productModel.create({
       unitId,
       name: dto.name,
@@ -118,10 +201,10 @@ export class SysProdutosService {
       variants: [
         {
           sku: `SKU-${Date.now()}`,
-          price: dto.price,
-          originalPrice: dto.price, // Inicialmente o preço original é o mesmo do preço
+          price: finalPrice,
+          originalPrice: finalPrice, // Inicialmente o preço original é o mesmo do preço
           promotionalPrice: undefined,
-          costPrice: dto.costPrice,
+          costPrice: finalCostPrice,
           currency: 'BRL',
           attributes: {},
           active: dto.active ?? true,
@@ -130,6 +213,8 @@ export class SysProdutosService {
       ],
       featured: false,
       active: dto.active ?? true,
+      type: productType,
+      dishComposition: dto.dishComposition,
       // Campos adicionais migrados
       brand: dto.brand,
       productModel: dto.productModel,

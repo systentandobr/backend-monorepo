@@ -9,6 +9,7 @@ import {
   Query,
   HttpCode,
   HttpStatus,
+  ForbiddenException,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { FranchisesService } from './franchises.service';
@@ -64,6 +65,33 @@ export class FranchisesController {
       throw new Error('Apenas administradores podem ver tendências regionais');
     }
     return this.franchisesService.getRegionalTrends();
+  }
+
+  // IMPORTANTE: Rotas específicas devem vir ANTES de rotas com parâmetros dinâmicos
+  // Caso contrário, o NestJS pode interpretar 'by-unit' como um :id
+  @Get('by-unit/:unitId/market-segments')
+  @UnitScope()
+  async getMarketSegments(
+    @Param('unitId') unitId: string,
+    @CurrentUser() user: CurrentUserShape,
+  ) {
+    // Decodificar o unitId (NestJS decodifica automaticamente, mas garantimos)
+    const decodedUnitId = decodeURIComponent(unitId);
+
+    // Validar se unitId foi fornecido
+    if (!decodedUnitId || decodedUnitId.trim() === '') {
+      throw new Error('unitId é obrigatório');
+    }
+
+    const userUnitId = user.unitId || user.profile?.unitId;
+    const isAdmin = this.isAdmin(user);
+    
+    // Verificar se o usuário tem permissão para acessar este unitId
+    if (!isAdmin && userUnitId !== decodedUnitId) {
+      throw new ForbiddenException('Acesso negado: você só pode consultar a segmentação da sua própria unidade');
+    }
+    
+    return this.franchisesService.getMarketSegments(decodedUnitId);
   }
 
   @Get(':id')

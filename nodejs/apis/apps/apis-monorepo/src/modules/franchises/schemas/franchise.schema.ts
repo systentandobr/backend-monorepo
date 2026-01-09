@@ -84,6 +84,13 @@ export class Franchise {
     radius?: number;
   };
 
+  @Prop({
+    type: [String],
+    enum: ['restaurant', 'delivery', 'retail', 'ecommerce', 'hybrid'],
+    default: [],
+  })
+  marketSegments?: string[];
+
   @Prop({ type: Object })
   metadata?: Record<string, any>;
 }
@@ -96,4 +103,5 @@ FranchiseSchema.index({ status: 1 });
 FranchiseSchema.index({ 'location.state': 1 });
 FranchiseSchema.index({ 'location.city': 1 });
 FranchiseSchema.index({ ownerId: 1 });
+FranchiseSchema.index({ marketSegments: 1 });
 

@@ -33,6 +33,9 @@ import { ProductImageController } from './controllers/product-image.controller';
 import { CatalogProductService } from './services/catalog-product.service';
 import { ProductImageService } from './services/product-image.service';
 import { PRODUCT_IMAGE_COLLECTION, ProductImageSchema } from './schemas/product-image.schema';
+import { IngredientsController } from './controllers/ingredients.controller';
+import { IngredientsService } from './services/ingredients.service';
+import { Ingredient, IngredientSchema } from './schemas/ingredient.schema';
 
 @Module({
   imports: [
@@ -47,6 +50,7 @@ import { PRODUCT_IMAGE_COLLECTION, ProductImageSchema } from './schemas/product-
       { name: VISITED_PRODUCT_COLLECTION, schema: VisitedProductSchema },
       { name: SEARCH_HISTORY_COLLECTION, schema: SearchHistorySchema },
       { name: PRODUCT_IMAGE_COLLECTION, schema: ProductImageSchema },
+      { name: Ingredient.name, schema: IngredientSchema },
     ]),
   ],
   controllers: [
@@ -59,6 +63,7 @@ import { PRODUCT_IMAGE_COLLECTION, ProductImageSchema } from './schemas/product-
     InventoryController,
     CatalogProductController,
     ProductImageController,
+    IngredientsController,
   ],
   providers: [
     SysProdutosService,
@@ -73,6 +78,7 @@ import { PRODUCT_IMAGE_COLLECTION, ProductImageSchema } from './schemas/product-
     InventoryService,
     CatalogProductService,
     ProductImageService,
+    IngredientsService,
   ],
   exports: [
     SysProdutosService,
@@ -84,6 +90,7 @@ import { PRODUCT_IMAGE_COLLECTION, ProductImageSchema } from './schemas/product-
     InventoryService,
     CatalogProductService,
     ProductImageService,
+    IngredientsService,
   ],
 })
 export class SysProdutosModule {}

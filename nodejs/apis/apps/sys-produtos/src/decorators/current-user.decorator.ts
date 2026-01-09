@@ -10,6 +10,14 @@ export interface CurrentUserShape {
   isEmailVerified?: boolean;
   isActive?: boolean;
   payload?: any;
+  profile?: {
+    unitId?: string;
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    domain?: string;
+    [key: string]: any;
+  };
 }
 
 export const CurrentUser = createParamDecorator(
