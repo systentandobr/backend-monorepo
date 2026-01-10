@@ -8,6 +8,7 @@ import { QueryProdutoDto } from './dto/query-produto.dto';
 import { CreateVariantDto, UpdateVariantDto, AdjustStockDto, AdjustStockDeltaDto } from './dto/variant.dto';
 import { UpdateProdutoMetadataDto } from './dto/produto-metadata.dto';
 import { IngredientsService } from './services/ingredients.service';
+import { IngredientDocument } from './schemas/ingredient.schema';
 
 @Injectable()
 export class SysProdutosService {
@@ -118,7 +119,7 @@ export class SysProdutosService {
 
     // Buscar todos os ingredientes
     const ingredientIds = dishComposition.ingredients.map((ing: any) => ing.ingredientId);
-    const ingredients = await this.ingredientsService.findByIds(ingredientIds, unitId);
+    const ingredients = await this.ingredientsService.findByIds(ingredientIds, unitId) as IngredientDocument[];
 
     if (ingredients.length !== ingredientIds.length) {
       throw new BadRequestException('Um ou mais ingredientes não foram encontrados');
@@ -127,7 +128,7 @@ export class SysProdutosService {
     // Calcular custo total
     let totalCost = 0;
     for (const dishIngredient of dishComposition.ingredients) {
-      const ingredient = ingredients.find((ing) => ing._id.toString() === dishIngredient.ingredientId);
+      const ingredient = ingredients.find((ing) => (ing as any)._id.toString() === dishIngredient.ingredientId);
       if (!ingredient) {
         throw new BadRequestException(`Ingrediente ${dishIngredient.ingredientId} não encontrado`);
       }

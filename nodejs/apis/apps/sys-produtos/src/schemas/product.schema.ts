@@ -247,7 +247,7 @@ export const ProductSchema = new Schema<Product>(
     variants: { type: [ProductVariantSchema], default: [] },
     featured: { type: Boolean, default: false, index: true },
     active: { type: Boolean, default: true, index: true },
-    type: { type: String, enum: ['product', 'dish'], default: 'product', index: true },
+    type: { type: String, enum: Object.values(ProductType), default: ProductType.PRODUCT, index: true },
     dishComposition: { type: DishCompositionSchema, required: false },
     
     // Campos adicionais migrados do projeto antigo
