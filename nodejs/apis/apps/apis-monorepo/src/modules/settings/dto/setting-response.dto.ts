@@ -48,4 +48,3 @@ export class SettingResponseDto {
   createdAt?: Date;
   updatedAt?: Date;
 }
-

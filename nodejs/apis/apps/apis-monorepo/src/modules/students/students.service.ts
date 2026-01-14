@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, ConflictException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  Logger,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Student, StudentDocument } from './schemas/student.schema';
@@ -15,7 +20,10 @@ export class StudentsService {
     @InjectModel(Student.name) private studentModel: Model<StudentDocument>,
   ) {}
 
-  async create(createStudentDto: CreateStudentDto, unitId: string): Promise<StudentResponseDto> {
+  async create(
+    createStudentDto: CreateStudentDto,
+    unitId: string,
+  ): Promise<StudentResponseDto> {
     // Verificar se já existe aluno com mesmo email na mesma unidade
     const existing = await this.studentModel.findOne({
       unitId,
@@ -23,7 +31,9 @@ export class StudentsService {
     });
 
     if (existing) {
-      throw new ConflictException('Aluno com este email já existe nesta unidade');
+      throw new ConflictException(
+        'Aluno com este email já existe nesta unidade',
+      );
     }
 
     const student = new this.studentModel({
@@ -35,7 +45,10 @@ export class StudentsService {
     return this.toResponseDto(saved);
   }
 
-  async findAll(filters: StudentFiltersDto, unitId: string): Promise<{
+  async findAll(
+    filters: StudentFiltersDto,
+    unitId: string,
+  ): Promise<{
     data: StudentResponseDto[];
     total: number;
     page: number;
@@ -69,12 +82,17 @@ export class StudentsService {
     const skip = (page - 1) * limit;
 
     const [data, total] = await Promise.all([
-      this.studentModel.find(query).skip(skip).limit(limit).sort({ createdAt: -1 }).exec(),
+      this.studentModel
+        .find(query)
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 })
+        .exec(),
       this.studentModel.countDocuments(query).exec(),
     ]);
 
     return {
-      data: data.map(item => this.toResponseDto(item)),
+      data: data.map((item) => this.toResponseDto(item)),
       total,
       page,
       limit,
@@ -89,12 +107,18 @@ export class StudentsService {
     return this.toResponseDto(student);
   }
 
-  async update(id: string, updateStudentDto: UpdateStudentDto, unitId: string): Promise<StudentResponseDto> {
-    const student = await this.studentModel.findOneAndUpdate(
-      { _id: id, unitId },
-      { $set: updateStudentDto },
-      { new: true },
-    ).exec();
+  async update(
+    id: string,
+    updateStudentDto: UpdateStudentDto,
+    unitId: string,
+  ): Promise<StudentResponseDto> {
+    const student = await this.studentModel
+      .findOneAndUpdate(
+        { _id: id, unitId },
+        { $set: updateStudentDto },
+        { new: true },
+      )
+      .exec();
 
     if (!student) {
       throw new NotFoundException(`Aluno com ID ${id} não encontrado`);
@@ -104,7 +128,9 @@ export class StudentsService {
   }
 
   async remove(id: string, unitId: string): Promise<void> {
-    const result = await this.studentModel.deleteOne({ _id: id, unitId }).exec();
+    const result = await this.studentModel
+      .deleteOne({ _id: id, unitId })
+      .exec();
     if (result.deletedCount === 0) {
       throw new NotFoundException(`Aluno com ID ${id} não encontrado`);
     }

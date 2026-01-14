@@ -16,7 +16,10 @@ import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { CustomerFiltersDto } from './dto/customer-filters.dto';
 import { UnitScope } from '../../decorators/unit-scope.decorator';
-import { CurrentUser, CurrentUserShape } from '../../decorators/current-user.decorator';
+import {
+  CurrentUser,
+  CurrentUserShape,
+} from '../../decorators/current-user.decorator';
 
 @ApiTags('customers')
 @Controller('customers')
@@ -59,10 +62,7 @@ export class CustomersController {
   }
 
   @Get(':id')
-  findOne(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
+  findOne(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     const unitId = user.unitId || user.profile?.unitId;
     if (!unitId) {
       throw new Error('unitId não encontrado no contexto do usuário');
@@ -85,10 +85,7 @@ export class CustomersController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
+  remove(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     const unitId = user.unitId || user.profile?.unitId;
     if (!unitId) {
       throw new Error('unitId não encontrado no contexto do usuário');
@@ -108,4 +105,3 @@ export class CustomersController {
     return this.customersService.getConversations(id, unitId);
   }
 }
-

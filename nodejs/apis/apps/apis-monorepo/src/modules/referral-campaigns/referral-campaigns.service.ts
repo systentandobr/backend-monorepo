@@ -6,7 +6,10 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { ReferralCampaign, ReferralCampaignDocument } from './schemas/referral-campaign.schema';
+import {
+  ReferralCampaign,
+  ReferralCampaignDocument,
+} from './schemas/referral-campaign.schema';
 import { CreateCampaignDto } from './dto/create-campaign.dto';
 import { UpdateCampaignDto } from './dto/update-campaign.dto';
 import { CampaignFiltersDto } from './dto/campaign-filters.dto';
@@ -35,7 +38,9 @@ export class ReferralCampaignsService {
     const endDate = new Date(createCampaignDto.endDate);
 
     if (startDate >= endDate) {
-      throw new BadRequestException('Data de início deve ser anterior à data de fim');
+      throw new BadRequestException(
+        'Data de início deve ser anterior à data de fim',
+      );
     }
 
     if (startDate < new Date()) {
@@ -43,8 +48,13 @@ export class ReferralCampaignsService {
     }
 
     // Validar tipo e recompensas
-    if (createCampaignDto.type === 'multi-tier' && !createCampaignDto.refereeReward) {
-      throw new BadRequestException('Campanhas multi-tier requerem refereeReward');
+    if (
+      createCampaignDto.type === 'multi-tier' &&
+      !createCampaignDto.refereeReward
+    ) {
+      throw new BadRequestException(
+        'Campanhas multi-tier requerem refereeReward',
+      );
     }
 
     // Verificar se slug já existe
@@ -90,7 +100,8 @@ export class ReferralCampaignsService {
             maxReferralsPerUser: createCampaignDto.rules.maxReferralsPerUser,
             maxReferralsTotal: createCampaignDto.rules.maxReferralsTotal,
             expirationDays: createCampaignDto.rules.expirationDays,
-            requireEmailVerification: createCampaignDto.rules.requireEmailVerification,
+            requireEmailVerification:
+              createCampaignDto.rules.requireEmailVerification,
             allowedProducts: createCampaignDto.rules.allowedProducts?.map(
               (id) => new Types.ObjectId(id),
             ),
@@ -130,10 +141,7 @@ export class ReferralCampaignsService {
       query.franchiseId = new Types.ObjectId(franchiseId);
     } else {
       // Se não especificado, mostrar campanhas globais e da franquia
-      query.$or = [
-        { franchiseId: { $exists: false } },
-        { franchiseId: null },
-      ];
+      query.$or = [{ franchiseId: { $exists: false } }, { franchiseId: null }];
     }
 
     if (filters.status) {
@@ -181,9 +189,12 @@ export class ReferralCampaignsService {
     };
   }
 
-  async findOne(id: string, franchiseId?: string): Promise<ReferralCampaignResponseDto> {
+  async findOne(
+    id: string,
+    franchiseId?: string,
+  ): Promise<ReferralCampaignResponseDto> {
     const query: any = { _id: id };
-    
+
     if (franchiseId) {
       query.$or = [
         { franchiseId: new Types.ObjectId(franchiseId) },
@@ -211,7 +222,9 @@ export class ReferralCampaignsService {
     return this.toResponseDto(campaign);
   }
 
-  async findByFranchise(franchiseId: string): Promise<ReferralCampaignResponseDto[]> {
+  async findByFranchise(
+    franchiseId: string,
+  ): Promise<ReferralCampaignResponseDto[]> {
     const campaigns = await this.campaignModel
       .find({
         $or: [
@@ -232,7 +245,7 @@ export class ReferralCampaignsService {
     franchiseId?: string,
   ): Promise<ReferralCampaignResponseDto> {
     const query: any = { _id: id };
-    
+
     if (franchiseId) {
       query.franchiseId = new Types.ObjectId(franchiseId);
     }
@@ -253,7 +266,9 @@ export class ReferralCampaignsService {
         : campaign.endDate;
 
       if (startDate >= endDate) {
-        throw new BadRequestException('Data de início deve ser anterior à data de fim');
+        throw new BadRequestException(
+          'Data de início deve ser anterior à data de fim',
+        );
       }
     }
 
@@ -263,15 +278,24 @@ export class ReferralCampaignsService {
     };
 
     // Copiar campos simples
-    if (updateCampaignDto.name !== undefined) updateData.name = updateCampaignDto.name;
-    if (updateCampaignDto.description !== undefined) updateData.description = updateCampaignDto.description;
-    if (updateCampaignDto.slug !== undefined) updateData.slug = updateCampaignDto.slug;
-    if (updateCampaignDto.type !== undefined) updateData.type = updateCampaignDto.type;
-    if (updateCampaignDto.rewardTypes !== undefined) updateData.rewardTypes = updateCampaignDto.rewardTypes;
-    if (updateCampaignDto.startDate !== undefined) updateData.startDate = new Date(updateCampaignDto.startDate);
-    if (updateCampaignDto.endDate !== undefined) updateData.endDate = new Date(updateCampaignDto.endDate);
-    if (updateCampaignDto.status !== undefined) updateData.status = updateCampaignDto.status;
-    if (updateCampaignDto.metadata !== undefined) updateData.metadata = updateCampaignDto.metadata;
+    if (updateCampaignDto.name !== undefined)
+      updateData.name = updateCampaignDto.name;
+    if (updateCampaignDto.description !== undefined)
+      updateData.description = updateCampaignDto.description;
+    if (updateCampaignDto.slug !== undefined)
+      updateData.slug = updateCampaignDto.slug;
+    if (updateCampaignDto.type !== undefined)
+      updateData.type = updateCampaignDto.type;
+    if (updateCampaignDto.rewardTypes !== undefined)
+      updateData.rewardTypes = updateCampaignDto.rewardTypes;
+    if (updateCampaignDto.startDate !== undefined)
+      updateData.startDate = new Date(updateCampaignDto.startDate);
+    if (updateCampaignDto.endDate !== undefined)
+      updateData.endDate = new Date(updateCampaignDto.endDate);
+    if (updateCampaignDto.status !== undefined)
+      updateData.status = updateCampaignDto.status;
+    if (updateCampaignDto.metadata !== undefined)
+      updateData.metadata = updateCampaignDto.metadata;
 
     // Converter referrerReward se fornecido
     if (updateCampaignDto.referrerReward) {
@@ -304,7 +328,8 @@ export class ReferralCampaignsService {
         maxReferralsPerUser: updateCampaignDto.rules.maxReferralsPerUser,
         maxReferralsTotal: updateCampaignDto.rules.maxReferralsTotal,
         expirationDays: updateCampaignDto.rules.expirationDays,
-        requireEmailVerification: updateCampaignDto.rules.requireEmailVerification,
+        requireEmailVerification:
+          updateCampaignDto.rules.requireEmailVerification,
         allowedProducts: updateCampaignDto.rules.allowedProducts?.map(
           (id) => new Types.ObjectId(id),
         ),
@@ -323,7 +348,7 @@ export class ReferralCampaignsService {
 
   async remove(id: string, franchiseId?: string): Promise<void> {
     const query: any = { _id: id };
-    
+
     if (franchiseId) {
       query.franchiseId = new Types.ObjectId(franchiseId);
     }
@@ -335,27 +360,38 @@ export class ReferralCampaignsService {
     }
   }
 
-  async activate(id: string, franchiseId?: string): Promise<ReferralCampaignResponseDto> {
+  async activate(
+    id: string,
+    franchiseId?: string,
+  ): Promise<ReferralCampaignResponseDto> {
     const campaign = await this.findOne(id, franchiseId);
-    
+
     const now = new Date();
     if (campaign.endDate < now) {
-      throw new BadRequestException('Não é possível ativar uma campanha expirada');
+      throw new BadRequestException(
+        'Não é possível ativar uma campanha expirada',
+      );
     }
 
     return this.update(id, { status: 'active' }, franchiseId);
   }
 
-  async pause(id: string, franchiseId?: string): Promise<ReferralCampaignResponseDto> {
+  async pause(
+    id: string,
+    franchiseId?: string,
+  ): Promise<ReferralCampaignResponseDto> {
     return this.update(id, { status: 'paused' }, franchiseId);
   }
 
-  async getStats(id: string, franchiseId?: string): Promise<CampaignStatsResponseDto> {
+  async getStats(
+    id: string,
+    franchiseId?: string,
+  ): Promise<CampaignStatsResponseDto> {
     const campaign = await this.findOne(id, franchiseId);
-    
+
     // TODO: Implementar cálculo real de estatísticas quando módulo de referrals estiver pronto
     // Por enquanto, retornar métricas básicas da campanha
-    
+
     return {
       campaignId: campaign.id,
       totalReferrals: campaign.metrics?.totalReferrals || 0,
@@ -370,7 +406,9 @@ export class ReferralCampaignsService {
     };
   }
 
-  async getActiveCampaigns(franchiseId?: string): Promise<ReferralCampaignResponseDto[]> {
+  async getActiveCampaigns(
+    franchiseId?: string,
+  ): Promise<ReferralCampaignResponseDto[]> {
     const now = new Date();
     const query: any = {
       status: 'active',
@@ -386,11 +424,16 @@ export class ReferralCampaignsService {
       ];
     }
 
-    const campaigns = await this.campaignModel.find(query).sort({ createdAt: -1 }).exec();
+    const campaigns = await this.campaignModel
+      .find(query)
+      .sort({ createdAt: -1 })
+      .exec();
     return campaigns.map((c) => this.toResponseDto(c));
   }
 
-  private toResponseDto(campaign: ReferralCampaignDocument): ReferralCampaignResponseDto {
+  private toResponseDto(
+    campaign: ReferralCampaignDocument,
+  ): ReferralCampaignResponseDto {
     return {
       id: campaign._id.toString(),
       franchiseId: campaign.franchiseId?.toString(),
@@ -420,8 +463,12 @@ export class ReferralCampaignsService {
             maxReferralsTotal: campaign.rules.maxReferralsTotal,
             expirationDays: campaign.rules.expirationDays,
             requireEmailVerification: campaign.rules.requireEmailVerification,
-            allowedProducts: campaign.rules.allowedProducts?.map((id) => id.toString()),
-            excludedProducts: campaign.rules.excludedProducts?.map((id) => id.toString()),
+            allowedProducts: campaign.rules.allowedProducts?.map((id) =>
+              id.toString(),
+            ),
+            excludedProducts: campaign.rules.excludedProducts?.map((id) =>
+              id.toString(),
+            ),
           }
         : undefined,
       status: campaign.status,

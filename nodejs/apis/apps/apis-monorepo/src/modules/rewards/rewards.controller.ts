@@ -11,7 +11,10 @@ import {
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { RewardsService } from './rewards.service';
 import { ProcessRewardDto } from './dto/process-reward.dto';
-import { CurrentUser, CurrentUserShape } from '../../decorators/current-user.decorator';
+import {
+  CurrentUser,
+  CurrentUserShape,
+} from '../../decorators/current-user.decorator';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 
 @ApiTags('rewards')
@@ -62,10 +65,7 @@ export class RewardsController {
   @ApiOperation({ summary: 'Detalhes da recompensa' })
   @ApiResponse({ status: 200, description: 'Recompensa encontrada' })
   @ApiResponse({ status: 404, description: 'Recompensa não encontrada' })
-  findOne(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
+  findOne(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     return this.rewardsService.findOne(id, user.id);
   }
 
@@ -75,10 +75,7 @@ export class RewardsController {
   @ApiOperation({ summary: 'Aprovar recompensa' })
   @ApiResponse({ status: 200, description: 'Recompensa aprovada' })
   @ApiResponse({ status: 404, description: 'Recompensa não encontrada' })
-  approve(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
+  approve(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     const franchiseId = user.unitId || user.profile?.unitId;
     return this.rewardsService.approve(id, user.id, franchiseId);
   }

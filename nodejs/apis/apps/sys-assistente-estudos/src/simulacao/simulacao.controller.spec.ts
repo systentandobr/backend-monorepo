@@ -9,11 +9,12 @@ describe('SimulacaoController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [SimulacaoController],
       providers: [SimulacaoService],
-    }).overrideProvider(
-      SimulacaoService,
-    ).useValue({
-      get: jest.fn(),
-    }).compile();
+    })
+      .overrideProvider(SimulacaoService)
+      .useValue({
+        get: jest.fn(),
+      })
+      .compile();
 
     controller = module.get<SimulacaoController>(SimulacaoController);
   });

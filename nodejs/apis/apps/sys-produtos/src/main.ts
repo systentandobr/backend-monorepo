@@ -3,7 +3,7 @@ import { SysProdutosModule } from './sys-produtos.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(SysProdutosModule, { cors: true });
-  
+
   // Lista de origens permitidas
   const allowedOrigins = [
     'http://localhost:3000',
@@ -35,11 +35,13 @@ async function bootstrap() {
       // Log para debug
       console.warn(`⚠️ CORS bloqueado para origem: ${origin}`);
       console.log(`📋 Origens permitidas: ${allowedOrigins.join(', ')}`);
-      
+
       // Em desenvolvimento, permitir todas as origens locais
       if (process.env.NODE_ENV !== 'production') {
         if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
-          console.log(`🔓 Permitindo origem local em desenvolvimento: ${origin}`);
+          console.log(
+            `🔓 Permitindo origem local em desenvolvimento: ${origin}`,
+          );
           return callback(null, true);
         }
       }
@@ -75,28 +77,39 @@ async function bootstrap() {
   const expressApp = app.getHttpAdapter().getInstance();
   expressApp.use((req: any, res: any, next: any) => {
     const origin = req.headers.origin;
-    
-    if (origin && (allowedOrigins.includes(origin) || origin.includes('localhost') || origin.includes('127.0.0.1'))) {
+
+    if (
+      origin &&
+      (allowedOrigins.includes(origin) ||
+        origin.includes('localhost') ||
+        origin.includes('127.0.0.1'))
+    ) {
       res.setHeader('Access-Control-Allow-Origin', origin);
       res.setHeader('Access-Control-Allow-Credentials', 'true');
     }
-    
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD');
-    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control, Pragma, Expires, x-api-key, x-domain, If-None-Match, If-Modified-Since');
+
+    res.setHeader(
+      'Access-Control-Allow-Methods',
+      'GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD',
+    );
+    res.setHeader(
+      'Access-Control-Allow-Headers',
+      'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control, Pragma, Expires, x-api-key, x-domain, If-None-Match, If-Modified-Since',
+    );
     res.setHeader('Access-Control-Max-Age', '86400');
-    
+
     // Responder imediatamente para requisições OPTIONS
     if (req.method === 'OPTIONS') {
       return res.status(204).send();
     }
-    
+
     next();
   });
-  
+
   const port = process.env.PORT || 9090;
   await app.listen(port);
   console.log(`🚀 Sys Produtos API rodando na porta ${port}`);
   console.log(`🌐 CORS configurado para as seguintes origens:`);
-  allowedOrigins.forEach(origin => console.log(`   - ${origin}`));
+  allowedOrigins.forEach((origin) => console.log(`   - ${origin}`));
 }
 bootstrap();

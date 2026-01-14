@@ -35,4 +35,4 @@ export class Game {
   updatedAt?: Date;
 }
 
-export const GameSchema = SchemaFactory.createForClass(Game); 
+export const GameSchema = SchemaFactory.createForClass(Game);

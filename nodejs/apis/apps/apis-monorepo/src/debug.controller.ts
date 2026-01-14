@@ -10,7 +10,7 @@ export class DebugController {
   @Get('info')
   async getDebugInfo() {
     const axios = require('axios');
-    
+
     let publicIp = 'Não foi possível obter';
     try {
       const response = await axios.get('https://api.ipify.org?format=json');
@@ -23,9 +23,15 @@ export class DebugController {
       timestamp: new Date().toISOString(),
       environment: {
         NODE_ENV: this.configService.get('NODE_ENV'),
-        USER_DB: this.configService.get('USER_DB') ? 'DEFINIDA' : 'NÃO DEFINIDA',
-        PASS_DB: this.configService.get('PASS_DB') ? 'DEFINIDA' : 'NÃO DEFINIDA',
-        HOST_DB: this.configService.get('HOST_DB') ? 'DEFINIDA' : 'NÃO DEFINIDA',
+        USER_DB: this.configService.get('USER_DB')
+          ? 'DEFINIDA'
+          : 'NÃO DEFINIDA',
+        PASS_DB: this.configService.get('PASS_DB')
+          ? 'DEFINIDA'
+          : 'NÃO DEFINIDA',
+        HOST_DB: this.configService.get('HOST_DB')
+          ? 'DEFINIDA'
+          : 'NÃO DEFINIDA',
       },
       network: {
         publicIp,
@@ -33,10 +39,10 @@ export class DebugController {
         platform: require('os').platform(),
       },
       mongodb: {
-        connectionString: this.configService.get('HOST_DB') ? 
-          `mongodb+srv://${this.configService.get('USER_DB')}:***@${this.configService.get('HOST_DB')}/` : 
-          'NÃO CONFIGURADA'
-      }
+        connectionString: this.configService.get('HOST_DB')
+          ? `mongodb+srv://${this.configService.get('USER_DB')}:***@${this.configService.get('HOST_DB')}/`
+          : 'NÃO CONFIGURADA',
+      },
     };
   }
 
@@ -45,7 +51,7 @@ export class DebugController {
     return {
       status: 'ok',
       timestamp: new Date().toISOString(),
-      service: 'apis-monorepo'
+      service: 'apis-monorepo',
     };
   }
-} 
+}

@@ -1,20 +1,29 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl, Min, Max } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUrl,
+  Min,
+  Max,
+} from 'class-validator';
 
-export type AffiliatePlatform = 
-  | 'shopee' 
-  | 'amazon' 
-  | 'magalu' 
-  | 'mercadolivre' 
-  | 'americanas' 
-  | 'casasbahia' 
+export type AffiliatePlatform =
+  | 'shopee'
+  | 'amazon'
+  | 'magalu'
+  | 'mercadolivre'
+  | 'americanas'
+  | 'casasbahia'
   | 'other';
 
-export type ProcessingStatus = 
-  | 'pending' 
-  | 'processing' 
-  | 'completed' 
-  | 'failed' 
+export type ProcessingStatus =
+  | 'pending'
+  | 'processing'
+  | 'completed'
+  | 'failed'
   | 'retrying';
 
 export class CreateAffiliateProductDto {
@@ -28,8 +37,26 @@ export class CreateAffiliateProductDto {
   @IsNotEmpty()
   affiliateUrl: string;
 
-  @ApiProperty({ enum: ['shopee', 'amazon', 'magalu', 'mercadolivre', 'americanas', 'casasbahia', 'other'] })
-  @IsEnum(['shopee', 'amazon', 'magalu', 'mercadolivre', 'americanas', 'casasbahia', 'other'])
+  @ApiProperty({
+    enum: [
+      'shopee',
+      'amazon',
+      'magalu',
+      'mercadolivre',
+      'americanas',
+      'casasbahia',
+      'other',
+    ],
+  })
+  @IsEnum([
+    'shopee',
+    'amazon',
+    'magalu',
+    'mercadolivre',
+    'americanas',
+    'casasbahia',
+    'other',
+  ])
   @IsOptional()
   platform?: AffiliatePlatform;
 }
@@ -45,7 +72,10 @@ export class UpdateAffiliateProductDto {
   @IsOptional()
   affiliateUrl?: string;
 
-  @ApiProperty({ enum: ['pending', 'processing', 'completed', 'failed', 'retrying'], required: false })
+  @ApiProperty({
+    enum: ['pending', 'processing', 'completed', 'failed', 'retrying'],
+    required: false,
+  })
   @IsEnum(['pending', 'processing', 'completed', 'failed', 'retrying'])
   @IsOptional()
   processingStatus?: ProcessingStatus;
@@ -63,7 +93,15 @@ export class QueryAffiliateProductDto {
   status?: ProcessingStatus;
 
   @ApiProperty({ required: false })
-  @IsEnum(['shopee', 'amazon', 'magalu', 'mercadolivre', 'americanas', 'casasbahia', 'other'])
+  @IsEnum([
+    'shopee',
+    'amazon',
+    'magalu',
+    'mercadolivre',
+    'americanas',
+    'casasbahia',
+    'other',
+  ])
   @IsOptional()
   platform?: AffiliatePlatform;
 
@@ -85,4 +123,3 @@ export class QueryAffiliateProductDto {
   @IsOptional()
   limit?: number;
 }
-

@@ -1,29 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types, Schema as MongooseSchema } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
-export type SettingDocument = Setting & Document & {
-  createdAt?: Date;
-  updatedAt?: Date;
-};
+export type SettingDocument = Setting &
+  Document & {
+    createdAt?: Date;
+    updatedAt?: Date;
+  };
 
-// Sub-schema para location (mesmo do franchise)
-const LocationSchema = new MongooseSchema({
-  lat: { type: Number, required: true },
-  lng: { type: Number, required: true },
-  address: { type: String, required: true },
-  city: { type: String, required: true },
-  state: { type: String, required: true },
-  zipCode: { type: String, required: true },
-  type: { type: String, enum: ['physical', 'digital'], required: true },
-}, { _id: false });
-
-// Sub-schema para territory (mesmo do franchise)
-const TerritorySchema = new MongooseSchema({
-  city: { type: String, required: true },
-  state: { type: String, required: true },
-  exclusive: { type: Boolean, default: true },
-  radius: { type: Number },
-}, { _id: false });
+// Sub-schemas para location e territory podem ser definidos aqui se necessário no futuro
+// Por enquanto, são definidos inline no schema principal
 
 @Schema({
   timestamps: true,
@@ -98,4 +83,3 @@ export const SettingSchema = SchemaFactory.createForClass(Setting);
 // Índices para performance
 SettingSchema.index({ unitId: 1 }, { unique: true });
 SettingSchema.index({ franchiseId: 1 });
-

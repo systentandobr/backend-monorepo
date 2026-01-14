@@ -6,7 +6,7 @@ import { Concurso } from './model/concurso.schema';
 @ApiTags('sys-assistente-estudos')
 @Controller('concursos')
 export class ConcursoController {
-  constructor(private readonly concursoService: ConcursoService) { }
+  constructor(private readonly concursoService: ConcursoService) {}
 
   @Post()
   create(@Body() createConcursoDto: any): Promise<Concurso> {

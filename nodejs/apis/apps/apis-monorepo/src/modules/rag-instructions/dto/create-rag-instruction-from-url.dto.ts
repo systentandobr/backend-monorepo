@@ -1,29 +1,35 @@
-import { IsString, IsObject, IsBoolean, IsOptional, IsUrl } from 'class-validator';
+import {
+  IsString,
+  IsObject,
+  IsBoolean,
+  IsOptional,
+  IsUrl,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateRagInstructionFromUrlDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'URL para extrair conteúdo e criar instruções RAG',
-    example: 'https://example.com/manual-produtos.pdf'
+    example: 'https://example.com/manual-produtos.pdf',
   })
   @IsUrl({}, { message: 'URL inválida' })
   url: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Título ou descrição das instruções',
-    example: 'Manual de Produtos - Extraído de URL'
+    example: 'Manual de Produtos - Extraído de URL',
   })
   @IsOptional()
   @IsString()
   title?: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Contexto adicional com dados específicos da unidade',
     example: {
       products: [],
       campaigns: [],
-      customers: []
-    }
+      customers: [],
+    },
   })
   @IsOptional()
   @IsObject()
@@ -35,14 +41,14 @@ export class CreateRagInstructionFromUrlDto {
     [key: string]: any;
   };
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Metadados sobre as instruções',
     example: {
       version: '1.0.0',
       author: 'admin',
       description: 'Instruções extraídas de URL',
-      tags: ['url', 'manual']
-    }
+      tags: ['url', 'manual'],
+    },
   })
   @IsOptional()
   @IsObject()
@@ -54,14 +60,17 @@ export class CreateRagInstructionFromUrlDto {
     [key: string]: any;
   };
 
-  @ApiPropertyOptional({ description: 'Se as instruções estão ativas', default: true })
+  @ApiPropertyOptional({
+    description: 'Se as instruções estão ativas',
+    default: true,
+  })
   @IsOptional()
   @IsBoolean()
   active?: boolean;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Se deve indexar automaticamente no RAG após processamento',
-    default: true
+    default: true,
   })
   @IsOptional()
   @IsBoolean()

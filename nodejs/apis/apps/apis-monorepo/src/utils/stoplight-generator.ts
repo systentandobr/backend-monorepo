@@ -20,10 +20,14 @@ export class StoplightGenerator {
     <style>
         body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
         elements-api { height: 100vh; display: block; }
-        ${config.theme === 'dark' ? `
+        ${
+          config.theme === 'dark'
+            ? `
         body { background-color: #1a1a1a; color: #ffffff; }
         elements-api { --sl-color-canvas-100: #1a1a1a; }
-        ` : ''}
+        `
+            : ''
+        }
     </style>
 </head>
 <body>

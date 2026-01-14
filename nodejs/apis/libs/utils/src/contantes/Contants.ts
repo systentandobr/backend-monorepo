@@ -1,4 +1,4 @@
-import { env } from "process";
+import { env } from 'process';
 
 export class Constants {
   static readonly ERRO_DESCONHECIDO = 'Erro desconhecido';
@@ -13,6 +13,5 @@ export class Constants {
 }
 
 export const jwtConstants = {
-  secret:
-    env.JWT_SECRET || 'secret_id',
+  secret: env.JWT_SECRET || 'secret_id',
 };

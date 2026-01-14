@@ -7,13 +7,14 @@ import { ProductivityGoal } from './schemas/productivity-goal.schema';
 @Injectable()
 export class ProductivityService {
   constructor(
-    @InjectModel(ProductivityGoal.name) private productivityGoalModel: Model<ProductivityGoal>,
+    @InjectModel(ProductivityGoal.name)
+    private productivityGoalModel: Model<ProductivityGoal>,
   ) {}
 
   async getProductivityGoals(): Promise<ApiResponse<any[]>> {
     try {
       const goals = await this.productivityGoalModel.find().exec();
-      
+
       return {
         success: true,
         data: goals,
@@ -31,7 +32,7 @@ export class ProductivityService {
   async getProductivityGoal(id: string): Promise<ApiResponse<any>> {
     try {
       const goal = await this.productivityGoalModel.findById(id).exec();
-      
+
       if (!goal) {
         return {
           success: false,
@@ -78,16 +79,21 @@ export class ProductivityService {
     }
   }
 
-  async updateGoalProgress(id: string, progress: number): Promise<ApiResponse<any>> {
+  async updateGoalProgress(
+    id: string,
+    progress: number,
+  ): Promise<ApiResponse<any>> {
     try {
-      const goal = await this.productivityGoalModel.findByIdAndUpdate(
-        id,
-        {
-          progress,
-          updatedAt: new Date().toISOString(),
-        },
-        { new: true }
-      ).exec();
+      const goal = await this.productivityGoalModel
+        .findByIdAndUpdate(
+          id,
+          {
+            progress,
+            updatedAt: new Date().toISOString(),
+          },
+          { new: true },
+        )
+        .exec();
 
       if (!goal) {
         return {
@@ -114,10 +120,11 @@ export class ProductivityService {
   async getProductivityAnalytics(): Promise<ApiResponse<any>> {
     try {
       const goals = await this.productivityGoalModel.find().exec();
-      
+
       const totalGoals = goals.length;
-      const completedGoals = goals.filter(g => g.progress === 100).length;
-      const avgProgress = goals.reduce((acc, g) => acc + g.progress, 0) / goals.length || 0;
+      const completedGoals = goals.filter((g) => g.progress === 100).length;
+      const avgProgress =
+        goals.reduce((acc, g) => acc + g.progress, 0) / goals.length || 0;
 
       return {
         success: true,
@@ -125,7 +132,8 @@ export class ProductivityService {
           total_goals: totalGoals,
           completed_goals: completedGoals,
           average_progress: avgProgress,
-          completion_rate: totalGoals > 0 ? (completedGoals / totalGoals) * 100 : 0,
+          completion_rate:
+            totalGoals > 0 ? (completedGoals / totalGoals) * 100 : 0,
         },
         timestamp: new Date().toISOString(),
       };
@@ -137,4 +145,4 @@ export class ProductivityService {
       };
     }
   }
-} 
+}

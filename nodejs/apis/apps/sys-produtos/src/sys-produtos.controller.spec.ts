@@ -11,7 +11,9 @@ describe('SysProdutosController', () => {
       providers: [SysProdutosService],
     }).compile();
 
-    sysProdutosController = app.get<SysProdutosController>(SysProdutosController);
+    sysProdutosController = app.get<SysProdutosController>(
+      SysProdutosController,
+    );
   });
 
   describe('root', () => {

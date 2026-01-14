@@ -22,7 +22,7 @@ export class DomainInterceptor implements NestInterceptor {
     if (domain) {
       // Adicionar domain ao request para uso nos controllers/services
       request.domain = domain;
-      
+
       // Também adicionar ao user para facilitar acesso
       if (request.user) {
         request.user.domain = domain;
@@ -36,4 +36,3 @@ export class DomainInterceptor implements NestInterceptor {
     return next.handle();
   }
 }
-

@@ -4,7 +4,10 @@ import { HealthController } from './health.controller';
 import { HealthService } from './health.service';
 import { HealthPlan, HealthPlanSchema } from './schemas/health-plan.schema';
 import { LatestLabs, LatestLabsSchema } from './schemas/latest-labs.schema';
-import { DietParameters, DietParametersSchema } from './schemas/diet-parameters.schema';
+import {
+  DietParameters,
+  DietParametersSchema,
+} from './schemas/diet-parameters.schema';
 import { Recipe, RecipeSchema } from './schemas/recipe.schema';
 
 @Module({
@@ -20,4 +23,4 @@ import { Recipe, RecipeSchema } from './schemas/recipe.schema';
   providers: [HealthService],
   exports: [HealthService],
 })
-export class HealthModule {} 
+export class HealthModule {}

@@ -12,14 +12,15 @@ export class HealthService {
   constructor(
     @InjectModel(HealthPlan.name) private healthPlanModel: Model<HealthPlan>,
     @InjectModel(LatestLabs.name) private latestLabsModel: Model<LatestLabs>,
-    @InjectModel(DietParameters.name) private dietParametersModel: Model<DietParameters>,
+    @InjectModel(DietParameters.name)
+    private dietParametersModel: Model<DietParameters>,
     @InjectModel(Recipe.name) private recipeModel: Model<Recipe>,
   ) {}
 
   async loadHealthPlan(): Promise<ApiResponse<any>> {
     try {
       const healthPlan = await this.healthPlanModel.findOne().exec();
-      
+
       return {
         success: true,
         data: healthPlan || {},
@@ -51,7 +52,10 @@ export class HealthService {
     }
   }
 
-  async markMeal(mealData: { day: string; meal: string }): Promise<ApiResponse<any>> {
+  async markMeal(mealData: {
+    day: string;
+    meal: string;
+  }): Promise<ApiResponse<any>> {
     try {
       // Implementação para marcar refeição
       return {
@@ -71,7 +75,7 @@ export class HealthService {
   async getLatestLabs(): Promise<ApiResponse<any>> {
     try {
       const labs = await this.latestLabsModel.findOne().exec();
-      
+
       return {
         success: true,
         data: labs || {},
@@ -89,7 +93,7 @@ export class HealthService {
   async getDietParameters(): Promise<ApiResponse<any>> {
     try {
       const dietParams = await this.dietParametersModel.findOne().exec();
-      
+
       return {
         success: true,
         data: dietParams || {},
@@ -107,7 +111,7 @@ export class HealthService {
   async getRecipes(): Promise<ApiResponse<any[]>> {
     try {
       const recipes = await this.recipeModel.find().exec();
-      
+
       return {
         success: true,
         data: recipes,
@@ -125,7 +129,7 @@ export class HealthService {
   async getRecipe(id: string): Promise<ApiResponse<any>> {
     try {
       const recipe = await this.recipeModel.findById(id).exec();
-      
+
       if (!recipe) {
         return {
           success: false,
@@ -181,4 +185,4 @@ export class HealthService {
       };
     }
   }
-} 
+}

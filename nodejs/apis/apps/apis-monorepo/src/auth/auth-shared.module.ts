@@ -25,4 +25,3 @@ import { DomainInterceptor } from '../interceptors/domain.interceptor';
   ],
 })
 export class AuthSharedModule {}
-

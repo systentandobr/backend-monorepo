@@ -1,14 +1,22 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, FilterQuery } from 'mongoose';
 import { CATEGORY_COLLECTION, Category } from '../schemas/category.schema';
-import { CreateCategoryDto, UpdateCategoryDto, QueryCategoryDto } from '../dto/category.dto';
+import {
+  CreateCategoryDto,
+  UpdateCategoryDto,
+  QueryCategoryDto,
+} from '../dto/category.dto';
 import { PRODUCT_COLLECTION, Product } from '../schemas/product.schema';
 
 @Injectable()
 export class CategoryService {
   constructor(
-    @InjectModel(CATEGORY_COLLECTION) 
+    @InjectModel(CATEGORY_COLLECTION)
     private readonly categoryModel: Model<Category>,
     @InjectModel(PRODUCT_COLLECTION)
     private readonly productModel: Model<Product>,
@@ -81,7 +89,7 @@ export class CategoryService {
           ...category,
           productCount: count,
         };
-      })
+      }),
     );
 
     return categoriesWithCount;
@@ -135,15 +143,17 @@ export class CategoryService {
     // Se o nome mudou, atualizar slug
     if (dto.name) {
       const newSlug = this.slugify(dto.name);
-      const existing = await this.categoryModel.findOne({ 
-        slug: newSlug, 
-        _id: { $ne: id } 
-      }).lean();
-      
+      const existing = await this.categoryModel
+        .findOne({
+          slug: newSlug,
+          _id: { $ne: id },
+        })
+        .lean();
+
       if (existing) {
         throw new BadRequestException('Categoria com este nome já existe');
       }
-      
+
       update.slug = newSlug;
     }
 
@@ -174,7 +184,7 @@ export class CategoryService {
 
     if (productCount > 0) {
       throw new BadRequestException(
-        `Não é possível excluir categoria com ${productCount} produto(s) associado(s)`
+        `Não é possível excluir categoria com ${productCount} produto(s) associado(s)`,
       );
     }
 
@@ -182,4 +192,3 @@ export class CategoryService {
     return { success: true };
   }
 }
-

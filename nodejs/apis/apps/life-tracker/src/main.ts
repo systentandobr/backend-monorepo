@@ -14,8 +14,7 @@ async function bootstrap() {
   // Configuração do CORS
   app.enableCors({
     origin: [
-      process.env.FRONTEND_URL ||
-      'http://localhost:3000',
+      process.env.FRONTEND_URL || 'http://localhost:3000',
       'http://localhost:3001',
       'http://localhost:3002',
       'http://localhost:3003',
@@ -45,11 +44,13 @@ async function bootstrap() {
   });
 
   // Validação global
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
   // Prefixo global da API
   app.setGlobalPrefix('api');
@@ -58,8 +59,12 @@ async function bootstrap() {
   await app.listen(port);
 
   console.log(`🚀 Life Tracker API rodando na porta ${port}`);
-  console.log(`📊 Health check: http://localhost:${port}/api/life-tracker/health`);
-  console.log(`📋 Dashboard: http://localhost:${port}/api/life-tracker/dashboard-summary`);
+  console.log(
+    `📊 Health check: http://localhost:${port}/api/life-tracker/health`,
+  );
+  console.log(
+    `📋 Dashboard: http://localhost:${port}/api/life-tracker/dashboard-summary`,
+  );
 }
 
 bootstrap();

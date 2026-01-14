@@ -5,10 +5,19 @@ import { GamificationService } from './gamification.service';
 import { PointsService } from './points.service';
 import { AchievementService } from './achievement.service';
 import { HabitListener } from './listeners/habit.listener';
-import { GamificationProfile, GamificationProfileSchema } from './schemas/gamification-profile.schema';
+import {
+  GamificationProfile,
+  GamificationProfileSchema,
+} from './schemas/gamification-profile.schema';
 import { Achievement, AchievementSchema } from './schemas/achievement.schema';
-import { UserAchievement, UserAchievementSchema } from './schemas/user-achievement.schema';
-import { PointTransaction, PointTransactionSchema } from './schemas/point-transaction.schema';
+import {
+  UserAchievement,
+  UserAchievementSchema,
+} from './schemas/user-achievement.schema';
+import {
+  PointTransaction,
+  PointTransactionSchema,
+} from './schemas/point-transaction.schema';
 
 @Module({
   imports: [
@@ -20,7 +29,12 @@ import { PointTransaction, PointTransactionSchema } from './schemas/point-transa
     ]),
   ],
   controllers: [GamificationController],
-  providers: [GamificationService, PointsService, AchievementService, HabitListener],
+  providers: [
+    GamificationService,
+    PointsService,
+    AchievementService,
+    HabitListener,
+  ],
   exports: [GamificationService, PointsService, AchievementService],
 })
-export class GamificationModule {} 
+export class GamificationModule {}

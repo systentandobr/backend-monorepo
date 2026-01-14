@@ -38,18 +38,25 @@ export class CatalogProductService {
 
     // Criar produto
     const product = await this.sysProdutosService.create(unitId, produtoDto);
-    const productId = (product as any)?._id?.toString() || (product as any)?.id?.toString();
-    
+    const productId =
+      (product as any)?._id?.toString() || (product as any)?.id?.toString();
+
     if (!productId) {
-      throw new BadRequestException('Não foi possível obter o ID do produto criado');
+      throw new BadRequestException(
+        'Não foi possível obter o ID do produto criado',
+      );
     }
 
     // Buscar ou criar catálogo padrão para o unitId
-    const catalog = await this.catalogService.findOrCreateDefaultCatalog(unitId, userId);
-    
+    const catalog = await this.catalogService.findOrCreateDefaultCatalog(
+      unitId,
+      userId,
+    );
+
     // Obter catalogId de forma segura (pode ser id ou _id dependendo de como foi retornado)
-    const catalogId = (catalog as any)?._id?.toString() || (catalog as any)?.id?.toString();
-    
+    const catalogId =
+      (catalog as any)?._id?.toString() || (catalog as any)?.id?.toString();
+
     if (!catalogId) {
       throw new BadRequestException('Não foi possível obter o ID do catálogo');
     }
@@ -69,7 +76,10 @@ export class CatalogProductService {
             );
           } catch (error) {
             // Log erro mas não falha a criação do produto
-            console.error(`Erro ao associar imagem ${imageRef.hashId} ao produto:`, error);
+            console.error(
+              `Erro ao associar imagem ${imageRef.hashId} ao produto:`,
+              error,
+            );
           }
         }
       }
@@ -82,4 +92,3 @@ export class CatalogProductService {
     };
   }
 }
-

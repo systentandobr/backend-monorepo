@@ -28,7 +28,13 @@ export class RewardResponseDto {
   type: 'cashback' | 'discount' | 'points' | 'physical';
   value: number;
   currency?: string;
-  status: 'pending' | 'processing' | 'approved' | 'paid' | 'cancelled' | 'expired';
+  status:
+    | 'pending'
+    | 'processing'
+    | 'approved'
+    | 'paid'
+    | 'cancelled'
+    | 'expired';
   details?: RewardDetailsResponseDto;
   processing?: RewardProcessingResponseDto;
   metadata?: Record<string, any>;

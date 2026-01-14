@@ -5,7 +5,9 @@ import { SysAssistenteEstudosService } from './sys-assistente-estudos.service';
 @ApiTags('sys-assistente-estudos')
 @Controller()
 export class SysAssistenteEstudosController {
-  constructor(private readonly sysAssistenteEstudosService: SysAssistenteEstudosService) {}
+  constructor(
+    private readonly sysAssistenteEstudosService: SysAssistenteEstudosService,
+  ) {}
 
   @Get()
   getHello(): string {

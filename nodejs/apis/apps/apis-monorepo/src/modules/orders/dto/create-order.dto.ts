@@ -1,4 +1,14 @@
-import { IsString, IsEmail, IsOptional, IsNumber, Min, IsEnum, IsArray, ValidateNested, IsObject } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsOptional,
+  IsNumber,
+  Min,
+  IsEnum,
+  IsArray,
+  ValidateNested,
+  IsObject,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 class OrderItemDto {
@@ -82,4 +92,3 @@ export class CreateOrderDto {
   @IsString()
   referralCode?: string; // Código de indicação usado no checkout
 }
-

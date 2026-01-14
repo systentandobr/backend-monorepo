@@ -23,19 +23,20 @@ describe('QuestionController', () => {
       ],
       controllers: [QuestionController],
       providers: [QuestionService, QuestionsRepository],
-
-    }).overrideProvider(QuestionService).useValue({
-      findAll: jest.fn(),
-      findOne: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      updateCorrectQuestion: jest.fn(),
-      updateInCorrectQuestion: jest.fn(),
-      explain: jest.fn(),
-      remove: jest.fn(),
-      deleteAll: jest.fn(),
-    }).compile();
-
+    })
+      .overrideProvider(QuestionService)
+      .useValue({
+        findAll: jest.fn(),
+        findOne: jest.fn(),
+        create: jest.fn(),
+        update: jest.fn(),
+        updateCorrectQuestion: jest.fn(),
+        updateInCorrectQuestion: jest.fn(),
+        explain: jest.fn(),
+        remove: jest.fn(),
+        deleteAll: jest.fn(),
+      })
+      .compile();
 
     service = module.get<QuestionService>(QuestionsRepository);
   });

@@ -11,7 +11,7 @@ export class LifeTrackerService {
         generated_at: new Date().toISOString(),
         locale: 'pt-BR',
         // Dados do plano integrado
-      }
+      },
     };
   }
 
@@ -24,7 +24,7 @@ export class LifeTrackerService {
         completed_today: 0,
         weekly_progress: 0,
         // Outros dados do dashboard
-      }
+      },
     };
   }
 
@@ -37,7 +37,7 @@ export class LifeTrackerService {
         finances: { progress: 0, goals: [] },
         business: { progress: 0, goals: [] },
         productivity: { progress: 0, goals: [] },
-      }
+      },
     };
   }
-} 
+}

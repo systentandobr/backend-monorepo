@@ -13,9 +13,13 @@ export class PointTransaction {
 
   @Prop({
     required: true,
-    enum: ['HABIT_COMPLETION', 'ROUTINE_COMPLETION', 'ACHIEVEMENT', 'BONUS']    
+    enum: ['HABIT_COMPLETION', 'ROUTINE_COMPLETION', 'ACHIEVEMENT', 'BONUS'],
   })
-  sourceType: 'HABIT_COMPLETION' | 'ROUTINE_COMPLETION' | 'ACHIEVEMENT' | 'BONUS';
+  sourceType:
+    | 'HABIT_COMPLETION'
+    | 'ROUTINE_COMPLETION'
+    | 'ACHIEVEMENT'
+    | 'BONUS';
 
   @Prop({ required: true })
   sourceId: string;
@@ -30,7 +34,8 @@ export class PointTransaction {
   updatedAt?: Date;
 }
 
-export const PointTransactionSchema = SchemaFactory.createForClass(PointTransaction);
+export const PointTransactionSchema =
+  SchemaFactory.createForClass(PointTransaction);
 
 // Índice para consultas por usuário
 PointTransactionSchema.index({ userId: 1, createdAt: -1 });

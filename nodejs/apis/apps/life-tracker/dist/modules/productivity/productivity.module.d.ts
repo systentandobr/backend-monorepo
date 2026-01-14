@@ -1,2 +1,1 @@
-export declare class ProductivityModule {
-}
+export declare class ProductivityModule {}

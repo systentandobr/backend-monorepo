@@ -3,7 +3,8 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateUserUnitDto {
   @ApiProperty({
-    description: 'ID da unidade/franquia a ser associada ao usuário. Use null ou string vazia para remover a associação.',
+    description:
+      'ID da unidade/franquia a ser associada ao usuário. Use null ou string vazia para remover a associação.',
     example: 'FR-001',
     required: false,
   })
@@ -12,4 +13,3 @@ export class UpdateUserUnitDto {
   @IsString({ message: 'unitId deve ser uma string' })
   unitId?: string | null;
 }
-

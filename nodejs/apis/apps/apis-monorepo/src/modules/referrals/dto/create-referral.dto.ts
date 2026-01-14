@@ -1,10 +1,4 @@
-import {
-  IsString,
-  IsMongoId,
-  IsOptional,
-  IsEnum,
-  IsObject,
-} from 'class-validator';
+import { IsMongoId, IsOptional, IsEnum, IsObject } from 'class-validator';
 
 export class CreateReferralDto {
   @IsMongoId()

@@ -34,7 +34,12 @@ export interface ProductMetadata {
   category: string;
 }
 
-export type VisitSource = 'search' | 'category' | 'related' | 'featured' | 'direct';
+export type VisitSource =
+  | 'search'
+  | 'category'
+  | 'related'
+  | 'featured'
+  | 'direct';
 
 export interface VisitedProduct extends Document {
   unitId?: string; // Multi-tenancy: opcional
@@ -210,5 +215,3 @@ SearchHistorySchema.index({ unitId: 1, userId: 1 });
 export const NAVIGATION_SESSION_COLLECTION = 'NavigationSession';
 export const VISITED_PRODUCT_COLLECTION = 'VisitedProduct';
 export const SEARCH_HISTORY_COLLECTION = 'SearchHistory';
-
-

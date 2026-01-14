@@ -16,7 +16,10 @@ import { ExercisesService } from './exercises.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
 import { UnitScope } from '../../decorators/unit-scope.decorator';
-import { CurrentUser, CurrentUserShape } from '../../decorators/current-user.decorator';
+import {
+  CurrentUser,
+  CurrentUserShape,
+} from '../../decorators/current-user.decorator';
 
 @ApiTags('exercises')
 @Controller('exercises')
@@ -32,7 +35,9 @@ export class ExercisesController {
   ) {
     const unitId = user.unitId || user.profile?.unitId;
     if (!unitId) {
-      throw new BadRequestException('unitId não encontrado no contexto do usuário');
+      throw new BadRequestException(
+        'unitId não encontrado no contexto do usuário',
+      );
     }
     return this.exercisesService.create(createExerciseDto, unitId);
   }
@@ -48,7 +53,9 @@ export class ExercisesController {
   ) {
     const unitId = user.unitId || user.profile?.unitId;
     if (!unitId) {
-      throw new BadRequestException('unitId não encontrado no contexto do usuário');
+      throw new BadRequestException(
+        'unitId não encontrado no contexto do usuário',
+      );
     }
     return this.exercisesService.findAll(
       { search, muscleGroup, equipment, difficulty, targetGender },
@@ -57,13 +64,12 @@ export class ExercisesController {
   }
 
   @Get(':id')
-  findOne(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
+  findOne(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     const unitId = user.unitId || user.profile?.unitId;
     if (!unitId) {
-      throw new BadRequestException('unitId não encontrado no contexto do usuário');
+      throw new BadRequestException(
+        'unitId não encontrado no contexto do usuário',
+      );
     }
     return this.exercisesService.findOne(id, unitId);
   }
@@ -76,20 +82,21 @@ export class ExercisesController {
   ) {
     const unitId = user.unitId || user.profile?.unitId;
     if (!unitId) {
-      throw new BadRequestException('unitId não encontrado no contexto do usuário');
+      throw new BadRequestException(
+        'unitId não encontrado no contexto do usuário',
+      );
     }
     return this.exercisesService.update(id, updateExerciseDto, unitId);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
+  remove(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     const unitId = user.unitId || user.profile?.unitId;
     if (!unitId) {
-      throw new BadRequestException('unitId não encontrado no contexto do usuário');
+      throw new BadRequestException(
+        'unitId não encontrado no contexto do usuário',
+      );
     }
     return this.exercisesService.remove(id, unitId);
   }

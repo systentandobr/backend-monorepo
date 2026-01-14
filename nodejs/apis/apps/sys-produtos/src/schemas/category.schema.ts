@@ -18,7 +18,7 @@ export const CategorySchema = new Schema<Category>(
     isActive: { type: Boolean, default: true, index: true },
     productCount: { type: Number, default: 0 },
   },
-  { timestamps: true, versionKey: false }
+  { timestamps: true, versionKey: false },
 );
 
 // Índices
@@ -26,4 +26,3 @@ CategorySchema.index({ name: 1, isActive: 1 });
 CategorySchema.index({ slug: 1 });
 
 export const CATEGORY_COLLECTION = 'Category';
-

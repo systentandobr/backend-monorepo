@@ -6,7 +6,7 @@ import { TemaEspecifico } from './model/temaEspecifico.schema';
 @ApiTags('sys-assistente-estudos')
 @Controller('temas-especificos')
 export class TemaespecificoController {
-  constructor(private readonly temaEspecificoService: TemaespecificoService) { }
+  constructor(private readonly temaEspecificoService: TemaespecificoService) {}
 
   @Post()
   create(@Body() createTemaEspecificoDto: any): Promise<TemaEspecifico> {
@@ -19,13 +19,19 @@ export class TemaespecificoController {
   }
 
   @Get('concurso/:concursoId/user/:userId')
-  @Get('concurso/:concursoId/user/:userId/filterOpenQuestions/:filterOpenQuestions')
+  @Get(
+    'concurso/:concursoId/user/:userId/filterOpenQuestions/:filterOpenQuestions',
+  )
   findByUserId(
     @Param('concursoId') concursoId: string,
     @Param('userId') userId: string,
     @Param('filterOpenQuestions') filterOpenQuestions: boolean,
   ): Promise<TemaEspecifico[]> {
-    return this.temaEspecificoService.findByTemaEspecificoUserId(concursoId, userId, filterOpenQuestions);
+    return this.temaEspecificoService.findByTemaEspecificoUserId(
+      concursoId,
+      userId,
+      filterOpenQuestions,
+    );
   }
 
   @Get(':id')
@@ -37,5 +43,4 @@ export class TemaespecificoController {
   deleteAll(): Promise<void> {
     return this.temaEspecificoService.deleteAll();
   }
-
 }

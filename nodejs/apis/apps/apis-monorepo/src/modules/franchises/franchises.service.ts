@@ -1,24 +1,40 @@
-import { Injectable, NotFoundException, ConflictException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  Logger,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Franchise, FranchiseDocument } from './schemas/franchise.schema';
 import { CreateFranchiseDto } from './dto/create-franchise.dto';
 import { UpdateFranchiseDto } from './dto/update-franchise.dto';
-import { FranchiseFiltersDto, FranchiseResponseDto, FranchiseMetricsDto, RegionalTrendDto } from './dto/franchise-response.dto';
+import {
+  FranchiseFiltersDto,
+  FranchiseResponseDto,
+  FranchiseMetricsDto,
+  RegionalTrendDto,
+} from './dto/franchise-response.dto';
 import { Order, OrderDocument } from '../orders/schemas/order.schema';
-import { Customer, CustomerDocument } from '../customers/schemas/customer.schema';
+import {
+  Customer,
+  CustomerDocument,
+} from '../customers/schemas/customer.schema';
 
 @Injectable()
 export class FranchisesService {
   private readonly logger = new Logger(FranchisesService.name);
 
   constructor(
-    @InjectModel(Franchise.name) private franchiseModel: Model<FranchiseDocument>,
+    @InjectModel(Franchise.name)
+    private franchiseModel: Model<FranchiseDocument>,
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
     @InjectModel(Customer.name) private customerModel: Model<CustomerDocument>,
   ) {}
 
-  async create(createFranchiseDto: CreateFranchiseDto): Promise<FranchiseResponseDto> {
+  async create(
+    createFranchiseDto: CreateFranchiseDto,
+  ): Promise<FranchiseResponseDto> {
     // Verificar se unitId já existe
     const existing = await this.franchiseModel.findOne({
       unitId: createFranchiseDto.unitId,
@@ -33,7 +49,11 @@ export class FranchisesService {
     return this.toResponseDto(saved);
   }
 
-  async findAll(filters: FranchiseFiltersDto, userUnitId?: string, isAdmin: boolean = false): Promise<{
+  async findAll(
+    filters: FranchiseFiltersDto,
+    userUnitId?: string,
+    isAdmin: boolean = false,
+  ): Promise<{
     data: FranchiseResponseDto[];
     total: number;
     page: number;
@@ -91,7 +111,7 @@ export class FranchisesService {
       data.map(async (franchise) => {
         const metrics = await this.getFranchiseMetrics(franchise.unitId);
         return { ...this.toResponseDto(franchise), metrics };
-      })
+      }),
     );
 
     return {
@@ -102,16 +122,20 @@ export class FranchisesService {
     };
   }
 
-  async findOne(id: string, userUnitId?: string, isAdmin: boolean = false): Promise<FranchiseResponseDto> {
+  async findOne(
+    id: string,
+    userUnitId?: string,
+    isAdmin: boolean = false,
+  ): Promise<FranchiseResponseDto> {
     const query: any = { _id: id };
-    
+
     // Se não for admin, garantir que só vê a própria franquia
     if (!isAdmin && userUnitId) {
       query.unitId = userUnitId;
     }
 
     const franchise = await this.franchiseModel.findOne(query).exec();
-    
+
     if (!franchise) {
       throw new NotFoundException('Franquia não encontrada');
     }
@@ -123,31 +147,51 @@ export class FranchisesService {
   async findByUnitId(unitId: string): Promise<FranchiseResponseDto | null> {
     const franchise = await this.franchiseModel.findOne({ unitId }).exec();
     if (!franchise) return null;
-    
+
     const metrics = await this.getFranchiseMetrics(unitId);
     return { ...this.toResponseDto(franchise), metrics };
   }
 
-  async getMarketSegments(unitId: string): Promise<('restaurant' | 'delivery' | 'retail' | 'ecommerce' | 'hybrid')[]> {
-    const franchise = await this.franchiseModel.findOne({ unitId }).select('marketSegments').exec();
+  async getMarketSegments(
+    unitId: string,
+  ): Promise<
+    ('restaurant' | 'delivery' | 'retail' | 'ecommerce' | 'hybrid')[]
+  > {
+    const franchise = await this.franchiseModel
+      .findOne({ unitId })
+      .select('marketSegments')
+      .exec();
     if (!franchise) {
       return [];
     }
-    return (franchise.marketSegments || []) as ('restaurant' | 'delivery' | 'retail' | 'ecommerce' | 'hybrid')[];
+    return (franchise.marketSegments || []) as (
+      | 'restaurant'
+      | 'delivery'
+      | 'retail'
+      | 'ecommerce'
+      | 'hybrid'
+    )[];
   }
 
-  async update(id: string, updateFranchiseDto: UpdateFranchiseDto, userUnitId?: string, isAdmin: boolean = false): Promise<FranchiseResponseDto> {
+  async update(
+    id: string,
+    updateFranchiseDto: UpdateFranchiseDto,
+    userUnitId?: string,
+    isAdmin: boolean = false,
+  ): Promise<FranchiseResponseDto> {
     const query: any = { _id: id };
-    
+
     if (!isAdmin && userUnitId) {
       query.unitId = userUnitId;
     }
 
-    const franchise = await this.franchiseModel.findOneAndUpdate(
-      query,
-      { ...updateFranchiseDto, updatedAt: new Date() },
-      { new: true },
-    ).exec();
+    const franchise = await this.franchiseModel
+      .findOneAndUpdate(
+        query,
+        { ...updateFranchiseDto, updatedAt: new Date() },
+        { new: true },
+      )
+      .exec();
 
     if (!franchise) {
       throw new NotFoundException('Franquia não encontrada');
@@ -157,15 +201,19 @@ export class FranchisesService {
     return { ...this.toResponseDto(franchise), metrics };
   }
 
-  async remove(id: string, userUnitId?: string, isAdmin: boolean = false): Promise<void> {
+  async remove(
+    id: string,
+    userUnitId?: string,
+    isAdmin: boolean = false,
+  ): Promise<void> {
     const query: any = { _id: id };
-    
+
     if (!isAdmin && userUnitId) {
       query.unitId = userUnitId;
     }
 
     const result = await this.franchiseModel.deleteOne(query).exec();
-    
+
     if (result.deletedCount === 0) {
       throw new NotFoundException('Franquia não encontrada');
     }
@@ -182,41 +230,62 @@ export class FranchisesService {
       // Calcular métricas agregadas
       const totalOrders = orders.length;
       const totalSales = orders
-        .filter(o => o.status !== 'cancelado')
+        .filter((o) => o.status !== 'cancelado')
         .reduce((sum, o) => sum + o.total, 0);
       const totalLeads = 0; // TODO: Integrar com módulo de leads
       const customerCount = customers.length;
-      const conversionRate = totalLeads > 0 ? (totalOrders / totalLeads) * 100 : 0;
+      const conversionRate =
+        totalLeads > 0 ? (totalOrders / totalLeads) * 100 : 0;
       const averageTicket = totalOrders > 0 ? totalSales / totalOrders : 0;
 
       // Calcular métricas do último mês
       const now = new Date();
       const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-      const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
-      
-      const lastMonthOrdersArray = orders.filter(o => 
-        o.orderDate >= lastMonthStart && o.orderDate <= lastMonthEnd
+      const lastMonthEnd = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        0,
+        23,
+        59,
+        59,
+      );
+
+      const lastMonthOrdersArray = orders.filter(
+        (o) => o.orderDate >= lastMonthStart && o.orderDate <= lastMonthEnd,
       );
       const lastMonthOrders = lastMonthOrdersArray.length;
       const lastMonthSales = lastMonthOrdersArray
-        .filter(o => o.status !== 'cancelado')
+        .filter((o) => o.status !== 'cancelado')
         .reduce((sum, o) => sum + o.total, 0);
       const lastMonthLeads = Math.floor(totalLeads * 0.1); // TODO: Buscar do módulo de leads
-      
+
       // Calcular crescimento (comparar último mês com mês anterior)
-      const previousMonthStart = new Date(now.getFullYear(), now.getMonth() - 2, 1);
-      const previousMonthEnd = new Date(now.getFullYear(), now.getMonth() - 1, 0, 23, 59, 59);
-      
-      const previousMonthOrders = orders.filter(o => 
-        o.orderDate >= previousMonthStart && o.orderDate <= previousMonthEnd
+      const previousMonthStart = new Date(
+        now.getFullYear(),
+        now.getMonth() - 2,
+        1,
+      );
+      const previousMonthEnd = new Date(
+        now.getFullYear(),
+        now.getMonth() - 1,
+        0,
+        23,
+        59,
+        59,
+      );
+
+      const previousMonthOrders = orders.filter(
+        (o) =>
+          o.orderDate >= previousMonthStart && o.orderDate <= previousMonthEnd,
       );
       const previousMonthSales = previousMonthOrders
-        .filter(o => o.status !== 'cancelado')
+        .filter((o) => o.status !== 'cancelado')
         .reduce((sum, o) => sum + o.total, 0);
-      
-      const growthRate = previousMonthSales > 0 
-        ? ((lastMonthSales - previousMonthSales) / previousMonthSales) * 100 
-        : 0;
+
+      const growthRate =
+        previousMonthSales > 0
+          ? ((lastMonthSales - previousMonthSales) / previousMonthSales) * 100
+          : 0;
 
       return {
         totalOrders,
@@ -231,7 +300,10 @@ export class FranchisesService {
         lastMonthLeads,
       };
     } catch (error) {
-      this.logger.error(`Erro ao calcular métricas para unitId ${unitId}:`, error);
+      this.logger.error(
+        `Erro ao calcular métricas para unitId ${unitId}:`,
+        error,
+      );
       // Retornar métricas zeradas em caso de erro
       return {
         totalOrders: 0,
@@ -249,15 +321,20 @@ export class FranchisesService {
   }
 
   async getRegionalTrends(): Promise<RegionalTrendDto[]> {
-    const franchises = await this.franchiseModel.find({ status: 'active' }).exec();
-    
-    // Agrupar por estado
-    const stateMap = new Map<string, {
-      franchises: FranchiseDocument[];
-      region: string;
-    }>();
+    const franchises = await this.franchiseModel
+      .find({ status: 'active' })
+      .exec();
 
-    franchises.forEach(franchise => {
+    // Agrupar por estado
+    const stateMap = new Map<
+      string,
+      {
+        franchises: FranchiseDocument[];
+        region: string;
+      }
+    >();
+
+    franchises.forEach((franchise) => {
       const state = franchise.location.state;
       if (!stateMap.has(state)) {
         stateMap.set(state, {
@@ -279,22 +356,24 @@ export class FranchisesService {
       let totalSales = 0;
       let totalOrders = 0;
       let totalLeads = 0;
-      let totalCustomers = 0;
 
       for (const franchise of franchisesInState) {
         const metrics = await this.getFranchiseMetrics(franchise.unitId);
         totalSales += metrics.totalSales;
         totalOrders += metrics.totalOrders;
         totalLeads += metrics.totalLeads;
-        totalCustomers += metrics.customerCount;
+        // customerCount não é usado no cálculo final
+        void metrics.customerCount;
       }
 
       const averageTicket = totalOrders > 0 ? totalSales / totalOrders : 0;
-      const conversionRate = totalLeads > 0 ? (totalOrders / totalLeads) * 100 : 0;
+      const conversionRate =
+        totalLeads > 0 ? (totalOrders / totalLeads) * 100 : 0;
 
       // Calcular crescimento (simplificado - em produção usar dados históricos)
       const growthRate = Math.random() * 30 - 10; // Mock entre -10% e +20%
-      const trend: 'up' | 'down' | 'stable' = growthRate > 5 ? 'up' : growthRate < -5 ? 'down' : 'stable';
+      const trend: 'up' | 'down' | 'stable' =
+        growthRate > 5 ? 'up' : growthRate < -5 ? 'down' : 'stable';
 
       trends.push({
         region: data.region,
@@ -327,10 +406,15 @@ export class FranchisesService {
       status: franchise.status,
       type: franchise.type,
       territory: franchise.territory,
-      marketSegments: (franchise.marketSegments || []) as ('restaurant' | 'delivery' | 'retail' | 'ecommerce' | 'hybrid')[],
+      marketSegments: (franchise.marketSegments || []) as (
+        | 'restaurant'
+        | 'delivery'
+        | 'retail'
+        | 'ecommerce'
+        | 'hybrid'
+      )[],
       createdAt: franchise.createdAt || new Date(),
       updatedAt: franchise.updatedAt || new Date(),
     };
   }
 }
-

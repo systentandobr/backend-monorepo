@@ -1,34 +1,45 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 
-export type RewardDocument = Reward & Document & {
-  createdAt?: Date;
-  updatedAt?: Date;
-};
+export type RewardDocument = Reward &
+  Document & {
+    createdAt?: Date;
+    updatedAt?: Date;
+  };
 
 // Sub-schema para RewardDetails
-const RewardDetailsSchema = new MongooseSchema({
-  walletId: { type: Types.ObjectId, ref: 'Wallet', required: false },
-  transactionId: { type: String, required: false },
-  couponCode: { type: String, required: false },
-  couponExpiresAt: { type: Date, required: false },
-  pointsAccountId: { type: Types.ObjectId, ref: 'PointsAccount', required: false },
-  productId: { type: Types.ObjectId, ref: 'Product', required: false },
-  shippingAddress: { type: Object, required: false },
-  trackingCode: { type: String, required: false },
-}, { _id: false });
+const RewardDetailsSchema = new MongooseSchema(
+  {
+    walletId: { type: Types.ObjectId, ref: 'Wallet', required: false },
+    transactionId: { type: String, required: false },
+    couponCode: { type: String, required: false },
+    couponExpiresAt: { type: Date, required: false },
+    pointsAccountId: {
+      type: Types.ObjectId,
+      ref: 'PointsAccount',
+      required: false,
+    },
+    productId: { type: Types.ObjectId, ref: 'Product', required: false },
+    shippingAddress: { type: Object, required: false },
+    trackingCode: { type: String, required: false },
+  },
+  { _id: false },
+);
 
 // Sub-schema para RewardProcessing
-const RewardProcessingSchema = new MongooseSchema({
-  scheduledAt: { type: Date, required: false },
-  processedAt: { type: Date, required: false },
-  approvedBy: { type: Types.ObjectId, ref: 'User', required: false },
-  approvedAt: { type: Date, required: false },
-  paidAt: { type: Date, required: false },
-  cancelledAt: { type: Date, required: false },
-  cancelledBy: { type: Types.ObjectId, ref: 'User', required: false },
-  cancelReason: { type: String, required: false },
-}, { _id: false });
+const RewardProcessingSchema = new MongooseSchema(
+  {
+    scheduledAt: { type: Date, required: false },
+    processedAt: { type: Date, required: false },
+    approvedBy: { type: Types.ObjectId, ref: 'User', required: false },
+    approvedAt: { type: Date, required: false },
+    paidAt: { type: Date, required: false },
+    cancelledAt: { type: Date, required: false },
+    cancelledBy: { type: Types.ObjectId, ref: 'User', required: false },
+    cancelReason: { type: String, required: false },
+  },
+  { _id: false },
+);
 
 @Schema({
   timestamps: true,
@@ -44,7 +55,12 @@ export class Reward {
   @Prop({ type: Types.ObjectId, ref: 'User', required: true, index: true })
   userId: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'ReferralCampaign', required: true, index: true })
+  @Prop({
+    type: Types.ObjectId,
+    ref: 'ReferralCampaign',
+    required: true,
+    index: true,
+  })
   campaignId: Types.ObjectId;
 
   @Prop({
@@ -66,7 +82,13 @@ export class Reward {
     default: 'pending',
     index: true,
   })
-  status: 'pending' | 'processing' | 'approved' | 'paid' | 'cancelled' | 'expired';
+  status:
+    | 'pending'
+    | 'processing'
+    | 'approved'
+    | 'paid'
+    | 'cancelled'
+    | 'expired';
 
   @Prop({
     type: RewardDetailsSchema,

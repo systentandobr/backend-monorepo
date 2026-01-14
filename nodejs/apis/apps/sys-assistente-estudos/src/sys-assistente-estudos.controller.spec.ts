@@ -11,7 +11,9 @@ describe('SysAssistenteEstudosController', () => {
       providers: [SysAssistenteEstudosService],
     }).compile();
 
-    sysAssistenteEstudosController = app.get<SysAssistenteEstudosController>(SysAssistenteEstudosController);
+    sysAssistenteEstudosController = app.get<SysAssistenteEstudosController>(
+      SysAssistenteEstudosController,
+    );
   });
 
   describe('root', () => {

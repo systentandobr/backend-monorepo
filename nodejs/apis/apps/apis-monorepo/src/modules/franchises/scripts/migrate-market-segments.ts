@@ -1,6 +1,6 @@
 /**
  * Script de migração para adicionar campo marketSegments em franchises existentes
- * 
+ *
  * Uso:
  * 1. Via NestJS CLI: npx ts-node src/modules/franchises/scripts/migrate-market-segments.ts
  * 2. Ou importar e executar em um script de migração do NestJS
@@ -9,26 +9,32 @@
 import { connect, connection, model, Schema } from 'mongoose';
 
 // Schema temporário para a migração
-const FranchiseSchema = new Schema({
-  unitId: String,
-  name: String,
-  location: {
-    type: {
-      type: String,
+const FranchiseSchema = new Schema(
+  {
+    unitId: String,
+    name: String,
+    location: {
+      type: {
+        type: String,
+      },
+    },
+    marketSegments: {
+      type: [String],
+      default: [],
     },
   },
-  marketSegments: {
-    type: [String],
-    default: [],
-  },
-}, { collection: 'franchises', strict: false });
+  { collection: 'franchises', strict: false },
+);
 
 const FranchiseModel = model('Franchise', FranchiseSchema);
 
 async function migrateMarketSegments() {
   try {
     // Conectar ao MongoDB
-    const mongoUri = process.env.MONGODB_URI || process.env.DATABASE_URL || 'mongodb://localhost:27017/systentando';
+    const mongoUri =
+      process.env.MONGODB_URI ||
+      process.env.DATABASE_URL ||
+      'mongodb://localhost:27017/systentando';
     console.log('🔌 Conectando ao MongoDB...');
     await connect(mongoUri);
     console.log('✅ Conectado ao MongoDB');
@@ -45,7 +51,7 @@ async function migrateMarketSegments() {
     console.log(`📊 Encontradas ${franchises.length} franchises para migrar`);
 
     let migrated = 0;
-    let skipped = 0;
+    const skipped = 0;
 
     for (const franchise of franchises) {
       // Heurística: determinar segmentação baseada em dados existentes
@@ -69,11 +75,13 @@ async function migrateMarketSegments() {
       // Atualizar franchise
       await FranchiseModel.updateOne(
         { _id: franchise._id },
-        { $set: { marketSegments: segments } }
+        { $set: { marketSegments: segments } },
       ).exec();
 
       migrated++;
-      console.log(`✅ Migrada: ${franchise.name || franchise.unitId} -> [${segments.join(', ')}]`);
+      console.log(
+        `✅ Migrada: ${franchise.name || franchise.unitId} -> [${segments.join(', ')}]`,
+      );
     }
 
     console.log('\n📈 Resumo da migração:');

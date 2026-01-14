@@ -1,5 +1,13 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBooleanString, IsInt, IsNumber, IsOptional, IsString, Min, Max } from 'class-validator';
+import {
+  IsBooleanString,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+  Max,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class QueryProdutoDto {
@@ -55,7 +63,9 @@ export class QueryProdutoDto {
   @IsBooleanString()
   inStock?: string;
 
-  @ApiPropertyOptional({ enum: ['price_asc', 'price_desc', 'rating_desc', 'newest', 'popular'] })
+  @ApiPropertyOptional({
+    enum: ['price_asc', 'price_desc', 'rating_desc', 'newest', 'popular'],
+  })
   @IsOptional()
   @IsString()
   sortBy?: 'price_asc' | 'price_desc' | 'rating_desc' | 'newest' | 'popular';
@@ -72,5 +82,3 @@ export class QueryProdutoDto {
   @Min(1)
   limit?: number = 20;
 }
-
-

@@ -21,4 +21,3 @@ export class CustomerStatsDto {
   new: number;
   averageTicket: number;
 }
-

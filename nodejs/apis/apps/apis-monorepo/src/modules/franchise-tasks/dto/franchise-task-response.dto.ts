@@ -1,54 +1,54 @@
 import { Expose } from 'class-transformer';
 
 export class FranchiseTaskResponseDto {
-    @Expose()
-    id: string;
+  @Expose()
+  id: string;
 
-    @Expose()
-    franchiseId: string;
+  @Expose()
+  franchiseId: string;
 
-    @Expose()
-    userId: string;
+  @Expose()
+  userId: string;
 
-    @Expose()
-    templateId: string;
+  @Expose()
+  templateId: string;
 
-    @Expose()
-    name: string;
+  @Expose()
+  name: string;
 
-    @Expose()
-    description: string;
+  @Expose()
+  description: string;
 
-    @Expose()
-    category: string;
+  @Expose()
+  category: string;
 
-    @Expose()
-    status: string;
+  @Expose()
+  status: string;
 
-    @Expose()
-    progress: number;
+  @Expose()
+  progress: number;
 
-    @Expose()
-    completedSteps: any[];
+  @Expose()
+  completedSteps: any[];
 
-    @Expose()
-    formData?: any;
+  @Expose()
+  formData?: any;
 
-    @Expose()
-    assignedAt: Date;
+  @Expose()
+  assignedAt: Date;
 
-    @Expose()
-    completedAt?: Date;
+  @Expose()
+  completedAt?: Date;
 
-    @Expose()
-    dueDate?: Date;
+  @Expose()
+  dueDate?: Date;
 
-    @Expose()
-    metadata: any;
+  @Expose()
+  metadata: any;
 
-    @Expose()
-    createdAt: Date;
+  @Expose()
+  createdAt: Date;
 
-    @Expose()
-    updatedAt: Date;
+  @Expose()
+  updatedAt: Date;
 }

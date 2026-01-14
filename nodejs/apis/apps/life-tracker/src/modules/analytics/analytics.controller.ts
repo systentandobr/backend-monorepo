@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AnalyticsService } from './analytics.service';
 import { ApiResponse } from '../../types';
@@ -29,12 +37,17 @@ export class AnalyticsController {
   }
 
   @Post('activities/mark')
-  async markActivity(@Body() activityData: { activityType: string; completed: boolean }): Promise<ApiResponse<any>> {
+  async markActivity(
+    @Body() activityData: { activityType: string; completed: boolean },
+  ): Promise<ApiResponse<any>> {
     return this.analyticsService.markActivity(activityData);
   }
 
   @Put('routines/:id')
-  async updateRoutine(@Param('id') id: string, @Body() routineData: any): Promise<ApiResponse<any>> {
+  async updateRoutine(
+    @Param('id') id: string,
+    @Body() routineData: any,
+  ): Promise<ApiResponse<any>> {
     return this.analyticsService.updateRoutine(id, routineData);
   }
 
@@ -42,4 +55,4 @@ export class AnalyticsController {
   async deleteRoutine(@Param('id') id: string): Promise<ApiResponse<any>> {
     return this.analyticsService.deleteRoutine(id);
   }
-} 
+}

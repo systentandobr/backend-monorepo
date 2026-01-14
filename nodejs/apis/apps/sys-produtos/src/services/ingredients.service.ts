@@ -1,7 +1,17 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Ingredient, IngredientDocument, IngredientUnit, PurchaseHistoryItem, LossRecord } from '../schemas/ingredient.schema';
+import {
+  Ingredient,
+  IngredientDocument,
+  IngredientUnit,
+  PurchaseHistoryItem,
+  LossRecord,
+} from '../schemas/ingredient.schema';
 
 export interface CreateIngredientDto {
   name: string;
@@ -47,7 +57,8 @@ export interface AddLossDto {
 @Injectable()
 export class IngredientsService {
   constructor(
-    @InjectModel(Ingredient.name) private ingredientModel: Model<IngredientDocument>,
+    @InjectModel(Ingredient.name)
+    private ingredientModel: Model<IngredientDocument>,
   ) {}
 
   async create(createDto: CreateIngredientDto): Promise<Ingredient> {
@@ -64,8 +75,11 @@ export class IngredientsService {
     return ingredient.save();
   }
 
-  async findAll(unitId: string, includeInactive = false): Promise<Ingredient[]> {
-    const query: any = { 
+  async findAll(
+    unitId: string,
+    includeInactive = false,
+  ): Promise<Ingredient[]> {
+    const query: any = {
       unitId,
       isDeleted: { $ne: true },
     };
@@ -78,11 +92,13 @@ export class IngredientsService {
   }
 
   async findOne(id: string, unitId: string): Promise<Ingredient> {
-    const ingredient = await this.ingredientModel.findOne({
-      _id: id,
-      unitId,
-      isDeleted: { $ne: true },
-    }).exec();
+    const ingredient = await this.ingredientModel
+      .findOne({
+        _id: id,
+        unitId,
+        isDeleted: { $ne: true },
+      })
+      .exec();
 
     if (!ingredient) {
       throw new NotFoundException(`Ingrediente com ID ${id} não encontrado`);
@@ -91,16 +107,22 @@ export class IngredientsService {
     return ingredient;
   }
 
-  async update(id: string, unitId: string, updateDto: UpdateIngredientDto): Promise<Ingredient> {
+  async update(
+    id: string,
+    unitId: string,
+    updateDto: UpdateIngredientDto,
+  ): Promise<Ingredient> {
     if (updateDto.costPrice !== undefined && updateDto.costPrice < 0) {
       throw new BadRequestException('Preço de custo não pode ser negativo');
     }
 
-    const ingredient = await this.ingredientModel.findOneAndUpdate(
-      { _id: id, unitId, isDeleted: { $ne: true } },
-      { ...updateDto, updatedAt: new Date() },
-      { new: true, runValidators: true },
-    ).exec();
+    const ingredient = await this.ingredientModel
+      .findOneAndUpdate(
+        { _id: id, unitId, isDeleted: { $ne: true } },
+        { ...updateDto, updatedAt: new Date() },
+        { new: true, runValidators: true },
+      )
+      .exec();
 
     if (!ingredient) {
       throw new NotFoundException(`Ingrediente com ID ${id} não encontrado`);
@@ -110,11 +132,13 @@ export class IngredientsService {
   }
 
   async remove(id: string, unitId: string): Promise<void> {
-    const ingredient = await this.ingredientModel.findOneAndUpdate(
-      { _id: id, unitId, isDeleted: { $ne: true } },
-      { isDeleted: true, updatedAt: new Date() },
-      { new: true },
-    ).exec();
+    const ingredient = await this.ingredientModel
+      .findOneAndUpdate(
+        { _id: id, unitId, isDeleted: { $ne: true } },
+        { isDeleted: true, updatedAt: new Date() },
+        { new: true },
+      )
+      .exec();
 
     if (!ingredient) {
       throw new NotFoundException(`Ingrediente com ID ${id} não encontrado`);
@@ -122,28 +146,37 @@ export class IngredientsService {
   }
 
   async findByIds(ids: string[], unitId: string): Promise<Ingredient[]> {
-    return this.ingredientModel.find({
-      _id: { $in: ids },
-      unitId,
-      isDeleted: { $ne: true },
-      active: true,
-    }).exec();
+    return this.ingredientModel
+      .find({
+        _id: { $in: ids },
+        unitId,
+        isDeleted: { $ne: true },
+        active: true,
+      })
+      .exec();
   }
 
-  async addPurchase(id: string, unitId: string, purchaseDto: AddPurchaseDto): Promise<Ingredient> {
+  async addPurchase(
+    id: string,
+    unitId: string,
+    purchaseDto: AddPurchaseDto,
+  ): Promise<Ingredient> {
     const ingredient = await this.findOne(id, unitId);
 
     const purchaseItem: PurchaseHistoryItem = {
-      purchaseDate: typeof purchaseDto.purchaseDate === 'string' 
-        ? new Date(purchaseDto.purchaseDate) 
-        : purchaseDto.purchaseDate,
+      purchaseDate:
+        typeof purchaseDto.purchaseDate === 'string'
+          ? new Date(purchaseDto.purchaseDate)
+          : purchaseDto.purchaseDate,
       quantity: purchaseDto.quantity,
       unitPrice: purchaseDto.unitPrice,
       totalPrice: purchaseDto.quantity * purchaseDto.unitPrice,
       supplierId: purchaseDto.supplierId,
       supplierName: purchaseDto.supplierName,
       expiryDate: purchaseDto.expiryDate
-        ? (typeof purchaseDto.expiryDate === 'string' ? new Date(purchaseDto.expiryDate) : purchaseDto.expiryDate)
+        ? typeof purchaseDto.expiryDate === 'string'
+          ? new Date(purchaseDto.expiryDate)
+          : purchaseDto.expiryDate
         : undefined,
       batchNumber: purchaseDto.batchNumber,
       notes: purchaseDto.notes,
@@ -151,23 +184,28 @@ export class IngredientsService {
 
     // Atualizar preço de custo se o novo preço for diferente
     const newCostPrice = purchaseDto.unitPrice;
-    const updatedCostPrice = ingredient.costPrice !== newCostPrice ? newCostPrice : ingredient.costPrice;
+    const updatedCostPrice =
+      ingredient.costPrice !== newCostPrice
+        ? newCostPrice
+        : ingredient.costPrice;
 
     // Atualizar estoque atual
     const currentStock = (ingredient.currentStock || 0) + purchaseDto.quantity;
 
-    const updated = await this.ingredientModel.findByIdAndUpdate(
-      id,
-      {
-        $push: { purchaseHistory: purchaseItem },
-        $set: {
-          costPrice: updatedCostPrice,
-          currentStock: currentStock,
-          updatedAt: new Date(),
+    const updated = await this.ingredientModel
+      .findByIdAndUpdate(
+        id,
+        {
+          $push: { purchaseHistory: purchaseItem },
+          $set: {
+            costPrice: updatedCostPrice,
+            currentStock: currentStock,
+            updatedAt: new Date(),
+          },
         },
-      },
-      { new: true }
-    ).exec();
+        { new: true },
+      )
+      .exec();
 
     if (!updated) {
       throw new NotFoundException(`Ingrediente com ID ${id} não encontrado`);
@@ -176,14 +214,21 @@ export class IngredientsService {
     return updated;
   }
 
-  async addLoss(id: string, unitId: string, lossDto: AddLossDto): Promise<Ingredient> {
+  async addLoss(
+    id: string,
+    unitId: string,
+    lossDto: AddLossDto,
+  ): Promise<Ingredient> {
     const ingredient = await this.findOne(id, unitId);
 
     // Calcular custo da perda baseado no preço atual
     const lossCost = (ingredient.costPrice || 0) * lossDto.quantity;
 
     const lossRecord: LossRecord = {
-      date: typeof lossDto.date === 'string' ? new Date(lossDto.date) : lossDto.date,
+      date:
+        typeof lossDto.date === 'string'
+          ? new Date(lossDto.date)
+          : lossDto.date,
       quantity: lossDto.quantity,
       reason: lossDto.reason,
       notes: lossDto.notes,
@@ -191,19 +236,24 @@ export class IngredientsService {
     };
 
     // Atualizar estoque atual (reduzir a quantidade perdida)
-    const currentStock = Math.max(0, (ingredient.currentStock || 0) - lossDto.quantity);
+    const currentStock = Math.max(
+      0,
+      (ingredient.currentStock || 0) - lossDto.quantity,
+    );
 
-    const updated = await this.ingredientModel.findByIdAndUpdate(
-      id,
-      {
-        $push: { lossRecords: lossRecord },
-        $set: {
-          currentStock: currentStock,
-          updatedAt: new Date(),
+    const updated = await this.ingredientModel
+      .findByIdAndUpdate(
+        id,
+        {
+          $push: { lossRecords: lossRecord },
+          $set: {
+            currentStock: currentStock,
+            updatedAt: new Date(),
+          },
         },
-      },
-      { new: true }
-    ).exec();
+        { new: true },
+      )
+      .exec();
 
     if (!updated) {
       throw new NotFoundException(`Ingrediente com ID ${id} não encontrado`);

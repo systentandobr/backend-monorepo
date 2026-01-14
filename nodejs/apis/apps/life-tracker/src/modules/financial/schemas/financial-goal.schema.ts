@@ -30,4 +30,4 @@ export class FinancialGoal {
   category?: string;
 }
 
-export const FinancialGoalSchema = SchemaFactory.createForClass(FinancialGoal); 
+export const FinancialGoalSchema = SchemaFactory.createForClass(FinancialGoal);

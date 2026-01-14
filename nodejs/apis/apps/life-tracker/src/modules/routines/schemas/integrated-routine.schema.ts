@@ -214,4 +214,5 @@ export class IntegratedRoutine {
   updatedAt?: Date;
 }
 
-export const IntegratedRoutineSchema = SchemaFactory.createForClass(IntegratedRoutine); 
+export const IntegratedRoutineSchema =
+  SchemaFactory.createForClass(IntegratedRoutine);

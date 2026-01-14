@@ -7,7 +7,7 @@ import { Simulacao } from '../model/simulacao.schema';
 export class SimulacaoRepository {
   constructor(
     @InjectModel(Simulacao.name) private simulacaoModel: Model<Simulacao>,
-  ) { }
+  ) {}
 
   async create(data: Simulacao): Promise<Simulacao> {
     const createSimulacaoDto = new this.simulacaoModel({

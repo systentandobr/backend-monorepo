@@ -6,8 +6,9 @@ import { InjectModel } from '@nestjs/mongoose';
 @Injectable()
 export class TemaespecificoService {
   constructor(
-    @InjectModel(TemaEspecifico.name) private temaEspecificoModel: Model<TemaEspecifico>,
-  ) { }
+    @InjectModel(TemaEspecifico.name)
+    private temaEspecificoModel: Model<TemaEspecifico>,
+  ) {}
 
   async create(data: TemaEspecifico): Promise<TemaEspecifico> {
     const createTemaEspecificoDto = new this.temaEspecificoModel({
@@ -15,16 +16,17 @@ export class TemaespecificoService {
       descricao: data.descricao,
       createdAt: data.createdAt ?? new Date(),
       updatedAt: undefined,
-
     });
-    const createdTemaEspecifico = new this.temaEspecificoModel(createTemaEspecificoDto);
+    const createdTemaEspecifico = new this.temaEspecificoModel(
+      createTemaEspecificoDto,
+    );
     return createdTemaEspecifico.save();
   }
 
   async findByTemaEspecificoUserId(
     concursoId: string,
     userId: string,
-    filterOpenQuestions = false
+    filterOpenQuestions = false,
   ): Promise<TemaEspecifico[]> {
     try {
       // const userObjectId = new Types.ObjectId(userId);
@@ -53,4 +55,3 @@ export class TemaespecificoService {
     await this.temaEspecificoModel.deleteMany({});
   }
 }
-

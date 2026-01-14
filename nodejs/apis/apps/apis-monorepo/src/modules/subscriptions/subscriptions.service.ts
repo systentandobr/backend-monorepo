@@ -1,7 +1,10 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { SubscriptionPlan, SubscriptionPlanDocument } from './schemas/subscription-plan.schema';
+import {
+  SubscriptionPlan,
+  SubscriptionPlanDocument,
+} from './schemas/subscription-plan.schema';
 import { Payment, PaymentDocument } from './schemas/payment.schema';
 import { CreateSubscriptionPlanDto } from './dto/create-subscription-plan.dto';
 import { UpdateSubscriptionPlanDto } from './dto/update-subscription-plan.dto';
@@ -14,12 +17,16 @@ export class SubscriptionsService {
   private readonly logger = new Logger(SubscriptionsService.name);
 
   constructor(
-    @InjectModel(SubscriptionPlan.name) private subscriptionPlanModel: Model<SubscriptionPlanDocument>,
+    @InjectModel(SubscriptionPlan.name)
+    private subscriptionPlanModel: Model<SubscriptionPlanDocument>,
     @InjectModel(Payment.name) private paymentModel: Model<PaymentDocument>,
   ) {}
 
   // ========== SUBSCRIPTION PLANS ==========
-  async createPlan(createPlanDto: CreateSubscriptionPlanDto, unitId: string): Promise<SubscriptionPlanResponseDto> {
+  async createPlan(
+    createPlanDto: CreateSubscriptionPlanDto,
+    unitId: string,
+  ): Promise<SubscriptionPlanResponseDto> {
     const plan = new this.subscriptionPlanModel({
       ...createPlanDto,
       unitId,
@@ -30,41 +37,66 @@ export class SubscriptionsService {
   }
 
   async findAllPlans(unitId: string): Promise<SubscriptionPlanResponseDto[]> {
-    const plans = await this.subscriptionPlanModel.find({ unitId }).sort({ createdAt: -1 }).exec();
-    return plans.map(plan => this.toPlanResponseDto(plan));
+    const plans = await this.subscriptionPlanModel
+      .find({ unitId })
+      .sort({ createdAt: -1 })
+      .exec();
+    return plans.map((plan) => this.toPlanResponseDto(plan));
   }
 
-  async findPlanById(id: string, unitId: string): Promise<SubscriptionPlanResponseDto> {
-    const plan = await this.subscriptionPlanModel.findOne({ _id: id, unitId }).exec();
+  async findPlanById(
+    id: string,
+    unitId: string,
+  ): Promise<SubscriptionPlanResponseDto> {
+    const plan = await this.subscriptionPlanModel
+      .findOne({ _id: id, unitId })
+      .exec();
     if (!plan) {
-      throw new NotFoundException(`Plano de assinatura com ID ${id} não encontrado`);
+      throw new NotFoundException(
+        `Plano de assinatura com ID ${id} não encontrado`,
+      );
     }
     return this.toPlanResponseDto(plan);
   }
 
-  async updatePlan(id: string, updatePlanDto: UpdateSubscriptionPlanDto, unitId: string): Promise<SubscriptionPlanResponseDto> {
-    const plan = await this.subscriptionPlanModel.findOneAndUpdate(
-      { _id: id, unitId },
-      { $set: updatePlanDto },
-      { new: true },
-    ).exec();
+  async updatePlan(
+    id: string,
+    updatePlanDto: UpdateSubscriptionPlanDto,
+    unitId: string,
+  ): Promise<SubscriptionPlanResponseDto> {
+    const plan = await this.subscriptionPlanModel
+      .findOneAndUpdate(
+        { _id: id, unitId },
+        { $set: updatePlanDto },
+        { new: true },
+      )
+      .exec();
 
     if (!plan) {
-      throw new NotFoundException(`Plano de assinatura com ID ${id} não encontrado`);
+      throw new NotFoundException(
+        `Plano de assinatura com ID ${id} não encontrado`,
+      );
     }
 
     return this.toPlanResponseDto(plan);
   }
 
   async removePlan(id: string, unitId: string): Promise<void> {
-    const result = await this.subscriptionPlanModel.deleteOne({ _id: id, unitId }).exec();
+    const result = await this.subscriptionPlanModel
+      .deleteOne({ _id: id, unitId })
+      .exec();
     if (result.deletedCount === 0) {
-      throw new NotFoundException(`Plano de assinatura com ID ${id} não encontrado`);
+      throw new NotFoundException(
+        `Plano de assinatura com ID ${id} não encontrado`,
+      );
     }
   }
 
   // ========== PAYMENTS ==========
-  async createPayment(createPaymentDto: CreatePaymentDto, unitId: string): Promise<PaymentResponseDto> {
+  async createPayment(
+    createPaymentDto: CreatePaymentDto,
+    unitId: string,
+  ): Promise<PaymentResponseDto> {
     const payment = new this.paymentModel({
       ...createPaymentDto,
       unitId,
@@ -76,7 +108,10 @@ export class SubscriptionsService {
     return this.toPaymentResponseDto(saved);
   }
 
-  async findAllPayments(filters: { studentId?: string; status?: string }, unitId: string): Promise<{
+  async findAllPayments(
+    filters: { studentId?: string; status?: string },
+    unitId: string,
+  ): Promise<{
     data: PaymentResponseDto[];
     total: number;
     page: number;
@@ -98,14 +133,17 @@ export class SubscriptionsService {
     ]);
 
     return {
-      data: data.map(item => this.toPaymentResponseDto(item)),
+      data: data.map((item) => this.toPaymentResponseDto(item)),
       total,
       page: 1,
       limit: 50,
     };
   }
 
-  async findPaymentById(id: string, unitId: string): Promise<PaymentResponseDto> {
+  async findPaymentById(
+    id: string,
+    unitId: string,
+  ): Promise<PaymentResponseDto> {
     const payment = await this.paymentModel.findOne({ _id: id, unitId }).exec();
     if (!payment) {
       throw new NotFoundException(`Pagamento com ID ${id} não encontrado`);
@@ -113,7 +151,12 @@ export class SubscriptionsService {
     return this.toPaymentResponseDto(payment);
   }
 
-  async markPaymentAsPaid(id: string, paidDate: string, paymentMethod: string, unitId: string): Promise<PaymentResponseDto> {
+  async markPaymentAsPaid(
+    id: string,
+    paidDate: string,
+    paymentMethod: string,
+    unitId: string,
+  ): Promise<PaymentResponseDto> {
     const payment = await this.paymentModel.findOne({ _id: id, unitId }).exec();
     if (!payment) {
       throw new NotFoundException(`Pagamento com ID ${id} não encontrado`);
@@ -127,7 +170,9 @@ export class SubscriptionsService {
     return this.toPaymentResponseDto(saved);
   }
 
-  private toPlanResponseDto(plan: SubscriptionPlanDocument): SubscriptionPlanResponseDto {
+  private toPlanResponseDto(
+    plan: SubscriptionPlanDocument,
+  ): SubscriptionPlanResponseDto {
     return {
       id: plan._id.toString(),
       unitId: plan.unitId,

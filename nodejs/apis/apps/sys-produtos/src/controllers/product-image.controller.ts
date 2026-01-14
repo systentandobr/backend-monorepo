@@ -13,11 +13,20 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiConsumes } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiConsumes,
+} from '@nestjs/swagger';
 import { Response } from 'express';
 import type { Multer } from 'multer';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
-import { CurrentUser, CurrentUserShape } from '../decorators/current-user.decorator';
+import {
+  CurrentUser,
+  CurrentUserShape,
+} from '../decorators/current-user.decorator';
 import { ProductImageService } from '../services/product-image.service';
 import { UploadMiddleware } from '../middleware/upload.middleware';
 import * as fs from 'fs';
@@ -87,10 +96,11 @@ export class ProductImageController {
       throw new BadRequestException('unitId não encontrado');
     }
 
-    const { filePath, mimeType } = await this.productImageService.getImageByHash(
-      hashId,
-      user.unitId as string,
-    );
+    const { filePath, mimeType } =
+      await this.productImageService.getImageByHash(
+        hashId,
+        user.unitId as string,
+      );
 
     // Configurar headers de cache
     res.setHeader('Content-Type', mimeType);
@@ -118,10 +128,11 @@ export class ProductImageController {
 
     // Por enquanto retorna a imagem original
     // Pode ser implementado para retornar thumbnail quando gerada
-    const { filePath, mimeType } = await this.productImageService.getImageByHash(
-      hashId,
-      user.unitId as string,
-    );
+    const { filePath, mimeType } =
+      await this.productImageService.getImageByHash(
+        hashId,
+        user.unitId as string,
+      );
 
     res.setHeader('Content-Type', mimeType);
     res.setHeader('Cache-Control', 'public, max-age=31536000');
@@ -136,7 +147,10 @@ export class ProductImageController {
   @ApiOperation({ summary: 'Deletar imagem' })
   @ApiResponse({ status: 200, description: 'Imagem deletada com sucesso' })
   @ApiResponse({ status: 404, description: 'Imagem não encontrada' })
-  async deleteImage(@Param('hashId') hashId: string, @CurrentUser() user: CurrentUserShape) {
+  async deleteImage(
+    @Param('hashId') hashId: string,
+    @CurrentUser() user: CurrentUserShape,
+  ) {
     if (!user.unitId) {
       throw new BadRequestException('unitId não encontrado');
     }
@@ -152,7 +166,10 @@ export class ProductImageController {
   @UseGuards(JwtAuthGuard)
   @Patch(':hashId/associate')
   @ApiOperation({ summary: 'Associar imagem a um produto' })
-  @ApiResponse({ status: 200, description: 'Imagem associada ao produto com sucesso' })
+  @ApiResponse({
+    status: 200,
+    description: 'Imagem associada ao produto com sucesso',
+  })
   @ApiResponse({ status: 404, description: 'Imagem não encontrada' })
   async associateImageToProduct(
     @Param('hashId') hashId: string,
@@ -167,7 +184,11 @@ export class ProductImageController {
       throw new BadRequestException('productId é obrigatório');
     }
 
-    await this.productImageService.associateImageToProduct(hashId, productId, user.unitId as string);
+    await this.productImageService.associateImageToProduct(
+      hashId,
+      productId,
+      user.unitId as string,
+    );
 
     return {
       success: true,
@@ -195,4 +216,3 @@ export class ProductImageController {
     };
   }
 }
-

@@ -57,7 +57,9 @@ describe('Gamification Profile Contract (e2e)', () => {
         todayPoints: 50,
       };
 
-      jest.spyOn(gamificationProfileModel, 'findOne').mockResolvedValue(mockProfile);
+      jest
+        .spyOn(gamificationProfileModel, 'findOne')
+        .mockResolvedValue(mockProfile);
 
       const response = await request(app.getHttpServer())
         .get('/gamification/profile?userId=user-123')

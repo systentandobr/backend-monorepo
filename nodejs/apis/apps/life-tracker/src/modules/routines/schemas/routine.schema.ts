@@ -45,4 +45,4 @@ export class Routine {
   updatedAt: string;
 }
 
-export const RoutineSchema = SchemaFactory.createForClass(Routine); 
+export const RoutineSchema = SchemaFactory.createForClass(Routine);

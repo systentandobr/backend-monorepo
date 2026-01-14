@@ -48,8 +48,8 @@ export class JwtValidatorService {
               'x-api-key': EnvironmentConfig.sysSeguranca.apiKey,
             },
             timeout: EnvironmentConfig.sysSeguranca.timeout,
-          }
-        )
+          },
+        ),
       );
 
       const responseData = response.data as any;
@@ -60,15 +60,15 @@ export class JwtValidatorService {
       return responseData.data;
     } catch (error) {
       console.error('Erro ao validar token com SYS-SEGURANÇA:', error);
-      
+
       if (error.response?.status === 401) {
         throw new UnauthorizedException('Token inválido ou expirado');
       }
-      
+
       if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
         throw new UnauthorizedException('Serviço de autenticação indisponível');
       }
-      
+
       throw new UnauthorizedException('Erro na validação do token');
     }
   }
@@ -85,7 +85,7 @@ export class JwtValidatorService {
       });
 
       const payload = await jwtService.verifyAsync(token);
-      
+
       // Verificar se o token não expirou
       if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
         throw new UnauthorizedException('Token expirado');
@@ -119,8 +119,11 @@ export class JwtValidatorService {
       console.log('Fallback SYS-SEGURANÇA validando token' + token);
       return await this.validateToken(token);
     } catch (error) {
-      console.warn('SYS-SEGURANÇA indisponível, usando validação local:', error.message);
-      
+      console.warn(
+        'SYS-SEGURANÇA indisponível, usando validação local:',
+        error.message,
+      );
+
       // Fallback para validação local
       return await this.validateTokenLocally(token);
     }

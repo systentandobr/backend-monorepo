@@ -1,32 +1,55 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { AffiliateProductService } from './services/affiliate-product.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { CurrentUser, CurrentUserShape } from './decorators/current-user.decorator';
-import { CreateAffiliateProductDto, UpdateAffiliateProductDto, QueryAffiliateProductDto } from './dto/affiliate-product.dto';
+import {
+  CurrentUser,
+  CurrentUserShape,
+} from './decorators/current-user.decorator';
+import {
+  CreateAffiliateProductDto,
+  UpdateAffiliateProductDto,
+  QueryAffiliateProductDto,
+} from './dto/affiliate-product.dto';
 
 @ApiTags('affiliate-products')
 @ApiBearerAuth()
 @Controller('affiliate-products')
 export class AffiliateProductController {
-  constructor(private readonly affiliateProductService: AffiliateProductService) {}
+  constructor(
+    private readonly affiliateProductService: AffiliateProductService,
+  ) {}
 
   @UseGuards(JwtAuthGuard)
   @Post()
   @ApiOperation({ summary: 'Criar novo produto afiliado' })
-  @ApiResponse({ status: 201, description: 'Produto afiliado criado com sucesso' })
+  @ApiResponse({
+    status: 201,
+    description: 'Produto afiliado criado com sucesso',
+  })
   create(
     @CurrentUser() user: CurrentUserShape,
-    @Body() dto: CreateAffiliateProductDto
+    @Body() dto: CreateAffiliateProductDto,
   ) {
     if (!user.id) {
       throw new Error('Usuário não autenticado');
     }
-    return this.affiliateProductService.create(
-      user.id,
-      user.unitId || '',
-      dto
-    );
+    return this.affiliateProductService.create(user.id, user.unitId || '', dto);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -35,16 +58,12 @@ export class AffiliateProductController {
   @ApiResponse({ status: 200, description: 'Lista de produtos afiliados' })
   list(
     @CurrentUser() user: CurrentUserShape,
-    @Query() query: QueryAffiliateProductDto
+    @Query() query: QueryAffiliateProductDto,
   ) {
     if (!user.id) {
       throw new Error('Usuário não autenticado');
     }
-    return this.affiliateProductService.list(
-      user.id,
-      user.unitId,
-      query
-    );
+    return this.affiliateProductService.list(user.id, user.unitId, query);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -55,10 +74,7 @@ export class AffiliateProductController {
     if (!user.id) {
       throw new Error('Usuário não autenticado');
     }
-    return this.affiliateProductService.getMetrics(
-      user.id,
-      user.unitId
-    );
+    return this.affiliateProductService.getMetrics(user.id, user.unitId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -66,10 +82,7 @@ export class AffiliateProductController {
   @ApiOperation({ summary: 'Obter produto afiliado por ID' })
   @ApiResponse({ status: 200, description: 'Produto afiliado encontrado' })
   @ApiResponse({ status: 404, description: 'Produto afiliado não encontrado' })
-  getById(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape
-  ) {
+  getById(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     if (!user.id) {
       throw new Error('Usuário não autenticado');
     }
@@ -84,7 +97,7 @@ export class AffiliateProductController {
   update(
     @Param('id') id: string,
     @CurrentUser() user: CurrentUserShape,
-    @Body() dto: UpdateAffiliateProductDto
+    @Body() dto: UpdateAffiliateProductDto,
   ) {
     if (!user.id) {
       throw new Error('Usuário não autenticado');
@@ -97,10 +110,7 @@ export class AffiliateProductController {
   @ApiOperation({ summary: 'Excluir produto afiliado' })
   @ApiResponse({ status: 200, description: 'Produto afiliado excluído' })
   @ApiResponse({ status: 404, description: 'Produto afiliado não encontrado' })
-  delete(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape
-  ) {
+  delete(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     if (!user.id) {
       throw new Error('Usuário não autenticado');
     }
@@ -112,14 +122,10 @@ export class AffiliateProductController {
   @ApiOperation({ summary: 'Reprocessar produto afiliado' })
   @ApiResponse({ status: 200, description: 'Reprocessamento iniciado' })
   @ApiResponse({ status: 404, description: 'Produto afiliado não encontrado' })
-  retry(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape
-  ) {
+  retry(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     if (!user.id) {
       throw new Error('Usuário não autenticado');
     }
     return this.affiliateProductService.retry(id, user.id);
   }
 }
-

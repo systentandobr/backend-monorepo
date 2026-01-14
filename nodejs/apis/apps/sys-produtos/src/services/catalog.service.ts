@@ -1,16 +1,29 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, FilterQuery } from 'mongoose';
 import { CATALOG_COLLECTION, Catalog } from '../schemas/catalog.schema';
-import { CreateCatalogDto, UpdateCatalogDto, QueryCatalogDto } from '../dto/catalog.dto';
+import {
+  CreateCatalogDto,
+  UpdateCatalogDto,
+  QueryCatalogDto,
+} from '../dto/catalog.dto';
 
 @Injectable()
 export class CatalogService {
   constructor(
-    @InjectModel(CATALOG_COLLECTION) private readonly catalogModel: Model<Catalog>,
+    @InjectModel(CATALOG_COLLECTION)
+    private readonly catalogModel: Model<Catalog>,
   ) {}
 
-  async create(unitId: string, ownerId: string, dto: CreateCatalogDto): Promise<Catalog & { id: string; _id?: any }> {
+  async create(
+    unitId: string,
+    ownerId: string,
+    dto: CreateCatalogDto,
+  ): Promise<Catalog & { id: string; _id?: any }> {
     const catalog = await this.catalogModel.create({
       unitId,
       ownerId,
@@ -29,17 +42,18 @@ export class CatalogService {
     } as Catalog & { id: string; _id?: any };
   }
 
-  async list(unitId: string, userId: string, query: QueryCatalogDto = {}): Promise<Catalog[]> {
+  async list(
+    unitId: string,
+    userId: string,
+    query: QueryCatalogDto = {},
+  ): Promise<Catalog[]> {
     const filter: FilterQuery<Catalog> = {
       unitId,
       isDeleted: { $ne: true },
     };
 
     // Filtrar por público ou do próprio usuário
-    filter.$or = [
-      { isPublic: true },
-      { ownerId: userId },
-    ];
+    filter.$or = [{ isPublic: true }, { ownerId: userId }];
 
     if (query.search) {
       filter.$and = [
@@ -57,9 +71,12 @@ export class CatalogService {
       filter.isPublic = query.isPublic;
     }
 
-    const catalogs = await this.catalogModel.find(filter).sort({ createdAt: -1 }).lean();
+    const catalogs = await this.catalogModel
+      .find(filter)
+      .sort({ createdAt: -1 })
+      .lean();
     // Adicionar id virtual aos objetos lean
-    return catalogs.map(cat => ({
+    return catalogs.map((cat) => ({
       ...cat,
       id: cat._id.toString(),
     })) as Catalog[];
@@ -80,7 +97,9 @@ export class CatalogService {
 
     // Verificar se o usuário tem acesso (público ou é o dono)
     if (!catalog.isPublic && catalog.ownerId !== userId) {
-      throw new ForbiddenException('Você não tem permissão para acessar este catálogo');
+      throw new ForbiddenException(
+        'Você não tem permissão para acessar este catálogo',
+      );
     }
 
     return {
@@ -103,7 +122,9 @@ export class CatalogService {
     });
 
     if (!catalog) {
-      throw new NotFoundException('Catálogo não encontrado ou você não tem permissão');
+      throw new NotFoundException(
+        'Catálogo não encontrado ou você não tem permissão',
+      );
     }
 
     const updated = await this.catalogModel
@@ -125,7 +146,9 @@ export class CatalogService {
     });
 
     if (!catalog) {
-      throw new NotFoundException('Catálogo não encontrado ou você não tem permissão');
+      throw new NotFoundException(
+        'Catálogo não encontrado ou você não tem permissão',
+      );
     }
 
     await this.catalogModel.findByIdAndUpdate(id, { isDeleted: true });
@@ -145,7 +168,9 @@ export class CatalogService {
     });
 
     if (!catalog) {
-      throw new NotFoundException('Catálogo não encontrado ou você não tem permissão');
+      throw new NotFoundException(
+        'Catálogo não encontrado ou você não tem permissão',
+      );
     }
 
     if (!catalog.productIds.includes(productId)) {
@@ -170,7 +195,9 @@ export class CatalogService {
     });
 
     if (!catalog) {
-      throw new NotFoundException('Catálogo não encontrado ou você não tem permissão');
+      throw new NotFoundException(
+        'Catálogo não encontrado ou você não tem permissão',
+      );
     }
 
     catalog.productIds = catalog.productIds.filter((id) => id !== productId);
@@ -182,7 +209,10 @@ export class CatalogService {
   /**
    * Buscar ou criar catálogo padrão para um unitId
    */
-  async findOrCreateDefaultCatalog(unitId: string, userId: string): Promise<Catalog & { id: string; _id?: any }> {
+  async findOrCreateDefaultCatalog(
+    unitId: string,
+    userId: string,
+  ): Promise<Catalog & { id: string; _id?: any }> {
     // Buscar catálogo padrão (nome "Catálogo Principal" ou primeiro catálogo do usuário)
     const existingCatalog = await this.catalogModel
       .findOne({
@@ -207,7 +237,7 @@ export class CatalogService {
     if (!catalogId) {
       throw new Error('Não foi possível obter o ID do catálogo existente');
     }
-    
+
     return {
       ...existingCatalog,
       id: catalogId,
@@ -215,5 +245,3 @@ export class CatalogService {
     } as Catalog & { id: string; _id?: any };
   }
 }
-
-

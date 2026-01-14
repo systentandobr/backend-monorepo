@@ -1,5 +1,15 @@
-import { IsString, IsEmail, IsOptional, IsEnum, IsObject, IsArray, IsNumber, Min, Max } from 'class-validator';
-import { LeadSource, LeadStatus } from '../schemas/lead.schema';
+import {
+  IsString,
+  IsEmail,
+  IsOptional,
+  IsEnum,
+  IsObject,
+  IsArray,
+  IsNumber,
+  Min,
+  Max,
+} from 'class-validator';
+import { LeadSource } from '../schemas/lead.schema';
 
 export class CreateLeadDto {
   @IsString()
@@ -38,4 +48,3 @@ export class CreateLeadDto {
   @Max(100)
   score?: number;
 }
-

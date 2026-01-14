@@ -64,7 +64,7 @@ describe('FinancialController', () => {
       };
 
       const mockRequest = {
-        user: { id: 'test-user-id' }
+        user: { id: 'test-user-id' },
       };
 
       mockFinancialService.getPortfolio.mockResolvedValue({
@@ -92,7 +92,7 @@ describe('FinancialController', () => {
       };
 
       const mockRequest = {
-        user: { id: 'test-user-id' }
+        user: { id: 'test-user-id' },
       };
 
       mockFinancialService.getPortfolioRiskAnalysis.mockResolvedValue({
@@ -105,7 +105,9 @@ describe('FinancialController', () => {
 
       expect(result.success).toBe(true);
       expect(result.data).toEqual(mockRiskAnalysis);
-      expect(service.getPortfolioRiskAnalysis).toHaveBeenCalledWith('test-user-id');
+      expect(service.getPortfolioRiskAnalysis).toHaveBeenCalledWith(
+        'test-user-id',
+      );
     });
   });
 
@@ -123,7 +125,7 @@ describe('FinancialController', () => {
       ];
 
       const mockRequest = {
-        user: { id: 'test-user-id' }
+        user: { id: 'test-user-id' },
       };
 
       mockFinancialService.getFinancialGoals.mockResolvedValue({
@@ -150,7 +152,7 @@ describe('FinancialController', () => {
       };
 
       const mockRequest = {
-        user: { id: 'test-user-id' }
+        user: { id: 'test-user-id' },
       };
 
       const mockCreatedGoal = {
@@ -166,11 +168,17 @@ describe('FinancialController', () => {
         timestamp: new Date().toISOString(),
       });
 
-      const result = await controller.createFinancialGoal(mockRequest, goalData);
+      const result = await controller.createFinancialGoal(
+        mockRequest,
+        goalData,
+      );
 
       expect(result.success).toBe(true);
       expect(result.data).toEqual(mockCreatedGoal);
-      expect(service.createFinancialGoal).toHaveBeenCalledWith('test-user-id', goalData);
+      expect(service.createFinancialGoal).toHaveBeenCalledWith(
+        'test-user-id',
+        goalData,
+      );
     });
   });
 });

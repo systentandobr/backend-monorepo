@@ -2,7 +2,10 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AnalyticsController } from './analytics.controller';
 import { AnalyticsService } from './analytics.service';
-import { AnalyticsData, AnalyticsDataSchema } from './schemas/analytics-data.schema';
+import {
+  AnalyticsData,
+  AnalyticsDataSchema,
+} from './schemas/analytics-data.schema';
 
 @Module({
   imports: [
@@ -14,4 +17,4 @@ import { AnalyticsData, AnalyticsDataSchema } from './schemas/analytics-data.sch
   providers: [AnalyticsService],
   exports: [AnalyticsService],
 })
-export class AnalyticsModule {} 
+export class AnalyticsModule {}

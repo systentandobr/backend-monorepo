@@ -16,20 +16,24 @@ export class UploadMiddleware {
           // Criar estrutura de pastas baseada em data-hora-minuto
           const now = new Date();
           const dateFolder = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}`;
-          
+
           // Gerar hashId temporário para criar pasta
           const tempHash = crypto.randomBytes(16).toString('hex');
-          const uploadPath = path.join(storageConfig.UPLOAD_DIR, dateFolder, tempHash);
-          
+          const uploadPath = path.join(
+            storageConfig.UPLOAD_DIR,
+            dateFolder,
+            tempHash,
+          );
+
           // Criar diretórios se não existirem
           if (!fs.existsSync(uploadPath)) {
             fs.mkdirSync(uploadPath, { recursive: true });
           }
-          
+
           // Armazenar tempHash no request para uso posterior
           (req as any).tempHash = tempHash;
           (req as any).dateFolder = dateFolder;
-          
+
           cb(null, uploadPath);
         },
         filename: (req, file, cb) => {
@@ -56,4 +60,3 @@ export class UploadMiddleware {
     };
   }
 }
-

@@ -1,8 +1,16 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import type { Multer } from 'multer';
-import { PRODUCT_IMAGE_COLLECTION, ProductImage } from '../schemas/product-image.schema';
+import {
+  PRODUCT_IMAGE_COLLECTION,
+  ProductImage,
+} from '../schemas/product-image.schema';
 import { storageConfig } from '../config/storage.config';
 import * as crypto from 'crypto';
 import * as path from 'path';
@@ -18,7 +26,8 @@ const rmdir = promisify(fs.rmdir);
 @Injectable()
 export class ProductImageService {
   constructor(
-    @InjectModel(PRODUCT_IMAGE_COLLECTION) private readonly productImageModel: Model<ProductImage>,
+    @InjectModel(PRODUCT_IMAGE_COLLECTION)
+    private readonly productImageModel: Model<ProductImage>,
   ) {}
 
   /**
@@ -36,7 +45,9 @@ export class ProductImageService {
    * Obtém dimensões da imagem
    * Nota: Implementação básica - pode ser melhorada com biblioteca de imagem no futuro
    */
-  private async getImageDimensions(filePath: string): Promise<{ width: number; height: number }> {
+  private async getImageDimensions(
+    filePath: string,
+  ): Promise<{ width: number; height: number }> {
     // Por enquanto retorna valores padrão
     // Pode ser implementado com sharp ou jimp no futuro
     return { width: 0, height: 0 };
@@ -50,9 +61,16 @@ export class ProductImageService {
     productId: string,
     unitId: string,
     isThumbnail: boolean = false,
-  ): Promise<{ hashId: string; url: string; thumbnailUrl?: string; path: string }> {
+  ): Promise<{
+    hashId: string;
+    url: string;
+    thumbnailUrl?: string;
+    path: string;
+  }> {
     if (!productId) {
-      throw new BadRequestException('productId é obrigatório para fazer upload de imagem');
+      throw new BadRequestException(
+        'productId é obrigatório para fazer upload de imagem',
+      );
     }
     // Validar arquivo
     if (!file) {
@@ -133,9 +151,14 @@ export class ProductImageService {
   /**
    * Obter imagem por hashId (não requer productId - pode ser imagem ainda não associada)
    */
-  async getImageByHash(hashId: string, unitId: string): Promise<{ filePath: string; mimeType: string }> {
+  async getImageByHash(
+    hashId: string,
+    unitId: string,
+  ): Promise<{ filePath: string; mimeType: string }> {
     // Buscar imagem por hashId e unitId (productId é opcional)
-    const image = await this.productImageModel.findOne({ hashId, unitId }).lean();
+    const image = await this.productImageModel
+      .findOne({ hashId, unitId })
+      .lean();
 
     if (!image) {
       throw new NotFoundException('Imagem não encontrada');
@@ -144,7 +167,9 @@ export class ProductImageService {
     const filePath = path.join(storageConfig.UPLOAD_DIR, image.path);
 
     if (!fs.existsSync(filePath)) {
-      throw new NotFoundException('Arquivo de imagem não encontrado no sistema de arquivos');
+      throw new NotFoundException(
+        'Arquivo de imagem não encontrado no sistema de arquivos',
+      );
     }
 
     return {
@@ -171,7 +196,10 @@ export class ProductImageService {
 
     // Remover thumbnail se existir
     if (image.thumbnailPath) {
-      const thumbnailPath = path.join(storageConfig.UPLOAD_DIR, image.thumbnailPath);
+      const thumbnailPath = path.join(
+        storageConfig.UPLOAD_DIR,
+        image.thumbnailPath,
+      );
       if (fs.existsSync(thumbnailPath)) {
         await unlink(thumbnailPath);
       }
@@ -195,7 +223,10 @@ export class ProductImageService {
   /**
    * Atualizar ordem das imagens
    */
-  async updateImageOrder(productId: string, imageHashes: string[]): Promise<void> {
+  async updateImageOrder(
+    productId: string,
+    imageHashes: string[],
+  ): Promise<void> {
     const updates = imageHashes.map((hashId, index) => ({
       updateOne: {
         filter: { hashId, productId },
@@ -209,7 +240,11 @@ export class ProductImageService {
   /**
    * Associar imagem a um produto (quando produto é criado após upload)
    */
-  async associateImageToProduct(hashId: string, productId: string, unitId: string): Promise<void> {
+  async associateImageToProduct(
+    hashId: string,
+    productId: string,
+    unitId: string,
+  ): Promise<void> {
     const image = await this.productImageModel.findOne({ hashId, unitId });
 
     if (!image) {
@@ -223,8 +258,13 @@ export class ProductImageService {
   /**
    * Obter todas as imagens de um produto
    */
-  async getProductImages(productId: string, unitId: string): Promise<ProductImage[]> {
-    return this.productImageModel.find({ productId, unitId }).sort({ order: 1 }).lean();
+  async getProductImages(
+    productId: string,
+    unitId: string,
+  ): Promise<ProductImage[]> {
+    return this.productImageModel
+      .find({ productId, unitId })
+      .sort({ order: 1 })
+      .lean();
   }
 }
-

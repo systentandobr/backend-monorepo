@@ -16,4 +16,4 @@ import { Category, CategorySchema } from './schemas/category.schema';
   providers: [HabitsService],
   exports: [HabitsService],
 })
-export class HabitsModule {} 
+export class HabitsModule {}

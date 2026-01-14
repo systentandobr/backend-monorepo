@@ -1,29 +1,36 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 
-export type FranchiseDocument = Franchise & Document & {
-  createdAt?: Date;
-  updatedAt?: Date;
-};
+export type FranchiseDocument = Franchise &
+  Document & {
+    createdAt?: Date;
+    updatedAt?: Date;
+  };
 
 // Sub-schema para location
-const LocationSchema = new MongooseSchema({
-  lat: { type: Number, required: true },
-  lng: { type: Number, required: true },
-  address: { type: String, required: true },
-  city: { type: String, required: true },
-  state: { type: String, required: true },
-  zipCode: { type: String, required: true },
-  type: { type: String, enum: ['physical', 'digital'], required: true },
-}, { _id: false });
+const LocationSchema = new MongooseSchema(
+  {
+    lat: { type: Number, required: true },
+    lng: { type: Number, required: true },
+    address: { type: String, required: true },
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    zipCode: { type: String, required: true },
+    type: { type: String, enum: ['physical', 'digital'], required: true },
+  },
+  { _id: false },
+);
 
 // Sub-schema para territory
-const TerritorySchema = new MongooseSchema({
-  city: { type: String, required: true },
-  state: { type: String, required: true },
-  exclusive: { type: Boolean, default: true },
-  radius: { type: Number },
-}, { _id: false });
+const TerritorySchema = new MongooseSchema(
+  {
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    exclusive: { type: Boolean, default: true },
+    radius: { type: Number },
+  },
+  { _id: false },
+);
 
 @Schema({
   timestamps: true,
@@ -104,4 +111,3 @@ FranchiseSchema.index({ 'location.state': 1 });
 FranchiseSchema.index({ 'location.city': 1 });
 FranchiseSchema.index({ ownerId: 1 });
 FranchiseSchema.index({ marketSegments: 1 });
-

@@ -1,13 +1,35 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { SysProdutosService } from './sys-produtos.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { CurrentUser, CurrentUserShape } from './decorators/current-user.decorator';
+import {
+  CurrentUser,
+  CurrentUserShape,
+} from './decorators/current-user.decorator';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { UpdateProdutoDto } from './dto/update-produto.dto';
 import { QueryProdutoDto } from './dto/query-produto.dto';
-import { AdjustStockDeltaDto, AdjustStockDto, CreateVariantDto, UpdateVariantDto } from './dto/variant.dto';
-import { CategoryDto, ImageDto, UpdateProdutoMetadataDto } from './dto/produto-metadata.dto';
+import {
+  AdjustStockDeltaDto,
+  AdjustStockDto,
+  CreateVariantDto,
+  UpdateVariantDto,
+} from './dto/variant.dto';
+import {
+  CategoryDto,
+  ImageDto,
+  UpdateProdutoMetadataDto,
+} from './dto/produto-metadata.dto';
 
 @ApiTags('produtos')
 @ApiBearerAuth()

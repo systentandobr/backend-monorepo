@@ -42,4 +42,4 @@ export class Recipe {
   updatedAt: string;
 }
 
-export const RecipeSchema = SchemaFactory.createForClass(Recipe); 
+export const RecipeSchema = SchemaFactory.createForClass(Recipe);

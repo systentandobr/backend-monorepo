@@ -12,4 +12,3 @@ export class UpdateOrderStatusDto {
 }
 
 export class UpdateOrderDto extends PartialType(CreateOrderDto) {}
-

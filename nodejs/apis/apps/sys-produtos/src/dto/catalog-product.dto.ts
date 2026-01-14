@@ -1,5 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsArray, ValidateNested, IsOptional } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsArray,
+  ValidateNested,
+  IsOptional,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { CreateProdutoDto } from './create-produto.dto';
 
@@ -29,4 +35,3 @@ export class CreateCatalogProductDto extends CreateProdutoDto {
   @Type(() => ImageReferenceDto)
   images?: ImageReferenceDto[];
 }
-

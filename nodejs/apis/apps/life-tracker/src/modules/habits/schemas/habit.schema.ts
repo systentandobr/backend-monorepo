@@ -45,4 +45,4 @@ export class Habit {
   domain?: string;
 }
 
-export const HabitSchema = SchemaFactory.createForClass(Habit); 
+export const HabitSchema = SchemaFactory.createForClass(Habit);

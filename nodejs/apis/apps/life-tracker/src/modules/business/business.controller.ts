@@ -19,7 +19,9 @@ export class BusinessController {
   }
 
   @Post('opportunities')
-  async createOpportunity(@Body() opportunityData: any): Promise<ApiResponse<any>> {
+  async createOpportunity(
+    @Body() opportunityData: any,
+  ): Promise<ApiResponse<any>> {
     return this.businessService.createOpportunity(opportunityData);
   }
 
@@ -46,13 +48,16 @@ export class BusinessController {
   @Put('projects/:id/progress')
   async updateProjectProgress(
     @Param('id') id: string,
-    @Body() progressData: { progress: number }
+    @Body() progressData: { progress: number },
   ): Promise<ApiResponse<any>> {
-    return this.businessService.updateProjectProgress(id, progressData.progress);
+    return this.businessService.updateProjectProgress(
+      id,
+      progressData.progress,
+    );
   }
 
   @Get('analytics')
   async getBusinessAnalytics(): Promise<ApiResponse<any>> {
     return this.businessService.getBusinessAnalytics();
   }
-} 
+}

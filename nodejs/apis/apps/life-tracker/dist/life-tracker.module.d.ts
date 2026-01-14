@@ -1,2 +1,1 @@
-export declare class LifeTrackerModule {
-}
+export declare class LifeTrackerModule {}

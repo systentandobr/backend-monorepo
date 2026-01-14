@@ -1,22 +1,22 @@
 import { IsString, IsObject, IsBoolean, IsOptional } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateRagInstructionFromPdfDto {
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Título ou descrição das instruções',
-    example: 'Manual de Produtos - Extraído de PDF'
+    example: 'Manual de Produtos - Extraído de PDF',
   })
   @IsOptional()
   @IsString()
   title?: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Contexto adicional com dados específicos da unidade',
     example: {
       products: [],
       campaigns: [],
-      customers: []
-    }
+      customers: [],
+    },
   })
   @IsOptional()
   @IsObject()
@@ -28,14 +28,14 @@ export class CreateRagInstructionFromPdfDto {
     [key: string]: any;
   };
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Metadados sobre as instruções',
     example: {
       version: '1.0.0',
       author: 'admin',
       description: 'Instruções extraídas de PDF',
-      tags: ['pdf', 'manual']
-    }
+      tags: ['pdf', 'manual'],
+    },
   })
   @IsOptional()
   @IsObject()
@@ -47,14 +47,17 @@ export class CreateRagInstructionFromPdfDto {
     [key: string]: any;
   };
 
-  @ApiPropertyOptional({ description: 'Se as instruções estão ativas', default: true })
+  @ApiPropertyOptional({
+    description: 'Se as instruções estão ativas',
+    default: true,
+  })
   @IsOptional()
   @IsBoolean()
   active?: boolean;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Se deve indexar automaticamente no RAG após processamento',
-    default: true
+    default: true,
   })
   @IsOptional()
   @IsBoolean()

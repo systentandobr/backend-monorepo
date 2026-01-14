@@ -12,9 +12,18 @@ import {
   HttpStatus,
   BadRequestException,
 } from '@nestjs/common';
-import { IngredientsService, CreateIngredientDto, UpdateIngredientDto, AddPurchaseDto, AddLossDto } from '../services/ingredients.service';
+import {
+  IngredientsService,
+  CreateIngredientDto,
+  UpdateIngredientDto,
+  AddPurchaseDto,
+  AddLossDto,
+} from '../services/ingredients.service';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
-import { CurrentUser, CurrentUserShape } from '../decorators/current-user.decorator';
+import {
+  CurrentUser,
+  CurrentUserShape,
+} from '../decorators/current-user.decorator';
 import { UnitScope } from '../decorators/unit-scope.decorator';
 
 @Controller('ingredients')
@@ -69,10 +78,7 @@ export class IngredientsController {
 
   @Get(':id')
   @UnitScope()
-  async findOne(
-    @Param('id') id: string,
-    @CurrentUser() user: any,
-  ) {
+  async findOne(@Param('id') id: string, @CurrentUser() user: any) {
     const unitId = user.unitId || user.profile?.unitId;
     if (!unitId) {
       throw new BadRequestException('UnitId é obrigatório');
@@ -98,7 +104,11 @@ export class IngredientsController {
       throw new BadRequestException('UnitId é obrigatório');
     }
 
-    const ingredient = await this.ingredientsService.update(id, unitId, updateDto);
+    const ingredient = await this.ingredientsService.update(
+      id,
+      unitId,
+      updateDto,
+    );
 
     return {
       success: true,
@@ -109,10 +119,7 @@ export class IngredientsController {
   @Delete(':id')
   @UnitScope()
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(
-    @Param('id') id: string,
-    @CurrentUser() user: any,
-  ) {
+  async remove(@Param('id') id: string, @CurrentUser() user: any) {
     const unitId = user.unitId || user.profile?.unitId;
     if (!unitId) {
       throw new BadRequestException('UnitId é obrigatório');
@@ -134,7 +141,11 @@ export class IngredientsController {
       throw new BadRequestException('UnitId é obrigatório');
     }
 
-    const ingredient = await this.ingredientsService.addPurchase(id, unitId, purchaseDto);
+    const ingredient = await this.ingredientsService.addPurchase(
+      id,
+      unitId,
+      purchaseDto,
+    );
 
     return {
       success: true,
@@ -155,7 +166,11 @@ export class IngredientsController {
       throw new BadRequestException('UnitId é obrigatório');
     }
 
-    const ingredient = await this.ingredientsService.addLoss(id, unitId, lossDto);
+    const ingredient = await this.ingredientsService.addLoss(
+      id,
+      unitId,
+      lossDto,
+    );
 
     return {
       success: true,

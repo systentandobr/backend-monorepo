@@ -26,10 +26,11 @@ import { GamificationModule } from './modules/gamification/gamification.module';
     MongooseModule.forRoot(
       `mongodb+srv://${encodeURIComponent(
         process.env.USER_DB as string,
-      )}:${encodeURIComponent(process.env.PASS_DB as string)}@${process.env.HOST_DB
+      )}:${encodeURIComponent(process.env.PASS_DB as string)}@${
+        process.env.HOST_DB
       }/life-tracker`,
     ),
-    
+
     // Módulos de domínio
     RoutinesModule,
     HabitsModule,
@@ -44,4 +45,4 @@ import { GamificationModule } from './modules/gamification/gamification.module';
   providers: [LifeTrackerService, JwtValidatorService],
   exports: [LifeTrackerService, JwtValidatorService],
 })
-export class LifeTrackerModule {} 
+export class LifeTrackerModule {}

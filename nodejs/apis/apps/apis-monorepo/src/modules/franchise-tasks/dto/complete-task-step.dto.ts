@@ -1,10 +1,10 @@
 import { IsNumber, IsOptional, IsObject } from 'class-validator';
 
 export class CompleteTaskStepDto {
-    @IsNumber()
-    stepOrder: number;
+  @IsNumber()
+  stepOrder: number;
 
-    @IsObject()
-    @IsOptional()
-    data?: any;
+  @IsObject()
+  @IsOptional()
+  data?: any;
 }

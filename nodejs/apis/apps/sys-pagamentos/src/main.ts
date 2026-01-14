@@ -3,7 +3,7 @@ import { SysPagamentosModule } from './sys-pagamentos.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(SysPagamentosModule);
-  
+
   // Configuração do CORS
   app.enableCors({
     origin: [
@@ -31,7 +31,7 @@ async function bootstrap() {
     preflightContinue: false,
     optionsSuccessStatus: 204,
   });
-  
+
   await app.listen(3000);
 }
 bootstrap();

@@ -1,2 +1,1 @@
-export declare class RoutinesModule {
-}
+export declare class RoutinesModule {}

@@ -17,11 +17,16 @@ export class HabitListener {
   @OnEvent('habit.completed')
   async handleHabitCompletedEvent(payload: HabitCompletedEvent) {
     try {
-      const { userId, habitId, difficulty = 'medium', habitName = 'Hábito' } = payload;
-      
+      const {
+        userId,
+        habitId,
+        difficulty = 'medium',
+        habitName = 'Hábito',
+      } = payload;
+
       // Calcular pontos baseado na dificuldade
       const points = this.calculatePoints('HABIT_COMPLETION', difficulty);
-      
+
       // Adicionar pontos
       const result = await this.gamificationService.addPoints(
         userId,
@@ -32,15 +37,25 @@ export class HabitListener {
       );
 
       if (result.success) {
-        console.log(`Pontos adicionados para usuário ${userId}: +${points} pontos`);
-        
+        console.log(
+          `Pontos adicionados para usuário ${userId}: +${points} pontos`,
+        );
+
         // Log de conquistas desbloqueadas
-        if (result.data.newAchievements && result.data.newAchievements.length > 0) {
-          console.log(`Novas conquistas desbloqueadas para usuário ${userId}:`, 
-            result.data.newAchievements.map(a => a.name));
+        if (
+          result.data.newAchievements &&
+          result.data.newAchievements.length > 0
+        ) {
+          console.log(
+            `Novas conquistas desbloqueadas para usuário ${userId}:`,
+            result.data.newAchievements.map((a) => a.name),
+          );
         }
       } else {
-        console.error(`Erro ao adicionar pontos para usuário ${userId}:`, result.error);
+        console.error(
+          `Erro ao adicionar pontos para usuário ${userId}:`,
+          result.error,
+        );
       }
     } catch (error) {
       console.error('Erro no HabitListener:', error);

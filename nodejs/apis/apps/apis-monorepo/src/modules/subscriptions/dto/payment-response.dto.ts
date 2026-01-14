@@ -7,7 +7,12 @@ export class PaymentResponseDto {
   dueDate: Date;
   paidDate?: Date;
   status: 'pending' | 'paid' | 'overdue' | 'cancelled';
-  paymentMethod?: 'credit_card' | 'debit_card' | 'pix' | 'cash' | 'bank_transfer';
+  paymentMethod?:
+    | 'credit_card'
+    | 'debit_card'
+    | 'pix'
+    | 'cash'
+    | 'bank_transfer';
   transactionId?: string;
   createdAt?: Date;
   updatedAt?: Date;

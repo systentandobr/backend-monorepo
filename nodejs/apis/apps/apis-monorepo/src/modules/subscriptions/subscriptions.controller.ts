@@ -16,7 +16,10 @@ import { CreateSubscriptionPlanDto } from './dto/create-subscription-plan.dto';
 import { UpdateSubscriptionPlanDto } from './dto/update-subscription-plan.dto';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UnitScope } from '../../decorators/unit-scope.decorator';
-import { CurrentUser, CurrentUserShape } from '../../decorators/current-user.decorator';
+import {
+  CurrentUser,
+  CurrentUserShape,
+} from '../../decorators/current-user.decorator';
 
 @ApiTags('subscriptions')
 @Controller('subscriptions')
@@ -48,10 +51,7 @@ export class SubscriptionsController {
   }
 
   @Get('plans/:id')
-  findPlanById(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
+  findPlanById(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     const unitId = user.unitId || user.profile?.unitId;
     if (!unitId) {
       throw new Error('unitId não encontrado no contexto do usuário');
@@ -74,10 +74,7 @@ export class SubscriptionsController {
 
   @Delete('plans/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  removePlan(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
+  removePlan(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     const unitId = user.unitId || user.profile?.unitId;
     if (!unitId) {
       throw new Error('unitId não encontrado no contexto do usuário');
@@ -109,7 +106,10 @@ export class SubscriptionsController {
     if (!unitId) {
       throw new Error('unitId não encontrado no contexto do usuário');
     }
-    return this.subscriptionsService.findAllPayments({ studentId, status }, unitId);
+    return this.subscriptionsService.findAllPayments(
+      { studentId, status },
+      unitId,
+    );
   }
 
   @Get('payments/:id')
@@ -135,6 +135,11 @@ export class SubscriptionsController {
     if (!unitId) {
       throw new Error('unitId não encontrado no contexto do usuário');
     }
-    return this.subscriptionsService.markPaymentAsPaid(id, paidDate, paymentMethod, unitId);
+    return this.subscriptionsService.markPaymentAsPaid(
+      id,
+      paidDate,
+      paymentMethod,
+      unitId,
+    );
   }
 }

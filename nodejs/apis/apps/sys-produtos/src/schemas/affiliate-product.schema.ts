@@ -1,19 +1,19 @@
 import { Schema, SchemaTypes, Document } from 'mongoose';
 
-export type ProcessingStatus = 
-  | 'pending' 
-  | 'processing' 
-  | 'completed' 
-  | 'failed' 
+export type ProcessingStatus =
+  | 'pending'
+  | 'processing'
+  | 'completed'
+  | 'failed'
   | 'retrying';
 
-export type AffiliatePlatform = 
-  | 'shopee' 
-  | 'amazon' 
-  | 'magalu' 
-  | 'mercadolivre' 
-  | 'americanas' 
-  | 'casasbahia' 
+export type AffiliatePlatform =
+  | 'shopee'
+  | 'amazon'
+  | 'magalu'
+  | 'mercadolivre'
+  | 'americanas'
+  | 'casasbahia'
   | 'other';
 
 export interface AffiliateProduct extends Document {
@@ -49,20 +49,28 @@ export const AffiliateProductSchema = new Schema<AffiliateProduct>(
     categoryId: { type: String, required: true, index: true },
     categoryName: { type: String, required: true },
     affiliateUrl: { type: String, required: true, index: true },
-    platform: { 
-      type: String, 
-      required: true, 
-      enum: ['shopee', 'amazon', 'magalu', 'mercadolivre', 'americanas', 'casasbahia', 'other'],
-      index: true 
+    platform: {
+      type: String,
+      required: true,
+      enum: [
+        'shopee',
+        'amazon',
+        'magalu',
+        'mercadolivre',
+        'americanas',
+        'casasbahia',
+        'other',
+      ],
+      index: true,
     },
     userId: { type: String, required: true, index: true },
     unitId: { type: String, required: true, index: true },
-    processingStatus: { 
-      type: String, 
-      required: true, 
+    processingStatus: {
+      type: String,
+      required: true,
       enum: ['pending', 'processing', 'completed', 'failed', 'retrying'],
       default: 'pending',
-      index: true 
+      index: true,
     },
     productId: { type: String, index: true },
     errorMessage: { type: String },
@@ -71,7 +79,7 @@ export const AffiliateProductSchema = new Schema<AffiliateProduct>(
     scrapedData: { type: SchemaTypes.Mixed },
     processedAt: { type: Date },
   },
-  { timestamps: true, versionKey: false }
+  { timestamps: true, versionKey: false },
 );
 
 // Índices compostos
@@ -80,4 +88,3 @@ AffiliateProductSchema.index({ unitId: 1, processingStatus: 1 });
 AffiliateProductSchema.index({ createdAt: -1 });
 
 export const AFFILIATE_PRODUCT_COLLECTION = 'AffiliateProduct';
-

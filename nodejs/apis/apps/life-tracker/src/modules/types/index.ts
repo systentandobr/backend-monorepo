@@ -64,4 +64,4 @@ export interface LeaderboardEntry {
   level: number;
   rank: number;
   username?: string;
-} 
+}

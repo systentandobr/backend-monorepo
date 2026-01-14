@@ -57,7 +57,9 @@ describe('Gamification Flow Integration (e2e)', () => {
     pointTransactionModel = moduleFixture.get<Model<any>>(
       getModelToken('PointTransaction'),
     );
-    achievementModel = moduleFixture.get<Model<any>>(getModelToken('Achievement'));
+    achievementModel = moduleFixture.get<Model<any>>(
+      getModelToken('Achievement'),
+    );
     userAchievementModel = moduleFixture.get<Model<any>>(
       getModelToken('UserAchievement'),
     );
@@ -82,7 +84,9 @@ describe('Gamification Flow Integration (e2e)', () => {
         save: jest.fn().mockResolvedValue(true),
       };
 
-      jest.spyOn(gamificationProfileModel, 'findOne').mockResolvedValue(mockProfile);
+      jest
+        .spyOn(gamificationProfileModel, 'findOne')
+        .mockResolvedValue(mockProfile);
 
       // Mock da transação
       const mockTransaction = {
@@ -94,7 +98,9 @@ describe('Gamification Flow Integration (e2e)', () => {
         save: jest.fn().mockResolvedValue(true),
       };
 
-      jest.spyOn(pointTransactionModel, 'create').mockReturnValue(mockTransaction);
+      jest
+        .spyOn(pointTransactionModel, 'create')
+        .mockReturnValue(mockTransaction);
 
       // Mock das conquistas
       const mockAchievements = [
@@ -117,7 +123,7 @@ describe('Gamification Flow Integration (e2e)', () => {
       });
 
       // Aguardar processamento
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Verificar se o perfil foi atualizado
       expect(mockProfile.save).toHaveBeenCalled();
@@ -150,7 +156,9 @@ describe('Gamification Flow Integration (e2e)', () => {
         save: jest.fn().mockResolvedValue(true),
       };
 
-      jest.spyOn(gamificationProfileModel, 'findOne').mockResolvedValue(mockProfile);
+      jest
+        .spyOn(gamificationProfileModel, 'findOne')
+        .mockResolvedValue(mockProfile);
 
       const mockTransaction = {
         userId: 'user-123',
@@ -161,7 +169,9 @@ describe('Gamification Flow Integration (e2e)', () => {
         save: jest.fn().mockResolvedValue(true),
       };
 
-      jest.spyOn(pointTransactionModel, 'create').mockReturnValue(mockTransaction);
+      jest
+        .spyOn(pointTransactionModel, 'create')
+        .mockReturnValue(mockTransaction);
 
       const response = await request(app.getHttpServer())
         .post('/gamification/transaction')
@@ -235,7 +245,9 @@ describe('Gamification Flow Integration (e2e)', () => {
         save: jest.fn().mockResolvedValue(true),
       };
 
-      jest.spyOn(gamificationProfileModel, 'findOne').mockResolvedValue(mockProfile);
+      jest
+        .spyOn(gamificationProfileModel, 'findOne')
+        .mockResolvedValue(mockProfile);
 
       // Adicionar pontos
       const response = await request(app.getHttpServer())

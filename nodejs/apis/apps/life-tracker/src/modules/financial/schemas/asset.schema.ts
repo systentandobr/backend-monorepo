@@ -33,4 +33,4 @@ export class Asset {
   updatedAt: string;
 }
 
-export const AssetSchema = SchemaFactory.createForClass(Asset); 
+export const AssetSchema = SchemaFactory.createForClass(Asset);

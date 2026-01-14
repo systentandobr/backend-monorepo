@@ -12,7 +12,12 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiOperation, ApiResponse, ApiConsumes } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiConsumes,
+} from '@nestjs/swagger';
 import type { Multer } from 'multer';
 import { RagInstructionsService } from './rag-instructions.service';
 import { CreateRagInstructionDto } from './dto/create-rag-instruction.dto';
@@ -22,13 +27,18 @@ import { CreateRagInstructionFromTextDto } from './dto/create-rag-instruction-fr
 import { CreateRagInstructionFromUrlDto } from './dto/create-rag-instruction-from-url.dto';
 import { CreateRagInstructionFromPdfDto } from './dto/create-rag-instruction-from-pdf.dto';
 import { UnitScope } from '../../decorators/unit-scope.decorator';
-import { CurrentUser, CurrentUserShape } from '../../decorators/current-user.decorator';
+import {
+  CurrentUser,
+  CurrentUserShape,
+} from '../../decorators/current-user.decorator';
 
 @ApiTags('rag-instructions')
 @Controller('rag-instructions')
 @UnitScope()
 export class RagInstructionsController {
-  constructor(private readonly ragInstructionsService: RagInstructionsService) {}
+  constructor(
+    private readonly ragInstructionsService: RagInstructionsService,
+  ) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -77,18 +87,20 @@ export class RagInstructionsController {
 
   @Post('from-pdf')
   @HttpCode(HttpStatus.CREATED)
-  @UseInterceptors(FileInterceptor('file', {
-    limits: {
-      fileSize: 10 * 1024 * 1024, // 10MB
-    },
-    fileFilter: (req, file, cb) => {
-      if (file.mimetype === 'application/pdf') {
-        cb(null, true);
-      } else {
-        cb(new Error('Apenas arquivos PDF são permitidos'), false);
-      }
-    },
-  }))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: {
+        fileSize: 10 * 1024 * 1024, // 10MB
+      },
+      fileFilter: (req, file, cb) => {
+        if (file.mimetype === 'application/pdf') {
+          cb(null, true);
+        } else {
+          cb(new Error('Apenas arquivos PDF são permitidos'), false);
+        }
+      },
+    }),
+  )
   @ApiOperation({ summary: 'Criar instruções RAG a partir de PDF' })
   @ApiConsumes('multipart/form-data')
   @ApiResponse({ status: 201, type: RagInstructionResponseDto })
@@ -111,10 +123,7 @@ export class RagInstructionsController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Reindexar instrução RAG no sistema de busca' })
   @ApiResponse({ status: 200, type: RagInstructionResponseDto })
-  reindex(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
+  reindex(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     const unitId = user.unitId || user.profile?.unitId;
     if (!unitId) {
       throw new Error('unitId não encontrado no contexto do usuário');
@@ -136,10 +145,7 @@ export class RagInstructionsController {
   @Get('by-id/:id')
   @ApiOperation({ summary: 'Buscar instrução RAG por ID' })
   @ApiResponse({ status: 200, type: RagInstructionResponseDto })
-  findOne(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
+  findOne(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     const unitId = user.unitId || user.profile?.unitId;
     if (!unitId) {
       throw new Error('unitId não encontrado no contexto do usuário');
@@ -201,10 +207,7 @@ export class RagInstructionsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Remover instruções RAG' })
   @ApiResponse({ status: 204 })
-  remove(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
+  remove(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     const unitId = user.unitId || user.profile?.unitId;
     if (!unitId) {
       throw new Error('unitId não encontrado no contexto do usuário');

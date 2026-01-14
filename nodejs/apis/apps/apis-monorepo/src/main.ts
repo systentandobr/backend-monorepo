@@ -14,21 +14,21 @@ import { EnvironmentConfig } from './config/environment.config';
  */
 async function getAllowedOriginsFromMongoDB(): Promise<string[]> {
   const origins: string[] = [];
-  
+
   try {
     const mongoUri = EnvironmentConfig.database.uri;
     const mongoose = require('mongoose');
-    
+
     // Criar conexão temporária
     const connection = await mongoose.createConnection(mongoUri).asPromise();
     const db = connection.db;
     const applicationsCollection = db.collection('applications');
-    
+
     // Buscar todas as aplicações ativas
     const applications = await applicationsCollection
       .find({ isActive: true })
       .toArray();
-    
+
     // Extrair todas as origens permitidas
     applications.forEach((app: any) => {
       if (app.allowedOrigins && Array.isArray(app.allowedOrigins)) {
@@ -39,16 +39,19 @@ async function getAllowedOriginsFromMongoDB(): Promise<string[]> {
         });
       }
     });
-    
+
     console.log(`📦 Origens encontradas no MongoDB: ${origins.length}`);
-    
+
     // Fechar conexão temporária
     await connection.close();
   } catch (error: any) {
-    console.warn('⚠️ Erro ao buscar origens do MongoDB:', error?.message || error);
+    console.warn(
+      '⚠️ Erro ao buscar origens do MongoDB:',
+      error?.message || error,
+    );
     console.log('📋 Usando apenas origens hardcoded');
   }
-  
+
   return origins;
 }
 
@@ -60,12 +63,10 @@ function matchesWildcardPattern(origin: string, pattern: string): boolean {
   if (!pattern.includes('*')) {
     return origin === pattern;
   }
-  
+
   // Converter wildcard para regex
-  const regexPattern = pattern
-    .replace(/\./g, '\\.')
-    .replace(/\*/g, '.*');
-  
+  const regexPattern = pattern.replace(/\./g, '\\.').replace(/\*/g, '.*');
+
   const regex = new RegExp(`^${regexPattern}$`);
   return regex.test(origin);
 }
@@ -130,10 +131,11 @@ async function bootstrap() {
       }
 
       // Verificar padrões com wildcard
-      const matchesWildcard = allowedOrigins.some(pattern => 
-        pattern.includes('*') && matchesWildcardPattern(origin, pattern)
+      const matchesWildcard = allowedOrigins.some(
+        (pattern) =>
+          pattern.includes('*') && matchesWildcardPattern(origin, pattern),
       );
-      
+
       if (matchesWildcard) {
         console.log(`✅ CORS permitido para origem (wildcard): ${origin}`);
         return callback(null, true);
@@ -142,7 +144,9 @@ async function bootstrap() {
       // Em desenvolvimento, permitir todas as origens locais
       if (process.env.NODE_ENV !== 'production') {
         if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
-          console.log(`🔓 Permitindo origem local em desenvolvimento: ${origin}`);
+          console.log(
+            `🔓 Permitindo origem local em desenvolvimento: ${origin}`,
+          );
           return callback(null, true);
         }
       }
@@ -182,57 +186,79 @@ async function bootstrap() {
   const expressApp = app.getHttpAdapter().getInstance();
   expressApp.use((req: any, res: any, next: any) => {
     const origin = req.headers.origin;
-    
+
     if (origin) {
       // Verificar origem exata
       const isExactMatch = allowedOrigins.includes(origin);
       // Verificar wildcards
-      const matchesWildcard = allowedOrigins.some(pattern => 
-        pattern.includes('*') && matchesWildcardPattern(origin, pattern)
+      const matchesWildcard = allowedOrigins.some(
+        (pattern) =>
+          pattern.includes('*') && matchesWildcardPattern(origin, pattern),
       );
       // Verificar localhost em desenvolvimento
-      const isLocalhost = process.env.NODE_ENV !== 'production' && 
+      const isLocalhost =
+        process.env.NODE_ENV !== 'production' &&
         (origin.includes('localhost') || origin.includes('127.0.0.1'));
-      
+
       if (isExactMatch || matchesWildcard || isLocalhost) {
         res.setHeader('Access-Control-Allow-Origin', origin);
         res.setHeader('Access-Control-Allow-Credentials', 'true');
       }
     }
-    
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD');
-    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control, Pragma, Expires, x-api-key, x-domain, If-None-Match, If-Modified-Since');
+
+    res.setHeader(
+      'Access-Control-Allow-Methods',
+      'GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD',
+    );
+    res.setHeader(
+      'Access-Control-Allow-Headers',
+      'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control, Pragma, Expires, x-api-key, x-domain, If-None-Match, If-Modified-Since',
+    );
     res.setHeader('Access-Control-Max-Age', '86400');
-    
+
     // Desabilitar cache em desenvolvimento para evitar 304 Not Modified
     if (process.env.NODE_ENV !== 'production') {
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
       res.setHeader('Pragma', 'no-cache');
       res.setHeader('Expires', '0');
     }
-    
+
     // Responder imediatamente para requisições OPTIONS
     if (req.method === 'OPTIONS') {
       return res.status(204).send();
     }
-    
+
     next();
   });
 
   // BEGIN SWAGGER CONFIG ---------------------------------------
   const packageFile = resolve(__dirname, '../../..', 'package.json');
   const pkg = JSON.parse(readFileSync(packageFile).toString());
-  
+
   const config = new DocumentBuilder()
     .setTitle(`${String(pkg.name).toUpperCase()} - Monorepo API Documentation`)
-    .setDescription(`${pkg.description}\n\nEste monorepo inclui todas as APIs do sistema Systentando.`)
+    .setDescription(
+      `${pkg.description}\n\nEste monorepo inclui todas as APIs do sistema Systentando.`,
+    )
     .setVersion('1.0')
-    .addTag('produtos', 'Sistema de Produtos - Gestão de produtos, variantes e estoque')
-    .addTag('affiliate-products', 'Produtos Afiliados - Gestão de produtos de afiliados')
+    .addTag(
+      'produtos',
+      'Sistema de Produtos - Gestão de produtos, variantes e estoque',
+    )
+    .addTag(
+      'affiliate-products',
+      'Produtos Afiliados - Gestão de produtos de afiliados',
+    )
     .addTag('categories', 'Categorias - Gestão de categorias de produtos')
-    .addTag('sys-assistente-estudos', 'Sistema Assistente de Estudos - Questões, concursos e simulações')
+    .addTag(
+      'sys-assistente-estudos',
+      'Sistema Assistente de Estudos - Questões, concursos e simulações',
+    )
     .addTag('sys-pagamentos', 'Sistema de Pagamentos - Gestão de pagamentos')
-    .addTag('life-tracker', 'Life Tracker - Rastreamento de vida e produtividade')
+    .addTag(
+      'life-tracker',
+      'Life Tracker - Rastreamento de vida e produtividade',
+    )
     .addTag('customers', 'Clientes - Gestão de clientes')
     .addTag('orders', 'Pedidos - Gestão de pedidos')
     .addTag('franchises', 'Franquias - Gestão de franquias')
@@ -247,7 +273,7 @@ async function bootstrap() {
     include: [AppModule],
     deepScanRoutes: true,
   });
-  
+
   // Criar diretório public se não existir
   const publicDir = join(process.cwd(), 'public');
   if (!existsSync(publicDir)) {
@@ -258,7 +284,11 @@ async function bootstrap() {
   if (process.env.SWAGGER_EXPORT === 'true') {
     const outputPath = join(process.cwd(), 'openapi.json');
     try {
-      require('fs').writeFileSync(outputPath, JSON.stringify(document, null, 2), 'utf-8');
+      require('fs').writeFileSync(
+        outputPath,
+        JSON.stringify(document, null, 2),
+        'utf-8',
+      );
       // Não encerramos a aplicação aqui; o script pode optar por finalizar o processo
     } catch (err) {
       // eslint-disable-next-line no-console
@@ -275,39 +305,39 @@ async function bootstrap() {
 
   // Configurar Stoplight Elements
   setupStoplightElements(app, pkg);
-  
+
   // Manter Swagger UI como backup (opcional)
   SwaggerModule.setup('/swagger', app, document, {
     customSiteTitle: `${pkg.name} - Swagger UI`,
     customfavIcon: '/favicon.ico',
   });
-  
+
   //END SWAGGER CONFIG ------------------------------------
-  
+
   const logger = new ConsoleLogger();
   const port = process.env.PORT || 9090;
-  
+
   logger.log(
     `${clc.magentaBright('🚀')} ${clc.green(
       'Application ready on port',
     )} ${clc.yellow(port.toString())}`,
   );
-  
+
   logger.log(
     `${clc.cyanBright('🌐')} ${clc.green(
       'CORS configurado para as seguintes origens:',
     )}`,
   );
-  allowedOrigins.forEach(origin => {
+  allowedOrigins.forEach((origin) => {
     logger.log(`   ${clc.cyanBright('-')} ${clc.yellow(origin)}`);
   });
-  
+
   logger.log(
     `${clc.cyanBright('📚')} ${clc.green(
       'Stoplight Elements documentation available at:',
     )} ${clc.yellow(`http://localhost:${port}/docs`)}`,
   );
-  
+
   logger.log(
     `${clc.cyanBright('📖')} ${clc.green(
       'Swagger UI documentation available at:',

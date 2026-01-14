@@ -1,59 +1,72 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 
-export type StudentDocument = Student & Document & {
-  createdAt?: Date;
-  updatedAt?: Date;
-};
+export type StudentDocument = Student &
+  Document & {
+    createdAt?: Date;
+    updatedAt?: Date;
+  };
 
 // Sub-schema para endereço
-const AddressSchema = new MongooseSchema({
-  street: { type: String },
-  number: { type: String },
-  complement: { type: String },
-  neighborhood: { type: String },
-  city: { type: String, required: true },
-  state: { type: String, required: true },
-  zipCode: { type: String },
-}, { _id: false });
+const AddressSchema = new MongooseSchema(
+  {
+    street: { type: String },
+    number: { type: String },
+    complement: { type: String },
+    neighborhood: { type: String },
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    zipCode: { type: String },
+  },
+  { _id: false },
+);
 
 // Sub-schema para contato de emergência
-const EmergencyContactSchema = new MongooseSchema({
-  name: { type: String, required: true },
-  phone: { type: String, required: true },
-  relationship: { type: String, required: true },
-}, { _id: false });
+const EmergencyContactSchema = new MongooseSchema(
+  {
+    name: { type: String, required: true },
+    phone: { type: String, required: true },
+    relationship: { type: String, required: true },
+  },
+  { _id: false },
+);
 
 // Sub-schema para informações de saúde
-const HealthInfoSchema = new MongooseSchema({
-  medicalConditions: { type: [String], default: [] },
-  medications: { type: [String], default: [] },
-  injuries: { type: [String], default: [] },
-  fitnessLevel: {
-    type: String,
-    enum: ['beginner', 'intermediate', 'advanced'],
-    default: 'beginner',
+const HealthInfoSchema = new MongooseSchema(
+  {
+    medicalConditions: { type: [String], default: [] },
+    medications: { type: [String], default: [] },
+    injuries: { type: [String], default: [] },
+    fitnessLevel: {
+      type: String,
+      enum: ['beginner', 'intermediate', 'advanced'],
+      default: 'beginner',
+    },
   },
-}, { _id: false });
+  { _id: false },
+);
 
 // Sub-schema para assinatura
-const SubscriptionSchema = new MongooseSchema({
-  planId: { type: String, required: true },
-  status: {
-    type: String,
-    enum: ['active', 'suspended', 'cancelled', 'expired'],
-    default: 'active',
+const SubscriptionSchema = new MongooseSchema(
+  {
+    planId: { type: String, required: true },
+    status: {
+      type: String,
+      enum: ['active', 'suspended', 'cancelled', 'expired'],
+      default: 'active',
+    },
+    startDate: { type: Date, required: true },
+    endDate: { type: Date },
+    paymentStatus: {
+      type: String,
+      enum: ['paid', 'pending', 'overdue'],
+      default: 'pending',
+    },
+    lastPaymentDate: { type: Date },
+    nextPaymentDate: { type: Date },
   },
-  startDate: { type: Date, required: true },
-  endDate: { type: Date },
-  paymentStatus: {
-    type: String,
-    enum: ['paid', 'pending', 'overdue'],
-    default: 'pending',
-  },
-  lastPaymentDate: { type: Date },
-  nextPaymentDate: { type: Date },
-}, { _id: false });
+  { _id: false },
+);
 
 @Schema({
   timestamps: true,

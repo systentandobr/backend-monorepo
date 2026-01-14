@@ -7,4 +7,3 @@ export class UpdateCustomerDto extends PartialType(CreateCustomerDto) {
   @IsBoolean()
   isActive?: boolean;
 }
-

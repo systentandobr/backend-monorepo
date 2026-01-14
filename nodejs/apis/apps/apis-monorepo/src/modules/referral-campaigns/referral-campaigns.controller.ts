@@ -16,8 +16,10 @@ import { ReferralCampaignsService } from './referral-campaigns.service';
 import { CreateCampaignDto } from './dto/create-campaign.dto';
 import { UpdateCampaignDto } from './dto/update-campaign.dto';
 import { CampaignFiltersDto } from './dto/campaign-filters.dto';
-import { UnitScope } from '../../decorators/unit-scope.decorator';
-import { CurrentUser, CurrentUserShape } from '../../decorators/current-user.decorator';
+import {
+  CurrentUser,
+  CurrentUserShape,
+} from '../../decorators/current-user.decorator';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 
 @ApiTags('referral-campaigns')
@@ -35,7 +37,11 @@ export class ReferralCampaignsController {
     @CurrentUser() user: CurrentUserShape,
   ) {
     const franchiseId = user.unitId || user.profile?.unitId;
-    return this.campaignsService.create(createCampaignDto, user.id, franchiseId);
+    return this.campaignsService.create(
+      createCampaignDto,
+      user.id,
+      franchiseId,
+    );
   }
 
   @Get()
@@ -76,10 +82,7 @@ export class ReferralCampaignsController {
   @ApiOperation({ summary: 'Obter detalhes de uma campanha' })
   @ApiResponse({ status: 200, description: 'Campanha encontrada' })
   @ApiResponse({ status: 404, description: 'Campanha não encontrada' })
-  findOne(
-    @Param('id') id: string,
-    @CurrentUser() user?: CurrentUserShape,
-  ) {
+  findOne(@Param('id') id: string, @CurrentUser() user?: CurrentUserShape) {
     const franchiseId = user?.unitId || user?.profile?.unitId;
     return this.campaignsService.findOne(id, franchiseId);
   }
@@ -104,10 +107,7 @@ export class ReferralCampaignsController {
   @ApiOperation({ summary: 'Deletar campanha' })
   @ApiResponse({ status: 204, description: 'Campanha deletada' })
   @ApiResponse({ status: 404, description: 'Campanha não encontrada' })
-  remove(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
+  remove(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     const franchiseId = user.unitId || user.profile?.unitId;
     return this.campaignsService.remove(id, franchiseId);
   }
@@ -116,10 +116,7 @@ export class ReferralCampaignsController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Ativar campanha' })
   @ApiResponse({ status: 200, description: 'Campanha ativada' })
-  activate(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
+  activate(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     const franchiseId = user.unitId || user.profile?.unitId;
     return this.campaignsService.activate(id, franchiseId);
   }
@@ -128,10 +125,7 @@ export class ReferralCampaignsController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Pausar campanha' })
   @ApiResponse({ status: 200, description: 'Campanha pausada' })
-  pause(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
+  pause(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     const franchiseId = user.unitId || user.profile?.unitId;
     return this.campaignsService.pause(id, franchiseId);
   }
@@ -140,10 +134,7 @@ export class ReferralCampaignsController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Obter estatísticas da campanha' })
   @ApiResponse({ status: 200, description: 'Estatísticas da campanha' })
-  getStats(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
+  getStats(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     const franchiseId = user.unitId || user.profile?.unitId;
     return this.campaignsService.getStats(id, franchiseId);
   }

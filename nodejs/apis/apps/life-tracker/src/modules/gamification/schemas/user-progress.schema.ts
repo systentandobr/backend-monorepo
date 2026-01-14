@@ -39,4 +39,4 @@ export class UserProgress {
   updatedAt?: Date;
 }
 
-export const UserProgressSchema = SchemaFactory.createForClass(UserProgress); 
+export const UserProgressSchema = SchemaFactory.createForClass(UserProgress);

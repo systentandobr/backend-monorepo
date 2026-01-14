@@ -1,10 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-export type LeadDocument = Lead & Document & {
-  createdAt?: Date;
-  updatedAt?: Date;
-};
+export type LeadDocument = Lead &
+  Document & {
+    createdAt?: Date;
+    updatedAt?: Date;
+  };
 
 export enum LeadStatus {
   NEW = 'new',
@@ -119,4 +120,3 @@ LeadSchema.index({ unitId: 1, createdAt: -1 });
 LeadSchema.index({ email: 1 });
 LeadSchema.index({ phone: 1 });
 LeadSchema.index({ score: -1 });
-

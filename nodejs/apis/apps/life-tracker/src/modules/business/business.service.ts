@@ -8,14 +8,16 @@ import { BusinessProject } from './schemas/business-project.schema';
 @Injectable()
 export class BusinessService {
   constructor(
-    @InjectModel(BusinessOpportunity.name) private opportunityModel: Model<BusinessOpportunity>,
-    @InjectModel(BusinessProject.name) private projectModel: Model<BusinessProject>,
+    @InjectModel(BusinessOpportunity.name)
+    private opportunityModel: Model<BusinessOpportunity>,
+    @InjectModel(BusinessProject.name)
+    private projectModel: Model<BusinessProject>,
   ) {}
 
   async getOpportunities(): Promise<ApiResponse<any[]>> {
     try {
       const opportunities = await this.opportunityModel.find().exec();
-      
+
       return {
         success: true,
         data: opportunities,
@@ -33,7 +35,7 @@ export class BusinessService {
   async getOpportunity(id: string): Promise<ApiResponse<any>> {
     try {
       const opportunity = await this.opportunityModel.findById(id).exec();
-      
+
       if (!opportunity) {
         return {
           success: false,
@@ -83,7 +85,7 @@ export class BusinessService {
   async getProjects(): Promise<ApiResponse<any[]>> {
     try {
       const projects = await this.projectModel.find().exec();
-      
+
       return {
         success: true,
         data: projects,
@@ -101,7 +103,7 @@ export class BusinessService {
   async getProject(id: string): Promise<ApiResponse<any>> {
     try {
       const project = await this.projectModel.findById(id).exec();
-      
+
       if (!project) {
         return {
           success: false,
@@ -148,16 +150,21 @@ export class BusinessService {
     }
   }
 
-  async updateProjectProgress(id: string, progress: number): Promise<ApiResponse<any>> {
+  async updateProjectProgress(
+    id: string,
+    progress: number,
+  ): Promise<ApiResponse<any>> {
     try {
-      const project = await this.projectModel.findByIdAndUpdate(
-        id,
-        {
-          progress,
-          updatedAt: new Date().toISOString(),
-        },
-        { new: true }
-      ).exec();
+      const project = await this.projectModel
+        .findByIdAndUpdate(
+          id,
+          {
+            progress,
+            updatedAt: new Date().toISOString(),
+          },
+          { new: true },
+        )
+        .exec();
 
       if (!project) {
         return {
@@ -245,10 +252,13 @@ export class BusinessService {
     try {
       const opportunities = await this.opportunityModel.find().exec();
       const projects = await this.projectModel.find().exec();
-      
+
       const totalOpportunities = opportunities.length;
-      const activeProjects = projects.filter(p => p.status === 'active').length;
-      const avgProjectProgress = projects.reduce((acc, p) => acc + p.progress, 0) / projects.length || 0;
+      const activeProjects = projects.filter(
+        (p) => p.status === 'active',
+      ).length;
+      const avgProjectProgress =
+        projects.reduce((acc, p) => acc + p.progress, 0) / projects.length || 0;
 
       return {
         success: true,
@@ -256,7 +266,10 @@ export class BusinessService {
           total_opportunities: totalOpportunities,
           active_projects: activeProjects,
           average_project_progress: avgProjectProgress,
-          total_investment_potential: opportunities.reduce((acc, o) => acc + o.investment, 0),
+          total_investment_potential: opportunities.reduce(
+            (acc, o) => acc + o.investment,
+            0,
+          ),
         },
         timestamp: new Date().toISOString(),
       };
@@ -268,4 +281,4 @@ export class BusinessService {
       };
     }
   }
-} 
+}

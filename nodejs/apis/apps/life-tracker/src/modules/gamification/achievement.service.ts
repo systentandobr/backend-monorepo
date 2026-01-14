@@ -2,8 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Achievement, AchievementDocument } from './schemas/achievement.schema';
-import { UserAchievement, UserAchievementDocument } from './schemas/user-achievement.schema';
-import { GamificationProfile, GamificationProfileDocument } from './schemas/gamification-profile.schema';
+import {
+  UserAchievement,
+  UserAchievementDocument,
+} from './schemas/user-achievement.schema';
+import {
+  GamificationProfile,
+  GamificationProfileDocument,
+} from './schemas/gamification-profile.schema';
 
 @Injectable()
 export class AchievementService {
@@ -19,7 +25,11 @@ export class AchievementService {
   /**
    * Obtém todas as conquistas disponíveis
    */
-  async getAllAchievements(): Promise<{ success: boolean; data?: any[]; error?: string }> {
+  async getAllAchievements(): Promise<{
+    success: boolean;
+    data?: any[];
+    error?: string;
+  }> {
     try {
       const achievements = await this.achievementModel.find().exec();
       return {
@@ -37,20 +47,30 @@ export class AchievementService {
   /**
    * Obtém conquistas do usuário com status de desbloqueio
    */
-  async getUserAchievements(userId: string): Promise<{ success: boolean; data?: any; error?: string }> {
+  async getUserAchievements(
+    userId: string,
+  ): Promise<{ success: boolean; data?: any; error?: string }> {
     try {
       const achievements = await this.achievementModel.find().exec();
-      const userAchievements = await this.userAchievementModel.find({ userId }).exec();
-      
-      const userAchievementIds = new Set(userAchievements.map(ua => ua.achievementId));
-      
-      const achievementsWithStatus = achievements.map(achievement => ({
+      const userAchievements = await this.userAchievementModel
+        .find({ userId })
+        .exec();
+
+      const userAchievementIds = new Set(
+        userAchievements.map((ua) => ua.achievementId),
+      );
+
+      const achievementsWithStatus = achievements.map((achievement) => ({
         ...achievement.toObject(),
         unlocked: userAchievementIds.has(achievement.achievementId),
-        unlockedAt: userAchievements.find(ua => ua.achievementId === achievement.achievementId)?.unlockedAt,
+        unlockedAt: userAchievements.find(
+          (ua) => ua.achievementId === achievement.achievementId,
+        )?.unlockedAt,
       }));
 
-      const unlockedCount = achievementsWithStatus.filter(a => a.unlocked).length;
+      const unlockedCount = achievementsWithStatus.filter(
+        (a) => a.unlocked,
+      ).length;
       const totalCount = achievements.length;
 
       return {
@@ -83,9 +103,13 @@ export class AchievementService {
   ): Promise<{ success: boolean; data?: any[]; error?: string }> {
     try {
       const achievements = await this.achievementModel.find().exec();
-      const userAchievements = await this.userAchievementModel.find({ userId }).exec();
-      
-      const userAchievementIds = new Set(userAchievements.map(ua => ua.achievementId));
+      const userAchievements = await this.userAchievementModel
+        .find({ userId })
+        .exec();
+
+      const userAchievementIds = new Set(
+        userAchievements.map((ua) => ua.achievementId),
+      );
       const newlyUnlocked: any[] = [];
 
       for (const achievement of achievements) {
@@ -95,8 +119,11 @@ export class AchievementService {
         }
 
         // Verificar critérios
-        const shouldUnlock = this.checkAchievementCriteria(achievement.criteria, userStats);
-        
+        const shouldUnlock = this.checkAchievementCriteria(
+          achievement.criteria,
+          userStats,
+        );
+
         if (shouldUnlock) {
           // Desbloquear conquista
           const userAchievement = new this.userAchievementModel({
@@ -153,7 +180,11 @@ export class AchievementService {
   /**
    * Cria conquistas padrão do sistema
    */
-  async createDefaultAchievements(): Promise<{ success: boolean; data?: any[]; error?: string }> {
+  async createDefaultAchievements(): Promise<{
+    success: boolean;
+    data?: any[];
+    error?: string;
+  }> {
     try {
       const defaultAchievements = [
         {
@@ -194,7 +225,7 @@ export class AchievementService {
       ];
 
       const createdAchievements = [];
-      
+
       for (const achievementData of defaultAchievements) {
         const existingAchievement = await this.achievementModel
           .findOne({ achievementId: achievementData.achievementId })

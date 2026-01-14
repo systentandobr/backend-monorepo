@@ -1,8 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { GamificationProfile, GamificationProfileDocument } from './schemas/gamification-profile.schema';
-import { PointTransaction, PointTransactionDocument } from './schemas/point-transaction.schema';
+import {
+  GamificationProfile,
+  GamificationProfileDocument,
+} from './schemas/gamification-profile.schema';
+import {
+  PointTransaction,
+  PointTransactionDocument,
+} from './schemas/point-transaction.schema';
 
 @Injectable()
 export class PointsService {
@@ -19,14 +25,20 @@ export class PointsService {
   async addPoints(
     userId: string,
     points: number,
-    sourceType: 'HABIT_COMPLETION' | 'ROUTINE_COMPLETION' | 'ACHIEVEMENT' | 'BONUS',
+    sourceType:
+      | 'HABIT_COMPLETION'
+      | 'ROUTINE_COMPLETION'
+      | 'ACHIEVEMENT'
+      | 'BONUS',
     sourceId: string,
     description: string,
   ): Promise<{ success: boolean; data?: any; error?: string }> {
     try {
       // Buscar ou criar perfil do usuário
-      let profile = await this.gamificationProfileModel.findOne({ userId }).exec();
-      
+      let profile = await this.gamificationProfileModel
+        .findOne({ userId })
+        .exec();
+
       if (!profile) {
         profile = new this.gamificationProfileModel({
           userId,
@@ -38,11 +50,11 @@ export class PointsService {
 
       // Adicionar pontos
       profile.totalPoints += points;
-      
+
       // Calcular novo nível
       const newLevel = Math.floor(profile.totalPoints / 100) + 1;
-      const pointsToNextLevel = (newLevel * 100) - profile.totalPoints;
-      
+      const pointsToNextLevel = newLevel * 100 - profile.totalPoints;
+
       profile.level = newLevel;
       profile.pointsToNextLevel = pointsToNextLevel;
       profile.updatedAt = new Date();
@@ -130,10 +142,14 @@ export class PointsService {
   /**
    * Obtém estatísticas de pontos do usuário
    */
-  async getUserPointsStats(userId: string): Promise<{ success: boolean; data?: any; error?: string }> {
+  async getUserPointsStats(
+    userId: string,
+  ): Promise<{ success: boolean; data?: any; error?: string }> {
     try {
-      const profile = await this.gamificationProfileModel.findOne({ userId }).exec();
-      
+      const profile = await this.gamificationProfileModel
+        .findOne({ userId })
+        .exec();
+
       if (!profile) {
         return {
           success: true,
@@ -147,10 +163,12 @@ export class PointsService {
       }
 
       // Calcular estatísticas adicionais
-      const totalTransactions = await this.pointTransactionModel.countDocuments({ userId });
+      const totalTransactions = await this.pointTransactionModel.countDocuments(
+        { userId },
+      );
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
+
       const todayTransactions = await this.pointTransactionModel
         .find({
           userId,
@@ -158,7 +176,10 @@ export class PointsService {
         })
         .exec();
 
-      const todayPoints = todayTransactions.reduce((sum, transaction) => sum + transaction.points, 0);
+      const todayPoints = todayTransactions.reduce(
+        (sum, transaction) => sum + transaction.points,
+        0,
+      );
 
       return {
         success: true,

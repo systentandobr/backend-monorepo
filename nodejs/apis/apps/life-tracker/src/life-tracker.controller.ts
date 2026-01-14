@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { LifeTrackerService } from './life-tracker.service';
 
@@ -26,4 +35,4 @@ export class LifeTrackerController {
   async getCrossModuleProgress() {
     return this.lifeTrackerService.getCrossModuleProgress();
   }
-} 
+}

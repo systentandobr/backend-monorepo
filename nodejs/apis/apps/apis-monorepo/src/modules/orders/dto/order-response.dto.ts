@@ -52,4 +52,3 @@ export class OrderFiltersDto {
   page?: number = 1;
   limit?: number = 50;
 }
-

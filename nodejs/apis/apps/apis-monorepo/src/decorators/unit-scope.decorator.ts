@@ -10,7 +10,7 @@ import { JwtAuthGuard } from '../guards/jwt-auth.guard';
  * - DomainInterceptor: Extrai e adiciona domain do usuário ao request
  * - UnitIdInterceptor: Injeta unitId nas queries
  * - UnitScopeGuard: Valida escopo de unidade
- * 
+ *
  * Uso:
  * @UnitScope()
  * @Get()
@@ -22,4 +22,3 @@ export function UnitScope() {
     UseInterceptors(DomainInterceptor, UnitIdInterceptor),
   );
 }
-

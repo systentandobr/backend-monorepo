@@ -7,7 +7,8 @@ import { AnalyticsData } from './schemas/analytics-data.schema';
 @Injectable()
 export class AnalyticsService {
   constructor(
-    @InjectModel(AnalyticsData.name) private analyticsDataModel: Model<AnalyticsData>,
+    @InjectModel(AnalyticsData.name)
+    private analyticsDataModel: Model<AnalyticsData>,
   ) {}
 
   async getAnalyticsData(): Promise<ApiResponse<any>> {
@@ -99,7 +100,10 @@ export class AnalyticsService {
     }
   }
 
-  async markActivity(activityData: { activityType: string; completed: boolean }): Promise<ApiResponse<any>> {
+  async markActivity(activityData: {
+    activityType: string;
+    completed: boolean;
+  }): Promise<ApiResponse<any>> {
     try {
       // Implementação para marcar atividade como completa/incompleta
       const { activityType, completed } = activityData;
@@ -165,7 +169,8 @@ export class AnalyticsService {
       // Implementação para deletar rotina
       // Aqui você implementaria a lógica para deletar do banco de dados
       // Por enquanto, retornamos uma resposta de sucesso
-      const analyticsRoutine = await this.analyticsDataModel.findByIdAndDelete(id);
+      const analyticsRoutine =
+        await this.analyticsDataModel.findByIdAndDelete(id);
       if (!analyticsRoutine) {
         return {
           success: false,
@@ -190,4 +195,4 @@ export class AnalyticsService {
       };
     }
   }
-} 
+}

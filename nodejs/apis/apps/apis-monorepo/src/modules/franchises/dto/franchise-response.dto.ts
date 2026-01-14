@@ -42,7 +42,13 @@ export class FranchiseResponseDto {
   status: 'active' | 'inactive' | 'pending' | 'suspended';
   type: 'standard' | 'premium' | 'express';
   territory?: FranchiseTerritoryDto;
-  marketSegments: ('restaurant' | 'delivery' | 'retail' | 'ecommerce' | 'hybrid')[];
+  marketSegments: (
+    | 'restaurant'
+    | 'delivery'
+    | 'retail'
+    | 'ecommerce'
+    | 'hybrid'
+  )[];
   metrics?: FranchiseMetricsDto;
   createdAt: Date;
   updatedAt: Date;
@@ -69,4 +75,3 @@ export class FranchiseFiltersDto {
   page?: number = 1;
   limit?: number = 50;
 }
-

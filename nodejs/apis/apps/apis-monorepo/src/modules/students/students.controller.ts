@@ -16,7 +16,10 @@ import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { StudentFiltersDto } from './dto/student-filters.dto';
 import { UnitScope } from '../../decorators/unit-scope.decorator';
-import { CurrentUser, CurrentUserShape } from '../../decorators/current-user.decorator';
+import {
+  CurrentUser,
+  CurrentUserShape,
+} from '../../decorators/current-user.decorator';
 
 @ApiTags('students')
 @Controller('students')
@@ -50,10 +53,7 @@ export class StudentsController {
   }
 
   @Get(':id')
-  findOne(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
+  findOne(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     const unitId = user.unitId || user.profile?.unitId;
     if (!unitId) {
       throw new Error('unitId não encontrado no contexto do usuário');
@@ -76,10 +76,7 @@ export class StudentsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
+  remove(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     const unitId = user.unitId || user.profile?.unitId;
     if (!unitId) {
       throw new Error('unitId não encontrado no contexto do usuário');

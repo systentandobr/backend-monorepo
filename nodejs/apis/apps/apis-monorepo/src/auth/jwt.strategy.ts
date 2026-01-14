@@ -18,7 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     // Usar o JwtValidatorService para validar o token
     // Isso garante consistência com a validação via SYS-SEGURANÇA
     try {
-      const token = payload; // O payload já vem decodificado do Passport
+      // O payload já vem decodificado do Passport
       // Para validação completa, precisaríamos do token original
       // Por enquanto, retornamos o payload validado
       return {
@@ -38,4 +38,3 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
   }
 }
-

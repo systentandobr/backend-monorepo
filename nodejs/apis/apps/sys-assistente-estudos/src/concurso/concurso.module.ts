@@ -12,7 +12,7 @@ import { TemaespecificoModule } from './temaespecifico/temaespecifico.module';
     ]),
     TemaespecificoModule,
   ],
-  providers: [ConcursoService,],
-  controllers: [ConcursoController,],
+  providers: [ConcursoService],
+  controllers: [ConcursoController],
 })
-export class ConcursoModule { }
+export class ConcursoModule {}

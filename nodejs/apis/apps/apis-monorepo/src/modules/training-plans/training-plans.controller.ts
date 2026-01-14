@@ -16,7 +16,10 @@ import { TrainingPlansService } from './training-plans.service';
 import { CreateTrainingPlanDto } from './dto/create-training-plan.dto';
 import { UpdateTrainingPlanDto } from './dto/update-training-plan.dto';
 import { UnitScope } from '../../decorators/unit-scope.decorator';
-import { CurrentUser, CurrentUserShape } from '../../decorators/current-user.decorator';
+import {
+  CurrentUser,
+  CurrentUserShape,
+} from '../../decorators/current-user.decorator';
 
 @ApiTags('training-plans')
 @Controller('training-plans')
@@ -32,7 +35,9 @@ export class TrainingPlansController {
   ) {
     const unitId = user.unitId || user.profile?.unitId;
     if (!unitId) {
-      throw new BadRequestException('unitId não encontrado no contexto do usuário');
+      throw new BadRequestException(
+        'unitId não encontrado no contexto do usuário',
+      );
     }
     return this.trainingPlansService.create(createTrainingPlanDto, unitId);
   }
@@ -45,7 +50,9 @@ export class TrainingPlansController {
   ) {
     const unitId = user.unitId || user.profile?.unitId;
     if (!unitId) {
-      throw new BadRequestException('unitId não encontrado no contexto do usuário');
+      throw new BadRequestException(
+        'unitId não encontrado no contexto do usuário',
+      );
     }
     return this.trainingPlansService.findAll({ studentId, status }, unitId);
   }
@@ -57,19 +64,20 @@ export class TrainingPlansController {
   ) {
     const unitId = user.unitId || user.profile?.unitId;
     if (!unitId) {
-      throw new BadRequestException('unitId não encontrado no contexto do usuário');
+      throw new BadRequestException(
+        'unitId não encontrado no contexto do usuário',
+      );
     }
     return this.trainingPlansService.findTemplates({ gender }, unitId);
   }
 
   @Get(':id')
-  findOne(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
+  findOne(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     const unitId = user.unitId || user.profile?.unitId;
     if (!unitId) {
-      throw new BadRequestException('unitId não encontrado no contexto do usuário');
+      throw new BadRequestException(
+        'unitId não encontrado no contexto do usuário',
+      );
     }
     return this.trainingPlansService.findOne(id, unitId);
   }
@@ -82,7 +90,9 @@ export class TrainingPlansController {
   ) {
     const unitId = user.unitId || user.profile?.unitId;
     if (!unitId) {
-      throw new BadRequestException('unitId não encontrado no contexto do usuário');
+      throw new BadRequestException(
+        'unitId não encontrado no contexto do usuário',
+      );
     }
     return this.trainingPlansService.update(id, updateTrainingPlanDto, unitId);
   }
@@ -95,20 +105,21 @@ export class TrainingPlansController {
   ) {
     const unitId = user.unitId || user.profile?.unitId;
     if (!unitId) {
-      throw new BadRequestException('unitId não encontrado no contexto do usuário');
+      throw new BadRequestException(
+        'unitId não encontrado no contexto do usuário',
+      );
     }
     return this.trainingPlansService.updateObjectives(id, objectives, unitId);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
+  remove(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     const unitId = user.unitId || user.profile?.unitId;
     if (!unitId) {
-      throw new BadRequestException('unitId não encontrado no contexto do usuário');
+      throw new BadRequestException(
+        'unitId não encontrado no contexto do usuário',
+      );
     }
     return this.trainingPlansService.remove(id, unitId);
   }

@@ -1,7 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { ApiResponse, IntegratedRoutine, CreateHabitDto, UpdateHabitDto, CompleteHabitDto } from '../../types';
+import {
+  ApiResponse,
+  IntegratedRoutine,
+  CreateHabitDto,
+  UpdateHabitDto,
+  CompleteHabitDto,
+} from '../../types';
 import { Routine } from './schemas/routine.schema';
 import { IntegratedRoutine as IntegratedRoutineModel } from './schemas/integrated-routine.schema';
 
@@ -9,13 +15,14 @@ import { IntegratedRoutine as IntegratedRoutineModel } from './schemas/integrate
 export class RoutinesService {
   constructor(
     @InjectModel(Routine.name) private routineModel: Model<Routine>,
-    @InjectModel(IntegratedRoutineModel.name) private integratedRoutineModel: Model<IntegratedRoutineModel>,
+    @InjectModel(IntegratedRoutineModel.name)
+    private integratedRoutineModel: Model<IntegratedRoutineModel>,
   ) {}
 
   async getIntegratedPlan(): Promise<ApiResponse<IntegratedRoutine>> {
     try {
       const plan = await this.integratedRoutineModel.findOne().exec();
-      
+
       if (!plan) {
         return {
           success: false,
@@ -41,7 +48,7 @@ export class RoutinesService {
   async getHabitsByDomain(domain: string): Promise<ApiResponse<any[]>> {
     try {
       const habits = await this.routineModel.find({ domain }).exec();
-      
+
       return {
         success: true,
         data: habits,
@@ -59,7 +66,7 @@ export class RoutinesService {
   async getIntegratedGoals(): Promise<ApiResponse<any[]>> {
     try {
       const plan = await this.integratedRoutineModel.findOne().exec();
-      
+
       if (!plan) {
         return {
           success: false,
@@ -108,16 +115,21 @@ export class RoutinesService {
     }
   }
 
-  async updateHabit(id: string, updateHabitDto: UpdateHabitDto): Promise<ApiResponse<any>> {
+  async updateHabit(
+    id: string,
+    updateHabitDto: UpdateHabitDto,
+  ): Promise<ApiResponse<any>> {
     try {
-      const habit = await this.routineModel.findByIdAndUpdate(
-        id,
-        {
-          ...updateHabitDto,
-          updatedAt: new Date().toISOString(),
-        },
-        { new: true }
-      ).exec();
+      const habit = await this.routineModel
+        .findByIdAndUpdate(
+          id,
+          {
+            ...updateHabitDto,
+            updatedAt: new Date().toISOString(),
+          },
+          { new: true },
+        )
+        .exec();
 
       if (!habit) {
         return {
@@ -141,20 +153,24 @@ export class RoutinesService {
     }
   }
 
-  async completeHabit(completeHabitDto: CompleteHabitDto): Promise<ApiResponse<any>> {
+  async completeHabit(
+    completeHabitDto: CompleteHabitDto,
+  ): Promise<ApiResponse<any>> {
     try {
-      const habit = await this.routineModel.findOneAndUpdate(
-        { 
-          id: completeHabitDto.habitId,
-          domain: completeHabitDto.domain 
-        },
-        {
-          completed: true,
-          streak: { $inc: 1 },
-          updatedAt: new Date().toISOString(),
-        },
-        { new: true }
-      ).exec();
+      const habit = await this.routineModel
+        .findOneAndUpdate(
+          {
+            id: completeHabitDto.habitId,
+            domain: completeHabitDto.domain,
+          },
+          {
+            completed: true,
+            streak: { $inc: 1 },
+            updatedAt: new Date().toISOString(),
+          },
+          { new: true },
+        )
+        .exec();
 
       if (!habit) {
         return {
@@ -178,12 +194,17 @@ export class RoutinesService {
     }
   }
 
-  async updateIntegratedGoalProgress(goalId: string, progress: number): Promise<ApiResponse<any>> {
+  async updateIntegratedGoalProgress(
+    goalId: string,
+    progress: number,
+  ): Promise<ApiResponse<any>> {
     try {
-      const result = await this.integratedRoutineModel.updateOne(
-        { 'integrated_goals.id': goalId },
-        { $set: { 'integrated_goals.$.progress': progress } }
-      ).exec();
+      const result = await this.integratedRoutineModel
+        .updateOne(
+          { 'integrated_goals.id': goalId },
+          { $set: { 'integrated_goals.$.progress': progress } },
+        )
+        .exec();
 
       if (result.modifiedCount === 0) {
         return {
@@ -206,4 +227,4 @@ export class RoutinesService {
       };
     }
   }
-} 
+}

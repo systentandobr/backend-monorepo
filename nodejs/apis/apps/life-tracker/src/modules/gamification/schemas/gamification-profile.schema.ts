@@ -24,4 +24,5 @@ export class GamificationProfile {
   updatedAt?: Date;
 }
 
-export const GamificationProfileSchema = SchemaFactory.createForClass(GamificationProfile);
+export const GamificationProfileSchema =
+  SchemaFactory.createForClass(GamificationProfile);

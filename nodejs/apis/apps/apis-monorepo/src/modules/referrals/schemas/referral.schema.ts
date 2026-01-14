@@ -1,47 +1,61 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 
-export type ReferralDocument = Referral & Document & {
-  createdAt?: Date;
-  updatedAt?: Date;
-};
+export type ReferralDocument = Referral &
+  Document & {
+    createdAt?: Date;
+    updatedAt?: Date;
+  };
 
 // Sub-schema para ReferralReward
-const ReferralRewardSchema = new MongooseSchema({
-  type: { type: String, enum: ['cashback', 'discount', 'points', 'physical'], required: true },
-  value: { type: Number, required: true },
-  currency: { type: String, required: false },
-  status: {
-    type: String,
-    enum: ['pending', 'processing', 'paid', 'cancelled'],
-    default: 'pending',
+const ReferralRewardSchema = new MongooseSchema(
+  {
+    type: {
+      type: String,
+      enum: ['cashback', 'discount', 'points', 'physical'],
+      required: true,
+    },
+    value: { type: Number, required: true },
+    currency: { type: String, required: false },
+    status: {
+      type: String,
+      enum: ['pending', 'processing', 'paid', 'cancelled'],
+      default: 'pending',
+    },
+    paidAt: { type: Date, required: false },
+    rewardId: { type: Types.ObjectId, ref: 'Reward', required: false },
   },
-  paidAt: { type: Date, required: false },
-  rewardId: { type: Types.ObjectId, ref: 'Reward', required: false },
-}, { _id: false });
+  { _id: false },
+);
 
 // Sub-schema para Tracking
-const TrackingSchema = new MongooseSchema({
-  sharedAt: { type: Date, required: false },
-  sharedVia: {
-    type: String,
-    enum: ['whatsapp', 'email', 'link', 'social'],
-    required: false,
+const TrackingSchema = new MongooseSchema(
+  {
+    sharedAt: { type: Date, required: false },
+    sharedVia: {
+      type: String,
+      enum: ['whatsapp', 'email', 'link', 'social'],
+      required: false,
+    },
+    registeredAt: { type: Date, required: false },
+    completedAt: { type: Date, required: false },
+    cancelledAt: { type: Date, required: false },
+    expiredAt: { type: Date, required: false },
   },
-  registeredAt: { type: Date, required: false },
-  completedAt: { type: Date, required: false },
-  cancelledAt: { type: Date, required: false },
-  expiredAt: { type: Date, required: false },
-}, { _id: false });
+  { _id: false },
+);
 
 // Sub-schema para Fraud
-const FraudSchema = new MongooseSchema({
-  score: { type: Number, default: 0, min: 0, max: 100 },
-  flags: { type: [String], default: [] },
-  verified: { type: Boolean, default: false },
-  verifiedAt: { type: Date, required: false },
-  verifiedBy: { type: Types.ObjectId, ref: 'User', required: false },
-}, { _id: false });
+const FraudSchema = new MongooseSchema(
+  {
+    score: { type: Number, default: 0, min: 0, max: 100 },
+    flags: { type: [String], default: [] },
+    verified: { type: Boolean, default: false },
+    verifiedAt: { type: Date, required: false },
+    verifiedBy: { type: Types.ObjectId, ref: 'User', required: false },
+  },
+  { _id: false },
+);
 
 @Schema({
   timestamps: true,
@@ -51,7 +65,12 @@ export class Referral {
   _id?: Types.ObjectId;
   id?: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'ReferralCampaign', required: true, index: true })
+  @Prop({
+    type: Types.ObjectId,
+    ref: 'ReferralCampaign',
+    required: true,
+    index: true,
+  })
   campaignId: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'Franchise', required: true, index: true })

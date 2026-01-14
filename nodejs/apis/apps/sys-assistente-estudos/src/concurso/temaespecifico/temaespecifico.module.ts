@@ -2,7 +2,10 @@ import { Module } from '@nestjs/common';
 import { TemaespecificoService } from './temaespecifico.service';
 import { TemaespecificoController } from './temaespecifico.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { TemaEspecifico, TemaEspecificoSchema } from './model/temaEspecifico.schema';
+import {
+  TemaEspecifico,
+  TemaEspecificoSchema,
+} from './model/temaEspecifico.schema';
 
 @Module({
   imports: [
@@ -11,6 +14,6 @@ import { TemaEspecifico, TemaEspecificoSchema } from './model/temaEspecifico.sch
     ]),
   ],
   providers: [TemaespecificoService],
-  controllers: [TemaespecificoController]
+  controllers: [TemaespecificoController],
 })
-export class TemaespecificoModule { }
+export class TemaespecificoModule {}

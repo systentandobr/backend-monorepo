@@ -36,4 +36,5 @@ export class BusinessProject {
   updatedAt: string;
 }
 
-export const BusinessProjectSchema = SchemaFactory.createForClass(BusinessProject); 
+export const BusinessProjectSchema =
+  SchemaFactory.createForClass(BusinessProject);

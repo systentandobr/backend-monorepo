@@ -1,10 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-export type SubscriptionPlanDocument = SubscriptionPlan & Document & {
-  createdAt?: Date;
-  updatedAt?: Date;
-};
+export type SubscriptionPlanDocument = SubscriptionPlan &
+  Document & {
+    createdAt?: Date;
+    updatedAt?: Date;
+  };
 
 @Schema({
   timestamps: true,
@@ -39,7 +40,8 @@ export class SubscriptionPlan {
   metadata?: Record<string, any>;
 }
 
-export const SubscriptionPlanSchema = SchemaFactory.createForClass(SubscriptionPlan);
+export const SubscriptionPlanSchema =
+  SchemaFactory.createForClass(SubscriptionPlan);
 
 // Índices para performance
 SubscriptionPlanSchema.index({ unitId: 1, isActive: 1 });

@@ -1,4 +1,13 @@
-import { IsString, IsNumber, IsBoolean, IsArray, IsOptional, IsEnum, ValidateNested, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsBoolean,
+  IsArray,
+  IsOptional,
+  IsEnum,
+  ValidateNested,
+  IsDateString,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 // ============================================================================
@@ -462,7 +471,7 @@ export enum TimeOfDay {
   MORNING = 'morning',
   AFTERNOON = 'afternoon',
   EVENING = 'evening',
-  ALL = 'all'
+  ALL = 'all',
 }
 
 export class HabitDto {
@@ -736,4 +745,4 @@ export class UpdateCategoryDto {
   @IsString({ each: true })
   @IsOptional()
   habits?: string[];
-} 
+}

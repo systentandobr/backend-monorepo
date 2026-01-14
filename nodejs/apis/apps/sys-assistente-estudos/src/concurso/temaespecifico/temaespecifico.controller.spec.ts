@@ -9,11 +9,12 @@ describe('TemaespecificoController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [TemaespecificoController],
       providers: [TemaespecificoService],
-    }).overrideProvider(
-      TemaespecificoService
-    ).useValue({
-      findall: jest.fn(),
-    }).compile();
+    })
+      .overrideProvider(TemaespecificoService)
+      .useValue({
+        findall: jest.fn(),
+      })
+      .compile();
 
     controller = module.get<TemaespecificoController>(TemaespecificoController);
   });

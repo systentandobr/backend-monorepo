@@ -11,7 +11,9 @@ describe('SysPagamentosController', () => {
       providers: [SysPagamentosService],
     }).compile();
 
-    sysPagamentosController = app.get<SysPagamentosController>(SysPagamentosController);
+    sysPagamentosController = app.get<SysPagamentosController>(
+      SysPagamentosController,
+    );
   });
 
   describe('root', () => {

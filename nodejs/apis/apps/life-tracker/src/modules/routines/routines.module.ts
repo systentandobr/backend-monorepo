@@ -2,8 +2,14 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RoutinesController } from './routines.controller';
 import { RoutinesService } from './routines.service';
-import { IntegratedRoutine, IntegratedRoutineSchema } from './schemas/integrated-routine.schema';
-import { DailyRoutine, DailyRoutineSchema } from './schemas/daily-routine.schema';
+import {
+  IntegratedRoutine,
+  IntegratedRoutineSchema,
+} from './schemas/integrated-routine.schema';
+import {
+  DailyRoutine,
+  DailyRoutineSchema,
+} from './schemas/daily-routine.schema';
 import { Routine, RoutineSchema } from './schemas/routine.schema';
 
 @Module({
@@ -18,4 +24,4 @@ import { Routine, RoutineSchema } from './schemas/routine.schema';
   providers: [RoutinesService],
   exports: [RoutinesService],
 })
-export class RoutinesModule {} 
+export class RoutinesModule {}

@@ -8,7 +8,9 @@ import { RewardsModule } from '../rewards/rewards.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Referral.name, schema: ReferralSchema }]),
+    MongooseModule.forFeature([
+      { name: Referral.name, schema: ReferralSchema },
+    ]),
     forwardRef(() => ReferralCampaignsModule),
     forwardRef(() => RewardsModule),
   ],

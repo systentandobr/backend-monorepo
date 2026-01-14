@@ -5,9 +5,17 @@ import {
   UseGuards,
   BadRequestException,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
-import { CurrentUser, CurrentUserShape } from '../decorators/current-user.decorator';
+import {
+  CurrentUser,
+  CurrentUserShape,
+} from '../decorators/current-user.decorator';
 import { CatalogProductService } from '../services/catalog-product.service';
 import { CreateCatalogProductDto } from '../dto/catalog-product.dto';
 
@@ -20,7 +28,10 @@ export class CatalogProductController {
   @UseGuards(JwtAuthGuard)
   @Post()
   @ApiOperation({ summary: 'Criar produto e associar ao catálogo' })
-  @ApiResponse({ status: 201, description: 'Produto criado e associado ao catálogo com sucesso' })
+  @ApiResponse({
+    status: 201,
+    description: 'Produto criado e associado ao catálogo com sucesso',
+  })
   @ApiResponse({ status: 400, description: 'Erro na validação dos dados' })
   async create(
     @CurrentUser() user: CurrentUserShape,
@@ -47,4 +58,3 @@ export class CatalogProductController {
     };
   }
 }
-

@@ -1,10 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-export type CustomerDocument = Customer & Document & {
-  createdAt?: Date;
-  updatedAt?: Date;
-};
+export type CustomerDocument = Customer &
+  Document & {
+    createdAt?: Date;
+    updatedAt?: Date;
+  };
 
 @Schema({
   timestamps: true,
@@ -61,4 +62,3 @@ export const CustomerSchema = SchemaFactory.createForClass(Customer);
 CustomerSchema.index({ unitId: 1, email: 1 }, { unique: true });
 CustomerSchema.index({ unitId: 1, status: 1 });
 CustomerSchema.index({ unitId: 1, createdAt: -1 });
-

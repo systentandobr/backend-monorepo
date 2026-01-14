@@ -26,14 +26,14 @@ export const CatalogSchema = new Schema<Catalog>(
 );
 
 // Virtual para retornar _id como id (compatibilidade com frontend)
-CatalogSchema.virtual('id').get(function() {
+CatalogSchema.virtual('id').get(function () {
   return this._id.toString();
 });
 
 // Garantir que o virtual seja incluído no JSON
 CatalogSchema.set('toJSON', {
   virtuals: true,
-  transform: function(doc, ret) {
+  transform: function (doc, ret) {
     delete ret._id;
     return ret;
   },
@@ -45,5 +45,3 @@ CatalogSchema.index({ ownerId: 1, isDeleted: 1 });
 CatalogSchema.index({ unitId: 1, ownerId: 1 });
 
 export const CATALOG_COLLECTION = 'Catalog';
-
-

@@ -1,4 +1,11 @@
-import { IsString, IsEmail, IsOptional, IsNumber, Min, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsOptional,
+  IsNumber,
+  Min,
+  IsEnum,
+} from 'class-validator';
 
 export class CreateCustomerDto {
   @IsString()
@@ -25,4 +32,3 @@ export class CreateCustomerDto {
   @Min(0)
   totalSpent?: number;
 }
-

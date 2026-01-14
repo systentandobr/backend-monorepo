@@ -10,7 +10,11 @@ export class ProductValidators {
    */
   validate(): boolean {
     // Validar nome
-    if (!this.product.name || this.product.name.length < 3 || this.product.name.length > 100) {
+    if (
+      !this.product.name ||
+      this.product.name.length < 3 ||
+      this.product.name.length > 100
+    ) {
       return false;
     }
 
@@ -33,12 +37,18 @@ export class ProductValidators {
     }
 
     // Validar rating se existir
-    if (this.product.rating !== undefined && (this.product.rating < 0 || this.product.rating > 5)) {
+    if (
+      this.product.rating !== undefined &&
+      (this.product.rating < 0 || this.product.rating > 5)
+    ) {
       return false;
     }
 
     // Validar NCM se existir (deve ter 8 dígitos)
-    if (this.product.ncm && !/^\d{8}$/.test(this.product.ncm.replace(/\./g, ''))) {
+    if (
+      this.product.ncm &&
+      !/^\d{8}$/.test(this.product.ncm.replace(/\./g, ''))
+    ) {
       return false;
     }
 
@@ -80,7 +90,10 @@ export class ProductValidators {
     }
 
     // Se tem preço promocional, usar ele
-    if (variant.promotionalPrice !== undefined && variant.promotionalPrice > 0) {
+    if (
+      variant.promotionalPrice !== undefined &&
+      variant.promotionalPrice > 0
+    ) {
       return variant.promotionalPrice;
     }
 
@@ -125,7 +138,10 @@ export class ProductValidators {
       return;
     }
 
-    const currentStock = variant.stockByUnit.get(unitId) || { quantity: 0, reserved: 0 };
+    const currentStock = variant.stockByUnit.get(unitId) || {
+      quantity: 0,
+      reserved: 0,
+    };
     const newQuantity = Math.max(0, currentStock.quantity + quantity);
 
     variant.stockByUnit.set(unitId, {
@@ -137,13 +153,20 @@ export class ProductValidators {
   /**
    * Reserva estoque de uma variante
    */
-  reserveStock(variantIndex: number, unitId: string, quantity: number): boolean {
+  reserveStock(
+    variantIndex: number,
+    unitId: string,
+    quantity: number,
+  ): boolean {
     const variant = this.product.variants[variantIndex];
     if (!variant) {
       return false;
     }
 
-    const currentStock = variant.stockByUnit.get(unitId) || { quantity: 0, reserved: 0 };
+    const currentStock = variant.stockByUnit.get(unitId) || {
+      quantity: 0,
+      reserved: 0,
+    };
     const available = currentStock.quantity - currentStock.reserved;
 
     if (available < quantity) {
@@ -167,7 +190,10 @@ export class ProductValidators {
       return;
     }
 
-    const currentStock = variant.stockByUnit.get(unitId) || { quantity: 0, reserved: 0 };
+    const currentStock = variant.stockByUnit.get(unitId) || {
+      quantity: 0,
+      reserved: 0,
+    };
     const newReserved = Math.max(0, currentStock.reserved - quantity);
 
     variant.stockByUnit.set(unitId, {
@@ -242,5 +268,3 @@ export class ProductValidators {
     return true;
   }
 }
-
-

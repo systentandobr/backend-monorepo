@@ -9,7 +9,8 @@ export interface StorageConfig {
 }
 
 export const storageConfig: StorageConfig = {
-  UPLOAD_DIR: process.env.UPLOAD_DIR || path.join(process.cwd(), 'uploads', 'products'),
+  UPLOAD_DIR:
+    process.env.UPLOAD_DIR || path.join(process.cwd(), 'uploads', 'products'),
   MAX_FILE_SIZE: parseInt(process.env.MAX_FILE_SIZE || '10485760', 10), // 10MB em bytes
   ALLOWED_MIME_TYPES: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
   THUMBNAIL_SIZE: {
@@ -18,4 +19,3 @@ export const storageConfig: StorageConfig = {
   },
   HASH_ALGORITHM: process.env.HASH_ALGORITHM || 'sha256',
 };
-

@@ -14,12 +14,16 @@ export class HealthController {
   }
 
   @Post('analytics/progress')
-  async updateHealthProgress(@Body() progressData: any): Promise<ApiResponse<any>> {
+  async updateHealthProgress(
+    @Body() progressData: any,
+  ): Promise<ApiResponse<any>> {
     return this.healthService.updateHealthProgress(progressData);
   }
 
   @Post('analytics/meals/mark')
-  async markMeal(@Body() mealData: { day: string; meal: string }): Promise<ApiResponse<any>> {
+  async markMeal(
+    @Body() mealData: { day: string; meal: string },
+  ): Promise<ApiResponse<any>> {
     return this.healthService.markMeal(mealData);
   }
 
@@ -52,4 +56,4 @@ export class HealthController {
   async getShoppingList(): Promise<ApiResponse<any>> {
     return this.healthService.getShoppingList();
   }
-} 
+}

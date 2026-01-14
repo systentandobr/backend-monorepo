@@ -1,7 +1,15 @@
 import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
-import { CurrentUser, CurrentUserShape } from '../decorators/current-user.decorator';
+import {
+  CurrentUser,
+  CurrentUserShape,
+} from '../decorators/current-user.decorator';
 import { NavigationService } from '../services/navigation.service';
 import { VisitSource } from '../schemas/navigation.schema';
 
@@ -44,7 +52,10 @@ export class NavigationController {
   @Get('visited-products')
   @ApiOperation({ summary: 'Obter produtos visitados' })
   @ApiResponse({ status: 200, description: 'Produtos visitados encontrados' })
-  getVisitedProducts(@CurrentUser() user: CurrentUserShape, @Query('limit') limit?: number) {
+  getVisitedProducts(
+    @CurrentUser() user: CurrentUserShape,
+    @Query('limit') limit?: number,
+  ) {
     if (!user.id) {
       throw new Error('Usuário não autenticado');
     }
@@ -91,7 +102,10 @@ export class NavigationController {
   @Get('history')
   @ApiOperation({ summary: 'Obter histórico de navegação' })
   @ApiResponse({ status: 200, description: 'Histórico encontrado' })
-  getNavigationHistory(@CurrentUser() user: CurrentUserShape, @Query('limit') limit?: number) {
+  getNavigationHistory(
+    @CurrentUser() user: CurrentUserShape,
+    @Query('limit') limit?: number,
+  ) {
     if (!user.id) {
       throw new Error('Usuário não autenticado');
     }
@@ -103,5 +117,3 @@ export class NavigationController {
     );
   }
 }
-
-

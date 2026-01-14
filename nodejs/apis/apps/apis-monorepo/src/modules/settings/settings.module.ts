@@ -3,7 +3,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { SettingsService } from './settings.service';
 import { SettingsController } from './settings.controller';
 import { Setting, SettingSchema } from './schemas/setting.schema';
-import { Franchise, FranchiseSchema } from '../franchises/schemas/franchise.schema';
+import {
+  Franchise,
+  FranchiseSchema,
+} from '../franchises/schemas/franchise.schema';
 
 @Module({
   imports: [
@@ -17,4 +20,3 @@ import { Franchise, FranchiseSchema } from '../franchises/schemas/franchise.sche
   exports: [SettingsService],
 })
 export class SettingsModule {}
-

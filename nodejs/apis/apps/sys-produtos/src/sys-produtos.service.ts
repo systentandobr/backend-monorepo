@@ -1,11 +1,24 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, FilterQuery } from 'mongoose';
-import { PRODUCT_COLLECTION, Product, ProductType } from './schemas/product.schema';
+import {
+  PRODUCT_COLLECTION,
+  Product,
+  ProductType,
+} from './schemas/product.schema';
 import { UpdateProdutoDto } from './dto/update-produto.dto';
 import { QueryProdutoDto } from './dto/query-produto.dto';
-import { CreateVariantDto, UpdateVariantDto, AdjustStockDto, AdjustStockDeltaDto } from './dto/variant.dto';
+import {
+  CreateVariantDto,
+  UpdateVariantDto,
+  AdjustStockDto,
+  AdjustStockDeltaDto,
+} from './dto/variant.dto';
 import { UpdateProdutoMetadataDto } from './dto/produto-metadata.dto';
 import { IngredientsService } from './services/ingredients.service';
 import { IngredientDocument } from './schemas/ingredient.schema';
@@ -13,13 +26,14 @@ import { IngredientDocument } from './schemas/ingredient.schema';
 @Injectable()
 export class SysProdutosService {
   constructor(
-    @InjectModel(PRODUCT_COLLECTION) private readonly productModel: Model<Product>,
+    @InjectModel(PRODUCT_COLLECTION)
+    private readonly productModel: Model<Product>,
     private readonly ingredientsService: IngredientsService,
   ) {}
 
   async list(unitId: string | undefined, query: QueryProdutoDto = {}) {
     const filter: FilterQuery<Product> = {};
-    
+
     // Filtro de busca por texto
     if (query.search) {
       filter.$or = [
@@ -30,7 +44,7 @@ export class SysProdutosService {
         { description: { $regex: query.search, $options: 'i' } },
       ];
     }
-    
+
     // Filtros específicos
     if (query.category) filter.categories = query.category;
     if (query.tag) filter.tags = query.tag;
@@ -38,14 +52,16 @@ export class SysProdutosService {
     if (query.featured === 'true') filter.featured = true;
     if (query.featured === 'false') filter.featured = false;
     if (query.rating !== undefined) filter.rating = { $gte: query.rating };
-    
+
     // Filtro de preço (busca na primeira variante ativa)
     if (query.priceMin !== undefined || query.priceMax !== undefined) {
       filter['variants.price'] = {};
-      if (query.priceMin !== undefined) filter['variants.price'].$gte = query.priceMin;
-      if (query.priceMax !== undefined) filter['variants.price'].$lte = query.priceMax;
+      if (query.priceMin !== undefined)
+        filter['variants.price'].$gte = query.priceMin;
+      if (query.priceMax !== undefined)
+        filter['variants.price'].$lte = query.priceMax;
     }
-    
+
     // Filtro de estoque
     if (query.inStock === 'true' && unitId) {
       filter[`variants.stockByUnit.${unitId}.quantity`] = { $gt: 0 };
@@ -82,12 +98,7 @@ export class SysProdutosService {
     }
 
     const [items, total] = await Promise.all([
-      this.productModel
-        .find(filter)
-        .skip(skip)
-        .limit(limit)
-        .sort(sort)
-        .lean(),
+      this.productModel.find(filter).skip(skip).limit(limit).sort(sort).lean(),
       this.productModel.countDocuments(filter),
     ]);
 
@@ -113,24 +124,39 @@ export class SysProdutosService {
     dishComposition: any,
     unitId: string,
   ): Promise<{ costPrice: number; price: number }> {
-    if (!dishComposition || !dishComposition.ingredients || dishComposition.ingredients.length === 0) {
+    if (
+      !dishComposition ||
+      !dishComposition.ingredients ||
+      dishComposition.ingredients.length === 0
+    ) {
       throw new BadRequestException('Prato deve ter pelo menos um ingrediente');
     }
 
     // Buscar todos os ingredientes
-    const ingredientIds = dishComposition.ingredients.map((ing: any) => ing.ingredientId);
-    const ingredients = await this.ingredientsService.findByIds(ingredientIds, unitId) as IngredientDocument[];
+    const ingredientIds = dishComposition.ingredients.map(
+      (ing: any) => ing.ingredientId,
+    );
+    const ingredients = (await this.ingredientsService.findByIds(
+      ingredientIds,
+      unitId,
+    )) as IngredientDocument[];
 
     if (ingredients.length !== ingredientIds.length) {
-      throw new BadRequestException('Um ou mais ingredientes não foram encontrados');
+      throw new BadRequestException(
+        'Um ou mais ingredientes não foram encontrados',
+      );
     }
 
     // Calcular custo total
     let totalCost = 0;
     for (const dishIngredient of dishComposition.ingredients) {
-      const ingredient = ingredients.find((ing) => (ing as any)._id.toString() === dishIngredient.ingredientId);
+      const ingredient = ingredients.find(
+        (ing) => (ing as any)._id.toString() === dishIngredient.ingredientId,
+      );
       if (!ingredient) {
-        throw new BadRequestException(`Ingrediente ${dishIngredient.ingredientId} não encontrado`);
+        throw new BadRequestException(
+          `Ingrediente ${dishIngredient.ingredientId} não encontrado`,
+        );
       }
 
       // Converter quantidade para a unidade do ingrediente se necessário
@@ -166,15 +192,18 @@ export class SysProdutosService {
     // Se for um prato, calcular preço automaticamente se necessário
     let finalPrice = dto.price;
     let finalCostPrice = dto.costPrice;
-    
+
     if (productType === ProductType.DISH && dto.dishComposition) {
       if (!unitId) {
         throw new BadRequestException('unitId é obrigatório para criar pratos');
       }
 
-      const calculatedPrices = await this.calculateDishPrice(dto.dishComposition, unitId);
+      const calculatedPrices = await this.calculateDishPrice(
+        dto.dishComposition,
+        unitId,
+      );
       finalCostPrice = calculatedPrices.costPrice;
-      
+
       // Se o preço não foi fornecido ou se o modo é automático, usar o preço calculado
       if (!dto.price || dto.dishComposition.pricingMode === 'auto') {
         finalPrice = calculatedPrices.price;
@@ -264,47 +293,63 @@ export class SysProdutosService {
       // Se não especificar originalPrice, usar price como originalPrice
       originalPrice: dto.originalPrice ?? dto.price,
     };
-    
-    const update = await this.productModel.findByIdAndUpdate(
-      productId,
-      { $push: { variants: variantData } },
-      { new: true },
-    ).lean();
+
+    const update = await this.productModel
+      .findByIdAndUpdate(
+        productId,
+        { $push: { variants: variantData } },
+        { new: true },
+      )
+      .lean();
     if (!update) throw new NotFoundException('Produto não encontrado');
     return update;
   }
 
   async updateVariant(productId: string, sku: string, dto: UpdateVariantDto) {
     const setOps: any = {};
-    
+
     if (dto.price !== undefined) setOps['variants.$.price'] = dto.price;
-    if (dto.originalPrice !== undefined) setOps['variants.$.originalPrice'] = dto.originalPrice;
-    if (dto.promotionalPrice !== undefined) setOps['variants.$.promotionalPrice'] = dto.promotionalPrice;
-    if (dto.costPrice !== undefined) setOps['variants.$.costPrice'] = dto.costPrice;
-    if (dto.discount !== undefined) setOps['variants.$.discount'] = dto.discount;
-    if (dto.discountEvent !== undefined) setOps['variants.$.discountEvent'] = dto.discountEvent;
-    if (dto.discountType !== undefined) setOps['variants.$.discountType'] = dto.discountType;
-    if (dto.currency !== undefined) setOps['variants.$.currency'] = dto.currency;
-    if (dto.comissionPerTransaction !== undefined) setOps['variants.$.comissionPerTransaction'] = dto.comissionPerTransaction;
+    if (dto.originalPrice !== undefined)
+      setOps['variants.$.originalPrice'] = dto.originalPrice;
+    if (dto.promotionalPrice !== undefined)
+      setOps['variants.$.promotionalPrice'] = dto.promotionalPrice;
+    if (dto.costPrice !== undefined)
+      setOps['variants.$.costPrice'] = dto.costPrice;
+    if (dto.discount !== undefined)
+      setOps['variants.$.discount'] = dto.discount;
+    if (dto.discountEvent !== undefined)
+      setOps['variants.$.discountEvent'] = dto.discountEvent;
+    if (dto.discountType !== undefined)
+      setOps['variants.$.discountType'] = dto.discountType;
+    if (dto.currency !== undefined)
+      setOps['variants.$.currency'] = dto.currency;
+    if (dto.comissionPerTransaction !== undefined)
+      setOps['variants.$.comissionPerTransaction'] =
+        dto.comissionPerTransaction;
     if (dto.taxes !== undefined) setOps['variants.$.taxes'] = dto.taxes;
-    if (dto.attributes !== undefined) setOps['variants.$.attributes'] = dto.attributes;
+    if (dto.attributes !== undefined)
+      setOps['variants.$.attributes'] = dto.attributes;
     if (dto.active !== undefined) setOps['variants.$.active'] = dto.active;
 
-    const doc = await this.productModel.findOneAndUpdate(
-      { _id: productId, 'variants.sku': sku },
-      { $set: setOps },
-      { new: true },
-    ).lean();
+    const doc = await this.productModel
+      .findOneAndUpdate(
+        { _id: productId, 'variants.sku': sku },
+        { $set: setOps },
+        { new: true },
+      )
+      .lean();
     if (!doc) throw new NotFoundException('Produto/variante não encontrado');
     return doc;
   }
 
   async removeVariant(productId: string, sku: string) {
-    const doc = await this.productModel.findByIdAndUpdate(
-      productId,
-      { $pull: { variants: { sku } } },
-      { new: true },
-    ).lean();
+    const doc = await this.productModel
+      .findByIdAndUpdate(
+        productId,
+        { $pull: { variants: { sku } } },
+        { new: true },
+      )
+      .lean();
     if (!doc) throw new NotFoundException('Produto não encontrado');
     return doc;
   }
@@ -321,90 +366,116 @@ export class SysProdutosService {
       setOps[`variants.$.stockByUnit.${dto.unitId}.reserved`] = res;
     }
 
-    const doc = await this.productModel.findOneAndUpdate(
-      { _id: productId, 'variants.sku': sku },
-      { $set: setOps },
-      { new: true },
-    ).lean();
+    const doc = await this.productModel
+      .findOneAndUpdate(
+        { _id: productId, 'variants.sku': sku },
+        { $set: setOps },
+        { new: true },
+      )
+      .lean();
     if (!doc) throw new NotFoundException('Produto/variante não encontrado');
     return doc;
   }
 
-  async incVariantStock(productId: string, sku: string, dto: AdjustStockDeltaDto) {
+  async incVariantStock(
+    productId: string,
+    sku: string,
+    dto: AdjustStockDeltaDto,
+  ) {
     // Buscar valores atuais para calcular novos com piso zero
     const doc = await this.productModel.findOne({ _id: productId }).lean();
     if (!doc) throw new NotFoundException('Produto não encontrado');
     const variant = (doc as any).variants?.find((v: any) => v.sku === sku);
     if (!variant) throw new NotFoundException('Variante não encontrada');
 
-    const current = (variant.stockByUnit && variant.stockByUnit[dto.unitId]) || { quantity: 0, reserved: 0 };
-    const nextQuantity = typeof dto.quantityDelta === 'number' ? Math.max(0, (current.quantity || 0) + dto.quantityDelta) : undefined;
-    const nextReserved = typeof dto.reservedDelta === 'number' ? Math.max(0, (current.reserved || 0) + dto.reservedDelta) : undefined;
+    const current = (variant.stockByUnit &&
+      variant.stockByUnit[dto.unitId]) || { quantity: 0, reserved: 0 };
+    const nextQuantity =
+      typeof dto.quantityDelta === 'number'
+        ? Math.max(0, (current.quantity || 0) + dto.quantityDelta)
+        : undefined;
+    const nextReserved =
+      typeof dto.reservedDelta === 'number'
+        ? Math.max(0, (current.reserved || 0) + dto.reservedDelta)
+        : undefined;
 
     const setOps: any = {};
-    if (typeof nextQuantity === 'number') setOps[`variants.$.stockByUnit.${dto.unitId}.quantity`] = nextQuantity;
-    if (typeof nextReserved === 'number') setOps[`variants.$.stockByUnit.${dto.unitId}.reserved`] = nextReserved;
+    if (typeof nextQuantity === 'number')
+      setOps[`variants.$.stockByUnit.${dto.unitId}.quantity`] = nextQuantity;
+    if (typeof nextReserved === 'number')
+      setOps[`variants.$.stockByUnit.${dto.unitId}.reserved`] = nextReserved;
 
-    const updated = await this.productModel.findOneAndUpdate(
-      { _id: productId, 'variants.sku': sku },
-      { $set: setOps },
-      { new: true },
-    ).lean();
-    if (!updated) throw new NotFoundException('Produto/variante não encontrado');
+    const updated = await this.productModel
+      .findOneAndUpdate(
+        { _id: productId, 'variants.sku': sku },
+        { $set: setOps },
+        { new: true },
+      )
+      .lean();
+    if (!updated)
+      throw new NotFoundException('Produto/variante não encontrado');
     return updated;
   }
 
   // ===== Metadados (categorias/imagens/attributesTemplate) =====
   async updateMetadata(productId: string, dto: UpdateProdutoMetadataDto) {
-    const doc = await this.productModel.findByIdAndUpdate(
-      productId,
-      {
-        ...(dto.categories ? { categories: dto.categories } : {}),
-        ...(dto.images ? { images: dto.images } : {}),
-        ...(dto.attributesTemplate ? { attributesTemplate: dto.attributesTemplate } : {}),
-      },
-      { new: true },
-    ).lean();
+    const doc = await this.productModel
+      .findByIdAndUpdate(
+        productId,
+        {
+          ...(dto.categories ? { categories: dto.categories } : {}),
+          ...(dto.images ? { images: dto.images } : {}),
+          ...(dto.attributesTemplate
+            ? { attributesTemplate: dto.attributesTemplate }
+            : {}),
+        },
+        { new: true },
+      )
+      .lean();
     if (!doc) throw new NotFoundException('Produto não encontrado');
     return doc;
   }
 
   async addImage(productId: string, url: string) {
-    const doc = await this.productModel.findByIdAndUpdate(
-      productId,
-      { $addToSet: { images: url } },
-      { new: true },
-    ).lean();
+    const doc = await this.productModel
+      .findByIdAndUpdate(
+        productId,
+        { $addToSet: { images: url } },
+        { new: true },
+      )
+      .lean();
     if (!doc) throw new NotFoundException('Produto não encontrado');
     return doc;
   }
 
   async removeImage(productId: string, url: string) {
-    const doc = await this.productModel.findByIdAndUpdate(
-      productId,
-      { $pull: { images: url } },
-      { new: true },
-    ).lean();
+    const doc = await this.productModel
+      .findByIdAndUpdate(productId, { $pull: { images: url } }, { new: true })
+      .lean();
     if (!doc) throw new NotFoundException('Produto não encontrado');
     return doc;
   }
 
   async addCategory(productId: string, category: string) {
-    const doc = await this.productModel.findByIdAndUpdate(
-      productId,
-      { $addToSet: { categories: category } },
-      { new: true },
-    ).lean();
+    const doc = await this.productModel
+      .findByIdAndUpdate(
+        productId,
+        { $addToSet: { categories: category } },
+        { new: true },
+      )
+      .lean();
     if (!doc) throw new NotFoundException('Produto não encontrado');
     return doc;
   }
 
   async removeCategory(productId: string, category: string) {
-    const doc = await this.productModel.findByIdAndUpdate(
-      productId,
-      { $pull: { categories: category } },
-      { new: true },
-    ).lean();
+    const doc = await this.productModel
+      .findByIdAndUpdate(
+        productId,
+        { $pull: { categories: category } },
+        { new: true },
+      )
+      .lean();
     if (!doc) throw new NotFoundException('Produto não encontrado');
     return doc;
   }

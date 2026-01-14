@@ -1,10 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-export type RagInstructionDocument = RagInstruction & Document & {
-  createdAt?: Date;
-  updatedAt?: Date;
-};
+export type RagInstructionDocument = RagInstruction &
+  Document & {
+    createdAt?: Date;
+    updatedAt?: Date;
+  };
 
 @Schema({
   timestamps: true,
@@ -65,7 +66,8 @@ export class RagInstruction {
   lastUsedAt?: Date;
 }
 
-export const RagInstructionSchema = SchemaFactory.createForClass(RagInstruction);
+export const RagInstructionSchema =
+  SchemaFactory.createForClass(RagInstruction);
 
 // Índices para performance
 RagInstructionSchema.index({ unitId: 1, active: 1 });

@@ -27,8 +27,12 @@ describe('Gamification Achievements Contract (e2e)', () => {
     app = moduleFixture.createNestApplication();
     await app.init();
 
-    achievementModel = moduleFixture.get<Model<any>>(getModelToken('Achievement'));
-    userAchievementModel = moduleFixture.get<Model<any>>(getModelToken('UserAchievement'));
+    achievementModel = moduleFixture.get<Model<any>>(
+      getModelToken('Achievement'),
+    );
+    userAchievementModel = moduleFixture.get<Model<any>>(
+      getModelToken('UserAchievement'),
+    );
   });
 
   afterAll(async () => {
@@ -77,7 +81,9 @@ describe('Gamification Achievements Contract (e2e)', () => {
       ];
 
       jest.spyOn(achievementModel, 'find').mockResolvedValue(mockAchievements);
-      jest.spyOn(userAchievementModel, 'find').mockResolvedValue(mockUserAchievements);
+      jest
+        .spyOn(userAchievementModel, 'find')
+        .mockResolvedValue(mockUserAchievements);
 
       const response = await request(app.getHttpServer())
         .get('/gamification/achievements?userId=user-123')

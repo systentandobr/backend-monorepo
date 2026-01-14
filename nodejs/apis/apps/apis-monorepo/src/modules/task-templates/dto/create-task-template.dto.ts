@@ -1,133 +1,142 @@
-import { IsString, IsNotEmpty, IsOptional, IsEnum, IsBoolean, IsNumber, IsArray, ValidateNested, IsObject } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsBoolean,
+  IsNumber,
+  IsArray,
+  ValidateNested,
+  IsObject,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 class TaskStepDto {
-    @IsNumber()
-    order: number;
+  @IsNumber()
+  order: number;
 
-    @IsString()
-    @IsNotEmpty()
-    title: string;
+  @IsString()
+  @IsNotEmpty()
+  title: string;
 
-    @IsString()
-    description: string;
+  @IsString()
+  description: string;
 
-    @IsBoolean()
-    @IsOptional()
-    required?: boolean;
+  @IsBoolean()
+  @IsOptional()
+  required?: boolean;
 }
 
 class ResourceDto {
-    @IsString()
-    type: string;
+  @IsString()
+  type: string;
 
-    @IsString()
-    url: string;
+  @IsString()
+  url: string;
 
-    @IsString()
-    title: string;
+  @IsString()
+  title: string;
 
-    @IsString()
-    @IsOptional()
-    description?: string;
+  @IsString()
+  @IsOptional()
+  description?: string;
 }
 
 class ValidationDto {
-    @IsString()
-    @IsOptional()
-    type?: string;
+  @IsString()
+  @IsOptional()
+  type?: string;
 
-    @IsBoolean()
-    @IsOptional()
-    required?: boolean;
+  @IsBoolean()
+  @IsOptional()
+  required?: boolean;
 
-    @IsString()
-    @IsOptional()
-    instructions?: string;
+  @IsString()
+  @IsOptional()
+  instructions?: string;
 
-    @IsArray()
-    @IsOptional()
-    acceptedFormats?: string[];
+  @IsArray()
+  @IsOptional()
+  acceptedFormats?: string[];
 }
 
 export class CreateTaskTemplateDto {
-    @IsString()
-    @IsNotEmpty()
-    name: string;
+  @IsString()
+  @IsNotEmpty()
+  name: string;
 
-    @IsString()
-    @IsNotEmpty()
-    description: string;
+  @IsString()
+  @IsNotEmpty()
+  description: string;
 
-    @IsString()
-    @IsNotEmpty()
-    category: string;
+  @IsString()
+  @IsNotEmpty()
+  category: string;
 
-    @IsString()
-    @IsOptional()
-    type?: string;
+  @IsString()
+  @IsOptional()
+  type?: string;
 
-    @IsString()
-    @IsOptional()
-    difficulty?: string;
+  @IsString()
+  @IsOptional()
+  difficulty?: string;
 
-    @IsNumber()
-    @IsOptional()
-    points?: number;
+  @IsNumber()
+  @IsOptional()
+  points?: number;
 
-    @IsArray()
-    @IsOptional()
-    dependencies?: string[];
+  @IsArray()
+  @IsOptional()
+  dependencies?: string[];
 
-    @IsString()
-    @IsOptional()
-    instructions?: string;
+  @IsString()
+  @IsOptional()
+  instructions?: string;
 
-    @IsString()
-    @IsOptional()
-    icon?: string;
+  @IsString()
+  @IsOptional()
+  icon?: string;
 
-    @IsString()
-    @IsOptional()
-    color?: string;
+  @IsString()
+  @IsOptional()
+  color?: string;
 
-    @IsObject()
-    @IsOptional()
-    @ValidateNested()
-    @Type(() => ValidationDto)
-    validation?: ValidationDto;
+  @IsObject()
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => ValidationDto)
+  validation?: ValidationDto;
 
-    @IsArray()
-    @ValidateNested({ each: true })
-    @Type(() => TaskStepDto)
-    steps: TaskStepDto[];
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => TaskStepDto)
+  steps: TaskStepDto[];
 
-    @IsOptional()
-    formTemplate?: any;
+  @IsOptional()
+  formTemplate?: any;
 
-    @IsString()
-    @IsOptional()
-    videoUrl?: string;
+  @IsString()
+  @IsOptional()
+  videoUrl?: string;
 
-    @IsArray()
-    @IsOptional()
-    @ValidateNested({ each: true })
-    @Type(() => ResourceDto)
-    resources?: ResourceDto[];
+  @IsArray()
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => ResourceDto)
+  resources?: ResourceDto[];
 
-    @IsNumber()
-    @IsOptional()
-    estimatedTime?: number;
+  @IsNumber()
+  @IsOptional()
+  estimatedTime?: number;
 
-    @IsBoolean()
-    @IsOptional()
-    isDefault?: boolean;
+  @IsBoolean()
+  @IsOptional()
+  isDefault?: boolean;
 
-    @IsNumber()
-    @IsOptional()
-    order?: number;
+  @IsNumber()
+  @IsOptional()
+  order?: number;
 
-    @IsObject()
-    @IsOptional()
-    metadata?: any;
+  @IsObject()
+  @IsOptional()
+  metadata?: any;
 }

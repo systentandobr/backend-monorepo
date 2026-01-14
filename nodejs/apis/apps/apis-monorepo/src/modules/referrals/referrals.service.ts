@@ -51,7 +51,9 @@ export class ReferralsService {
    * Valida se o código de indicação é válido
    */
   async validateCode(code: string): Promise<ReferralResponseDto> {
-    const referral = await this.referralModel.findOne({ referralCode: code }).exec();
+    const referral = await this.referralModel
+      .findOne({ referralCode: code })
+      .exec();
 
     if (!referral) {
       throw new NotFoundException('Código de indicação não encontrado');
@@ -62,7 +64,10 @@ export class ReferralsService {
     }
 
     // Verificar se expirou
-    if (referral.tracking?.expiredAt && referral.tracking.expiredAt < new Date()) {
+    if (
+      referral.tracking?.expiredAt &&
+      referral.tracking.expiredAt < new Date()
+    ) {
       await this.referralModel.updateOne(
         { _id: referral._id },
         { status: 'expired', 'tracking.expiredAt': new Date() },
@@ -111,7 +116,9 @@ export class ReferralsService {
       });
 
       if (totalReferrals >= campaign.rules.maxReferralsTotal) {
-        throw new BadRequestException('Limite total de indicações da campanha atingido');
+        throw new BadRequestException(
+          'Limite total de indicações da campanha atingido',
+        );
       }
     }
 
@@ -120,11 +127,15 @@ export class ReferralsService {
     let attempts = 0;
     do {
       referralCode = this.generateReferralCode();
-      const existing = await this.referralModel.findOne({ referralCode }).exec();
+      const existing = await this.referralModel
+        .findOne({ referralCode })
+        .exec();
       if (!existing) break;
       attempts++;
       if (attempts > 10) {
-        throw new BadRequestException('Erro ao gerar código único. Tente novamente.');
+        throw new BadRequestException(
+          'Erro ao gerar código único. Tente novamente.',
+        );
       }
     } while (true);
 
@@ -232,7 +243,10 @@ export class ReferralsService {
     };
   }
 
-  async findOne(id: string, franchiseId?: string): Promise<ReferralResponseDto> {
+  async findOne(
+    id: string,
+    franchiseId?: string,
+  ): Promise<ReferralResponseDto> {
     const query: any = { _id: id };
 
     if (franchiseId) {
@@ -252,14 +266,20 @@ export class ReferralsService {
     return this.validateCode(code);
   }
 
-  async findByUser(userId: string, franchiseId?: string): Promise<ReferralResponseDto[]> {
+  async findByUser(
+    userId: string,
+    franchiseId?: string,
+  ): Promise<ReferralResponseDto[]> {
     const query: any = { referrerId: new Types.ObjectId(userId) };
 
     if (franchiseId) {
       query.franchiseId = new Types.ObjectId(franchiseId);
     }
 
-    const referrals = await this.referralModel.find(query).sort({ createdAt: -1 }).exec();
+    const referrals = await this.referralModel
+      .find(query)
+      .sort({ createdAt: -1 })
+      .exec();
     return referrals.map((r) => this.toResponseDto(r));
   }
 
@@ -268,7 +288,9 @@ export class ReferralsService {
     orderId: string,
     refereeId: string,
   ): Promise<ReferralResponseDto> {
-    const referral = await this.referralModel.findOne({ _id: referralId }).exec();
+    const referral = await this.referralModel
+      .findOne({ _id: referralId })
+      .exec();
 
     if (!referral) {
       throw new NotFoundException('Indicação não encontrada');
@@ -306,7 +328,10 @@ export class ReferralsService {
     userId: string,
     franchiseId?: string,
   ): Promise<ReferralResponseDto> {
-    const query: any = { _id: referralId, referrerId: new Types.ObjectId(userId) };
+    const query: any = {
+      _id: referralId,
+      referrerId: new Types.ObjectId(userId),
+    };
 
     if (franchiseId) {
       query.franchiseId = new Types.ObjectId(franchiseId);
@@ -319,7 +344,9 @@ export class ReferralsService {
     }
 
     if (referral.status === 'completed') {
-      throw new BadRequestException('Não é possível cancelar uma indicação completada');
+      throw new BadRequestException(
+        'Não é possível cancelar uma indicação completada',
+      );
     }
 
     if (referral.status === 'cancelled') {
@@ -353,10 +380,18 @@ export class ReferralsService {
     const referrals = await this.referralModel.find(query).exec();
 
     const totalReferrals = referrals.length;
-    const completedReferrals = referrals.filter((r) => r.status === 'completed').length;
-    const pendingReferrals = referrals.filter((r) => r.status === 'pending').length;
-    const cancelledReferrals = referrals.filter((r) => r.status === 'cancelled').length;
-    const expiredReferrals = referrals.filter((r) => r.status === 'expired').length;
+    const completedReferrals = referrals.filter(
+      (r) => r.status === 'completed',
+    ).length;
+    const pendingReferrals = referrals.filter(
+      (r) => r.status === 'pending',
+    ).length;
+    const cancelledReferrals = referrals.filter(
+      (r) => r.status === 'cancelled',
+    ).length;
+    const expiredReferrals = referrals.filter(
+      (r) => r.status === 'expired',
+    ).length;
 
     const totalRewardsValue = referrals
       .filter((r) => r.status === 'completed')
@@ -388,10 +423,13 @@ export class ReferralsService {
    */
   private async updateCampaignMetrics(campaignId: string): Promise<void> {
     const stats = await this.getCampaignStats(campaignId);
-    
+
     // TODO: Atualizar métricas na campanha quando o serviço de campanhas permitir
     // Por enquanto, apenas logamos
-    this.logger.debug(`Métricas atualizadas para campanha ${campaignId}:`, stats);
+    this.logger.debug(
+      `Métricas atualizadas para campanha ${campaignId}:`,
+      stats,
+    );
   }
 
   private toResponseDto(referral: ReferralDocument): ReferralResponseDto {

@@ -36,4 +36,5 @@ export class ProductivityGoal {
   updatedAt: string;
 }
 
-export const ProductivityGoalSchema = SchemaFactory.createForClass(ProductivityGoal); 
+export const ProductivityGoalSchema =
+  SchemaFactory.createForClass(ProductivityGoal);

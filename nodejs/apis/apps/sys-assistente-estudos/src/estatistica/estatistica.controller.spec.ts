@@ -22,8 +22,13 @@ describe('EstatisticaController', () => {
         ]),
       ],
       controllers: [EstatisticaController],
-      providers: [EstatisticaRepository, EstatisticaService, EstatisticaRepository],
-    }).overrideProvider(EstatisticaService)
+      providers: [
+        EstatisticaRepository,
+        EstatisticaService,
+        EstatisticaRepository,
+      ],
+    })
+      .overrideProvider(EstatisticaService)
       .useValue({
         create: jest.fn(),
         update: jest.fn(),
@@ -34,7 +39,6 @@ describe('EstatisticaController', () => {
         deleteAll: jest.fn(),
       })
       .compile();
-
 
     controller = module.get<EstatisticaController>(EstatisticaController);
   });

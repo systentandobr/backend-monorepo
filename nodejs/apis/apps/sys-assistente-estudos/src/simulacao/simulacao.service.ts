@@ -8,7 +8,7 @@ export class SimulacaoService {
   constructor(
     readonly repository: SimulacaoRepository,
     readonly questionService: QuestionService,
-  ) { }
+  ) {}
 
   async create(data: Simulacao): Promise<Simulacao> {
     return await this.repository.create(data);
@@ -18,13 +18,17 @@ export class SimulacaoService {
     return await this.repository.update(id, data);
   }
 
-  async filterQuestions(results: Simulacao[], filter = false): Promise<Simulacao[]> {
+  async filterQuestions(
+    results: Simulacao[],
+    filter = false,
+  ): Promise<Simulacao[]> {
     const simulacoesComQuestoes = [];
     if (filter) {
       for (const simulacao of results) {
-        const questionsBySimulacao = await this.questionService.findBySimulacaoId(
-          { simulacaoId: simulacao._id },
-        );
+        const questionsBySimulacao =
+          await this.questionService.findBySimulacaoId({
+            simulacaoId: simulacao._id,
+          });
         const existe = questionsBySimulacao.some(
           (question) => !question.correctAnswerChecked,
         );
@@ -39,7 +43,7 @@ export class SimulacaoService {
   async findByTemaEspecificoUserId(
     temaEspecificoId: string,
     userId: string,
-    filterOpenQuestions = false
+    filterOpenQuestions = false,
   ): Promise<Simulacao[]> {
     const results = await this.repository.findByTemaEspecificoUserId(
       temaEspecificoId,

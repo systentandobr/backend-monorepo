@@ -5,7 +5,7 @@ import { Document, Schema as MongooseSchema } from 'mongoose';
 export class TemaEspecifico extends Document {
   @Prop({
     type: MongooseSchema.Types.ObjectId,
-    searchIndex: true
+    searchIndex: true,
   })
   id: string;
 
@@ -24,7 +24,7 @@ export class TemaEspecifico extends Document {
 
   @Prop()
   updatedAt: Date;
-
 }
 
-export const TemaEspecificoSchema = SchemaFactory.createForClass(TemaEspecifico);
+export const TemaEspecificoSchema =
+  SchemaFactory.createForClass(TemaEspecifico);

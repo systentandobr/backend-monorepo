@@ -1,18 +1,30 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, FilterQuery } from 'mongoose';
-import { AFFILIATE_PRODUCT_COLLECTION, AffiliateProduct } from '../schemas/affiliate-product.schema';
-import { CreateAffiliateProductDto, UpdateAffiliateProductDto, QueryAffiliateProductDto } from '../dto/affiliate-product.dto';
+import {
+  AFFILIATE_PRODUCT_COLLECTION,
+  AffiliateProduct,
+} from '../schemas/affiliate-product.schema';
+import {
+  CreateAffiliateProductDto,
+  UpdateAffiliateProductDto,
+  QueryAffiliateProductDto,
+} from '../dto/affiliate-product.dto';
 import { SysProdutosService } from '../sys-produtos.service';
 import { CreateProdutoDto } from '../dto/create-produto.dto';
 import axios from 'axios';
 
 @Injectable()
 export class AffiliateProductService {
-  private readonly SCRAPER_API_URL = process.env.SCRAPER_API_URL || 'http://localhost:8002';
+  private readonly SCRAPER_API_URL =
+    process.env.SCRAPER_API_URL || 'http://localhost:8002';
 
   constructor(
-    @InjectModel(AFFILIATE_PRODUCT_COLLECTION) 
+    @InjectModel(AFFILIATE_PRODUCT_COLLECTION)
     private readonly affiliateProductModel: Model<AffiliateProduct>,
     private readonly produtosService: SysProdutosService,
   ) {}
@@ -37,14 +49,18 @@ export class AffiliateProductService {
     });
 
     // Processar em background
-    this.processProductAsync(affiliateProduct._id.toString()).catch(err => {
+    this.processProductAsync(affiliateProduct._id.toString()).catch((err) => {
       console.error('Erro ao processar produto:', err);
     });
 
     return affiliateProduct.toObject();
   }
 
-  async list(userId: string, unitId: string | undefined, query: QueryAffiliateProductDto = {}) {
+  async list(
+    userId: string,
+    unitId: string | undefined,
+    query: QueryAffiliateProductDto = {},
+  ) {
     const filter: FilterQuery<AffiliateProduct> = {
       userId,
     };
@@ -88,7 +104,9 @@ export class AffiliateProductService {
   }
 
   async getById(id: string, userId: string) {
-    const doc = await this.affiliateProductModel.findOne({ _id: id, userId }).lean();
+    const doc = await this.affiliateProductModel
+      .findOne({ _id: id, userId })
+      .lean();
     if (!doc) throw new NotFoundException('Produto afiliado não encontrado');
     return doc;
   }
@@ -102,13 +120,17 @@ export class AffiliateProductService {
   }
 
   async delete(id: string, userId: string) {
-    const res = await this.affiliateProductModel.findOneAndDelete({ _id: id, userId }).lean();
+    const res = await this.affiliateProductModel
+      .findOneAndDelete({ _id: id, userId })
+      .lean();
     if (!res) throw new NotFoundException('Produto afiliado não encontrado');
     return { success: true };
   }
 
   async retry(id: string, userId: string) {
-    const doc = await this.affiliateProductModel.findOne({ _id: id, userId }).lean();
+    const doc = await this.affiliateProductModel
+      .findOne({ _id: id, userId })
+      .lean();
     if (!doc) throw new NotFoundException('Produto afiliado não encontrado');
 
     if (doc.retryCount >= doc.maxRetries) {
@@ -123,7 +145,7 @@ export class AffiliateProductService {
     });
 
     // Processar em background
-    this.processProductAsync(id).catch(err => {
+    this.processProductAsync(id).catch((err) => {
       console.error('Erro ao reprocessar produto:', err);
     });
 
@@ -137,19 +159,24 @@ export class AffiliateProductService {
         processingStatus: 'processing',
       });
 
-      const affiliateProduct = await this.affiliateProductModel.findById(affiliateProductId).lean();
+      const affiliateProduct = await this.affiliateProductModel
+        .findById(affiliateProductId)
+        .lean();
       if (!affiliateProduct) {
         throw new Error('Produto afiliado não encontrado');
       }
 
       // Chamar API de scraping Python
-      const scraperResponse = await axios.post(`${this.SCRAPER_API_URL}/scrape`, {
-        url: affiliateProduct.affiliateUrl,
-        platform: affiliateProduct.platform,
-        category_id: affiliateProduct.categoryId,
-        user_id: affiliateProduct.userId,
-        unit_id: affiliateProduct.unitId,
-      });
+      const scraperResponse = await axios.post(
+        `${this.SCRAPER_API_URL}/scrape`,
+        {
+          url: affiliateProduct.affiliateUrl,
+          platform: affiliateProduct.platform,
+          category_id: affiliateProduct.categoryId,
+          user_id: affiliateProduct.userId,
+          unit_id: affiliateProduct.unitId,
+        },
+      );
 
       if (!scraperResponse.data.success) {
         throw new Error(scraperResponse.data.error || 'Erro ao fazer scraping');
@@ -168,13 +195,14 @@ export class AffiliateProductService {
 
       const createdProduct = await this.produtosService.create(
         affiliateProduct.unitId,
-        productData
+        productData,
       );
 
       // Obter ID do produto criado (pode ser ObjectId ou string)
-      const productId = typeof createdProduct._id === 'string' 
-        ? createdProduct._id 
-        : createdProduct._id.toString();
+      const productId =
+        typeof createdProduct._id === 'string'
+          ? createdProduct._id
+          : createdProduct._id.toString();
 
       // Atualizar metadados do produto (imagens, categorias)
       if (scrapedData.images && scrapedData.images.length > 0) {
@@ -191,7 +219,6 @@ export class AffiliateProductService {
         scrapedData,
         processedAt: new Date(),
       });
-
     } catch (error: any) {
       console.error('Erro ao processar produto afiliado:', error);
 
@@ -203,12 +230,23 @@ export class AffiliateProductService {
     }
   }
 
-  private detectPlatform(url: string): 'shopee' | 'amazon' | 'magalu' | 'mercadolivre' | 'americanas' | 'casasbahia' | 'other' {
+  private detectPlatform(
+    url: string,
+  ):
+    | 'shopee'
+    | 'amazon'
+    | 'magalu'
+    | 'mercadolivre'
+    | 'americanas'
+    | 'casasbahia'
+    | 'other' {
     const lowerUrl = url.toLowerCase();
     if (lowerUrl.includes('shopee')) return 'shopee';
     if (lowerUrl.includes('amazon')) return 'amazon';
-    if (lowerUrl.includes('magalu') || lowerUrl.includes('magazine')) return 'magalu';
-    if (lowerUrl.includes('mercadolivre') || lowerUrl.includes('mercadolibre')) return 'mercadolivre';
+    if (lowerUrl.includes('magalu') || lowerUrl.includes('magazine'))
+      return 'magalu';
+    if (lowerUrl.includes('mercadolivre') || lowerUrl.includes('mercadolibre'))
+      return 'mercadolivre';
     if (lowerUrl.includes('americanas')) return 'americanas';
     if (lowerUrl.includes('casasbahia')) return 'casasbahia';
     return 'other';
@@ -218,14 +256,30 @@ export class AffiliateProductService {
     const filter: FilterQuery<AffiliateProduct> = { userId };
     if (unitId) filter.unitId = unitId;
 
-    const [total, pending, processing, completed, failed, retrying] = await Promise.all([
-      this.affiliateProductModel.countDocuments(filter),
-      this.affiliateProductModel.countDocuments({ ...filter, processingStatus: 'pending' }),
-      this.affiliateProductModel.countDocuments({ ...filter, processingStatus: 'processing' }),
-      this.affiliateProductModel.countDocuments({ ...filter, processingStatus: 'completed' }),
-      this.affiliateProductModel.countDocuments({ ...filter, processingStatus: 'failed' }),
-      this.affiliateProductModel.countDocuments({ ...filter, processingStatus: 'retrying' }),
-    ]);
+    const [total, pending, processing, completed, failed, retrying] =
+      await Promise.all([
+        this.affiliateProductModel.countDocuments(filter),
+        this.affiliateProductModel.countDocuments({
+          ...filter,
+          processingStatus: 'pending',
+        }),
+        this.affiliateProductModel.countDocuments({
+          ...filter,
+          processingStatus: 'processing',
+        }),
+        this.affiliateProductModel.countDocuments({
+          ...filter,
+          processingStatus: 'completed',
+        }),
+        this.affiliateProductModel.countDocuments({
+          ...filter,
+          processingStatus: 'failed',
+        }),
+        this.affiliateProductModel.countDocuments({
+          ...filter,
+          processingStatus: 'retrying',
+        }),
+      ]);
 
     return {
       total,
@@ -237,4 +291,3 @@ export class AffiliateProductService {
     };
   }
 }
-

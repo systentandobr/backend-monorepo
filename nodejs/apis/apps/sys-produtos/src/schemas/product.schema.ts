@@ -102,7 +102,7 @@ export interface Product extends Document {
   active: boolean;
   type?: ProductType; // Tipo do produto: 'product' ou 'dish' (prato)
   dishComposition?: DishComposition; // Composição do prato (apenas quando type='dish')
-  
+
   // Campos adicionais migrados do projeto antigo
   brand?: string; // Marca do produto
   productModel?: string; // Modelo do produto (renomeado de 'model' para evitar conflito com Document.model)
@@ -122,7 +122,7 @@ export interface Product extends Document {
   url?: string; // URL do produto
   affiliateUrl?: string; // URL de afiliado
   taxInformation?: TaxInformation; // Informações fiscais completas - CRÍTICO PARA BRASIL
-  
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -197,7 +197,11 @@ const TaxInformationSchema = new Schema<TaxInformation, Document>(
     icmsByState: {
       type: Map,
       of: new Schema({
-        origin: { type: String, enum: ['Internal', 'External'], required: true },
+        origin: {
+          type: String,
+          enum: ['Internal', 'External'],
+          required: true,
+        },
         taxRate: { type: Number, required: true, min: 0, max: 100 },
       }),
       default: {},
@@ -237,7 +241,13 @@ export const ProductSchema = new Schema<Product>(
   {
     unitId: { type: String, index: true },
     name: { type: String, required: true, trim: true, index: true },
-    slug: { type: String, required: true, trim: true, unique: true, index: true },
+    slug: {
+      type: String,
+      required: true,
+      trim: true,
+      unique: true,
+      index: true,
+    },
     description: { type: String },
     images: { type: [ProductImageReferenceSchema], default: [] },
     thumbnail: { type: String }, // HashId da imagem principal (compatibilidade)
@@ -247,9 +257,14 @@ export const ProductSchema = new Schema<Product>(
     variants: { type: [ProductVariantSchema], default: [] },
     featured: { type: Boolean, default: false, index: true },
     active: { type: Boolean, default: true, index: true },
-    type: { type: String, enum: Object.values(ProductType), default: ProductType.PRODUCT, index: true },
+    type: {
+      type: String,
+      enum: Object.values(ProductType),
+      default: ProductType.PRODUCT,
+      index: true,
+    },
     dishComposition: { type: DishCompositionSchema, required: false },
-    
+
     // Campos adicionais migrados do projeto antigo
     brand: { type: String, index: true },
     productModel: { type: String },
@@ -262,7 +277,11 @@ export const ProductSchema = new Schema<Product>(
     warranty: { type: String },
     ncm: { type: String, index: true }, // NCM - CRÍTICO
     ean13: { type: String, index: true }, // Código de barras EAN-13 - CRÍTICO
-    unitOfMeasurement: { type: String, enum: ['UN', 'KG', 'M', 'L'], index: true },
+    unitOfMeasurement: {
+      type: String,
+      enum: ['UN', 'KG', 'M', 'L'],
+      index: true,
+    },
     supplierID: { type: String, index: true },
     recommendedAge: { type: String },
     specifications: { type: SchemaTypes.Mixed },
@@ -282,5 +301,3 @@ ProductSchema.index({ ean13: 1 });
 ProductSchema.index({ unitId: 1, active: 1 });
 
 export const PRODUCT_COLLECTION = 'Product';
-
-

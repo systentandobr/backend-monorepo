@@ -1,10 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-export type PaymentDocument = Payment & Document & {
-  createdAt?: Date;
-  updatedAt?: Date;
-};
+export type PaymentDocument = Payment &
+  Document & {
+    createdAt?: Date;
+    updatedAt?: Date;
+  };
 
 @Schema({
   timestamps: true,
@@ -20,7 +21,12 @@ export class Payment {
   @Prop({ required: true, index: true, type: Types.ObjectId, ref: 'Student' })
   studentId: string;
 
-  @Prop({ required: true, index: true, type: Types.ObjectId, ref: 'SubscriptionPlan' })
+  @Prop({
+    required: true,
+    index: true,
+    type: Types.ObjectId,
+    ref: 'SubscriptionPlan',
+  })
   subscriptionPlanId: string;
 
   @Prop({ type: Number, required: true })
@@ -44,7 +50,12 @@ export class Payment {
     type: String,
     enum: ['credit_card', 'debit_card', 'pix', 'cash', 'bank_transfer'],
   })
-  paymentMethod?: 'credit_card' | 'debit_card' | 'pix' | 'cash' | 'bank_transfer';
+  paymentMethod?:
+    | 'credit_card'
+    | 'debit_card'
+    | 'pix'
+    | 'cash'
+    | 'bank_transfer';
 
   @Prop()
   transactionId?: string;

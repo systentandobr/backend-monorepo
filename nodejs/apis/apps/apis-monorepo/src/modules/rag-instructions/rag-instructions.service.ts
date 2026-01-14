@@ -1,7 +1,10 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { RagInstruction, RagInstructionDocument } from './schemas/rag-instruction.schema';
+import {
+  RagInstruction,
+  RagInstructionDocument,
+} from './schemas/rag-instruction.schema';
 import { CreateRagInstructionDto } from './dto/create-rag-instruction.dto';
 import { UpdateRagInstructionDto } from './dto/update-rag-instruction.dto';
 import { RagInstructionResponseDto } from './dto/rag-instruction-response.dto';
@@ -17,7 +20,7 @@ export class RagInstructionsService {
   private readonly logger = new Logger(RagInstructionsService.name);
 
   constructor(
-    @InjectModel(RagInstruction.name) 
+    @InjectModel(RagInstruction.name)
     private ragInstructionModel: Model<RagInstructionDocument>,
     private urlContentProcessor: UrlContentProcessorService,
     private pdfContentProcessor: PdfContentProcessorService,
@@ -25,8 +28,8 @@ export class RagInstructionsService {
   ) {}
 
   async create(
-    createDto: CreateRagInstructionDto, 
-    unitId: string
+    createDto: CreateRagInstructionDto,
+    unitId: string,
   ): Promise<RagInstructionResponseDto> {
     // Verificar se já existe instrução para esta unidade
     const existing = await this.ragInstructionModel.findOne({
@@ -48,28 +51,34 @@ export class RagInstructionsService {
     return this.toResponseDto(saved);
   }
 
-  async findByUnitId(unitId: string): Promise<RagInstructionResponseDto | null> {
+  async findByUnitId(
+    unitId: string,
+  ): Promise<RagInstructionResponseDto | null> {
     const defaultUnitId = process.env.DEFAULT_UNIT_ID || '#BR#SP#SYSTEM#0001';
-    
+
     // Buscar instrução específica da unidade ou fallback para padrão
-    let instruction = await this.ragInstructionModel.findOne({
-      unitId,
-      active: true,
-    }).sort({ updatedAt: -1 });
+    let instruction = await this.ragInstructionModel
+      .findOne({
+        unitId,
+        active: true,
+      })
+      .sort({ updatedAt: -1 });
 
     // Se não encontrou e não é a unidade padrão, buscar padrão
     if (!instruction && unitId !== defaultUnitId) {
-      instruction = await this.ragInstructionModel.findOne({
-        unitId: defaultUnitId,
-        active: true,
-      }).sort({ updatedAt: -1 });
+      instruction = await this.ragInstructionModel
+        .findOne({
+          unitId: defaultUnitId,
+          active: true,
+        })
+        .sort({ updatedAt: -1 });
     }
 
     if (instruction) {
       // Atualizar lastUsedAt
       instruction.lastUsedAt = new Date();
       await instruction.save();
-      
+
       return this.toResponseDto(instruction);
     }
 
@@ -87,10 +96,13 @@ export class RagInstructionsService {
       .sort({ updatedAt: -1 })
       .exec();
 
-    return instructions.map(inst => this.toResponseDto(inst));
+    return instructions.map((inst) => this.toResponseDto(inst));
   }
 
-  async findOne(id: string, unitId: string): Promise<RagInstructionResponseDto> {
+  async findOne(
+    id: string,
+    unitId: string,
+  ): Promise<RagInstructionResponseDto> {
     const instruction = await this.ragInstructionModel.findOne({
       _id: id,
       unitId,
@@ -106,12 +118,12 @@ export class RagInstructionsService {
   async update(
     id: string,
     updateDto: UpdateRagInstructionDto,
-    unitId: string
+    unitId: string,
   ): Promise<RagInstructionResponseDto> {
     const instruction = await this.ragInstructionModel.findOneAndUpdate(
       { _id: id, unitId },
       { ...updateDto, updatedAt: new Date() },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!instruction) {
@@ -137,9 +149,11 @@ export class RagInstructionsService {
    */
   async createFromText(
     createDto: CreateRagInstructionFromTextDto,
-    unitId: string
+    unitId: string,
   ): Promise<RagInstructionResponseDto> {
-    this.logger.log(`Criando instrução RAG a partir de texto para unitId: ${unitId}`);
+    this.logger.log(
+      `Criando instrução RAG a partir de texto para unitId: ${unitId}`,
+    );
 
     // Processar texto em instruções (dividir por parágrafos ou linhas)
     const instructions = this.processTextToInstructions(createDto.content);
@@ -163,22 +177,21 @@ export class RagInstructionsService {
 
     // Indexar no RAG se solicitado
     if (createDto.indexInRAG !== false) {
-      await this.ragIndexingService.indexContent(
-        unitId,
-        createDto.content,
-        'text'
-      ).then(result => {
-        if (result.success) {
-          saved.metadata = {
-            ...saved.metadata,
-            indexedInRAG: true,
-            ragIndexedAt: new Date(),
-          };
-          saved.save();
-        }
-      }).catch(err => {
-        this.logger.warn(`Falha ao indexar conteúdo: ${err.message}`);
-      });
+      await this.ragIndexingService
+        .indexContent(unitId, createDto.content, 'text')
+        .then((result) => {
+          if (result.success) {
+            saved.metadata = {
+              ...saved.metadata,
+              indexedInRAG: true,
+              ragIndexedAt: new Date(),
+            };
+            saved.save();
+          }
+        })
+        .catch((err) => {
+          this.logger.warn(`Falha ao indexar conteúdo: ${err.message}`);
+        });
     }
 
     return this.toResponseDto(saved);
@@ -189,9 +202,11 @@ export class RagInstructionsService {
    */
   async createFromUrl(
     createDto: CreateRagInstructionFromUrlDto,
-    unitId: string
+    unitId: string,
   ): Promise<RagInstructionResponseDto> {
-    this.logger.log(`Criando instrução RAG a partir de URL para unitId: ${unitId}`);
+    this.logger.log(
+      `Criando instrução RAG a partir de URL para unitId: ${unitId}`,
+    );
 
     // Atualizar status de processamento
     const tempInstruction = new this.ragInstructionModel({
@@ -209,8 +224,10 @@ export class RagInstructionsService {
 
     try {
       // Extrair conteúdo da URL
-      const extracted = await this.urlContentProcessor.extractContentFromUrl(createDto.url);
-      
+      const extracted = await this.urlContentProcessor.extractContentFromUrl(
+        createDto.url,
+      );
+
       // Processar conteúdo em instruções
       const instructions = this.processTextToInstructions(extracted.content);
 
@@ -220,7 +237,8 @@ export class RagInstructionsService {
       tempSaved.metadata = {
         ...tempSaved.metadata,
         ...createDto.metadata,
-        description: createDto.title || extracted.title || createDto.metadata?.description,
+        description:
+          createDto.title || extracted.title || createDto.metadata?.description,
         processingStatus: 'completed',
         processedAt: new Date(),
       };
@@ -229,23 +247,23 @@ export class RagInstructionsService {
 
       // Indexar no RAG se solicitado
       if (createDto.indexInRAG !== false) {
-        await this.ragIndexingService.indexContent(
-          unitId,
-          extracted.content,
-          'url',
-          { url: createDto.url }
-        ).then(result => {
-          if (result.success) {
-            saved.metadata = {
-              ...saved.metadata,
-              indexedInRAG: true,
-              ragIndexedAt: new Date(),
-            };
-            saved.save();
-          }
-        }).catch(err => {
-          this.logger.warn(`Falha ao indexar conteúdo: ${err.message}`);
-        });
+        await this.ragIndexingService
+          .indexContent(unitId, extracted.content, 'url', {
+            url: createDto.url,
+          })
+          .then((result) => {
+            if (result.success) {
+              saved.metadata = {
+                ...saved.metadata,
+                indexedInRAG: true,
+                ragIndexedAt: new Date(),
+              };
+              saved.save();
+            }
+          })
+          .catch((err) => {
+            this.logger.warn(`Falha ao indexar conteúdo: ${err.message}`);
+          });
       }
 
       return this.toResponseDto(saved);
@@ -267,9 +285,11 @@ export class RagInstructionsService {
   async createFromPdf(
     createDto: CreateRagInstructionFromPdfDto,
     file: any,
-    unitId: string
+    unitId: string,
   ): Promise<RagInstructionResponseDto> {
-    this.logger.log(`Criando instrução RAG a partir de PDF para unitId: ${unitId}`);
+    this.logger.log(
+      `Criando instrução RAG a partir de PDF para unitId: ${unitId}`,
+    );
 
     // Atualizar status de processamento
     const tempInstruction = new this.ragInstructionModel({
@@ -288,7 +308,7 @@ export class RagInstructionsService {
     try {
       // Extrair texto do PDF
       const extracted = await this.pdfContentProcessor.extractTextFromPdf(file);
-      
+
       // Processar conteúdo em instruções
       const instructions = this.processTextToInstructions(extracted.content);
 
@@ -298,7 +318,10 @@ export class RagInstructionsService {
       tempSaved.metadata = {
         ...tempSaved.metadata,
         ...createDto.metadata,
-        description: createDto.title || file.originalname || createDto.metadata?.description,
+        description:
+          createDto.title ||
+          file.originalname ||
+          createDto.metadata?.description,
         processingStatus: 'completed',
         processedAt: new Date(),
         ...extracted.metadata,
@@ -308,23 +331,24 @@ export class RagInstructionsService {
 
       // Indexar no RAG se solicitado
       if (createDto.indexInRAG !== false) {
-        await this.ragIndexingService.indexContent(
-          unitId,
-          extracted.content,
-          'pdf',
-          { fileName: file.originalname, fileId: saved._id.toString() }
-        ).then(result => {
-          if (result.success) {
-            saved.metadata = {
-              ...saved.metadata,
-              indexedInRAG: true,
-              ragIndexedAt: new Date(),
-            };
-            saved.save();
-          }
-        }).catch(err => {
-          this.logger.warn(`Falha ao indexar conteúdo: ${err.message}`);
-        });
+        await this.ragIndexingService
+          .indexContent(unitId, extracted.content, 'pdf', {
+            fileName: file.originalname,
+            fileId: saved._id.toString(),
+          })
+          .then((result) => {
+            if (result.success) {
+              saved.metadata = {
+                ...saved.metadata,
+                indexedInRAG: true,
+                ragIndexedAt: new Date(),
+              };
+              saved.save();
+            }
+          })
+          .catch((err) => {
+            this.logger.warn(`Falha ao indexar conteúdo: ${err.message}`);
+          });
       }
 
       return this.toResponseDto(saved);
@@ -351,15 +375,15 @@ export class RagInstructionsService {
     // Dividir por parágrafos duplos (quebras de linha duplas)
     const paragraphs = content
       .split(/\n\s*\n/)
-      .map(p => p.trim())
-      .filter(p => p.length > 0);
+      .map((p) => p.trim())
+      .filter((p) => p.length > 0);
 
     // Se houver poucos parágrafos, dividir por linhas
     if (paragraphs.length < 2) {
       return content
         .split('\n')
-        .map(line => line.trim())
-        .filter(line => line.length > 0);
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0);
     }
 
     return paragraphs;
@@ -368,7 +392,10 @@ export class RagInstructionsService {
   /**
    * Reindexa uma instrução no RAG
    */
-  async reindex(id: string, unitId: string): Promise<RagInstructionResponseDto> {
+  async reindex(
+    id: string,
+    unitId: string,
+  ): Promise<RagInstructionResponseDto> {
     const instruction = await this.ragInstructionModel.findOne({
       _id: id,
       unitId,
@@ -379,7 +406,9 @@ export class RagInstructionsService {
     }
 
     if (!instruction.rawContent) {
-      throw new NotFoundException('Conteúdo bruto não disponível para reindexação');
+      throw new NotFoundException(
+        'Conteúdo bruto não disponível para reindexação',
+      );
     }
 
     const result = await this.ragIndexingService.indexContent(
@@ -390,7 +419,7 @@ export class RagInstructionsService {
         url: instruction.sourceUrl,
         fileName: instruction.sourceFileName,
         fileId: instruction.sourceFileId || instruction._id.toString(),
-      }
+      },
     );
 
     if (result.success) {
@@ -405,7 +434,9 @@ export class RagInstructionsService {
     return this.toResponseDto(instruction);
   }
 
-  private toResponseDto(instruction: RagInstructionDocument): RagInstructionResponseDto {
+  private toResponseDto(
+    instruction: RagInstructionDocument,
+  ): RagInstructionResponseDto {
     return {
       id: instruction._id.toString(),
       unitId: instruction.unitId,

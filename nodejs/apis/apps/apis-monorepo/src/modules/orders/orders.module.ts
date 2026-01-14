@@ -19,4 +19,3 @@ import { RewardsModule } from '../rewards/rewards.module';
   exports: [OrdersService],
 })
 export class OrdersModule {}
-

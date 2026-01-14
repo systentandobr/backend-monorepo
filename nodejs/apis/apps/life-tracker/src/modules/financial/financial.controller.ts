@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Put, Patch, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { FinancialService } from './financial.service';
 import { ApiResponse } from '../../types';
@@ -53,7 +64,10 @@ export class FinancialController {
   }
 
   @Post('portfolio/assets')
-  async addAsset(@Request() req, @Body() assetData: AddAssetDto): Promise<ApiResponse<any>> {
+  async addAsset(
+    @Request() req,
+    @Body() assetData: AddAssetDto,
+  ): Promise<ApiResponse<any>> {
     return this.financialService.addAsset(req.user.id, assetData);
   }
 
@@ -61,13 +75,16 @@ export class FinancialController {
   async updateAsset(
     @Request() req,
     @Param('assetId') assetId: string,
-    @Body() assetData: UpdateAssetDto
+    @Body() assetData: UpdateAssetDto,
   ): Promise<ApiResponse<any>> {
     return this.financialService.updateAsset(req.user.id, assetId, assetData);
   }
 
   @Delete('portfolio/assets/:assetId')
-  async removeAsset(@Request() req, @Param('assetId') assetId: string): Promise<ApiResponse<any>> {
+  async removeAsset(
+    @Request() req,
+    @Param('assetId') assetId: string,
+  ): Promise<ApiResponse<any>> {
     return this.financialService.removeAsset(req.user.id, assetId);
   }
 
@@ -77,12 +94,18 @@ export class FinancialController {
   }
 
   @Get('goals/:id')
-  async getFinancialGoal(@Request() req, @Param('id') id: string): Promise<ApiResponse<any>> {
+  async getFinancialGoal(
+    @Request() req,
+    @Param('id') id: string,
+  ): Promise<ApiResponse<any>> {
     return this.financialService.getFinancialGoal(req.user.id, id);
   }
 
   @Post('goals')
-  async createFinancialGoal(@Request() req, @Body() goalData: CreateGoalDto): Promise<ApiResponse<any>> {
+  async createFinancialGoal(
+    @Request() req,
+    @Body() goalData: CreateGoalDto,
+  ): Promise<ApiResponse<any>> {
     return this.financialService.createFinancialGoal(req.user.id, goalData);
   }
 
@@ -90,18 +113,24 @@ export class FinancialController {
   async updateFinancialGoal(
     @Request() req,
     @Param('id') id: string,
-    @Body() goalData: UpdateGoalDto
+    @Body() goalData: UpdateGoalDto,
   ): Promise<ApiResponse<any>> {
     return this.financialService.updateFinancialGoal(req.user.id, id, goalData);
   }
 
   @Delete('goals/:id')
-  async deleteFinancialGoal(@Request() req, @Param('id') id: string): Promise<ApiResponse<any>> {
+  async deleteFinancialGoal(
+    @Request() req,
+    @Param('id') id: string,
+  ): Promise<ApiResponse<any>> {
     return this.financialService.deleteFinancialGoal(req.user.id, id);
   }
 
   @Post('market-data')
-  async getMarketData(@Request() req, @Body() requestData: MarketDataRequestDto): Promise<ApiResponse<any[]>> {
+  async getMarketData(
+    @Request() req,
+    @Body() requestData: MarketDataRequestDto,
+  ): Promise<ApiResponse<any[]>> {
     return this.financialService.getMarketData(requestData.symbols);
   }
 
@@ -109,8 +138,8 @@ export class FinancialController {
   async getPriceHistory(
     @Request() req,
     @Param('symbol') symbol: string,
-    @Param('period') period?: string
+    @Param('period') period?: string,
   ): Promise<ApiResponse<any>> {
     return this.financialService.getPriceHistory(symbol, period || '1m');
   }
-} 
+}

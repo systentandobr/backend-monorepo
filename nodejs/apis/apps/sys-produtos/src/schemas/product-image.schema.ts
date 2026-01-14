@@ -45,4 +45,3 @@ ProductImageSchema.index({ unitId: 1, hashId: 1 });
 ProductImageSchema.index({ productId: 1, isThumbnail: 1 });
 
 export const PRODUCT_IMAGE_COLLECTION = 'ProductImage';
-

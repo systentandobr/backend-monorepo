@@ -14,15 +14,20 @@ export class Portfolio {
   @Prop({ required: true, default: 0 })
   totalInvested: number;
 
-  @Prop({ type: [{
-    id: String,
-    symbol: String,
-    name: String,
-    quantity: Number,
-    averagePrice: Number,
-    currentPrice: Number,
-    lastUpdated: Date,
-  }], default: [] })
+  @Prop({
+    type: [
+      {
+        id: String,
+        symbol: String,
+        name: String,
+        quantity: Number,
+        averagePrice: Number,
+        currentPrice: Number,
+        lastUpdated: Date,
+      },
+    ],
+    default: [],
+  })
   assets: Array<{
     id: string;
     symbol: string;
@@ -37,4 +42,4 @@ export class Portfolio {
   lastUpdated: Date;
 }
 
-export const PortfolioSchema = SchemaFactory.createForClass(Portfolio); 
+export const PortfolioSchema = SchemaFactory.createForClass(Portfolio);

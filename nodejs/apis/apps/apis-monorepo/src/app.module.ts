@@ -27,8 +27,6 @@ import { TrainingPlansModule } from './modules/training-plans/training-plans.mod
 import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
 import { ExercisesModule } from './modules/exercises/exercises.module';
 
-
-
 @Module({
   imports: [
     HttpModule,
@@ -59,4 +57,4 @@ import { ExercisesModule } from './modules/exercises/exercises.module';
   controllers: [AppController, DebugController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

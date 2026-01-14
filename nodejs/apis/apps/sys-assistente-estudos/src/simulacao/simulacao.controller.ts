@@ -14,7 +14,7 @@ import { Simulacao } from './model/simulacao.schema';
 @ApiTags('sys-assistente-estudos')
 @Controller('simulacoes')
 export class SimulacaoController {
-  constructor(private readonly simulacaoService: SimulacaoService) { }
+  constructor(private readonly simulacaoService: SimulacaoService) {}
 
   @Post()
   create(@Body() createSimulacaoDto: any): Promise<Simulacao> {
@@ -32,13 +32,19 @@ export class SimulacaoController {
   }
 
   @Get('temaEspecifico/:temaEspecificoId/user/:userId')
-  @Get('temaEspecifico/:temaEspecificoId/user/:userId/filterOpenQuestions/:filterOpenQuestions')
+  @Get(
+    'temaEspecifico/:temaEspecificoId/user/:userId/filterOpenQuestions/:filterOpenQuestions',
+  )
   findByUserId(
     @Param('temaEspecificoId') temaEspecificoId: string,
     @Param('userId') userId: string,
     @Param('filterOpenQuestions') filterOpenQuestions: boolean,
   ): Promise<Simulacao[]> {
-    return this.simulacaoService.findByTemaEspecificoUserId(temaEspecificoId, userId, filterOpenQuestions);
+    return this.simulacaoService.findByTemaEspecificoUserId(
+      temaEspecificoId,
+      userId,
+      filterOpenQuestions,
+    );
   }
 
   @Get(':id')

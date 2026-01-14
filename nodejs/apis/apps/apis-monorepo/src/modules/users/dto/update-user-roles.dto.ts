@@ -24,4 +24,3 @@ export class UpdateUserRolesDto {
   @IsString({ each: true })
   permissions?: string[];
 }
-

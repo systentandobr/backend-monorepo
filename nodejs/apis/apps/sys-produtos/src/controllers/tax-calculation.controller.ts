@@ -1,5 +1,10 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { TaxCalculationService } from '../services/tax-calculation.service';
 import { TaxInformationDto } from '../dto/create-produto.dto';
@@ -43,9 +48,8 @@ export class TaxCalculationController {
       icms,
       icmsSt,
       isExempt: this.taxCalculationService.isExempt(taxInformation),
-      hasSubstitutionTax: this.taxCalculationService.hasSubstitutionTax(taxInformation),
+      hasSubstitutionTax:
+        this.taxCalculationService.hasSubstitutionTax(taxInformation),
     };
   }
 }
-
-

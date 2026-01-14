@@ -20,7 +20,8 @@ describe('EstatisticaService', () => {
         ]),
       ],
       providers: [EstatisticaRepository, EstatisticaService],
-    }).overrideProvider(EstatisticaService)
+    })
+      .overrideProvider(EstatisticaService)
       .useValue({
         create: jest.fn(),
         update: jest.fn(),
@@ -32,11 +33,8 @@ describe('EstatisticaService', () => {
       })
       .compile();
 
-
     service = module.get<EstatisticaService>(EstatisticaService);
   });
-
-
 
   it('should be defined', () => {
     expect(service).toBeDefined();

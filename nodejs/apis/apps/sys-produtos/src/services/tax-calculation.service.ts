@@ -2,12 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { TaxInformation } from '../schemas/product.schema';
 
 export interface TributoStrategy {
-  calculateTributo(taxInformation: TaxInformation, price: number, estado: string): number;
+  calculateTributo(
+    taxInformation: TaxInformation,
+    price: number,
+    estado: string,
+  ): number;
 }
 
 @Injectable()
 export class TributacaoICMS implements TributoStrategy {
-  calculateTributo(taxInformation: TaxInformation, price: number, estado: string): number {
+  calculateTributo(
+    taxInformation: TaxInformation,
+    price: number,
+    estado: string,
+  ): number {
     if (!taxInformation || taxInformation.exempt) {
       return 0;
     }
@@ -25,7 +33,11 @@ export class TributacaoICMS implements TributoStrategy {
 
 @Injectable()
 export class TributacaoICMSCSt implements TributoStrategy {
-  calculateTributo(taxInformation: TaxInformation, price: number, estado: string): number {
+  calculateTributo(
+    taxInformation: TaxInformation,
+    price: number,
+    estado: string,
+  ): number {
     if (!taxInformation || !taxInformation.icmsSt) {
       return 0;
     }
@@ -76,12 +88,20 @@ export class TaxCalculationService {
     let totalTaxes = 0;
 
     // Calcular ICMS
-    const icms = this.tributacaoICMS.calculateTributo(taxInformation, price, estado);
+    const icms = this.tributacaoICMS.calculateTributo(
+      taxInformation,
+      price,
+      estado,
+    );
     totalTaxes += icms;
 
     // Calcular ICMS-ST se aplicável
     if (taxInformation.icmsSt) {
-      const icmsSt = this.tributacaoICMSCSt.calculateTributo(taxInformation, price, estado);
+      const icmsSt = this.tributacaoICMSCSt.calculateTributo(
+        taxInformation,
+        price,
+        estado,
+      );
       totalTaxes += icmsSt;
     }
 
@@ -91,7 +111,11 @@ export class TaxCalculationService {
   /**
    * Calcula apenas o ICMS
    */
-  calculateICMS(taxInformation: TaxInformation | undefined, price: number, estado: string): number {
+  calculateICMS(
+    taxInformation: TaxInformation | undefined,
+    price: number,
+    estado: string,
+  ): number {
     if (!taxInformation) {
       return 0;
     }
@@ -101,11 +125,19 @@ export class TaxCalculationService {
   /**
    * Calcula apenas o ICMS-ST
    */
-  calculateICMSST(taxInformation: TaxInformation | undefined, price: number, estado: string): number {
+  calculateICMSST(
+    taxInformation: TaxInformation | undefined,
+    price: number,
+    estado: string,
+  ): number {
     if (!taxInformation) {
       return 0;
     }
-    return this.tributacaoICMSCSt.calculateTributo(taxInformation, price, estado);
+    return this.tributacaoICMSCSt.calculateTributo(
+      taxInformation,
+      price,
+      estado,
+    );
   }
 
   /**
@@ -122,5 +154,3 @@ export class TaxCalculationService {
     return !!taxInformation?.icmsSt;
   }
 }
-
-

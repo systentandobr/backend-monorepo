@@ -1,8 +1,27 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { CategoryService } from './services/category.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { CreateCategoryDto, UpdateCategoryDto, QueryCategoryDto } from './dto/category.dto';
+import {
+  CreateCategoryDto,
+  UpdateCategoryDto,
+  QueryCategoryDto,
+} from './dto/category.dto';
 
 @ApiTags('categories')
 @ApiBearerAuth()
@@ -50,9 +69,11 @@ export class CategoryController {
   @ApiOperation({ summary: 'Excluir categoria' })
   @ApiResponse({ status: 200, description: 'Categoria excluída' })
   @ApiResponse({ status: 404, description: 'Categoria não encontrada' })
-  @ApiResponse({ status: 400, description: 'Categoria possui produtos associados' })
+  @ApiResponse({
+    status: 400,
+    description: 'Categoria possui produtos associados',
+  })
   delete(@Param('id') id: string) {
     return this.categoryService.delete(id);
   }
 }
-

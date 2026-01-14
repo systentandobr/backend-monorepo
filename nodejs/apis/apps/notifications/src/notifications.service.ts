@@ -1,4 +1,10 @@
-import { Injectable, Logger, Inject, Optional, forwardRef } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  Inject,
+  Optional,
+  forwardRef,
+} from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
@@ -21,13 +27,17 @@ export class NotificationsService {
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
-    @Optional() @Inject(forwardRef(() => SettingsService))
+    @Optional()
+    @Inject(forwardRef(() => SettingsService))
     private readonly settingsService?: SettingsService,
   ) {
     // Configurações padrão de fallback (variáveis de ambiente)
-    this.defaultTelegramBotToken = this.configService.get<string>('TELEGRAM_BOT_TOKEN') || '';
-    this.defaultTelegramChatId = this.configService.get<string>('TELEGRAM_CHAT_ID') || '';
-    this.defaultDiscordWebhookUrl = this.configService.get<string>('DISCORD_WEBHOOK_URL') || '';
+    this.defaultTelegramBotToken =
+      this.configService.get<string>('TELEGRAM_BOT_TOKEN') || '';
+    this.defaultTelegramChatId =
+      this.configService.get<string>('TELEGRAM_CHAT_ID') || '';
+    this.defaultDiscordWebhookUrl =
+      this.configService.get<string>('DISCORD_WEBHOOK_URL') || '';
     this.defaultEmailConfig = {
       host: this.configService.get<string>('EMAIL_HOST') || '',
       port: this.configService.get<number>('EMAIL_PORT') || 587,
@@ -44,37 +54,58 @@ export class NotificationsService {
   private async getNotificationConfig(unitId?: string): Promise<{
     telegram?: { botToken?: string; chatId?: string; enabled?: boolean };
     discord?: { webhookUrl?: string; enabled?: boolean };
-    email?: { host?: string; port?: number; username?: string; password?: string; from?: string; enabled?: boolean };
+    email?: {
+      host?: string;
+      port?: number;
+      username?: string;
+      password?: string;
+      from?: string;
+      enabled?: boolean;
+    };
   }> {
-    
     try {
       // Busca configurações do banco
-      const settings = await this.settingsService.getNotificationSettings(unitId);
-      
+      const settings =
+        await this.settingsService.getNotificationSettings(unitId);
+
       if (settings) {
         // Mescla configurações do banco com fallback para variáveis de ambiente
         return {
           telegram: {
-            botToken: settings.telegram?.botToken || this.defaultTelegramBotToken,
+            botToken:
+              settings.telegram?.botToken || this.defaultTelegramBotToken,
             chatId: settings.telegram?.chatId || this.defaultTelegramChatId,
-            enabled: settings.telegram?.enabled !== false && !!(settings.telegram?.botToken || this.defaultTelegramBotToken) && !!(settings.telegram?.chatId || this.defaultTelegramChatId),
+            enabled:
+              settings.telegram?.enabled !== false &&
+              !!(settings.telegram?.botToken || this.defaultTelegramBotToken) &&
+              !!(settings.telegram?.chatId || this.defaultTelegramChatId),
           },
           discord: {
-            webhookUrl: settings.discord?.webhookUrl || this.defaultDiscordWebhookUrl,
-            enabled: settings.discord?.enabled !== false && !!(settings.discord?.webhookUrl || this.defaultDiscordWebhookUrl),
+            webhookUrl:
+              settings.discord?.webhookUrl || this.defaultDiscordWebhookUrl,
+            enabled:
+              settings.discord?.enabled !== false &&
+              !!(settings.discord?.webhookUrl || this.defaultDiscordWebhookUrl),
           },
           email: {
             host: settings.email?.host || this.defaultEmailConfig.host,
             port: settings.email?.port || this.defaultEmailConfig.port,
-            username: settings.email?.username || this.defaultEmailConfig.username,
-            password: settings.email?.password || this.defaultEmailConfig.password,
+            username:
+              settings.email?.username || this.defaultEmailConfig.username,
+            password:
+              settings.email?.password || this.defaultEmailConfig.password,
             from: settings.email?.from || this.defaultEmailConfig.from,
-            enabled: settings.email?.enabled !== false && !!(settings.email?.host || this.defaultEmailConfig.host) && !!(settings.email?.username || this.defaultEmailConfig.username),
+            enabled:
+              settings.email?.enabled !== false &&
+              !!(settings.email?.host || this.defaultEmailConfig.host) &&
+              !!(settings.email?.username || this.defaultEmailConfig.username),
           },
         };
       }
     } catch (error) {
-      this.logger.warn(`Erro ao buscar configurações do banco para unitId ${unitId}: ${error.message}`);
+      this.logger.warn(
+        `Erro ao buscar configurações do banco para unitId ${unitId}: ${error.message}`,
+      );
     }
 
     // Fallback para configurações padrão
@@ -90,7 +121,11 @@ export class NotificationsService {
       },
       email: {
         ...this.defaultEmailConfig,
-        enabled: !!(this.defaultEmailConfig.host && this.defaultEmailConfig.username && this.defaultEmailConfig.password),
+        enabled: !!(
+          this.defaultEmailConfig.host &&
+          this.defaultEmailConfig.username &&
+          this.defaultEmailConfig.password
+        ),
       },
     };
   }
@@ -98,10 +133,17 @@ export class NotificationsService {
   /**
    * Envia notificação para Telegram
    */
-  async sendTelegramNotification(payload: NotificationPayload, unitId?: string): Promise<boolean> {
+  async sendTelegramNotification(
+    payload: NotificationPayload,
+    unitId?: string,
+  ): Promise<boolean> {
     const config = await this.getNotificationConfig(unitId);
-    
-    if (!config.telegram?.enabled || !config.telegram?.botToken || !config.telegram?.chatId) {
+
+    if (
+      !config.telegram?.enabled ||
+      !config.telegram?.botToken ||
+      !config.telegram?.chatId
+    ) {
       this.logger.warn('Telegram bot token ou chat ID não configurados');
       return false;
     }
@@ -118,19 +160,21 @@ export class NotificationsService {
       }
 
       const url = `https://api.telegram.org/bot${config.telegram.botToken}/sendMessage`;
-      
+
       await firstValueFrom(
         this.httpService.post(url, {
           chat_id: config.telegram.chatId,
           text: message,
           parse_mode: 'Markdown',
-        })
+        }),
       );
 
       this.logger.log('Notificação enviada para Telegram com sucesso');
       return true;
     } catch (error) {
-      this.logger.error(`Erro ao enviar notificação para Telegram: ${error.message}`);
+      this.logger.error(
+        `Erro ao enviar notificação para Telegram: ${error.message}`,
+      );
       return false;
     }
   }
@@ -138,9 +182,12 @@ export class NotificationsService {
   /**
    * Envia notificação para Discord
    */
-  async sendDiscordNotification(payload: NotificationPayload, unitId?: string): Promise<boolean> {
+  async sendDiscordNotification(
+    payload: NotificationPayload,
+    unitId?: string,
+  ): Promise<boolean> {
     const config = await this.getNotificationConfig(unitId);
-    
+
     if (!config.discord?.enabled || !config.discord?.webhookUrl) {
       this.logger.warn('Discord webhook URL não configurada');
       return false;
@@ -165,36 +212,49 @@ export class NotificationsService {
       await firstValueFrom(
         this.httpService.post(config.discord.webhookUrl, {
           embeds: [embed],
-        })
+        }),
       );
 
       this.logger.log('Notificação enviada para Discord com sucesso');
       return true;
     } catch (error) {
-      this.logger.error(`Erro ao enviar notificação para Discord: ${error.message}`);
+      this.logger.error(
+        `Erro ao enviar notificação para Discord: ${error.message}`,
+      );
       return false;
     }
   }
 
-  
-
   /**
    * Envia notificação para ambos os canais
    */
-  async sendNotification(payload: NotificationPayload, unitId?: string, toSend?: ToReceivers): Promise<{
+  async sendNotification(
+    payload: NotificationPayload,
+    unitId?: string,
+    toSend?: ToReceivers,
+  ): Promise<{
     telegram: boolean;
     discord: boolean;
     email: boolean;
   }> {
-    const [telegramResult, discordResult, emailResult] = await Promise.allSettled([
-      toSend?.sendToAdmins ? this.sendTelegramNotification(payload, unitId) : Promise.resolve(false),
-      toSend?.sendToAdmins ? this.sendDiscordNotification(payload, unitId) : Promise.resolve(false),
-      toSend?.sendToClients ? this.sendEmailNotification(payload, unitId) : Promise.resolve(false),
-    ]);
+    const [telegramResult, discordResult, emailResult] =
+      await Promise.allSettled([
+        toSend?.sendToAdmins
+          ? this.sendTelegramNotification(payload, unitId)
+          : Promise.resolve(false),
+        toSend?.sendToAdmins
+          ? this.sendDiscordNotification(payload, unitId)
+          : Promise.resolve(false),
+        toSend?.sendToClients
+          ? this.sendEmailNotification(payload, unitId)
+          : Promise.resolve(false),
+      ]);
 
     return {
-      telegram: telegramResult.status === 'fulfilled' ? telegramResult.value : false,
-      discord: discordResult.status === 'fulfilled' ? discordResult.value : false,
+      telegram:
+        telegramResult.status === 'fulfilled' ? telegramResult.value : false,
+      discord:
+        discordResult.status === 'fulfilled' ? discordResult.value : false,
       email: emailResult.status === 'fulfilled' ? emailResult.value : false,
     };
   }
@@ -257,7 +317,9 @@ export class NotificationsService {
                     ${escapeHtml(payload.message)}
                   </p>
                   
-                  ${metadataHtml ? `
+                  ${
+                    metadataHtml
+                      ? `
                   <div style="margin-top: 32px; border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden;">
                     <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f9fafb;">
                       <tr>
@@ -268,7 +330,9 @@ export class NotificationsService {
                       ${metadataHtml}
                     </table>
                   </div>
-                  ` : ''}
+                  `
+                      : ''
+                  }
                 </td>
               </tr>
               
@@ -293,10 +357,20 @@ export class NotificationsService {
   /**
    * Envia notificação para email
    */
-  async sendEmailNotification(payload: NotificationPayload, unitId?: string): Promise<boolean> {
+  async sendEmailNotification(
+    payload: NotificationPayload,
+    unitId?: string,
+  ): Promise<boolean> {
     const config = await this.getNotificationConfig(unitId);
-    
-    if (!config.email?.enabled || !config.email?.host || !config.email?.port || !config.email?.username || !config.email?.password || !config.email?.from) {
+
+    if (
+      !config.email?.enabled ||
+      !config.email?.host ||
+      !config.email?.port ||
+      !config.email?.username ||
+      !config.email?.password ||
+      !config.email?.from
+    ) {
       this.logger.warn('Email config não configurada');
       return false;
     }
@@ -306,12 +380,16 @@ export class NotificationsService {
     try {
       // Verificar se nodemailer está disponível
       if (!nodemailer) {
-        this.logger.error('nodemailer não está disponível. Verifique se está instalado: npm install nodemailer');
+        this.logger.error(
+          'nodemailer não está disponível. Verifique se está instalado: npm install nodemailer',
+        );
         return false;
       }
 
       if (typeof nodemailer.createTransport !== 'function') {
-        this.logger.error(`nodemailer.createTransport não é uma função. Tipo: ${typeof nodemailer.createTransport}`);
+        this.logger.error(
+          `nodemailer.createTransport não é uma função. Tipo: ${typeof nodemailer.createTransport}`,
+        );
         return false;
       }
 
@@ -330,7 +408,14 @@ export class NotificationsService {
         to: payload.metadata?.Email,
         subject: payload.title,
         html: this.customHTMLMessage(payload),
-        text: payload.message + (payload.metadata ? '\n\n' + Object.entries(payload.metadata).map(([key, value]) => `${key}: ${value}`).join('\n') : ''),
+        text:
+          payload.message +
+          (payload.metadata
+            ? '\n\n' +
+              Object.entries(payload.metadata)
+                .map(([key, value]) => `${key}: ${value}`)
+                .join('\n')
+            : ''),
       };
 
       await transporter.sendMail(mailOptions);
@@ -338,10 +423,11 @@ export class NotificationsService {
       this.logger.log('Notificação enviada para email com sucesso');
       return true;
     } catch (error) {
-      this.logger.error(`Erro ao enviar notificação para email: ${error.message}`);
+      this.logger.error(
+        `Erro ao enviar notificação para email: ${error.message}`,
+      );
       return false;
-    }
-    finally {
+    } finally {
       await transporter?.close();
       this.logger.log('Conexão com o servidor de email fechada');
     }
@@ -376,7 +462,10 @@ export class NotificationsService {
       },
     };
 
-    await this.sendNotification(payload, lead.unitId, { sendToAdmins: true, sendToClients: false });
+    await this.sendNotification(payload, lead.unitId, {
+      sendToAdmins: true,
+      sendToClients: false,
+    });
   }
 
   /**
@@ -408,7 +497,10 @@ export class NotificationsService {
       },
     };
 
-    await this.sendNotification(payload, lead.unitId, { sendToAdmins: true, sendToClients: false });
+    await this.sendNotification(payload, lead.unitId, {
+      sendToAdmins: true,
+      sendToClients: false,
+    });
   }
 
   /**
@@ -434,7 +526,10 @@ export class NotificationsService {
       },
     };
 
-    await this.sendNotification(payload, lead.unitId, { sendToAdmins: false, sendToClients: true });
+    await this.sendNotification(payload, lead.unitId, {
+      sendToAdmins: false,
+      sendToClients: true,
+    });
   }
 
   /**
@@ -460,7 +555,10 @@ export class NotificationsService {
       },
     };
 
-    await this.sendNotification(payload, customer.unitId, { sendToAdmins: true, sendToClients: false });
+    await this.sendNotification(payload, customer.unitId, {
+      sendToAdmins: true,
+      sendToClients: false,
+    });
   }
 
   async notifyNewConversation(conversation: {
@@ -489,11 +587,14 @@ export class NotificationsService {
         'ID Lead': conversation.id,
         'ID Unidade': conversation.unitId,
         'URL da Conversa': conversation.chatUrl,
-        'Mensagem': conversation.mensagem,
+        Mensagem: conversation.mensagem,
       },
     };
 
-    await this.sendNotification(payload, conversation.unitId, { sendToAdmins: false, sendToClients: true });
+    await this.sendNotification(payload, conversation.unitId, {
+      sendToAdmins: false,
+      sendToClients: true,
+    });
   }
 
   /**
@@ -511,7 +612,7 @@ export class NotificationsService {
       message: `Um novo pedido foi recebido`,
       type: 'success',
       metadata: {
-        'Número': order.orderNumber,
+        Número: order.orderNumber,
         Cliente: order.customerName,
         Total: `R$ ${order.total.toFixed(2)}`,
         'ID Pedido': order.id,
@@ -519,7 +620,10 @@ export class NotificationsService {
       },
     };
 
-    await this.sendNotification(payload, order.unitId, { sendToAdmins: true, sendToClients: true });
+    await this.sendNotification(payload, order.unitId, {
+      sendToAdmins: true,
+      sendToClients: true,
+    });
   }
 
   private getEmojiForType(type?: string): string {
@@ -548,4 +652,3 @@ export class NotificationsService {
     }
   }
 }
-

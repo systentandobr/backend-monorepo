@@ -1,4 +1,13 @@
-import { IsString, IsEmail, IsOptional, IsDateString, IsEnum, IsObject, IsArray, IsBoolean } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsOptional,
+  IsDateString,
+  IsEnum,
+  IsObject,
+  IsArray,
+  IsBoolean,
+} from 'class-validator';
 
 export class AddressDto {
   @IsOptional()

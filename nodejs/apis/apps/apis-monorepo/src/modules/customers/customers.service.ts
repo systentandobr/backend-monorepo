@@ -1,4 +1,11 @@
-import { Injectable, NotFoundException, ConflictException, Logger, Inject, forwardRef } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  Logger,
+  Inject,
+  forwardRef,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import axios from 'axios';
@@ -6,7 +13,10 @@ import { Customer, CustomerDocument } from './schemas/customer.schema';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { CustomerFiltersDto } from './dto/customer-filters.dto';
-import { CustomerResponseDto, CustomerStatsDto } from './dto/customer-response.dto';
+import {
+  CustomerResponseDto,
+  CustomerStatsDto,
+} from './dto/customer-response.dto';
 import { NotificationsService } from '../../../../notifications/src/notifications.service';
 
 @Injectable()
@@ -19,7 +29,10 @@ export class CustomersService {
     private readonly notificationsService: NotificationsService,
   ) {}
 
-  async create(createCustomerDto: CreateCustomerDto, unitId: string): Promise<CustomerResponseDto> {
+  async create(
+    createCustomerDto: CreateCustomerDto,
+    unitId: string,
+  ): Promise<CustomerResponseDto> {
     // Verificar se já existe cliente com mesmo email na mesma unidade
     const existing = await this.customerModel.findOne({
       unitId,
@@ -27,34 +40,45 @@ export class CustomersService {
     });
 
     if (existing) {
-      throw new ConflictException('Cliente com este email já existe nesta unidade');
+      throw new ConflictException(
+        'Cliente com este email já existe nesta unidade',
+      );
     }
 
     const customer = new this.customerModel({
       ...createCustomerDto,
       unitId,
-      firstPurchaseAt: createCustomerDto.totalPurchases > 0 ? new Date() : undefined,
-      lastPurchaseAt: createCustomerDto.totalPurchases > 0 ? new Date() : undefined,
+      firstPurchaseAt:
+        createCustomerDto.totalPurchases > 0 ? new Date() : undefined,
+      lastPurchaseAt:
+        createCustomerDto.totalPurchases > 0 ? new Date() : undefined,
     });
 
     const saved = await customer.save();
     const responseDto = this.toResponseDto(saved);
-    
+
     // Enviar notificação sobre novo cliente
-    this.notificationsService.notifyNewCustomer({
-      id: responseDto.id,
-      name: responseDto.name,
-      email: responseDto.email,
-      phone: responseDto.phone,
-      unitId: responseDto.unitId,
-    }).catch(err => {
-      this.logger.error(`Erro ao enviar notificação de novo cliente: ${err.message}`);
-    });
-    
+    this.notificationsService
+      .notifyNewCustomer({
+        id: responseDto.id,
+        name: responseDto.name,
+        email: responseDto.email,
+        phone: responseDto.phone,
+        unitId: responseDto.unitId,
+      })
+      .catch((err) => {
+        this.logger.error(
+          `Erro ao enviar notificação de novo cliente: ${err.message}`,
+        );
+      });
+
     return responseDto;
   }
 
-  async findAll(filters: CustomerFiltersDto, unitId: string): Promise<{
+  async findAll(
+    filters: CustomerFiltersDto,
+    unitId: string,
+  ): Promise<{
     data: CustomerResponseDto[];
     total: number;
     page: number;
@@ -90,7 +114,7 @@ export class CustomersService {
     ]);
 
     return {
-      data: data.map(c => this.toResponseDto(c)),
+      data: data.map((c) => this.toResponseDto(c)),
       total,
       page,
       limit,
@@ -98,8 +122,10 @@ export class CustomersService {
   }
 
   async findOne(id: string, unitId: string): Promise<CustomerResponseDto> {
-    const customer = await this.customerModel.findOne({ _id: id, unitId }).exec();
-    
+    const customer = await this.customerModel
+      .findOne({ _id: id, unitId })
+      .exec();
+
     if (!customer) {
       throw new NotFoundException('Cliente não encontrado');
     }
@@ -107,12 +133,18 @@ export class CustomersService {
     return this.toResponseDto(customer);
   }
 
-  async update(id: string, updateCustomerDto: UpdateCustomerDto, unitId: string): Promise<CustomerResponseDto> {
-    const customer = await this.customerModel.findOneAndUpdate(
-      { _id: id, unitId },
-      { ...updateCustomerDto, updatedAt: new Date() },
-      { new: true },
-    ).exec();
+  async update(
+    id: string,
+    updateCustomerDto: UpdateCustomerDto,
+    unitId: string,
+  ): Promise<CustomerResponseDto> {
+    const customer = await this.customerModel
+      .findOneAndUpdate(
+        { _id: id, unitId },
+        { ...updateCustomerDto, updatedAt: new Date() },
+        { new: true },
+      )
+      .exec();
 
     if (!customer) {
       throw new NotFoundException('Cliente não encontrado');
@@ -122,21 +154,25 @@ export class CustomersService {
   }
 
   async remove(id: string, unitId: string): Promise<void> {
-    const result = await this.customerModel.deleteOne({ _id: id, unitId }).exec();
-    
+    const result = await this.customerModel
+      .deleteOne({ _id: id, unitId })
+      .exec();
+
     if (result.deletedCount === 0) {
       throw new NotFoundException('Cliente não encontrado');
     }
   }
 
   async getStats(unitId: string): Promise<CustomerStatsDto> {
-    const customers = await this.customerModel.find({ unitId, isActive: true }).exec();
-    
+    const customers = await this.customerModel
+      .find({ unitId, isActive: true })
+      .exec();
+
     const total = customers.length;
-    const active = customers.filter(c => c.status === 'ativo').length;
-    const vip = customers.filter(c => c.status === 'vip').length;
-    const newCustomers = customers.filter(c => c.status === 'novo').length;
-    
+    const active = customers.filter((c) => c.status === 'ativo').length;
+    const vip = customers.filter((c) => c.status === 'vip').length;
+    const newCustomers = customers.filter((c) => c.status === 'novo').length;
+
     const totalSpent = customers.reduce((sum, c) => sum + c.totalSpent, 0);
     const averageTicket = total > 0 ? totalSpent / total : 0;
 
@@ -149,7 +185,10 @@ export class CustomersService {
     };
   }
 
-  async getConversations(customerId: string, unitId: string): Promise<{
+  async getConversations(
+    customerId: string,
+    unitId: string,
+  ): Promise<{
     sessions: Array<{
       sessionId: string;
       firstMessageAt: string;
@@ -163,10 +202,13 @@ export class CustomersService {
     }>;
   }> {
     // Verificar se customer existe
-    const customer = await this.findOne(customerId, unitId);
-    
-    const pythonApiUrl = process.env.PYTHON_CHATBOT_API_URL || process.env.PYTHON_RAG_API_URL || 'http://localhost:7001';
-    
+    await this.findOne(customerId, unitId);
+
+    const pythonApiUrl =
+      process.env.PYTHON_CHATBOT_API_URL ||
+      process.env.PYTHON_RAG_API_URL ||
+      'http://localhost:7001';
+
     try {
       // Buscar sessões associadas ao customer
       const response = await axios.get(
@@ -177,22 +219,25 @@ export class CustomersService {
             limit: 100,
           },
           timeout: parseInt(process.env.PYTHON_CHATBOT_TIMEOUT || '10000', 10), // 10 segundos
-        }
+        },
       );
 
       const sessions = response.data.sessions || [];
-      
+
       // Para cada sessão, buscar histórico completo
       const sessionsWithHistory = await Promise.all(
         sessions.map(async (session: any) => {
           try {
             const historyResponse = await axios.get(
               `${pythonApiUrl}/sessions/${session.sessionId}/history`,
-              { 
-                timeout: parseInt(process.env.PYTHON_CHATBOT_HISTORY_TIMEOUT || '15000', 10) // 15 segundos (reduzido de 30)
-              }
+              {
+                timeout: parseInt(
+                  process.env.PYTHON_CHATBOT_HISTORY_TIMEOUT || '15000',
+                  10,
+                ), // 15 segundos (reduzido de 30)
+              },
             );
-            
+
             return {
               sessionId: session.sessionId,
               firstMessageAt: session.firstMessageAt,
@@ -201,7 +246,9 @@ export class CustomersService {
               history: historyResponse.data.messages || [],
             };
           } catch (error: any) {
-            this.logger.warn(`Erro ao buscar histórico da sessão ${session.sessionId}: ${error.message}`);
+            this.logger.warn(
+              `Erro ao buscar histórico da sessão ${session.sessionId}: ${error.message}`,
+            );
             return {
               sessionId: session.sessionId,
               firstMessageAt: session.firstMessageAt,
@@ -210,14 +257,16 @@ export class CustomersService {
               history: [],
             };
           }
-        })
+        }),
       );
 
       return {
         sessions: sessionsWithHistory,
       };
     } catch (error: any) {
-      this.logger.error(`Erro ao buscar conversas do customer ${customerId}: ${error.message}`);
+      this.logger.error(
+        `Erro ao buscar conversas do customer ${customerId}: ${error.message}`,
+      );
       // Retornar vazio em caso de erro (degradação graciosa)
       return {
         sessions: [],
@@ -243,4 +292,3 @@ export class CustomersService {
     };
   }
 }
-

@@ -1,4 +1,4 @@
-import { QuestionDto } from "../../question/model/question.dto";
+import { QuestionDto } from '../../question/model/question.dto';
 
 export interface EstatisticaDto {
   userId: string;

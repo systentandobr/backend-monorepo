@@ -1,37 +1,51 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 
-export type ReferralCampaignDocument = ReferralCampaign & Document & {
-  createdAt?: Date;
-  updatedAt?: Date;
-};
+export type ReferralCampaignDocument = ReferralCampaign &
+  Document & {
+    createdAt?: Date;
+    updatedAt?: Date;
+  };
 
 // Sub-schema para Reward
-const RewardSchema = new MongooseSchema({
-  type: { type: String, enum: ['cashback', 'discount', 'points', 'physical'], required: true },
-  value: { type: Number, required: true },
-  currency: { type: String, required: false },
-  productId: { type: Types.ObjectId, ref: 'Product', required: false },
-}, { _id: false });
+const RewardSchema = new MongooseSchema(
+  {
+    type: {
+      type: String,
+      enum: ['cashback', 'discount', 'points', 'physical'],
+      required: true,
+    },
+    value: { type: Number, required: true },
+    currency: { type: String, required: false },
+    productId: { type: Types.ObjectId, ref: 'Product', required: false },
+  },
+  { _id: false },
+);
 
 // Sub-schema para CampaignRules
-const CampaignRulesSchema = new MongooseSchema({
-  minPurchaseValue: { type: Number, required: false },
-  maxReferralsPerUser: { type: Number, required: false },
-  maxReferralsTotal: { type: Number, required: false },
-  expirationDays: { type: Number, default: 30 },
-  requireEmailVerification: { type: Boolean, default: true },
-  allowedProducts: { type: [Types.ObjectId], required: false },
-  excludedProducts: { type: [Types.ObjectId], required: false },
-}, { _id: false });
+const CampaignRulesSchema = new MongooseSchema(
+  {
+    minPurchaseValue: { type: Number, required: false },
+    maxReferralsPerUser: { type: Number, required: false },
+    maxReferralsTotal: { type: Number, required: false },
+    expirationDays: { type: Number, default: 30 },
+    requireEmailVerification: { type: Boolean, default: true },
+    allowedProducts: { type: [Types.ObjectId], required: false },
+    excludedProducts: { type: [Types.ObjectId], required: false },
+  },
+  { _id: false },
+);
 
 // Sub-schema para CampaignMetrics
-const CampaignMetricsSchema = new MongooseSchema({
-  totalReferrals: { type: Number, default: 0 },
-  completedReferrals: { type: Number, default: 0 },
-  totalRewardsValue: { type: Number, default: 0 },
-  conversionRate: { type: Number, default: 0 },
-}, { _id: false });
+const CampaignMetricsSchema = new MongooseSchema(
+  {
+    totalReferrals: { type: Number, default: 0 },
+    completedReferrals: { type: Number, default: 0 },
+    totalRewardsValue: { type: Number, default: 0 },
+    conversionRate: { type: Number, default: 0 },
+  },
+  { _id: false },
+);
 
 @Schema({
   timestamps: true,
@@ -135,7 +149,8 @@ export class ReferralCampaign {
   createdBy: Types.ObjectId;
 }
 
-export const ReferralCampaignSchema = SchemaFactory.createForClass(ReferralCampaign);
+export const ReferralCampaignSchema =
+  SchemaFactory.createForClass(ReferralCampaign);
 
 // Índices para performance
 ReferralCampaignSchema.index({ franchiseId: 1, status: 1 });

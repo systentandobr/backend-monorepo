@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 
 @Injectable()
 export class UnitScopeGuard implements CanActivate {
@@ -7,18 +12,24 @@ export class UnitScopeGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const req = context.switchToHttp().getRequest();
     const user = req?.user;
-    
-    console.log(`🔍 [UnitScopeGuard] Validando escopo para ${req.method} ${req.url}`);
+
+    console.log(
+      `🔍 [UnitScopeGuard] Validando escopo para ${req.method} ${req.url}`,
+    );
     console.log(`   User: ${user?.id || 'não encontrado'}`);
-    console.log(`   UnitId: ${user?.unitId || user?.profile?.unitId || 'não informado'}`);
-    
+    console.log(
+      `   UnitId: ${user?.unitId || user?.profile?.unitId || 'não informado'}`,
+    );
+
     // Extrair unitId do usuário (pode vir de user.unitId ou user.profile?.unitId)
-    const userUnitId: string | undefined = user?.unitId || user?.profile?.unitId;
+    const userUnitId: string | undefined =
+      user?.unitId || user?.profile?.unitId;
 
     // Verificar se é admin (admins podem não ter unitId em algumas rotas administrativas)
-    const isAdmin = user?.roles?.some((r: any) => 
-      ['admin', 'sistema', 'system', 'support'].includes(r.name || r)
-    ) || false;
+    const isAdmin =
+      user?.roles?.some((r: any) =>
+        ['admin', 'sistema', 'system', 'support'].includes(r.name || r),
+      ) || false;
 
     // Se não há unitId do usuário e não é admin, bloquear
     if (!userUnitId && !isAdmin) {
@@ -27,9 +38,14 @@ export class UnitScopeGuard implements CanActivate {
     }
 
     // Checa params/body/query por unitId quando presente
-    const targetUnitId = req.params?.[this.paramKey] || req.body?.[this.paramKey] || req.query?.[this.paramKey];
+    const targetUnitId =
+      req.params?.[this.paramKey] ||
+      req.body?.[this.paramKey] ||
+      req.query?.[this.paramKey];
     if (targetUnitId && targetUnitId !== userUnitId && !isAdmin) {
-      console.error(`❌ [UnitScopeGuard] Tentativa de acesso a unitId diferente: ${targetUnitId} vs ${userUnitId}`);
+      console.error(
+        `❌ [UnitScopeGuard] Tentativa de acesso a unitId diferente: ${targetUnitId} vs ${userUnitId}`,
+      );
       throw new ForbiddenException('Acesso negado ao escopo de unidade');
     }
 
@@ -37,5 +53,3 @@ export class UnitScopeGuard implements CanActivate {
     return true;
   }
 }
-
-

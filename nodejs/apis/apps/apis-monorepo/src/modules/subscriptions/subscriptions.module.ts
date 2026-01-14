@@ -2,7 +2,10 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SubscriptionsController } from './subscriptions.controller';
 import { SubscriptionsService } from './subscriptions.service';
-import { SubscriptionPlan, SubscriptionPlanSchema } from './schemas/subscription-plan.schema';
+import {
+  SubscriptionPlan,
+  SubscriptionPlanSchema,
+} from './schemas/subscription-plan.schema';
 import { Payment, PaymentSchema } from './schemas/payment.schema';
 
 @Module({

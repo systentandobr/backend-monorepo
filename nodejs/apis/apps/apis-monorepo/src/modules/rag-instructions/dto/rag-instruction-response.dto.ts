@@ -7,15 +7,15 @@ export class RagInstructionResponseDto {
   @ApiProperty({ description: 'Identificador da unidade' })
   unitId: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Array de instruções para o agente RAG',
-    type: [String]
+    type: [String],
   })
   instructions: string[];
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Tipo de fonte do conteúdo',
-    enum: ['text', 'url', 'pdf']
+    enum: ['text', 'url', 'pdf'],
   })
   sourceType?: 'text' | 'url' | 'pdf';
 
@@ -31,8 +31,8 @@ export class RagInstructionResponseDto {
   @ApiPropertyOptional({ description: 'Conteúdo bruto extraído' })
   rawContent?: string;
 
-  @ApiPropertyOptional({ 
-    description: 'Contexto adicional com dados específicos da unidade'
+  @ApiPropertyOptional({
+    description: 'Contexto adicional com dados específicos da unidade',
   })
   context?: {
     products?: any[];
@@ -42,8 +42,8 @@ export class RagInstructionResponseDto {
     [key: string]: any;
   };
 
-  @ApiPropertyOptional({ 
-    description: 'Metadados sobre as instruções'
+  @ApiPropertyOptional({
+    description: 'Metadados sobre as instruções',
   })
   metadata?: {
     version?: string;

@@ -42,4 +42,4 @@ export class HealthPlan {
   updatedAt: string;
 }
 
-export const HealthPlanSchema = SchemaFactory.createForClass(HealthPlan); 
+export const HealthPlanSchema = SchemaFactory.createForClass(HealthPlan);

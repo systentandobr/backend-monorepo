@@ -17,6 +17,4 @@ export class UpdateLeadDto extends PartialType(CreateLeadDto) {
   pipeline?: {
     stage: string;
   };
-  
 }
-

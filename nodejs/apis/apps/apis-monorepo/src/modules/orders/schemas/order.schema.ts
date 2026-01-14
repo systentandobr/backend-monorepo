@@ -1,30 +1,37 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 
-export type OrderDocument = Order & Document & {
-  createdAt?: Date;
-  updatedAt?: Date;
-};
+export type OrderDocument = Order &
+  Document & {
+    createdAt?: Date;
+    updatedAt?: Date;
+  };
 
 // Sub-schema para OrderItem
-const OrderItemSchema = new MongooseSchema({
-  productId: { type: String, required: true },
-  productName: { type: String, required: true },
-  quantity: { type: Number, required: true },
-  price: { type: Number, required: true },
-  total: { type: Number, required: true },
-}, { _id: false });
+const OrderItemSchema = new MongooseSchema(
+  {
+    productId: { type: String, required: true },
+    productName: { type: String, required: true },
+    quantity: { type: Number, required: true },
+    price: { type: Number, required: true },
+    total: { type: Number, required: true },
+  },
+  { _id: false },
+);
 
 // Sub-schema para ShippingAddress
-const ShippingAddressSchema = new MongooseSchema({
-  street: { type: String, required: true },
-  number: { type: String, required: true },
-  complement: { type: String },
-  neighborhood: { type: String, required: true },
-  city: { type: String, required: true },
-  state: { type: String, required: true },
-  zipCode: { type: String, required: true },
-}, { _id: false });
+const ShippingAddressSchema = new MongooseSchema(
+  {
+    street: { type: String, required: true },
+    number: { type: String, required: true },
+    complement: { type: String },
+    neighborhood: { type: String, required: true },
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    zipCode: { type: String, required: true },
+  },
+  { _id: false },
+);
 
 @Schema({
   timestamps: true,
@@ -116,4 +123,3 @@ OrderSchema.index({ unitId: 1, customerId: 1 });
 OrderSchema.index({ orderNumber: 1 }, { unique: true });
 OrderSchema.index({ referralCode: 1 });
 OrderSchema.index({ referralId: 1 });
-

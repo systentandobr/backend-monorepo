@@ -321,4 +321,4 @@ export interface CrossModuleProgress {
   finances: { progress: number; goals: DomainGoal[] };
   business: { progress: number; goals: DomainGoal[] };
   productivity: { progress: number; goals: DomainGoal[] };
-} 
+}

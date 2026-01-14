@@ -14,7 +14,10 @@ import { SettingsService } from './settings.service';
 import { CreateSettingDto } from './dto/create-setting.dto';
 import { UpdateSettingDto } from './dto/update-setting.dto';
 import { UnitScope } from '../../decorators/unit-scope.decorator';
-import { CurrentUser, CurrentUserShape } from '../../decorators/current-user.decorator';
+import {
+  CurrentUser,
+  CurrentUserShape,
+} from '../../decorators/current-user.decorator';
 
 @ApiTags('settings')
 @Controller('settings')
@@ -24,7 +27,9 @@ export class SettingsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Criar ou atualizar configurações para uma unidade' })
+  @ApiOperation({
+    summary: 'Criar ou atualizar configurações para uma unidade',
+  })
   create(
     @Body() createSettingDto: CreateSettingDto,
     @CurrentUser() user: CurrentUserShape,
@@ -78,4 +83,3 @@ export class SettingsController {
     return this.settingsService.findOne(unitId);
   }
 }
-

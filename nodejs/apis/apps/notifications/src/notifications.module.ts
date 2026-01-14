@@ -17,4 +17,3 @@ import { SettingsModule } from '../../apis-monorepo/src/modules/settings/setting
   exports: [NotificationsService],
 })
 export class NotificationsModule {}
-

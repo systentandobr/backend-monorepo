@@ -22,7 +22,10 @@ export class PdfContentProcessorService {
       }
 
       // Verificar se é PDF
-      if (file.mimetype !== 'application/pdf' && !file.originalname.toLowerCase().endsWith('.pdf')) {
+      if (
+        file.mimetype !== 'application/pdf' &&
+        !file.originalname.toLowerCase().endsWith('.pdf')
+      ) {
         throw new BadRequestException('Arquivo deve ser um PDF');
       }
 
@@ -39,11 +42,11 @@ export class PdfContentProcessorService {
       };
     } catch (error: any) {
       this.logger.error(`Erro ao extrair texto de PDF: ${error.message}`);
-      
+
       if (error instanceof BadRequestException) {
         throw error;
       }
-      
+
       throw new BadRequestException(`Erro ao processar PDF: ${error.message}`);
     }
   }

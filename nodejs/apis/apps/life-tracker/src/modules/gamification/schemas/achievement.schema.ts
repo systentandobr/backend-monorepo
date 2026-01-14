@@ -19,10 +19,14 @@ export class Achievement {
 
   @Prop({
     type: {
-      criteriaType: { type: String, enum: ['STREAK', 'POINTS', 'HABIT_COUNT', 'ROUTINE_COUNT'], required: true },
-      value: { type: Number, required: true }
+      criteriaType: {
+        type: String,
+        enum: ['STREAK', 'POINTS', 'HABIT_COUNT', 'ROUTINE_COUNT'],
+        required: true,
+      },
+      value: { type: Number, required: true },
     },
-    required: true
+    required: true,
   })
   criteria: {
     criteriaType: 'STREAK' | 'POINTS' | 'HABIT_COUNT' | 'ROUTINE_COUNT';

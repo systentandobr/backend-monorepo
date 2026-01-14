@@ -7,7 +7,8 @@ export class RagIndexingService {
   private readonly pythonApiUrl: string;
 
   constructor() {
-    this.pythonApiUrl = process.env.PYTHON_RAG_API_URL || 'http://localhost:7001';
+    this.pythonApiUrl =
+      process.env.PYTHON_RAG_API_URL || 'http://localhost:7001';
   }
 
   /**
@@ -21,7 +22,7 @@ export class RagIndexingService {
       url?: string;
       fileName?: string;
       fileId?: string;
-    }
+    },
   ): Promise<{ success: boolean; message?: string }> {
     try {
       this.logger.log(`Indexando conteúdo no RAG para unitId: ${unitId}`);
@@ -41,7 +42,7 @@ export class RagIndexingService {
           headers: {
             'Content-Type': 'application/json',
           },
-        }
+        },
       );
 
       if (response.status === 200 || response.status === 201) {
@@ -52,7 +53,7 @@ export class RagIndexingService {
       return { success: false, message: 'Resposta inesperada do serviço RAG' };
     } catch (error: any) {
       this.logger.error(`Erro ao indexar conteúdo no RAG: ${error.message}`);
-      
+
       // Não falhar a criação da instrução se a indexação falhar
       // A indexação pode ser feita posteriormente
       return {
@@ -65,12 +66,17 @@ export class RagIndexingService {
   /**
    * Reindexa uma instrução existente
    */
-  async reindexInstruction(unitId: string, instructionId: string): Promise<{
+  async reindexInstruction(
+    unitId: string,
+    instructionId: string,
+  ): Promise<{
     success: boolean;
     message?: string;
   }> {
     try {
-      this.logger.log(`Reindexando instrução ${instructionId} para unitId: ${unitId}`);
+      this.logger.log(
+        `Reindexando instrução ${instructionId} para unitId: ${unitId}`,
+      );
 
       const response = await axios.post(
         `${this.pythonApiUrl}/api/rag/reindex-instruction`,
@@ -83,7 +89,7 @@ export class RagIndexingService {
           headers: {
             'Content-Type': 'application/json',
           },
-        }
+        },
       );
 
       if (response.status === 200 || response.status === 201) {

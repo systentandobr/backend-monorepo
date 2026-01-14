@@ -31,26 +31,37 @@ export class RewardsService {
   /**
    * Processa uma recompensa baseada em uma indicação completada
    */
-  async processReward(processRewardDto: ProcessRewardDto): Promise<RewardResponseDto | null> {
+  async processReward(
+    processRewardDto: ProcessRewardDto,
+  ): Promise<RewardResponseDto | null> {
     // Buscar indicação
     const referral = await this.referralsService.findOne(
       processRewardDto.referralId,
     );
 
     if (referral.status !== 'completed') {
-      throw new BadRequestException('Indicação deve estar completada para processar recompensa');
+      throw new BadRequestException(
+        'Indicação deve estar completada para processar recompensa',
+      );
     }
 
     // Buscar campanha
     const campaign = await this.campaignsService.findOne(referral.campaignId);
 
     // Processar recompensa do indicador
-    if (referral.referrerReward && referral.referrerReward.status === 'pending') {
+    if (
+      referral.referrerReward &&
+      referral.referrerReward.status === 'pending'
+    ) {
       await this.createReward({
         referralId: referral.id,
         userId: referral.referrerId,
         campaignId: referral.campaignId,
-        type: campaign.referrerReward.type as 'cashback' | 'discount' | 'points' | 'physical',
+        type: campaign.referrerReward.type as
+          | 'cashback'
+          | 'discount'
+          | 'points'
+          | 'physical',
         value: campaign.referrerReward.value,
         currency: campaign.referrerReward.currency,
         metadata: processRewardDto.metadata,
@@ -68,7 +79,11 @@ export class RewardsService {
         referralId: referral.id,
         userId: referral.refereeId,
         campaignId: referral.campaignId,
-        type: campaign.refereeReward.type as 'cashback' | 'discount' | 'points' | 'physical',
+        type: campaign.refereeReward.type as
+          | 'cashback'
+          | 'discount'
+          | 'points'
+          | 'physical',
         value: campaign.refereeReward.value,
         currency: campaign.refereeReward.currency,
         metadata: processRewardDto.metadata,
@@ -114,17 +129,20 @@ export class RewardsService {
 
   async findAllByUser(
     userId: string,
-    franchiseId?: string,
+    _franchiseId?: string,
   ): Promise<RewardResponseDto[]> {
     const query: any = { userId: new Types.ObjectId(userId) };
 
     // TODO: Filtrar por franchiseId através da campanha quando necessário
 
-    const rewards = await this.rewardModel.find(query).sort({ createdAt: -1 }).exec();
+    const rewards = await this.rewardModel
+      .find(query)
+      .sort({ createdAt: -1 })
+      .exec();
     return rewards.map((r) => this.toResponseDto(r));
   }
 
-  async findPending(franchiseId?: string): Promise<RewardResponseDto[]> {
+  async findPending(_franchiseId?: string): Promise<RewardResponseDto[]> {
     const query: any = { status: 'pending' };
 
     // TODO: Filtrar por franchiseId através da campanha quando necessário
@@ -156,7 +174,7 @@ export class RewardsService {
   async approve(
     id: string,
     approvedBy: string,
-    franchiseId?: string,
+    _franchiseId?: string,
   ): Promise<RewardResponseDto> {
     const reward = await this.rewardModel.findOne({ _id: id }).exec();
 
@@ -165,7 +183,9 @@ export class RewardsService {
     }
 
     if (reward.status !== 'pending' && reward.status !== 'processing') {
-      throw new BadRequestException('Recompensa não pode ser aprovada neste status');
+      throw new BadRequestException(
+        'Recompensa não pode ser aprovada neste status',
+      );
     }
 
     reward.status = 'approved';
@@ -190,7 +210,7 @@ export class RewardsService {
     id: string,
     cancelledBy: string,
     reason: string,
-    franchiseId?: string,
+    _franchiseId?: string,
   ): Promise<RewardResponseDto> {
     const reward = await this.rewardModel.findOne({ _id: id }).exec();
 
@@ -199,7 +219,9 @@ export class RewardsService {
     }
 
     if (reward.status === 'paid') {
-      throw new BadRequestException('Não é possível cancelar uma recompensa já paga');
+      throw new BadRequestException(
+        'Não é possível cancelar uma recompensa já paga',
+      );
     }
 
     reward.status = 'cancelled';
@@ -223,7 +245,9 @@ export class RewardsService {
     }
 
     if (reward.status !== 'approved') {
-      throw new BadRequestException('Recompensa deve estar aprovada para ser marcada como paga');
+      throw new BadRequestException(
+        'Recompensa deve estar aprovada para ser marcada como paga',
+      );
     }
 
     reward.status = 'paid';
@@ -238,17 +262,24 @@ export class RewardsService {
     // Atualizar status na indicação
     // Nota: findOne pode não precisar de franchiseId neste contexto
     try {
-      const referral = await this.referralsService.findOne(reward.referralId.toString());
-      
+      const referral = await this.referralsService.findOne(
+        reward.referralId.toString(),
+      );
+
       if (referral.referrerId === reward.userId.toString()) {
         // TODO: Atualizar status da recompensa do referrer na indicação
       }
 
-      if (referral.refereeId === reward.userId.toString() && referral.refereeReward) {
+      if (
+        referral.refereeId === reward.userId.toString() &&
+        referral.refereeReward
+      ) {
         // TODO: Atualizar status da recompensa do referee na indicação
       }
     } catch (error) {
-      this.logger.warn(`Erro ao buscar indicação para atualizar status: ${error.message}`);
+      this.logger.warn(
+        `Erro ao buscar indicação para atualizar status: ${error.message}`,
+      );
     }
 
     return this.toResponseDto(saved);

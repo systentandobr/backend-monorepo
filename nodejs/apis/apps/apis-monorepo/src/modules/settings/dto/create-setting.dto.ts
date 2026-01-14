@@ -1,4 +1,11 @@
-import { IsString, IsOptional, IsObject, IsBoolean, IsNumber, ValidateNested } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsObject,
+  IsBoolean,
+  IsNumber,
+  ValidateNested,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 class TelegramConfigDto {
@@ -174,4 +181,3 @@ export class CreateSettingDto {
   @IsObject()
   general?: Record<string, any>;
 }
-

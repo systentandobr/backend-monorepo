@@ -39,4 +39,5 @@ export class BusinessOpportunity {
   updatedAt: string;
 }
 
-export const BusinessOpportunitySchema = SchemaFactory.createForClass(BusinessOpportunity); 
+export const BusinessOpportunitySchema =
+  SchemaFactory.createForClass(BusinessOpportunity);

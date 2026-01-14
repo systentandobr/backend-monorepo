@@ -1,4 +1,9 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtValidatorService } from '../services/jwt-validator.service';
 
 @Injectable()
@@ -15,8 +20,9 @@ export class JwtAuthGuard implements CanActivate {
 
     try {
       // Validar token usando SYS-SEGURANÇA com fallback local
-      const validationResult = await this.jwtValidatorService.validateTokenWithFallback(token);
-      
+      const validationResult =
+        await this.jwtValidatorService.validateTokenWithFallback(token);
+
       if (!validationResult.isValid) {
         throw new UnauthorizedException('Token inválido');
       }
@@ -31,7 +37,7 @@ export class JwtAuthGuard implements CanActivate {
         isEmailVerified: validationResult.user.isEmailVerified,
         isActive: validationResult.user.isActive,
       };
-      
+
       return true;
     } catch (error) {
       if (error instanceof UnauthorizedException) {

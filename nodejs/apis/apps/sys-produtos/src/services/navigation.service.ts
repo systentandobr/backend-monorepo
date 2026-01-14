@@ -52,7 +52,10 @@ export class NavigationService {
   }
 
   async closeSession(sessionId: string): Promise<void> {
-    await this.navigationSessionModel.updateOne({ sessionId }, { status: 'closed' });
+    await this.navigationSessionModel.updateOne(
+      { sessionId },
+      { status: 'closed' },
+    );
   }
 
   // Visited Products
@@ -114,7 +117,10 @@ export class NavigationService {
     resultsCount: number,
     filters?: SearchFilters,
     results?: SearchResult[],
-    metadata?: { searchType?: 'text' | 'filter' | 'autocomplete' | 'voice'; autocomplete?: boolean },
+    metadata?: {
+      searchType?: 'text' | 'filter' | 'autocomplete' | 'voice';
+      autocomplete?: boolean;
+    },
   ): Promise<SearchHistory> {
     const searchHistory = await this.searchHistoryModel.create({
       unitId,
@@ -149,5 +155,3 @@ export class NavigationService {
     return history as SearchHistory[];
   }
 }
-
-

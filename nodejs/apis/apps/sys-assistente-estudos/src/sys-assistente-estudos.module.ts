@@ -10,7 +10,6 @@ import { EstatisticaModule } from './estatistica/estatistica.module';
 import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
-
   imports: [
     ConfigModule.forRoot({
       isGlobal: true, // Torna as variáveis de ambiente acessíveis globalmente
@@ -48,4 +47,4 @@ import { MongooseModule } from '@nestjs/mongoose';
   controllers: [SysAssistenteEstudosController],
   providers: [SysAssistenteEstudosService],
 })
-export class SysAssistenteEstudosModule { }
+export class SysAssistenteEstudosModule {}

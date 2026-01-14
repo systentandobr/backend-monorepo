@@ -14,11 +14,17 @@ export class ExercisesService {
     @InjectModel(Exercise.name) private exerciseModel: Model<ExerciseDocument>,
   ) {}
 
-  async create(createExerciseDto: CreateExerciseDto, unitId: string): Promise<ExerciseResponseDto> {
+  async create(
+    createExerciseDto: CreateExerciseDto,
+    unitId: string,
+  ): Promise<ExerciseResponseDto> {
     const exerciseData = {
       ...createExerciseDto,
       unitId,
-      isActive: createExerciseDto.isActive !== undefined ? createExerciseDto.isActive : true,
+      isActive:
+        createExerciseDto.isActive !== undefined
+          ? createExerciseDto.isActive
+          : true,
     };
 
     const exercise = new this.exerciseModel(exerciseData);
@@ -67,24 +73,35 @@ export class ExercisesService {
       ];
     }
 
-    const exercises = await this.exerciseModel.find(query).sort({ name: 1 }).exec();
+    const exercises = await this.exerciseModel
+      .find(query)
+      .sort({ name: 1 })
+      .exec();
     return exercises.map((exercise) => this.toResponseDto(exercise));
   }
 
   async findOne(id: string, unitId: string): Promise<ExerciseResponseDto> {
-    const exercise = await this.exerciseModel.findOne({ _id: id, unitId }).exec();
+    const exercise = await this.exerciseModel
+      .findOne({ _id: id, unitId })
+      .exec();
     if (!exercise) {
       throw new NotFoundException(`Exercise with ID ${id} not found`);
     }
     return this.toResponseDto(exercise);
   }
 
-  async update(id: string, updateExerciseDto: UpdateExerciseDto, unitId: string): Promise<ExerciseResponseDto> {
-    const exercise = await this.exerciseModel.findOneAndUpdate(
-      { _id: id, unitId },
-      { $set: updateExerciseDto },
-      { new: true },
-    ).exec();
+  async update(
+    id: string,
+    updateExerciseDto: UpdateExerciseDto,
+    unitId: string,
+  ): Promise<ExerciseResponseDto> {
+    const exercise = await this.exerciseModel
+      .findOneAndUpdate(
+        { _id: id, unitId },
+        { $set: updateExerciseDto },
+        { new: true },
+      )
+      .exec();
 
     if (!exercise) {
       throw new NotFoundException(`Exercise with ID ${id} not found`);
@@ -94,7 +111,9 @@ export class ExercisesService {
   }
 
   async remove(id: string, unitId: string): Promise<void> {
-    const result = await this.exerciseModel.findOneAndDelete({ _id: id, unitId }).exec();
+    const result = await this.exerciseModel
+      .findOneAndDelete({ _id: id, unitId })
+      .exec();
     if (!result) {
       throw new NotFoundException(`Exercise with ID ${id} not found`);
     }

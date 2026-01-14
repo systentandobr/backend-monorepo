@@ -16,14 +16,17 @@ import { CreateLeadDto } from './dto/create-lead.dto';
 import { UpdateLeadDto } from './dto/update-lead.dto';
 import { LeadFiltersDto } from './dto/lead-response.dto';
 import { UnitScope } from '../../decorators/unit-scope.decorator';
-import { CurrentUser, CurrentUserShape } from '../../decorators/current-user.decorator';
+import {
+  CurrentUser,
+  CurrentUserShape,
+} from '../../decorators/current-user.decorator';
 import { LeadStatus } from './schemas/lead.schema';
 
 @ApiTags('leads')
 @Controller('leads')
 @UnitScope()
 export class LeadsController {
-  constructor(private readonly leadsService: LeadsService) { }
+  constructor(private readonly leadsService: LeadsService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -60,10 +63,7 @@ export class LeadsController {
   }
 
   @Get(':id')
-  findOne(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
+  findOne(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     const unitId = user.unitId || user.profile?.unitId;
     if (!unitId) {
       throw new Error('unitId não encontrado no contexto do usuário');
@@ -99,10 +99,7 @@ export class LeadsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
+  remove(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     const unitId = user.unitId || user.profile?.unitId;
     if (!unitId) {
       throw new Error('unitId não encontrado no contexto do usuário');
@@ -121,7 +118,13 @@ export class LeadsController {
     if (!unitId) {
       throw new Error('unitId não encontrado no contexto do usuário');
     }
-    return this.leadsService.createConversation(id, unitId, user.id, body.customerId, body.stage);
+    return this.leadsService.createConversation(
+      id,
+      unitId,
+      user.id,
+      body.customerId,
+      body.stage,
+    );
   }
 
   @Get(':id/conversations')
@@ -132,19 +135,29 @@ export class LeadsController {
     @Query('customerId') customerId?: string,
   ) {
     const unitId = user.unitId || user.profile?.unitId;
-    
+
     // #region agent log
-    fetch('http://127.0.0.1:7245/ingest/2c2ef524-2985-45e5-aeb9-914704297ab1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'leads.controller.ts:135',message:'Controller entry',data:{leadId:id,unitId,customerId,userId:user.id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+    fetch('http://127.0.0.1:7245/ingest/2c2ef524-2985-45e5-aeb9-914704297ab1', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        location: 'leads.controller.ts:135',
+        message: 'Controller entry',
+        data: { leadId: id, unitId, customerId, userId: user.id },
+        timestamp: Date.now(),
+        sessionId: 'debug-session',
+        runId: 'run1',
+        hypothesisId: 'A',
+      }),
+    }).catch(() => {});
     // #endregion
 
     console.log('getLeadConversations:: ', {
       unitId,
-    })
+    });
     if (!unitId) {
       throw new Error('unitId não encontrado no contexto do usuário');
     }
     return this.leadsService.getConversations(id, unitId, customerId, user.id);
   }
-
 }
-

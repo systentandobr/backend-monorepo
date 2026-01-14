@@ -17,7 +17,10 @@ import { CreateFranchiseDto } from './dto/create-franchise.dto';
 import { UpdateFranchiseDto } from './dto/update-franchise.dto';
 import { FranchiseFiltersDto } from './dto/franchise-response.dto';
 import { UnitScope } from '../../decorators/unit-scope.decorator';
-import { CurrentUser, CurrentUserShape } from '../../decorators/current-user.decorator';
+import {
+  CurrentUser,
+  CurrentUserShape,
+} from '../../decorators/current-user.decorator';
 
 @ApiTags('franchises')
 @Controller('franchises')
@@ -27,8 +30,8 @@ export class FranchisesController {
   // Helper para verificar se é admin
   private isAdmin(user: CurrentUserShape): boolean {
     const roles = user.roles || [];
-    return roles.some((r: any) => 
-      ['admin', 'sistema', 'system', 'support'].includes(r.name || r)
+    return roles.some((r: any) =>
+      ['admin', 'sistema', 'system', 'support'].includes(r.name || r),
     );
   }
 
@@ -85,21 +88,20 @@ export class FranchisesController {
 
     const userUnitId = user.unitId || user.profile?.unitId;
     const isAdmin = this.isAdmin(user);
-    
+
     // Verificar se o usuário tem permissão para acessar este unitId
     if (!isAdmin && userUnitId !== decodedUnitId) {
-      throw new ForbiddenException('Acesso negado: você só pode consultar a segmentação da sua própria unidade');
+      throw new ForbiddenException(
+        'Acesso negado: você só pode consultar a segmentação da sua própria unidade',
+      );
     }
-    
+
     return this.franchisesService.getMarketSegments(decodedUnitId);
   }
 
   @Get(':id')
   @UnitScope()
-  findOne(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
+  findOne(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     const unitId = user.unitId || user.profile?.unitId;
     const isAdmin = this.isAdmin(user);
     return this.franchisesService.findOne(id, unitId, isAdmin);
@@ -107,14 +109,13 @@ export class FranchisesController {
 
   @Get(':id/metrics')
   @UnitScope()
-  getMetrics(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
+  getMetrics(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     const unitId = user.unitId || user.profile?.unitId;
     const isAdmin = this.isAdmin(user);
-    
-    return this.franchisesService.findOne(id, unitId, isAdmin).then(f => f.metrics);
+
+    return this.franchisesService
+      .findOne(id, unitId, isAdmin)
+      .then((f) => f.metrics);
   }
 
   @Patch(':id')
@@ -126,30 +127,31 @@ export class FranchisesController {
   ) {
     const unitId = user.unitId || user.profile?.unitId;
     const isAdmin = this.isAdmin(user);
-    
+
     // Apenas admin pode atualizar qualquer franquia, ou o próprio dono pode atualizar a sua
     if (!isAdmin && unitId) {
       // Verificar se está atualizando a própria franquia
       // Isso será validado no service
     }
-    
-    return this.franchisesService.update(id, updateFranchiseDto, unitId, isAdmin);
+
+    return this.franchisesService.update(
+      id,
+      updateFranchiseDto,
+      unitId,
+      isAdmin,
+    );
   }
 
   @Delete(':id')
   @UnitScope()
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
+  remove(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     // Apenas admin pode deletar franquias
     if (!this.isAdmin(user)) {
       throw new Error('Apenas administradores podem deletar franquias');
     }
-    
+
     const unitId = user.unitId || user.profile?.unitId;
     return this.franchisesService.remove(id, unitId, true);
   }
 }
-

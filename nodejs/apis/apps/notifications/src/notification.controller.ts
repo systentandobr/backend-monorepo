@@ -1,14 +1,14 @@
-import { Body, Controller, Post } from "@nestjs/common";
-import { NotificationPayload } from "./types/config";
-import { NotificationsService } from "./notifications.service";
-import { ApiResponse, ApiOperation, ApiBody } from "@nestjs/swagger";
+import { Body, Controller, Post } from '@nestjs/common';
+import { NotificationPayload } from './types/config';
+import { NotificationsService } from './notifications.service';
+import { ApiResponse, ApiOperation, ApiBody } from '@nestjs/swagger';
 
-/** 
+/**
  * Controller for notifications
  */
 @Controller('notifications')
 export class NotificationController {
-  constructor(private readonly notificationsService: NotificationsService) { }
+  constructor(private readonly notificationsService: NotificationsService) {}
 
   @Post('send')
   @ApiOperation({ summary: 'Send notification' })
@@ -23,11 +23,11 @@ export class NotificationController {
           message: 'A operação foi concluída com êxito',
           type: 'success',
           metadata: {
-            'ID': '12345',
-            'Status': 'Concluído',
-            'Data': '2024-01-15T10:30:00Z'
-          }
-        }
+            ID: '12345',
+            Status: 'Concluído',
+            Data: '2024-01-15T10:30:00Z',
+          },
+        },
       },
       exemplo2: {
         summary: 'Notificação de erro',
@@ -37,10 +37,10 @@ export class NotificationController {
           message: 'Ocorreu um erro ao processar a solicitação',
           type: 'error',
           metadata: {
-            'Código': 'ERR001',
-            'Detalhes': 'Erro de validação'
-          }
-        }
+            Código: 'ERR001',
+            Detalhes: 'Erro de validação',
+          },
+        },
       },
       exemplo3: {
         summary: 'Notificação simples',
@@ -48,27 +48,34 @@ export class NotificationController {
         value: {
           title: 'ℹ️ Informação',
           message: 'Esta é uma mensagem informativa',
-          type: 'info'
-        }
-      }
-    }
+          type: 'info',
+        },
+      },
+    },
   })
   @ApiResponse({ status: 200, description: 'Notification sent' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
-  async sendNotification(@Body() payload: NotificationPayload & { unitId?: string }): Promise<{
+  async sendNotification(
+    @Body() payload: NotificationPayload & { unitId?: string },
+  ): Promise<{
     telegram: boolean;
     discord: boolean;
     email: boolean;
   }> {
-    const unitId = payload.unitId || payload.metadata?.unitId || payload.metadata?.['ID Unidade'];
+    const unitId =
+      payload.unitId ||
+      payload.metadata?.unitId ||
+      payload.metadata?.['ID Unidade'];
     return this.notificationsService.sendNotification(payload, unitId);
   }
 
   @Post('trigger/lead-welcome')
   @ApiOperation({ summary: 'Trigger welcome notification for a lead' })
   @ApiResponse({ status: 200, description: 'Welcome notification sent' })
-  async sendLeadWelcome(@Body() body: { leadId: string; unitId: string; name?: string }) {
+  async sendLeadWelcome(
+    @Body() body: { leadId: string; unitId: string; name?: string },
+  ) {
     const payload: NotificationPayload = {
       title: '👋 Bem-vindo ao TaDeVolta!',
       message: `Olá ${body.name || 'Visitante'}, ficamos felizes com seu interesse. Em breve um consultor entrará em contato.`,
@@ -76,8 +83,8 @@ export class NotificationController {
       metadata: {
         leadId: body.leadId,
         unitId: body.unitId,
-        trigger: 'lead-welcome'
-      }
+        trigger: 'lead-welcome',
+      },
     };
     return this.notificationsService.sendNotification(payload, body.unitId);
   }
@@ -85,13 +92,15 @@ export class NotificationController {
   @Post('trigger/chat-link')
   @ApiOperation({ summary: 'Generate and send chat link notification' })
   @ApiResponse({ status: 200, description: 'Chat link notification sent' })
-  async sendChatLink(@Body() body: { leadId: string; unitId: string; stage?: string }) {
+  async sendChatLink(
+    @Body() body: { leadId: string; unitId: string; stage?: string },
+  ) {
     // Generate the chat URL (using the same logic as frontend for consistency, but server-side)
     const baseUrl = 'https://chat.tadevolta.com.br';
     const params = new URLSearchParams({
       leadId: body.leadId,
       unitId: body.unitId,
-      stage: body.stage || 'initial'
+      stage: body.stage || 'initial',
     });
     const chatUrl = `${baseUrl}/?${params.toString()}`;
 
@@ -103,8 +112,8 @@ export class NotificationController {
         leadId: body.leadId,
         unitId: body.unitId,
         chatUrl: chatUrl,
-        trigger: 'chat-link'
-      }
+        trigger: 'chat-link',
+      },
     };
     return this.notificationsService.sendNotification(payload, body.unitId);
   }

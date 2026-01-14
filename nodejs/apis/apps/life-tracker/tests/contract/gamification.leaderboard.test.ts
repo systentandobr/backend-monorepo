@@ -49,8 +49,12 @@ describe('Gamification Leaderboard Contract (e2e)', () => {
         },
       ];
 
-      jest.spyOn(gamificationProfileModel, 'find').mockResolvedValue(mockLeaderboard);
-      jest.spyOn(gamificationProfileModel, 'countDocuments').mockResolvedValue(2);
+      jest
+        .spyOn(gamificationProfileModel, 'find')
+        .mockResolvedValue(mockLeaderboard);
+      jest
+        .spyOn(gamificationProfileModel, 'countDocuments')
+        .mockResolvedValue(2);
 
       const response = await request(app.getHttpServer())
         .get('/gamification/leaderboard')
@@ -90,8 +94,12 @@ describe('Gamification Leaderboard Contract (e2e)', () => {
         },
       ];
 
-      jest.spyOn(gamificationProfileModel, 'find').mockResolvedValue(mockLeaderboard);
-      jest.spyOn(gamificationProfileModel, 'countDocuments').mockResolvedValue(1);
+      jest
+        .spyOn(gamificationProfileModel, 'find')
+        .mockResolvedValue(mockLeaderboard);
+      jest
+        .spyOn(gamificationProfileModel, 'countDocuments')
+        .mockResolvedValue(1);
 
       const response = await request(app.getHttpServer())
         .get('/gamification/leaderboard?period=weekly')
@@ -118,8 +126,12 @@ describe('Gamification Leaderboard Contract (e2e)', () => {
         },
       ];
 
-      jest.spyOn(gamificationProfileModel, 'find').mockResolvedValue(mockLeaderboard);
-      jest.spyOn(gamificationProfileModel, 'countDocuments').mockResolvedValue(1);
+      jest
+        .spyOn(gamificationProfileModel, 'find')
+        .mockResolvedValue(mockLeaderboard);
+      jest
+        .spyOn(gamificationProfileModel, 'countDocuments')
+        .mockResolvedValue(1);
 
       const response = await request(app.getHttpServer())
         .get('/gamification/leaderboard?period=daily')
@@ -146,8 +158,12 @@ describe('Gamification Leaderboard Contract (e2e)', () => {
         },
       ];
 
-      jest.spyOn(gamificationProfileModel, 'find').mockResolvedValue(mockLeaderboard);
-      jest.spyOn(gamificationProfileModel, 'countDocuments').mockResolvedValue(1);
+      jest
+        .spyOn(gamificationProfileModel, 'find')
+        .mockResolvedValue(mockLeaderboard);
+      jest
+        .spyOn(gamificationProfileModel, 'countDocuments')
+        .mockResolvedValue(1);
 
       const response = await request(app.getHttpServer())
         .get('/gamification/leaderboard?period=monthly')
@@ -166,7 +182,9 @@ describe('Gamification Leaderboard Contract (e2e)', () => {
 
     it('deve retornar lista vazia quando não há usuários', async () => {
       jest.spyOn(gamificationProfileModel, 'find').mockResolvedValue([]);
-      jest.spyOn(gamificationProfileModel, 'countDocuments').mockResolvedValue(0);
+      jest
+        .spyOn(gamificationProfileModel, 'countDocuments')
+        .mockResolvedValue(0);
 
       const response = await request(app.getHttpServer())
         .get('/gamification/leaderboard')

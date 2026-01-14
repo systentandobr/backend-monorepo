@@ -35,4 +35,4 @@ export class AnalyticsData {
   updatedAt: string;
 }
 
-export const AnalyticsDataSchema = SchemaFactory.createForClass(AnalyticsData); 
+export const AnalyticsDataSchema = SchemaFactory.createForClass(AnalyticsData);

@@ -1,10 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-export type ExerciseDocument = Exercise & Document & {
-  createdAt?: Date;
-  updatedAt?: Date;
-};
+export type ExerciseDocument = Exercise &
+  Document & {
+    createdAt?: Date;
+    updatedAt?: Date;
+  };
 
 @Schema({
   timestamps: true,

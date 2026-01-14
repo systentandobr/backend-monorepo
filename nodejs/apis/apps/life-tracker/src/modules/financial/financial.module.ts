@@ -5,7 +5,10 @@ import { FinancialController } from './financial.controller';
 import { FinancialService } from './financial.service';
 import { Portfolio, PortfolioSchema } from './schemas/portfolio.schema';
 import { Asset, AssetSchema } from './schemas/asset.schema';
-import { FinancialGoal, FinancialGoalSchema } from './schemas/financial-goal.schema';
+import {
+  FinancialGoal,
+  FinancialGoalSchema,
+} from './schemas/financial-goal.schema';
 import { JwtValidatorService } from '../../services/jwt-validator.service';
 
 @Module({
@@ -24,4 +27,4 @@ import { JwtValidatorService } from '../../services/jwt-validator.service';
   providers: [FinancialService, JwtValidatorService],
   exports: [FinancialService],
 })
-export class FinancialModule {} 
+export class FinancialModule {}

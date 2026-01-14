@@ -27,7 +27,8 @@ export class UrlContentProcessorService {
         responseType: 'arraybuffer',
         timeout: 30000,
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         },
       });
 
@@ -35,16 +36,21 @@ export class UrlContentProcessorService {
       const buffer = Buffer.from(response.data);
 
       // Verificar se é PDF
-      if (contentType.includes('application/pdf') || url.toLowerCase().endsWith('.pdf')) {
+      if (
+        contentType.includes('application/pdf') ||
+        url.toLowerCase().endsWith('.pdf')
+      ) {
         return this.extractFromPdfBuffer(buffer, url);
       }
 
       // Processar como HTML
-      return this.extractFromHtml(buffer.toString('utf-8'), url);
+      return this.extractFromHtml(buffer.toString('utf-8'));
     } catch (error: any) {
-      this.logger.error(`Erro ao extrair conteúdo de URL ${url}: ${error.message}`);
+      this.logger.error(
+        `Erro ao extrair conteúdo de URL ${url}: ${error.message}`,
+      );
       throw new BadRequestException(
-        `Não foi possível extrair conteúdo da URL: ${error.message}`
+        `Não foi possível extrair conteúdo da URL: ${error.message}`,
       );
     }
   }
@@ -52,7 +58,9 @@ export class UrlContentProcessorService {
   /**
    * Extrai texto de HTML
    */
-  private extractFromHtml(html: string, url: string): {
+  private extractFromHtml(
+    html: string,
+  ): {
     content: string;
     title?: string;
     metadata?: any;
@@ -61,7 +69,9 @@ export class UrlContentProcessorService {
       const $ = cheerio.load(html);
 
       // Remover scripts, styles e outros elementos não desejados
-      $('script, style, nav, header, footer, aside, .ad, .advertisement').remove();
+      $(
+        'script, style, nav, header, footer, aside, .ad, .advertisement',
+      ).remove();
 
       // Extrair título
       const title = $('title').text() || $('h1').first().text() || '';
@@ -90,7 +100,9 @@ export class UrlContentProcessorService {
       };
     } catch (error: any) {
       this.logger.error(`Erro ao processar HTML: ${error.message}`);
-      throw new BadRequestException(`Erro ao processar conteúdo HTML: ${error.message}`);
+      throw new BadRequestException(
+        `Erro ao processar conteúdo HTML: ${error.message}`,
+      );
     }
   }
 
@@ -99,7 +111,7 @@ export class UrlContentProcessorService {
    */
   private async extractFromPdfBuffer(
     buffer: Buffer,
-    url: string
+    url: string,
   ): Promise<{
     content: string;
     title?: string;
@@ -110,7 +122,10 @@ export class UrlContentProcessorService {
 
       return {
         content: this.cleanText(pdfData.text),
-        title: pdfData.info?.Title || url.split('/').pop()?.replace('.pdf', '') || undefined,
+        title:
+          pdfData.info?.Title ||
+          url.split('/').pop()?.replace('.pdf', '') ||
+          undefined,
         metadata: {
           contentType: 'application/pdf',
           pages: pdfData.numpages,

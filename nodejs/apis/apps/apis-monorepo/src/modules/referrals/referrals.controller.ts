@@ -13,7 +13,10 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ReferralsService } from './referrals.service';
 import { CreateReferralDto } from './dto/create-referral.dto';
 import { ReferralFiltersDto } from './dto/referral-filters.dto';
-import { CurrentUser, CurrentUserShape } from '../../decorators/current-user.decorator';
+import {
+  CurrentUser,
+  CurrentUserShape,
+} from '../../decorators/current-user.decorator';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 
 @ApiTags('referrals')
@@ -34,7 +37,11 @@ export class ReferralsController {
     if (!franchiseId) {
       throw new Error('unitId não encontrado no contexto do usuário');
     }
-    return this.referralsService.create(createReferralDto, user.id, franchiseId);
+    return this.referralsService.create(
+      createReferralDto,
+      user.id,
+      franchiseId,
+    );
   }
 
   @Get()
@@ -83,10 +90,7 @@ export class ReferralsController {
   @ApiOperation({ summary: 'Detalhes da indicação' })
   @ApiResponse({ status: 200, description: 'Indicação encontrada' })
   @ApiResponse({ status: 404, description: 'Indicação não encontrada' })
-  findOne(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserShape,
-  ) {
+  findOne(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     const franchiseId = user.unitId || user.profile?.unitId;
     return this.referralsService.findOne(id, franchiseId);
   }
@@ -100,7 +104,11 @@ export class ReferralsController {
     @Param('id') id: string,
     @Body() body: { orderId: string; refereeId: string },
   ) {
-    return this.referralsService.completeReferral(id, body.orderId, body.refereeId);
+    return this.referralsService.completeReferral(
+      id,
+      body.orderId,
+      body.refereeId,
+    );
   }
 
   @Post(':id/cancel')

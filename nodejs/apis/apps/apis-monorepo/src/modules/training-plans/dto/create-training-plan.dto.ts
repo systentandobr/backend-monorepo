@@ -1,4 +1,15 @@
-import { IsString, IsOptional, IsArray, IsDateString, IsEnum, IsNumber, ValidateNested, Min, Max, IsBoolean } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsArray,
+  IsDateString,
+  IsEnum,
+  IsNumber,
+  ValidateNested,
+  Min,
+  Max,
+  IsBoolean,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class TimeSlotDto {

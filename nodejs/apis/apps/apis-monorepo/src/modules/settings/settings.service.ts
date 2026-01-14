@@ -1,11 +1,14 @@
-import { Injectable, NotFoundException, Logger, Inject, forwardRef } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Setting, SettingDocument } from './schemas/setting.schema';
 import { CreateSettingDto } from './dto/create-setting.dto';
 import { UpdateSettingDto } from './dto/update-setting.dto';
 import { SettingResponseDto } from './dto/setting-response.dto';
-import { Franchise, FranchiseDocument } from '../franchises/schemas/franchise.schema';
+import {
+  Franchise,
+  FranchiseDocument,
+} from '../franchises/schemas/franchise.schema';
 
 @Injectable()
 export class SettingsService {
@@ -13,7 +16,8 @@ export class SettingsService {
 
   constructor(
     @InjectModel(Setting.name) private settingModel: Model<SettingDocument>,
-    @InjectModel(Franchise.name) private franchiseModel: Model<FranchiseDocument>,
+    @InjectModel(Franchise.name)
+    private franchiseModel: Model<FranchiseDocument>,
   ) {}
 
   /**
@@ -35,7 +39,9 @@ export class SettingsService {
   /**
    * Cria ou atualiza configurações para uma unidade
    */
-  async createOrUpdate(createSettingDto: CreateSettingDto): Promise<SettingResponseDto> {
+  async createOrUpdate(
+    createSettingDto: CreateSettingDto,
+  ): Promise<SettingResponseDto> {
     const { unitId, franchiseId, ...updateData } = createSettingDto;
 
     // Buscar franchiseId automaticamente se não fornecido
@@ -47,7 +53,9 @@ export class SettingsService {
       const franchise = await this.franchiseModel.findOne({ unitId }).exec();
       if (franchise && franchise._id) {
         franchiseObjectId = franchise._id;
-        this.logger.log(`FranchiseId encontrado automaticamente para unitId ${unitId}: ${franchiseObjectId}`);
+        this.logger.log(
+          `FranchiseId encontrado automaticamente para unitId ${unitId}: ${franchiseObjectId}`,
+        );
       }
     }
 
@@ -71,7 +79,7 @@ export class SettingsService {
    */
   async findByUnitId(unitId: string): Promise<SettingResponseDto | null> {
     const setting = await this.settingModel.findOne({ unitId });
-    
+
     if (!setting) {
       return null;
     }
@@ -84,9 +92,11 @@ export class SettingsService {
    */
   async findOne(unitId: string): Promise<SettingResponseDto> {
     const setting = await this.findByUnitId(unitId);
-    
+
     if (!setting) {
-      throw new NotFoundException(`Configurações não encontradas para a unidade ${unitId}`);
+      throw new NotFoundException(
+        `Configurações não encontradas para a unidade ${unitId}`,
+      );
     }
 
     return setting;
@@ -95,7 +105,10 @@ export class SettingsService {
   /**
    * Atualiza configurações de uma unidade
    */
-  async update(unitId: string, updateSettingDto: UpdateSettingDto): Promise<SettingResponseDto> {
+  async update(
+    unitId: string,
+    updateSettingDto: UpdateSettingDto,
+  ): Promise<SettingResponseDto> {
     const setting = await this.settingModel.findOneAndUpdate(
       { unitId },
       { $set: updateSettingDto },
@@ -103,7 +116,9 @@ export class SettingsService {
     );
 
     if (!setting) {
-      throw new NotFoundException(`Configurações não encontradas para a unidade ${unitId}`);
+      throw new NotFoundException(
+        `Configurações não encontradas para a unidade ${unitId}`,
+      );
     }
 
     return this.toResponseDto(setting);
@@ -114,9 +129,11 @@ export class SettingsService {
    */
   async remove(unitId: string): Promise<void> {
     const result = await this.settingModel.deleteOne({ unitId });
-    
+
     if (result.deletedCount === 0) {
-      throw new NotFoundException(`Configurações não encontradas para a unidade ${unitId}`);
+      throw new NotFoundException(
+        `Configurações não encontradas para a unidade ${unitId}`,
+      );
     }
   }
 
@@ -125,7 +142,7 @@ export class SettingsService {
    */
   async findAll(): Promise<SettingResponseDto[]> {
     const settings = await this.settingModel.find();
-    return settings.map(setting => this.toResponseDto(setting));
+    return settings.map((setting) => this.toResponseDto(setting));
   }
 
   /**
@@ -135,10 +152,16 @@ export class SettingsService {
   async getNotificationSettings(unitId: string): Promise<{
     telegram?: { botToken?: string; chatId?: string; enabled?: boolean };
     discord?: { webhookUrl?: string; enabled?: boolean };
-    email?: { host?: string; port?: number; username?: string; password?: string; from?: string; enabled?: boolean };
+    email?: {
+      host?: string;
+      port?: number;
+      username?: string;
+      password?: string;
+      from?: string;
+      enabled?: boolean;
+    };
   } | null> {
     const setting = await this.findByUnitId(unitId);
     return setting?.notifications || null;
   }
 }
-

@@ -1,51 +1,51 @@
 import { Expose } from 'class-transformer';
 
 export class TrainingResponseDto {
-    @Expose()
-    id: string;
+  @Expose()
+  id: string;
 
-    @Expose()
-    title: string;
+  @Expose()
+  title: string;
 
-    @Expose()
-    description: string;
+  @Expose()
+  description: string;
 
-    @Expose()
-    category: string;
+  @Expose()
+  category: string;
 
-    @Expose()
-    type: string;
+  @Expose()
+  type: string;
 
-    @Expose()
-    videoUrl?: string;
+  @Expose()
+  videoUrl?: string;
 
-    @Expose()
-    thumbnailUrl?: string;
+  @Expose()
+  thumbnailUrl?: string;
 
-    @Expose()
-    duration?: number;
+  @Expose()
+  duration?: number;
 
-    @Expose()
-    resources: any[];
+  @Expose()
+  resources: any[];
 
-    @Expose()
-    isGlobal: boolean;
+  @Expose()
+  isGlobal: boolean;
 
-    @Expose()
-    franchiseId?: string;
+  @Expose()
+  franchiseId?: string;
 
-    @Expose()
-    order: number;
+  @Expose()
+  order: number;
 
-    @Expose()
-    viewCount: number;
+  @Expose()
+  viewCount: number;
 
-    @Expose()
-    metadata: any;
+  @Expose()
+  metadata: any;
 
-    @Expose()
-    createdAt: Date;
+  @Expose()
+  createdAt: Date;
 
-    @Expose()
-    updatedAt: Date;
+  @Expose()
+  updatedAt: Date;
 }

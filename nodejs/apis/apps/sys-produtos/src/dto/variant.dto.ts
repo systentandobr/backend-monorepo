@@ -1,5 +1,15 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import { IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, Min, Max } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+  Min,
+  Max,
+} from 'class-validator';
 import { DiscountEvent, DiscountType } from '../schemas/product.schema';
 
 export class CreateVariantDto {
@@ -59,7 +69,9 @@ export class CreateVariantDto {
   @Max(100)
   comissionPerTransaction?: number; // Comissão por transação (percentual)
 
-  @ApiPropertyOptional({ description: 'Impostos (%) - pode ser calculado dinamicamente' })
+  @ApiPropertyOptional({
+    description: 'Impostos (%) - pode ser calculado dinamicamente',
+  })
   @IsOptional()
   @IsNumber()
   @Min(0)
@@ -85,13 +97,17 @@ export class AdjustStockDto {
   @IsNotEmpty()
   unitId: string;
 
-  @ApiPropertyOptional({ description: 'Quantidade absoluta para setar (opcional)' })
+  @ApiPropertyOptional({
+    description: 'Quantidade absoluta para setar (opcional)',
+  })
   @IsOptional()
   @IsNumber()
   @Min(0)
   quantity?: number;
 
-  @ApiPropertyOptional({ description: 'Reservado absoluto para setar (opcional)' })
+  @ApiPropertyOptional({
+    description: 'Reservado absoluto para setar (opcional)',
+  })
   @IsOptional()
   @IsNumber()
   @Min(0)
@@ -104,15 +120,17 @@ export class AdjustStockDeltaDto {
   @IsNotEmpty()
   unitId: string;
 
-  @ApiPropertyOptional({ description: 'Delta para quantity (pode ser negativo)' })
+  @ApiPropertyOptional({
+    description: 'Delta para quantity (pode ser negativo)',
+  })
   @IsOptional()
   @IsNumber()
   quantityDelta?: number;
 
-  @ApiPropertyOptional({ description: 'Delta para reserved (pode ser negativo)' })
+  @ApiPropertyOptional({
+    description: 'Delta para reserved (pode ser negativo)',
+  })
   @IsOptional()
   @IsNumber()
   reservedDelta?: number;
 }
-
-

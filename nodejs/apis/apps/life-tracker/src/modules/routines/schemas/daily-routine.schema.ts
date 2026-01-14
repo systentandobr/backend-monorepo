@@ -27,4 +27,4 @@ export class DailyRoutine {
   updatedAt?: Date;
 }
 
-export const DailyRoutineSchema = SchemaFactory.createForClass(DailyRoutine); 
+export const DailyRoutineSchema = SchemaFactory.createForClass(DailyRoutine);

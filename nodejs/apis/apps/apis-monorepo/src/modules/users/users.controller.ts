@@ -12,10 +12,20 @@ import {
   HttpException,
   Req,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiBody, ApiParam } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiQuery,
+  ApiBody,
+  ApiParam,
+} from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
-import { CurrentUser, CurrentUserShape } from '../../decorators/current-user.decorator';
+import {
+  CurrentUser,
+  CurrentUserShape,
+} from '../../decorators/current-user.decorator';
 import { UpdateUserUnitDto } from './dto/update-user-unit.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserRolesDto } from './dto/update-user-roles.dto';
@@ -30,7 +40,8 @@ export class UsersController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Cria um novo usuário',
-    description: 'Cria um novo usuário no sistema SYS-SEGURANÇA com o mesmo domain do usuário autenticado'
+    description:
+      'Cria um novo usuário no sistema SYS-SEGURANÇA com o mesmo domain do usuário autenticado',
   })
   @ApiBody({
     type: CreateUserDto,
@@ -87,8 +98,12 @@ export class UsersController {
 
     if (!domain) {
       throw new HttpException(
-        { message: 'Domain não encontrado no contexto do usuário. Usuários devem ter um domain configurado.', error: 'Bad Request' },
-        HttpStatus.BAD_REQUEST
+        {
+          message:
+            'Domain não encontrado no contexto do usuário. Usuários devem ter um domain configurado.',
+          error: 'Bad Request',
+        },
+        HttpStatus.BAD_REQUEST,
       );
     }
 
@@ -98,8 +113,11 @@ export class UsersController {
 
     if (!token) {
       throw new HttpException(
-        { message: 'Token de autenticação não encontrado', error: 'Unauthorized' },
-        HttpStatus.UNAUTHORIZED
+        {
+          message: 'Token de autenticação não encontrado',
+          error: 'Unauthorized',
+        },
+        HttpStatus.UNAUTHORIZED,
       );
     }
 
@@ -107,7 +125,10 @@ export class UsersController {
     // O token já foi validado pelo JwtAuthGuard, então request.user deve ter os dados corretos
     console.log(`🔑 [UsersController] Token extraído do header:`, {
       tokenLength: token.length,
-      tokenPreview: token.length > 20 ? `${token.substring(0, 10)}...${token.substring(token.length - 10)}` : '***',
+      tokenPreview:
+        token.length > 20
+          ? `${token.substring(0, 10)}...${token.substring(token.length - 10)}`
+          : '***',
       userFromGuard: {
         id: user.id,
         username: user.username,
@@ -125,12 +146,14 @@ export class UsersController {
       roles: user.roles?.map((r: any) => r.name || r) || [],
       rolesRaw: user.roles,
       domain: user.domain || user.profile?.domain,
-      payload: user.payload ? {
-        ...user.payload,
-        sub: user.payload.user?.sub,
-        username: user.payload.user?.username,
-        roles: user.payload.user?.roles,
-      } : undefined,
+      payload: user.payload
+        ? {
+            ...user.payload,
+            sub: user.payload.user?.sub,
+            username: user.payload.user?.username,
+            roles: user.payload.user?.roles,
+          }
+        : undefined,
     });
 
     try {
@@ -149,37 +172,42 @@ export class UsersController {
       }
       // Se não for HttpException, converter para 500
       throw new HttpException(
-        { message: error.message || 'Erro ao criar usuário', error: 'Internal Server Error' },
-        HttpStatus.INTERNAL_SERVER_ERROR
+        {
+          message: error.message || 'Erro ao criar usuário',
+          error: 'Internal Server Error',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
   @Get('available')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Lista usuários disponíveis filtrados por domain e unitId',
-    description: 'Retorna lista de usuários do mesmo domain do usuário autenticado. Se o usuário tiver unitId, filtra também por unitId (retorna apenas usuários com mesmo unitId ou sem unitId).'
+    description:
+      'Retorna lista de usuários do mesmo domain do usuário autenticado. Se o usuário tiver unitId, filtra também por unitId (retorna apenas usuários com mesmo unitId ou sem unitId).',
   })
-  @ApiQuery({ 
-    name: 'search', 
-    required: false, 
-    description: 'Termo de busca para filtrar usuários por nome, email ou username' 
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description:
+      'Termo de busca para filtrar usuários por nome, email ou username',
   })
-  @ApiQuery({ 
-    name: 'page', 
-    required: false, 
+  @ApiQuery({
+    name: 'page',
+    required: false,
     type: Number,
-    description: 'Número da página (padrão: 1)' 
+    description: 'Número da página (padrão: 1)',
   })
-  @ApiQuery({ 
-    name: 'limit', 
-    required: false, 
+  @ApiQuery({
+    name: 'limit',
+    required: false,
     type: Number,
-    description: 'Limite de resultados por página (padrão: 50)' 
+    description: 'Limite de resultados por página (padrão: 50)',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Lista de usuários disponíveis',
     schema: {
       type: 'object',
@@ -217,7 +245,9 @@ export class UsersController {
     const domain = user.domain || user.profile?.domain;
 
     if (!domain) {
-      throw new Error('Domain não encontrado no contexto do usuário. Usuários devem ter um domain configurado.');
+      throw new Error(
+        'Domain não encontrado no contexto do usuário. Usuários devem ter um domain configurado.',
+      );
     }
 
     // Extrair unitId do usuário autenticado
@@ -231,8 +261,12 @@ export class UsersController {
       throw new Error('Token de autenticação não encontrado');
     }
 
-    console.log(`📋 [UsersController] Buscando usuários disponíveis para domain: ${domain}`);
-    console.log(`   Usuário autenticado: ${user.username || user.email || user.id}`);
+    console.log(
+      `📋 [UsersController] Buscando usuários disponíveis para domain: ${domain}`,
+    );
+    console.log(
+      `   Usuário autenticado: ${user.username || user.email || user.id}`,
+    );
     console.log(`   UnitId do usuário: ${userUnitId || 'não informado'}`);
     console.log(`   Search: ${search || 'não informado'}`);
 
@@ -258,7 +292,9 @@ export class UsersController {
         return !userUnitIdValue || userUnitIdValue === userUnitId;
       });
 
-      console.log(`   Filtrado por unitId: ${filteredUsers.length} de ${response.data.length} usuários`);
+      console.log(
+        `   Filtrado por unitId: ${filteredUsers.length} de ${response.data.length} usuários`,
+      );
 
       return {
         data: filteredUsers,
@@ -274,35 +310,37 @@ export class UsersController {
 
   @Get('by-unit')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Lista usuários filtrados por unitId',
-    description: 'Retorna lista de usuários associados a uma unidade/franquia específica do mesmo domain'
+    description:
+      'Retorna lista de usuários associados a uma unidade/franquia específica do mesmo domain',
   })
-  @ApiQuery({ 
-    name: 'unitId', 
-    required: true, 
+  @ApiQuery({
+    name: 'unitId',
+    required: true,
     description: 'ID da unidade/franquia para filtrar usuários',
-    type: String
+    type: String,
   })
-  @ApiQuery({ 
-    name: 'search', 
-    required: false, 
-    description: 'Termo de busca para filtrar usuários por nome, email ou username' 
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description:
+      'Termo de busca para filtrar usuários por nome, email ou username',
   })
-  @ApiQuery({ 
-    name: 'page', 
-    required: false, 
+  @ApiQuery({
+    name: 'page',
+    required: false,
     type: Number,
-    description: 'Número da página (padrão: 1)' 
+    description: 'Número da página (padrão: 1)',
   })
-  @ApiQuery({ 
-    name: 'limit', 
-    required: false, 
+  @ApiQuery({
+    name: 'limit',
+    required: false,
     type: Number,
-    description: 'Limite de resultados por página (padrão: 50)' 
+    description: 'Limite de resultados por página (padrão: 50)',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Lista de usuários encontrados',
     schema: {
       type: 'object',
@@ -344,7 +382,7 @@ export class UsersController {
     }
 
     const domain = user.domain || user.profile?.domain;
-    
+
     // Extrair token do header Authorization
     const authHeader = request.headers?.authorization || '';
     const token = authHeader.replace('Bearer ', '');
@@ -357,31 +395,44 @@ export class UsersController {
     // Roles permitidas: admin, moderator, system podem consultar qualquer unitId
     // Roles franqueado e gerente só podem consultar sua própria unitId
     const userRoles = user.roles || [];
-    const roleNames = userRoles.map((r: any) => {
-      // Se role é um objeto com propriedade name, usar name; caso contrário, usar o valor direto
-      if (typeof r === 'object' && r !== null && 'name' in r) {
-        return r.name;
-      }
-      return r;
-    }).filter(Boolean);
-    
+    const roleNames = userRoles
+      .map((r: any) => {
+        // Se role é um objeto com propriedade name, usar name; caso contrário, usar o valor direto
+        if (typeof r === 'object' && r !== null && 'name' in r) {
+          return r.name;
+        }
+        return r;
+      })
+      .filter(Boolean);
+
     const adminRoles = ['admin', 'moderator', 'system', 'sistema'];
-    const franchiseRoles = ['franqueado', 'franchisee', 'franquia', 'gerente', 'manager', 'parceiro', 'partner'];
-    
-    const isAdmin = adminRoles.some(role => roleNames.includes(role));
-    const isFranchiseeOrManager = franchiseRoles.some(role => roleNames.includes(role));
+    const franchiseRoles = [
+      'franqueado',
+      'franchisee',
+      'franquia',
+      'gerente',
+      'manager',
+      'parceiro',
+      'partner',
+    ];
+
+    const isAdmin = adminRoles.some((role) => roleNames.includes(role));
+    const isFranchiseeOrManager = franchiseRoles.some((role) =>
+      roleNames.includes(role),
+    );
 
     // Se é franqueado ou gerente, verificar se está consultando sua própria unitId
     if (isFranchiseeOrManager && !isAdmin) {
       const userUnitId = user.unitId || user.profile?.unitId;
-      
+
       if (!userUnitId) {
         throw new HttpException(
-          { 
-            message: 'Usuário não possui unitId associado. Apenas usuários com unitId podem consultar usuários da franquia.', 
-            error: 'Forbidden' 
+          {
+            message:
+              'Usuário não possui unitId associado. Apenas usuários com unitId podem consultar usuários da franquia.',
+            error: 'Forbidden',
           },
-          HttpStatus.FORBIDDEN
+          HttpStatus.FORBIDDEN,
         );
       }
 
@@ -391,11 +442,11 @@ export class UsersController {
 
       if (decodedRequestUnitId !== decodedUserUnitId) {
         throw new HttpException(
-          { 
-            message: `Acesso negado. Você só pode consultar usuários da sua própria franquia (unitId: ${decodedUserUnitId}).`, 
-            error: 'Forbidden' 
+          {
+            message: `Acesso negado. Você só pode consultar usuários da sua própria franquia (unitId: ${decodedUserUnitId}).`,
+            error: 'Forbidden',
           },
-          HttpStatus.FORBIDDEN
+          HttpStatus.FORBIDDEN,
         );
       }
     }
@@ -405,7 +456,9 @@ export class UsersController {
     console.log(`   User Roles: ${roleNames.join(', ') || 'não informado'}`);
     console.log(`   Is Admin: ${isAdmin}`);
     console.log(`   Is Franchisee/Manager: ${isFranchiseeOrManager}`);
-    console.log(`   User UnitId: ${user.unitId || user.profile?.unitId || 'não informado'}`);
+    console.log(
+      `   User UnitId: ${user.unitId || user.profile?.unitId || 'não informado'}`,
+    );
     console.log(`   Search: ${search || 'não informado'}`);
 
     const pageNumber = page ? parseInt(String(page), 10) : 1;
@@ -424,16 +477,17 @@ export class UsersController {
 
   @Patch(':id/unit')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Atualiza o unitId de um usuário',
-    description: 'Atualiza a unidade/franquia associada a um usuário específico do mesmo domain'
+    description:
+      'Atualiza a unidade/franquia associada a um usuário específico do mesmo domain',
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'ID do usuário a ser atualizado',
-    type: String 
+    type: String,
   })
-  @ApiBody({ 
+  @ApiBody({
     type: UpdateUserUnitDto,
     description: 'Dados para atualização do unitId',
     examples: {
@@ -443,8 +497,8 @@ export class UsersController {
       },
     },
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'unitId atualizado com sucesso',
     schema: {
       type: 'object',
@@ -470,7 +524,7 @@ export class UsersController {
     @Req() request: any,
   ) {
     const domain = user.domain || user.profile?.domain;
-    
+
     // Extrair token do header Authorization
     const authHeader = request.headers?.authorization || '';
     const token = authHeader.replace('Bearer ', '');
@@ -495,9 +549,9 @@ export class UsersController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Busca um usuário por ID',
-    description: 'Retorna informações de um usuário específico do mesmo domain'
+    description: 'Retorna informações de um usuário específico do mesmo domain',
   })
   @ApiResponse({ status: 200, description: 'Usuário encontrado' })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
@@ -507,7 +561,6 @@ export class UsersController {
     @CurrentUser() user: CurrentUserShape,
     @Req() request: any,
   ) {
-   
     // Extrair token do header Authorization
     const authHeader = request.headers?.authorization || '';
     const token = authHeader.replace('Bearer ', '');
@@ -515,9 +568,9 @@ export class UsersController {
     if (!token) {
       throw new Error('Token de autenticação não encontrado');
     }
-    
+
     const foundUser = await this.usersService.findUserById(id, token);
-    
+
     if (!foundUser) {
       throw new Error('Usuário não encontrado');
     }
@@ -527,30 +580,31 @@ export class UsersController {
 
   @Patch(':id/roles')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Atualiza roles e permissões de um usuário',
-    description: 'Atualiza os roles e permissões de um usuário específico do mesmo domain. Apenas admins podem executar esta ação.'
+    description:
+      'Atualiza os roles e permissões de um usuário específico do mesmo domain. Apenas admins podem executar esta ação.',
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'ID do usuário a ser atualizado',
-    type: String 
+    type: String,
   })
-  @ApiBody({ 
+  @ApiBody({
     type: UpdateUserRolesDto,
     description: 'Dados para atualização de roles e permissões',
     examples: {
       example1: {
-        value: { 
+        value: {
           roles: ['franqueado', 'gerente'],
-          permissions: ['users:read', 'users:create']
+          permissions: ['users:read', 'users:create'],
         },
         summary: 'Exemplo de atualização de roles e permissões',
       },
     },
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Roles e permissões atualizados com sucesso',
     schema: {
       type: 'object',
@@ -574,29 +628,32 @@ export class UsersController {
     @Req() request: any,
   ) {
     const domain = user.domain || user.profile?.domain;
-    
+
     // Verificar se o usuário tem permissão para atualizar roles
     const userRoles = user.roles || [];
-    const roleNames = userRoles.map((r: any) => {
-      if (typeof r === 'object' && r !== null && 'name' in r) {
-        return r.name;
-      }
-      return r;
-    }).filter(Boolean);
-    
+    const roleNames = userRoles
+      .map((r: any) => {
+        if (typeof r === 'object' && r !== null && 'name' in r) {
+          return r.name;
+        }
+        return r;
+      })
+      .filter(Boolean);
+
     const adminRoles = ['admin', 'moderator', 'system', 'sistema'];
-    const isAdmin = adminRoles.some(role => roleNames.includes(role));
+    const isAdmin = adminRoles.some((role) => roleNames.includes(role));
 
     if (!isAdmin) {
       throw new HttpException(
-        { 
-          message: 'Acesso negado. Apenas administradores podem atualizar roles e permissões de usuários.', 
-          error: 'Forbidden' 
+        {
+          message:
+            'Acesso negado. Apenas administradores podem atualizar roles e permissões de usuários.',
+          error: 'Forbidden',
         },
-        HttpStatus.FORBIDDEN
+        HttpStatus.FORBIDDEN,
       );
     }
-    
+
     // Extrair token do header Authorization
     const authHeader = request.headers?.authorization || '';
     const token = authHeader.replace('Bearer ', '');
@@ -605,9 +662,15 @@ export class UsersController {
       throw new Error('Token de autenticação não encontrado');
     }
 
-    console.log(`📋 [UsersController] Atualizando roles e permissões do usuário ${id}`);
-    console.log(`   Roles: ${updateUserRolesDto.roles?.join(', ') || 'não informado'}`);
-    console.log(`   Permissions: ${updateUserRolesDto.permissions?.join(', ') || 'não informado'}`);
+    console.log(
+      `📋 [UsersController] Atualizando roles e permissões do usuário ${id}`,
+    );
+    console.log(
+      `   Roles: ${updateUserRolesDto.roles?.join(', ') || 'não informado'}`,
+    );
+    console.log(
+      `   Permissions: ${updateUserRolesDto.permissions?.join(', ') || 'não informado'}`,
+    );
     console.log(`   Domain: ${domain || 'não informado'}`);
 
     const updatedUser = await this.usersService.updateUserRoles(
@@ -621,4 +684,3 @@ export class UsersController {
     return updatedUser;
   }
 }
-

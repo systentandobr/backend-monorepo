@@ -63,4 +63,4 @@ export class LatestLabs {
   updatedAt: string;
 }
 
-export const LatestLabsSchema = SchemaFactory.createForClass(LatestLabs); 
+export const LatestLabsSchema = SchemaFactory.createForClass(LatestLabs);

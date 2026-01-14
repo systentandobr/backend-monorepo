@@ -28,7 +28,7 @@ import { handlerImportFileErrorMessage } from './handlers';
 @ApiTags('sys-assistente-estudos')
 @Controller('questions')
 export class QuestionController {
-  constructor(private readonly questionService: QuestionService) { }
+  constructor(private readonly questionService: QuestionService) {}
 
   @Get('simulacao/:id')
   async findAll(@Param('id') simulacaoId: string): Promise<QuestionDto[]> {

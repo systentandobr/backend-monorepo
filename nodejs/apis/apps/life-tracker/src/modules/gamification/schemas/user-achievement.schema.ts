@@ -21,7 +21,8 @@ export class UserAchievement {
   updatedAt?: Date;
 }
 
-export const UserAchievementSchema = SchemaFactory.createForClass(UserAchievement);
+export const UserAchievementSchema =
+  SchemaFactory.createForClass(UserAchievement);
 
 // Índice composto para garantir que um usuário só possa ganhar cada conquista uma vez
 UserAchievementSchema.index({ userId: 1, achievementId: 1 }, { unique: true });

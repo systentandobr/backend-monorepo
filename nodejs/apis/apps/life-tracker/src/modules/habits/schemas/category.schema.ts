@@ -30,4 +30,4 @@ export class Category {
   updatedAt: string;
 }
 
-export const CategorySchema = SchemaFactory.createForClass(Category); 
+export const CategorySchema = SchemaFactory.createForClass(Category);

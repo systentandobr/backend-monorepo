@@ -2,8 +2,14 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { BusinessController } from './business.controller';
 import { BusinessService } from './business.service';
-import { BusinessOpportunity, BusinessOpportunitySchema } from './schemas/business-opportunity.schema';
-import { BusinessProject, BusinessProjectSchema } from './schemas/business-project.schema';
+import {
+  BusinessOpportunity,
+  BusinessOpportunitySchema,
+} from './schemas/business-opportunity.schema';
+import {
+  BusinessProject,
+  BusinessProjectSchema,
+} from './schemas/business-project.schema';
 
 @Module({
   imports: [
@@ -16,4 +22,4 @@ import { BusinessProject, BusinessProjectSchema } from './schemas/business-proje
   providers: [BusinessService],
   exports: [BusinessService],
 })
-export class BusinessModule {} 
+export class BusinessModule {}

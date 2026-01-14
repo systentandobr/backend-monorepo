@@ -52,7 +52,9 @@ export class UsersService {
     limit: number = 50,
   ): Promise<UsersListResponse> {
     try {
-      console.log(`🔍 [UsersService] Buscando usuários disponíveis para domain: ${domain}`);
+      console.log(
+        `🔍 [UsersService] Buscando usuários disponíveis para domain: ${domain}`,
+      );
       console.log(`   Search: ${search || 'não informado'}`);
       console.log(`   Page: ${page}, Limit: ${limit}`);
 
@@ -70,12 +72,12 @@ export class UsersService {
           params,
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             'x-api-key': EnvironmentConfig.sysSeguranca.apiKey,
             'x-domain': domain, // Header para filtrar por domain
           },
           timeout: EnvironmentConfig.sysSeguranca.timeout,
-        })
+        }),
       );
 
       const responseData = response.data;
@@ -85,7 +87,10 @@ export class UsersService {
       let total = 0;
 
       if (responseData.success === false) {
-        console.error('❌ Resposta do SYS-SEGURANÇA indicou falha:', responseData);
+        console.error(
+          '❌ Resposta do SYS-SEGURANÇA indicou falha:',
+          responseData,
+        );
         throw new Error('Erro ao buscar usuários');
       }
 
@@ -112,7 +117,9 @@ export class UsersService {
         total = responseData.total || users.length;
       }
 
-      console.log(`✅ [UsersService] ${users.length} usuários encontrados para domain ${domain}`);
+      console.log(
+        `✅ [UsersService] ${users.length} usuários encontrados para domain ${domain}`,
+      );
 
       return {
         data: users,
@@ -129,7 +136,9 @@ export class UsersService {
 
       if (error.response?.status === 404) {
         // Se o endpoint não existe, retornar lista vazia
-        console.warn('⚠️ [UsersService] Endpoint /api/v1/users não encontrado no SYS-SEGURANÇA');
+        console.warn(
+          '⚠️ [UsersService] Endpoint /api/v1/users não encontrado no SYS-SEGURANÇA',
+        );
         return {
           data: [],
           total: 0,
@@ -158,7 +167,9 @@ export class UsersService {
     limit: number = 50,
   ): Promise<UsersListResponse> {
     try {
-      console.log(`🔍 [UsersService] getAllUsersByDomain para domain: ${domain}`);
+      console.log(
+        `🔍 [UsersService] getAllUsersByDomain para domain: ${domain}`,
+      );
       console.log(`   Search: ${search || 'não informado'}`);
       console.log(`   Page: ${page}, Limit: ${limit}`);
 
@@ -172,16 +183,19 @@ export class UsersService {
       }
 
       const response = await firstValueFrom(
-        this.httpService.get(`${this.sysSegurancaUrl}/api/v1/users/all/${domain}`, {
-          params,
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-            'x-api-key': EnvironmentConfig.sysSeguranca.apiKey,
-            'x-domain': domain,
+        this.httpService.get(
+          `${this.sysSegurancaUrl}/api/v1/users/all/${domain}`,
+          {
+            params,
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+              'x-api-key': EnvironmentConfig.sysSeguranca.apiKey,
+              'x-domain': domain,
+            },
+            timeout: EnvironmentConfig.sysSeguranca.timeout,
           },
-          timeout: EnvironmentConfig.sysSeguranca.timeout,
-        })
+        ),
       );
 
       const responseData = response.data;
@@ -191,7 +205,10 @@ export class UsersService {
       let total = 0;
 
       if (responseData.success === false) {
-        console.error('❌ Resposta do SYS-SEGURANÇA indicou falha:', responseData);
+        console.error(
+          '❌ Resposta do SYS-SEGURANÇA indicou falha:',
+          responseData,
+        );
         throw new Error('Erro ao buscar usuários por domain');
       }
 
@@ -218,7 +235,9 @@ export class UsersService {
         total = responseData.total || users.length;
       }
 
-      console.log(`✅ [UsersService] getAllUsersByDomain: ${users.length} usuários encontrados para domain ${domain}`);
+      console.log(
+        `✅ [UsersService] getAllUsersByDomain: ${users.length} usuários encontrados para domain ${domain}`,
+      );
 
       return {
         data: users,
@@ -235,7 +254,9 @@ export class UsersService {
 
       if (error.response?.status === 404) {
         // Se o endpoint não existe, tentar fallback para o método findAvailableUsers
-        console.warn('⚠️ [UsersService] Endpoint /api/v1/users/by-domain não encontrado, usando fallback');
+        console.warn(
+          '⚠️ [UsersService] Endpoint /api/v1/users/by-domain não encontrado, usando fallback',
+        );
         return this.findAvailableUsers(domain, token, search, page, limit);
       }
 
@@ -256,12 +277,12 @@ export class UsersService {
         this.httpService.get(`${this.sysSegurancaUrl}/api/v1/users/${userId}`, {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             'x-api-key': EnvironmentConfig.sysSeguranca.apiKey,
             'x-domain': 'viralkids-web',
           },
           timeout: EnvironmentConfig.sysSeguranca.timeout,
-        })
+        }),
       );
 
       const responseData = response.data;
@@ -291,7 +312,9 @@ export class UsersService {
   ): Promise<User> {
     try {
       const unitIdValue = unitId === null || unitId === undefined ? '' : unitId;
-      console.log(`🔄 [UsersService] Atualizando unitId do usuário ${userId} para ${unitIdValue || '(removendo)'}`);
+      console.log(
+        `🔄 [UsersService] Atualizando unitId do usuário ${userId} para ${unitIdValue || '(removendo)'}`,
+      );
 
       const response = await firstValueFrom(
         this.httpService.patch(
@@ -300,26 +323,33 @@ export class UsersService {
           {
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
               'x-api-key': EnvironmentConfig.sysSeguranca.apiKey,
               ...(domain ? { 'x-domain': domain } : {}),
             },
             timeout: EnvironmentConfig.sysSeguranca.timeout,
-          }
-        )
+          },
+        ),
       );
 
       const responseData = response.data;
 
       if (responseData.success === false) {
-        console.error('❌ Resposta do SYS-SEGURANÇA indicou falha:', responseData);
-        throw new Error(responseData.message || 'Erro ao atualizar unitId do usuário');
+        console.error(
+          '❌ Resposta do SYS-SEGURANÇA indicou falha:',
+          responseData,
+        );
+        throw new Error(
+          responseData.message || 'Erro ao atualizar unitId do usuário',
+        );
       }
 
       // Retornar o usuário atualizado
       const updatedUser = responseData.data || responseData;
 
-      console.log(`✅ [UsersService] unitId atualizado com sucesso para usuário ${userId}`);
+      console.log(
+        `✅ [UsersService] unitId atualizado com sucesso para usuário ${userId}`,
+      );
 
       return updatedUser;
     } catch (error: any) {
@@ -356,13 +386,15 @@ export class UsersService {
     search?: string,
     page: number = 1,
     limit: number = 50,
-    currentUser?: any, // Usuário atual para verificação de permissões (opcional)
+    _currentUser?: any, // Usuário atual para verificação de permissões (opcional)
   ): Promise<UsersListResponse> {
     // Decodificar unitId se vier URL encoded (ex: %23BR%23RN...)
     const decodedUnitId = decodeURIComponent(unitId);
 
     try {
-      console.log(`🔍 [UsersService] Buscando usuários por unitId: ${decodedUnitId}`);
+      console.log(
+        `🔍 [UsersService] Buscando usuários por unitId: ${decodedUnitId}`,
+      );
       console.log(`   UnitId original (URL encoded): ${unitId}`);
       console.log(`   Domain: ${domain || 'não informado'}`);
       console.log(`   Search: ${search || 'não informado'}`);
@@ -383,12 +415,12 @@ export class UsersService {
           params,
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             'x-api-key': EnvironmentConfig.sysSeguranca.apiKey,
             ...(domain ? { 'x-domain': domain } : {}),
           },
           timeout: EnvironmentConfig.sysSeguranca.timeout,
-        })
+        }),
       );
 
       const responseData = response.data;
@@ -398,8 +430,14 @@ export class UsersService {
       let total = 0;
 
       if (responseData.success === false) {
-        console.error('❌ Resposta do SYS-SEGURANÇA indicou falha:', responseData);
-        throw new Error(responseData.message || 'Default errorMessage ao buscar usuários por unitId');
+        console.error(
+          '❌ Resposta do SYS-SEGURANÇA indicou falha:',
+          responseData,
+        );
+        throw new Error(
+          responseData.message ||
+            'Default errorMessage ao buscar usuários por unitId',
+        );
       }
 
       // Se tem success: true e data, usar data
@@ -425,7 +463,9 @@ export class UsersService {
         total = responseData.total || users.length;
       }
 
-      console.log(`✅ [UsersService] ${users.length} usuários encontrados para unitId ${decodedUnitId}`);
+      console.log(
+        `✅ [UsersService] ${users.length} usuários encontrados para unitId ${decodedUnitId}`,
+      );
 
       return {
         data: users,
@@ -441,7 +481,9 @@ export class UsersService {
       });
 
       if (error.response?.status === 404) {
-        console.warn('⚠️ [UsersService] Endpoint /api/v1/users/by-unit não encontrado no SYS-SEGURANÇA');
+        console.warn(
+          '⚠️ [UsersService] Endpoint /api/v1/users/by-unit não encontrado no SYS-SEGURANÇA',
+        );
         return {
           data: [],
           total: 0,
@@ -455,13 +497,18 @@ export class UsersService {
       }
 
       if (error.response?.status === 400) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Parâmetros inválidos';
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          'Parâmetros inválidos';
         console.error('❌ [UsersService] Erro 400 - Detalhes:', {
           message: errorMessage,
           unitId: decodedUnitId,
           responseData: error.response?.data,
         });
-        throw new Error(`Erro na requisição: ${errorMessage}. Verifique se o unitId "${decodedUnitId}" é válido.`);
+        throw new Error(
+          `Erro na requisição: ${errorMessage}. Verifique se o unitId "${decodedUnitId}" é válido.`,
+        );
       }
 
       throw new Error(`Erro ao buscar usuários por unitId: ${error.message}`);
@@ -493,10 +540,12 @@ export class UsersService {
     },
     token: string,
     domain: string,
-    user: CurrentUserShape,
+    _user: CurrentUserShape,
   ): Promise<User> {
     try {
-      console.log(`➕ [UsersService] Criando novo usuário: ${createUserDto.email}`);
+      console.log(
+        `➕ [UsersService] Criando novo usuário: ${createUserDto.email}`,
+      );
       console.log(`   Domain: ${domain}`);
 
       // Preparar payload para o SYS-SEGURANÇA
@@ -524,9 +573,10 @@ export class UsersService {
       };
 
       // Log do token sendo enviado (apenas primeiros e últimos caracteres para segurança)
-      const tokenPreview = token.length > 20
-        ? `${token.substring(0, 10)}...${token.substring(token.length - 10)}`
-        : '***';
+      const tokenPreview =
+        token.length > 20
+          ? `${token.substring(0, 10)}...${token.substring(token.length - 10)}`
+          : '***';
 
       console.log(`📤 [UsersService] Enviando requisição para SYS-SEGURANÇA:`, {
         url: `${this.sysSegurancaUrl}/api/v1/auth/register`,
@@ -542,24 +592,28 @@ export class UsersService {
           {
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
               'x-api-key': EnvironmentConfig.sysSeguranca.apiKey,
               'x-domain': domain,
             },
             timeout: EnvironmentConfig.sysSeguranca.timeout,
-          }
-        )
+          },
+        ),
       );
 
       const responseData = response.data;
 
       if (responseData.success === false) {
-        console.error('❌ Resposta do SYS-SEGURANÇA indicou falha:', responseData);
+        console.error(
+          '❌ Resposta do SYS-SEGURANÇA indicou falha:',
+          responseData,
+        );
         throw new Error(responseData.message || 'Erro ao criar usuário');
       }
 
       // O SYS-SEGURANÇA retorna o usuário criado
-      const createdUser = responseData.user || responseData.data || responseData;
+      const createdUser =
+        responseData.user || responseData.data || responseData;
 
       // Se o usuário foi criado com sucesso e tem unitId, atualizar o unitId
       if (createUserDto.unitId && createdUser.id) {
@@ -571,12 +625,17 @@ export class UsersService {
             domain,
           );
         } catch (unitError) {
-          console.warn('⚠️ [UsersService] Erro ao atualizar unitId após criação:', unitError);
+          console.warn(
+            '⚠️ [UsersService] Erro ao atualizar unitId após criação:',
+            unitError,
+          );
           // Não falhar a criação se o unitId não puder ser atualizado
         }
       }
 
-      console.log(`✅ [UsersService] Usuário criado com sucesso: ${createdUser.id}`);
+      console.log(
+        `✅ [UsersService] Usuário criado com sucesso: ${createdUser.id}`,
+      );
 
       return createdUser;
     } catch (error: any) {
@@ -588,14 +647,20 @@ export class UsersService {
 
       // Tratar erros HTTP específicos e propagar com status code correto
       if (error.response?.status === 400) {
-        const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Dados inválidos';
+        const errorMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          'Dados inválidos';
         // Se a mensagem é um array, juntar as mensagens
         const message = Array.isArray(errorMessage)
           ? errorMessage.join(', ')
           : errorMessage;
         throw new HttpException(
-          { message: `Erro na criação do usuário: ${message}`, error: 'Bad Request' },
-          HttpStatus.BAD_REQUEST
+          {
+            message: `Erro na criação do usuário: ${message}`,
+            error: 'Bad Request',
+          },
+          HttpStatus.BAD_REQUEST,
         );
       }
 
@@ -619,29 +684,35 @@ export class UsersService {
 
         throw new HttpException(
           { message: errorMessage, error: 'Conflict' },
-          HttpStatus.CONFLICT
+          HttpStatus.CONFLICT,
         );
       }
 
       if (error.response?.status === 401) {
         throw new HttpException(
-          { message: 'Não autorizado para criar usuário', error: 'Unauthorized' },
-          HttpStatus.UNAUTHORIZED
+          {
+            message: 'Não autorizado para criar usuário',
+            error: 'Unauthorized',
+          },
+          HttpStatus.UNAUTHORIZED,
         );
       }
 
       if (error.response?.status === 403) {
         throw new HttpException(
           { message: 'Acesso negado para criar usuário', error: 'Forbidden' },
-          HttpStatus.FORBIDDEN
+          HttpStatus.FORBIDDEN,
         );
       }
 
       // Para outros erros, usar status 500 mas manter a mensagem original
-      const errorMessage = error.response?.data?.message || error.message || 'Erro ao criar usuário';
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        'Erro ao criar usuário';
       throw new HttpException(
         { message: errorMessage, error: 'Internal Server Error' },
-        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -657,9 +728,13 @@ export class UsersService {
     domain?: string,
   ): Promise<User> {
     try {
-      console.log(`🔄 [UsersService] Atualizando roles e permissões do usuário ${userId}`);
+      console.log(
+        `🔄 [UsersService] Atualizando roles e permissões do usuário ${userId}`,
+      );
       console.log(`   Roles: ${roles?.join(', ') || 'não informado'}`);
-      console.log(`   Permissions: ${permissions?.join(', ') || 'não informado'}`);
+      console.log(
+        `   Permissions: ${permissions?.join(', ') || 'não informado'}`,
+      );
 
       const payload: any = {};
       if (roles !== undefined) {
@@ -677,49 +752,65 @@ export class UsersService {
           {
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
               'x-api-key': EnvironmentConfig.sysSeguranca.apiKey,
               ...(domain ? { 'x-domain': domain } : {}),
             },
             timeout: EnvironmentConfig.sysSeguranca.timeout,
-          }
-        )
+          },
+        ),
       );
 
       const responseData = response.data;
 
       if (responseData.success === false) {
-        console.error('❌ Resposta do SYS-SEGURANÇA indicou falha:', responseData);
-        throw new Error(responseData.message || 'Erro ao atualizar roles e permissões do usuário');
+        console.error(
+          '❌ Resposta do SYS-SEGURANÇA indicou falha:',
+          responseData,
+        );
+        throw new Error(
+          responseData.message ||
+            'Erro ao atualizar roles e permissões do usuário',
+        );
       }
 
       // Retornar o usuário atualizado
-      const updatedUser = responseData.data || responseData.user || responseData;
+      const updatedUser =
+        responseData.data || responseData.user || responseData;
 
-      console.log(`✅ [UsersService] Roles e permissões atualizados com sucesso para usuário ${userId}`);
+      console.log(
+        `✅ [UsersService] Roles e permissões atualizados com sucesso para usuário ${userId}`,
+      );
 
       return updatedUser;
     } catch (error: any) {
-      console.error('❌ [UsersService] Erro ao atualizar roles e permissões do usuário:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-        url: error.config?.url,
-      });
+      console.error(
+        '❌ [UsersService] Erro ao atualizar roles e permissões do usuário:',
+        {
+          message: error.message,
+          response: error.response?.data,
+          status: error.response?.status,
+          url: error.config?.url,
+        },
+      );
 
       // Verificar se é erro 404 - pode ser rota não encontrada ou usuário não encontrado
       if (error.response?.status === 404) {
         const errorMessage = error.response?.data?.message || '';
 
-        // Se a mensagem indica que a rota não foi encontrada (Cannot PATCH), 
+        // Se a mensagem indica que a rota não foi encontrada (Cannot PATCH),
         // isso significa que o endpoint não existe na API de segurança
-        if (errorMessage.includes('Cannot PATCH') || errorMessage.includes('Not Found')) {
+        if (
+          errorMessage.includes('Cannot PATCH') ||
+          errorMessage.includes('Not Found')
+        ) {
           throw new HttpException(
             {
-              message: 'Endpoint de atualização de roles não está disponível na API de segurança. Verifique se a API de segurança está atualizada.',
+              message:
+                'Endpoint de atualização de roles não está disponível na API de segurança. Verifique se a API de segurança está atualizada.',
               error: 'Endpoint Not Found',
             },
-            HttpStatus.NOT_FOUND
+            HttpStatus.NOT_FOUND,
           );
         }
 
@@ -729,7 +820,7 @@ export class UsersService {
             message: 'Usuário não encontrado ou não pertence ao domain',
             error: 'Not Found',
           },
-          HttpStatus.NOT_FOUND
+          HttpStatus.NOT_FOUND,
         );
       }
 
@@ -739,7 +830,7 @@ export class UsersService {
             message: 'Não autorizado para atualizar usuário',
             error: 'Unauthorized',
           },
-          HttpStatus.UNAUTHORIZED
+          HttpStatus.UNAUTHORIZED,
         );
       }
 
@@ -749,7 +840,7 @@ export class UsersService {
             message: 'Acesso negado para atualizar usuário',
             error: 'Forbidden',
           },
-          HttpStatus.FORBIDDEN
+          HttpStatus.FORBIDDEN,
         );
       }
 
@@ -759,7 +850,7 @@ export class UsersService {
             message: error.response?.data?.message || 'Dados inválidos',
             error: 'Bad Request',
           },
-          HttpStatus.BAD_REQUEST
+          HttpStatus.BAD_REQUEST,
         );
       }
 
@@ -769,9 +860,8 @@ export class UsersService {
           message: `Erro ao atualizar roles e permissões do usuário: ${errorMessage}`,
           error: 'Internal Server Error',
         },
-        HttpStatus.INTERNAL_SERVER_ERROR
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 }
-

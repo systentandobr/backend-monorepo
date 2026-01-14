@@ -1,4 +1,16 @@
-import { IsString, IsEmail, IsOptional, IsEnum, IsObject, ValidateNested, IsNumber, IsBoolean, Min, Max, IsArray, ArrayMinSize } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsOptional,
+  IsEnum,
+  IsObject,
+  ValidateNested,
+  IsNumber,
+  IsBoolean,
+  Min,
+  Max,
+  IsArray,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 class LocationDto {
@@ -85,7 +97,14 @@ export class CreateFranchiseDto {
 
   @IsOptional()
   @IsArray()
-  @IsEnum(['restaurant', 'delivery', 'retail', 'ecommerce', 'hybrid'], { each: true })
-  marketSegments?: ('restaurant' | 'delivery' | 'retail' | 'ecommerce' | 'hybrid')[];
+  @IsEnum(['restaurant', 'delivery', 'retail', 'ecommerce', 'hybrid'], {
+    each: true,
+  })
+  marketSegments?: (
+    | 'restaurant'
+    | 'delivery'
+    | 'retail'
+    | 'ecommerce'
+    | 'hybrid'
+  )[];
 }
-

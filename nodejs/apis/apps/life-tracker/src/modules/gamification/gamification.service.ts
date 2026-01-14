@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ApiResponse } from '../../types';
-import { GamificationProfile, GamificationProfileDocument } from './schemas/gamification-profile.schema';
+import {
+  GamificationProfile,
+  GamificationProfileDocument,
+} from './schemas/gamification-profile.schema';
 import { PointsService } from './points.service';
 import { AchievementService } from './achievement.service';
 
@@ -21,7 +24,7 @@ export class GamificationService {
   async getProfile(userId: string): Promise<ApiResponse<any>> {
     try {
       const result = await this.pointsService.getUserPointsStats(userId);
-      
+
       if (!result.success) {
         return {
           success: false,
@@ -50,7 +53,7 @@ export class GamificationService {
   async getAchievements(userId: string): Promise<ApiResponse<any>> {
     try {
       const result = await this.achievementService.getUserAchievements(userId);
-      
+
       if (!result.success) {
         return {
           success: false,
@@ -76,17 +79,23 @@ export class GamificationService {
   /**
    * Obtém ranking de usuários
    */
-  async getLeaderboard(period: 'daily' | 'weekly' | 'monthly' | 'all' = 'all'): Promise<ApiResponse<any>> {
+  async getLeaderboard(
+    period: 'daily' | 'weekly' | 'monthly' | 'all' = 'all',
+  ): Promise<ApiResponse<any>> {
     try {
       let dateFilter = {};
-      
+
       if (period !== 'all') {
         const now = new Date();
         let startDate: Date;
-        
+
         switch (period) {
           case 'daily':
-            startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            startDate = new Date(
+              now.getFullYear(),
+              now.getMonth(),
+              now.getDate(),
+            );
             break;
           case 'weekly':
             startDate = new Date(now);
@@ -96,7 +105,7 @@ export class GamificationService {
             startDate = new Date(now.getFullYear(), now.getMonth(), 1);
             break;
         }
-        
+
         dateFilter = { updatedAt: { $gte: startDate } };
       }
 
@@ -136,7 +145,11 @@ export class GamificationService {
   async addPoints(
     userId: string,
     points: number,
-    sourceType: 'HABIT_COMPLETION' | 'ROUTINE_COMPLETION' | 'ACHIEVEMENT' | 'BONUS',
+    sourceType:
+      | 'HABIT_COMPLETION'
+      | 'ROUTINE_COMPLETION'
+      | 'ACHIEVEMENT'
+      | 'BONUS',
     sourceId: string,
     description: string,
   ): Promise<ApiResponse<any>> {
@@ -166,10 +179,11 @@ export class GamificationService {
         routinesCompleted: 0, // TODO: Implementar contagem de rotinas
       };
 
-      const achievementsResult = await this.achievementService.checkAndUnlockAchievements(
-        userId,
-        userStats,
-      );
+      const achievementsResult =
+        await this.achievementService.checkAndUnlockAchievements(
+          userId,
+          userStats,
+        );
 
       return {
         success: true,
@@ -194,7 +208,7 @@ export class GamificationService {
   async initializeDefaultAchievements(): Promise<ApiResponse<any>> {
     try {
       const result = await this.achievementService.createDefaultAchievements();
-      
+
       return {
         success: result.success,
         data: result.data,
@@ -209,4 +223,4 @@ export class GamificationService {
       };
     }
   }
-} 
+}

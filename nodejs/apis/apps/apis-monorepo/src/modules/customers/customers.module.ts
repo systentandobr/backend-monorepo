@@ -7,7 +7,9 @@ import { NotificationsModule } from '../../../../notifications/src/notifications
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Customer.name, schema: CustomerSchema }]),
+    MongooseModule.forFeature([
+      { name: Customer.name, schema: CustomerSchema },
+    ]),
     forwardRef(() => NotificationsModule),
   ],
   controllers: [CustomersController],
@@ -15,4 +17,3 @@ import { NotificationsModule } from '../../../../notifications/src/notifications
   exports: [CustomersService],
 })
 export class CustomersModule {}
-

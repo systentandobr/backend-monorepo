@@ -9,11 +9,23 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
-import { CurrentUser, CurrentUserShape } from '../decorators/current-user.decorator';
+import {
+  CurrentUser,
+  CurrentUserShape,
+} from '../decorators/current-user.decorator';
 import { CatalogService } from '../services/catalog.service';
-import { CreateCatalogDto, UpdateCatalogDto, QueryCatalogDto } from '../dto/catalog.dto';
+import {
+  CreateCatalogDto,
+  UpdateCatalogDto,
+  QueryCatalogDto,
+} from '../dto/catalog.dto';
 
 @ApiTags('catalogs')
 @ApiBearerAuth()
@@ -123,5 +135,3 @@ export class CatalogController {
     );
   }
 }
-
-

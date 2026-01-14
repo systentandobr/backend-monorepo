@@ -47,4 +47,5 @@ export class DietParameters {
   updatedAt: string;
 }
 
-export const DietParametersSchema = SchemaFactory.createForClass(DietParameters); 
+export const DietParametersSchema =
+  SchemaFactory.createForClass(DietParameters);
