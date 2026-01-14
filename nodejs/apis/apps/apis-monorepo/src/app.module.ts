@@ -22,6 +22,10 @@ import { FranchiseTasksModule } from './modules/franchise-tasks/franchise-tasks.
 import { TrainingsModule } from './modules/trainings/trainings.module';
 import { RagInstructionsModule } from './modules/rag-instructions/rag-instructions.module';
 import { SettingsModule } from './modules/settings/settings.module';
+import { StudentsModule } from './modules/students/students.module';
+import { TrainingPlansModule } from './modules/training-plans/training-plans.module';
+import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
+import { ExercisesModule } from './modules/exercises/exercises.module';
 
 
 
@@ -47,6 +51,10 @@ import { SettingsModule } from './modules/settings/settings.module';
     TrainingsModule,
     RagInstructionsModule,
     SettingsModule,
+    StudentsModule,
+    TrainingPlansModule,
+    SubscriptionsModule,
+    ExercisesModule,
   ],
   controllers: [AppController, DebugController],
   providers: [AppService],

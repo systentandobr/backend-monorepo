@@ -7,7 +7,6 @@ import { NotificationsModule } from '../../../../notifications/src/notifications
 
 @Module({
   imports: [
-    MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://localhost:27017/customers'),
     MongooseModule.forFeature([{ name: Customer.name, schema: CustomerSchema }]),
     forwardRef(() => NotificationsModule),
   ],

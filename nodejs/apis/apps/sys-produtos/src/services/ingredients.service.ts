@@ -6,7 +6,7 @@ import { Ingredient, IngredientDocument, IngredientUnit, PurchaseHistoryItem, Lo
 export interface CreateIngredientDto {
   name: string;
   unit: IngredientUnit;
-  costPrice: number;
+  costPrice?: number;
   unitId: string;
   description?: string;
   brand?: string;

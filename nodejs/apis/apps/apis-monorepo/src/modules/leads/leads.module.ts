@@ -9,7 +9,6 @@ import { LeadsPublicController } from './leads.public.controller';
 
 @Module({
   imports: [
-    MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://localhost:27017/leads'),
     MongooseModule.forFeature([{ name: Lead.name, schema: LeadSchema }]),
     forwardRef(() => NotificationsModule),
   ],
