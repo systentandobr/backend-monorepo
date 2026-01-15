@@ -58,9 +58,9 @@ export class SolarController {
   @ApiResponse({ status: 200, description: 'Dados de produção retornados com sucesso' })
   async getProductionData(
     @Param('unitId') unitId: string,
+    @CurrentUser() user: CurrentUserShape,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
-    @CurrentUser() user: CurrentUserShape,
   ) {
     const decodedUnitId = decodeURIComponent(unitId);
     this.validateUnitIdAccess(decodedUnitId, user);
