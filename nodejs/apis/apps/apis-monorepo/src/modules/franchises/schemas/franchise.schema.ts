@@ -93,7 +93,7 @@ export class Franchise {
 
   @Prop({
     type: [String],
-    enum: ['restaurant', 'delivery', 'retail', 'ecommerce', 'hybrid', 'gym'],
+    enum: ['restaurant', 'delivery', 'retail', 'ecommerce', 'hybrid', 'gym', 'solar_plant'],
     default: [],
   })
   marketSegments?: string[];

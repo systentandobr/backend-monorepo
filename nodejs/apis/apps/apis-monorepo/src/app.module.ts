@@ -26,6 +26,7 @@ import { StudentsModule } from './modules/students/students.module';
 import { TrainingPlansModule } from './modules/training-plans/training-plans.module';
 import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
 import { ExercisesModule } from './modules/exercises/exercises.module';
+import { SolarModule } from './modules/solar/solar.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { ExercisesModule } from './modules/exercises/exercises.module';
     TrainingPlansModule,
     SubscriptionsModule,
     ExercisesModule,
+    SolarModule,
   ],
   controllers: [AppController, DebugController],
   providers: [AppService],
