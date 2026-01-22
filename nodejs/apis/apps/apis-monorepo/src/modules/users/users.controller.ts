@@ -547,6 +547,121 @@ export class UsersController {
     return updatedUser;
   }
 
+  @Get('profile')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Retorna os dados do perfil do usuário autenticado',
+    description: 'Retorna informações completas do perfil do usuário que está autenticado',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Perfil do usuário retornado com sucesso',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        data: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            name: { type: 'string' },
+            email: { type: 'string' },
+            role: { type: 'string' },
+            unitId: { type: 'string', nullable: true },
+            avatar: { type: 'string', nullable: true },
+            phone: { type: 'string', nullable: true },
+            status: {
+              type: 'string',
+              enum: ['ACTIVE', 'INACTIVE', 'PENDING', 'SUSPENDED'],
+            },
+            emailVerified: { type: 'boolean' },
+            createdAt: { type: 'string' },
+            updatedAt: { type: 'string' },
+          },
+        },
+        error: { type: 'string', nullable: true },
+      },
+    },
+  })
+  @ApiResponse({ status: 401, description: 'Não autorizado' })
+  async getProfile(
+    @CurrentUser() user: CurrentUserShape,
+    @Req() request: any,
+  ): Promise<{
+    success: boolean;
+    data: {
+      id: string;
+      name: string;
+      email: string;
+      role: string;
+      unitId: string | null;
+      avatar: string | null;
+      phone: string | null;
+      status: 'ACTIVE' | 'INACTIVE' | 'PENDING' | 'SUSPENDED';
+      emailVerified: boolean;
+      createdAt: string;
+      updatedAt: string;
+    };
+    error: null;
+  }> {
+    // Extrair token do header Authorization
+    const authHeader = request.headers?.authorization || '';
+    const token = authHeader.replace('Bearer ', '');
+
+    if (!token) {
+      throw new HttpException(
+        {
+          success: false,
+          data: null,
+          error: 'Token de autenticação não encontrado',
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    // Buscar dados completos do usuário
+    const foundUser = await this.usersService.findUserById(user.id, token);
+
+    if (!foundUser) {
+      throw new HttpException(
+        {
+          success: false,
+          data: null,
+          error: 'Usuário não encontrado',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    // Formatar resposta conforme especificação
+    // A interface User tem: id, username, email, profile?, roles?, isActive
+    const statusValue: 'ACTIVE' | 'INACTIVE' | 'PENDING' | 'SUSPENDED' = 
+      foundUser.isActive ? 'ACTIVE' : 'INACTIVE';
+    
+    const profile = {
+      id: foundUser.id || user.id,
+      name:
+        `${foundUser.profile?.firstName || ''} ${foundUser.profile?.lastName || ''}`.trim() ||
+        foundUser.username ||
+        user.username,
+      email: foundUser.email || user.email,
+      role: foundUser.roles?.[0]?.name || (Array.isArray(foundUser.roles) && foundUser.roles[0] ? String(foundUser.roles[0]) : 'STUDENT'),
+      unitId: (foundUser.profile?.unitId || user.unitId || null) as string | null,
+      avatar: (foundUser.profile?.avatar || null) as string | null,
+      phone: (foundUser.profile?.phone || null) as string | null,
+      status: statusValue,
+      emailVerified: foundUser.profile?.emailVerified || false,
+      createdAt: foundUser.profile?.createdAt || new Date().toISOString(),
+      updatedAt: foundUser.profile?.updatedAt || new Date().toISOString(),
+    };
+
+    return {
+      success: true,
+      data: profile,
+      error: null,
+    };
+  }
+
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({

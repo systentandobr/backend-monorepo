@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  BadRequestException,
   Logger,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -15,6 +16,8 @@ import {
   FranchiseMetricsDto,
   RegionalTrendDto,
 } from './dto/franchise-response.dto';
+import { NearbyQueryDto } from './dto/nearby-query.dto';
+import { NearbyFranchiseDto } from './dto/nearby-response.dto';
 import { Order, OrderDocument } from '../orders/schemas/order.schema';
 import {
   Customer,
@@ -391,6 +394,116 @@ export class FranchisesService {
     return trends.sort((a, b) => b.totalSales - a.totalSales);
   }
 
+  /**
+   * Calcula a distância entre dois pontos usando a fórmula de Haversine
+   * Retorna a distância em quilômetros
+   */
+  private calculateDistance(
+    lat1: number,
+    lng1: number,
+    lat2: number,
+    lng2: number,
+  ): number {
+    const R = 6371; // Raio da Terra em km
+    const dLat = this.toRad(lat2 - lat1);
+    const dLng = this.toRad(lng2 - lng1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(this.toRad(lat1)) *
+        Math.cos(this.toRad(lat2)) *
+        Math.sin(dLng / 2) *
+        Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+
+  /**
+   * Converte graus para radianos
+   */
+  private toRad(degrees: number): number {
+    return (degrees * Math.PI) / 180;
+  }
+
+  /**
+   * Busca unidades mais próximas filtradas por segmentação de mercado
+   */
+  async findNearby(
+    query: NearbyQueryDto,
+  ): Promise<NearbyFranchiseDto[]> {
+    let lat: number;
+    let lng: number;
+
+    // Se não forneceu coordenadas, tentar geocodificar o endereço
+    if (!query.lat || !query.lng) {
+      if (query.address) {
+        // TODO: Implementar geocodificação real usando serviço de mapas
+        // Por enquanto, lançar erro pedindo coordenadas
+        throw new BadRequestException(
+          'Coordenadas (lat/lng) são obrigatórias. Geocodificação de endereço será implementada em breve.',
+        );
+      } else {
+        throw new BadRequestException(
+          'É necessário fornecer coordenadas (lat/lng) ou endereço',
+        );
+      }
+    } else {
+      lat = query.lat;
+      lng = query.lng;
+    }
+
+    const radius = query.radius || 50; // Default 50km
+    const limit = query.limit || 20;
+
+    // Buscar franquias ativas com o segmento de mercado especificado
+    const franchises = await this.franchiseModel
+      .find({
+        status: 'active',
+        marketSegments: query.marketSegment,
+        'location.type': 'physical', // Apenas unidades físicas têm localização
+      })
+      .exec();
+
+    // Calcular distância para cada franquia e filtrar por raio
+    const franchisesWithDistance: Array<{
+      franchise: FranchiseDocument;
+      distance: number;
+    }> = [];
+
+    for (const franchise of franchises) {
+      const distance = this.calculateDistance(
+        lat,
+        lng,
+        franchise.location.lat,
+        franchise.location.lng,
+      );
+
+      if (distance <= radius) {
+        franchisesWithDistance.push({ franchise, distance });
+      }
+    }
+
+    // Ordenar por distância (mais próximas primeiro)
+    franchisesWithDistance.sort((a, b) => a.distance - b.distance);
+
+    // Limitar resultados
+    const limited = franchisesWithDistance.slice(0, limit);
+
+    // Converter para DTOs com distância
+    const result: NearbyFranchiseDto[] = await Promise.all(
+      limited.map(async ({ franchise, distance }) => {
+        const baseDto = this.toResponseDto(franchise);
+        const metrics = await this.getFranchiseMetrics(franchise.unitId);
+        return {
+          ...baseDto,
+          metrics,
+          distance: Math.round(distance * 10) / 10, // Arredondar para 1 casa decimal
+        };
+      }),
+    );
+
+    return result;
+  }
+
   private toResponseDto(franchise: FranchiseDocument): FranchiseResponseDto {
     return {
       id: franchise._id.toString(),
@@ -412,6 +525,8 @@ export class FranchisesService {
         | 'retail'
         | 'ecommerce'
         | 'hybrid'
+        | 'gym'
+        | 'solar_plant'
       )[],
       createdAt: franchise.createdAt || new Date(),
       updatedAt: franchise.updatedAt || new Date(),

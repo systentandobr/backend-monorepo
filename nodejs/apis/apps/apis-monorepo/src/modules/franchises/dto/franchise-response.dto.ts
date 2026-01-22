@@ -48,6 +48,8 @@ export class FranchiseResponseDto {
     | 'retail'
     | 'ecommerce'
     | 'hybrid'
+    | 'gym'
+    | 'solar_plant'
   )[];
   metrics?: FranchiseMetricsDto;
   createdAt: Date;

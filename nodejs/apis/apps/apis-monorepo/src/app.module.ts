@@ -8,6 +8,7 @@ import { SysPagamentosModule } from 'apps/sys-pagamentos/src/sys-pagamentos.modu
 import { SysProdutosModule } from 'apps/sys-produtos/src/sys-produtos.module';
 import { LifeTrackerModule } from 'apps/life-tracker/src/life-tracker.module';
 import { AuthSharedModule } from './auth/auth-shared.module';
+import { AuthPublicController } from './auth/auth-public.controller';
 import { CustomersModule } from './modules/customers/customers.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { FranchisesModule } from './modules/franchises/franchises.module';
@@ -27,6 +28,8 @@ import { TrainingPlansModule } from './modules/training-plans/training-plans.mod
 import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
 import { ExercisesModule } from './modules/exercises/exercises.module';
 import { SolarModule } from './modules/solar/solar.module';
+import { BioimpedanceModule } from './modules/bioimpedance/bioimpedance.module';
+import { GamificationModule } from './modules/gamification/gamification.module';
 
 @Module({
   imports: [
@@ -55,8 +58,10 @@ import { SolarModule } from './modules/solar/solar.module';
     SubscriptionsModule,
     ExercisesModule,
     SolarModule,
+    BioimpedanceModule,
+    GamificationModule,
   ],
-  controllers: [AppController, DebugController],
+  controllers: [AppController, DebugController, AuthPublicController],
   providers: [AppService],
 })
 export class AppModule {}

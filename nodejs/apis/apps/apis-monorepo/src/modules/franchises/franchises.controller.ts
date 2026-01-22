@@ -11,11 +11,18 @@ import {
   HttpStatus,
   ForbiddenException,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { FranchisesService } from './franchises.service';
 import { CreateFranchiseDto } from './dto/create-franchise.dto';
 import { UpdateFranchiseDto } from './dto/update-franchise.dto';
 import { FranchiseFiltersDto } from './dto/franchise-response.dto';
+import { NearbyQueryDto } from './dto/nearby-query.dto';
+import { NearbyFranchiseDto } from './dto/nearby-response.dto';
 import { UnitScope } from '../../decorators/unit-scope.decorator';
 import {
   CurrentUser,
@@ -72,6 +79,76 @@ export class FranchisesController {
 
   // IMPORTANTE: Rotas específicas devem vir ANTES de rotas com parâmetros dinâmicos
   // Caso contrário, o NestJS pode interpretar 'by-unit' como um :id
+  @Get('nearby')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Busca unidades mais próximas por segmentação de mercado',
+    description:
+      'Retorna unidades ativas filtradas por tipo de segmentação (ex: gym), ordenadas por distância do ponto de referência',
+  })
+  @ApiQuery({
+    name: 'lat',
+    required: false,
+    type: Number,
+    description: 'Latitude do ponto de referência',
+  })
+  @ApiQuery({
+    name: 'lng',
+    required: false,
+    type: Number,
+    description: 'Longitude do ponto de referência',
+  })
+  @ApiQuery({
+    name: 'address',
+    required: false,
+    type: String,
+    description: 'Endereço para geocodificação (alternativa a lat/lng)',
+  })
+  @ApiQuery({
+    name: 'marketSegment',
+    required: true,
+    enum: [
+      'restaurant',
+      'delivery',
+      'retail',
+      'ecommerce',
+      'hybrid',
+      'gym',
+      'solar_plant',
+    ],
+    description: 'Tipo de segmentação de mercado',
+  })
+  @ApiQuery({
+    name: 'radius',
+    required: false,
+    type: Number,
+    description: 'Raio máximo de busca em km (padrão: 50)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Número máximo de resultados (padrão: 20)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de unidades próximas ordenadas por distância',
+    type: [NearbyFranchiseDto],
+  })
+  @ApiResponse({ status: 400, description: 'Dados inválidos' })
+  async findNearby(@Query() query: NearbyQueryDto): Promise<{
+    success: boolean;
+    data: NearbyFranchiseDto[];
+    error: null;
+  }> {
+    const franchises = await this.franchisesService.findNearby(query);
+    return {
+      success: true,
+      data: franchises,
+      error: null,
+    };
+  }
+
   @Get('by-unit/:unitId/market-segments')
   @UnitScope()
   async getMarketSegments(
