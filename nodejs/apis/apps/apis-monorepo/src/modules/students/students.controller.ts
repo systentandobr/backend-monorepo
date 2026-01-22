@@ -9,8 +9,15 @@ import {
   Query,
   HttpCode,
   HttpStatus,
+  Req,
+  NotFoundException,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+} from '@nestjs/swagger';
 import { StudentsService } from './students.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
@@ -29,15 +36,49 @@ export class StudentsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: 'Cria um novo aluno',
+    description:
+      'Cria um novo aluno e automaticamente cria o usuário correspondente no sistema de autenticação (SYS-SEGURANÇA)',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Aluno criado com sucesso',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Aluno com este email já existe nesta unidade',
+  })
   create(
     @Body() createStudentDto: CreateStudentDto,
     @CurrentUser() user: CurrentUserShape,
+    @Req() request: any,
   ) {
     const unitId = user.unitId || user.profile?.unitId;
     if (!unitId) {
       throw new Error('unitId não encontrado no contexto do usuário');
     }
-    return this.studentsService.create(createStudentDto, unitId);
+
+    const domain = user.domain || user.profile?.domain;
+    if (!domain) {
+      throw new Error('domain não encontrado no contexto do usuário');
+    }
+
+    // Extrair token do header Authorization
+    const authHeader = request.headers?.authorization || '';
+    const token = authHeader.replace('Bearer ', '');
+
+    if (!token) {
+      throw new Error('Token de autenticação não encontrado');
+    }
+
+    return this.studentsService.create(
+      createStudentDto,
+      unitId,
+      token,
+      domain,
+      user,
+    );
   }
 
   @Get()
@@ -82,5 +123,44 @@ export class StudentsController {
       throw new Error('unitId não encontrado no contexto do usuário');
     }
     return this.studentsService.remove(id, unitId);
+  }
+
+  @Get('by-user/:userId')
+  @ApiOperation({
+    summary: 'Busca aluno pelo userId',
+    description:
+      'Retorna o aluno relacionado ao userId (ID do usuário no sistema de autenticação)',
+  })
+  @ApiParam({
+    name: 'userId',
+    description: 'ID do usuário no sistema de autenticação (SYS-SEGURANÇA)',
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Aluno encontrado',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Aluno não encontrado para este userId',
+  })
+  async findByUserId(
+    @Param('userId') userId: string,
+    @CurrentUser() user: CurrentUserShape,
+  ) {
+    const unitId = user.unitId || user.profile?.unitId;
+    const student = await this.studentsService.findByUserId(userId, unitId);
+
+    if (!student) {
+      throw new NotFoundException(
+        `Aluno não encontrado para o userId: ${userId}`,
+      );
+    }
+
+    return {
+      success: true,
+      data: student,
+      error: null,
+    };
   }
 }

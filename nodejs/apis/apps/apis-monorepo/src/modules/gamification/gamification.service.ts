@@ -236,6 +236,334 @@ export class GamificationService {
   }
 
   /**
+   * Retorna histórico de check-ins do usuário
+   */
+  async getCheckInHistory(
+    userId: string,
+    unitId: string,
+    startDate?: Date,
+    endDate?: Date,
+    limit: number = 50,
+  ): Promise<{
+    checkIns: Array<{
+      id: string;
+      userId: string;
+      date: string;
+      points: number;
+      unitId: string;
+      metadata?: any;
+    }>;
+    total: number;
+    currentStreak: number;
+    longestStreak: number;
+  }> {
+    // Construir query para check-ins
+    const query: any = {
+      userId,
+      unitId,
+      sourceType: 'CHECK_IN',
+    };
+
+    // Adicionar filtro de data se fornecido
+    if (startDate || endDate) {
+      query.createdAt = {};
+      if (startDate) {
+        query.createdAt.$gte = startDate;
+      }
+      if (endDate) {
+        query.createdAt.$lte = endDate;
+      }
+    }
+
+    // Buscar transações de check-in
+    const transactions = await this.pointTransactionModel
+      .find(query)
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .exec();
+
+    // Buscar total sem limite
+    const total = await this.pointTransactionModel.countDocuments(query).exec();
+
+    // Converter para formato de resposta
+    const checkIns = transactions.map((transaction) => ({
+      id: transaction._id.toString(),
+      userId: transaction.userId,
+      date: transaction.createdAt!.toISOString(),
+      points: transaction.points,
+      unitId: transaction.unitId,
+      metadata: transaction.metadata,
+    }));
+
+    // Calcular streaks
+    const allCheckIns = await this.pointTransactionModel
+      .find({
+        userId,
+        unitId,
+        sourceType: 'CHECK_IN',
+      })
+      .sort({ createdAt: -1 })
+      .exec();
+
+    const { currentStreak, longestStreak } = this.calculateStreaks(allCheckIns);
+
+    return {
+      checkIns,
+      total,
+      currentStreak,
+      longestStreak,
+    };
+  }
+
+  /**
+   * Calcula streaks (sequências consecutivas) de check-ins
+   */
+  private calculateStreaks(
+    checkIns: PointTransactionDocument[],
+  ): { currentStreak: number; longestStreak: number } {
+    if (checkIns.length === 0) {
+      return { currentStreak: 0, longestStreak: 0 };
+    }
+
+    // Agrupar check-ins por dia
+    const checkInsByDay = new Map<string, PointTransactionDocument[]>();
+    checkIns.forEach((checkIn) => {
+      const date = new Date(checkIn.createdAt!);
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const dayKey = `${date.getFullYear()}-${month}-${day}`;
+      if (!checkInsByDay.has(dayKey)) {
+        checkInsByDay.set(dayKey, []);
+      }
+      checkInsByDay.get(dayKey)!.push(checkIn);
+    });
+
+    const sortedDays = Array.from(checkInsByDay.keys()).sort().reverse(); // Mais recente primeiro
+
+    // Calcular streak atual (começando de hoje)
+    let currentStreak = 0;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let checkDate = new Date(today);
+
+    for (const dayKey of sortedDays) {
+      const [year, month, day] = dayKey.split('-').map(Number);
+      const dayDate = new Date(year, month - 1, day);
+      dayDate.setHours(0, 0, 0, 0);
+
+      if (dayDate.getTime() === checkDate.getTime()) {
+        currentStreak++;
+        checkDate.setDate(checkDate.getDate() - 1);
+      } else if (dayDate.getTime() < checkDate.getTime()) {
+        // Se encontrou um dia anterior sem check-in, quebrar o streak
+        break;
+      }
+    }
+
+    // Calcular maior streak (verificar todas as sequências)
+    let longestStreak = 0;
+    let tempStreak = 0;
+    let lastDate: Date | null = null;
+
+    // Ordenar dias do mais antigo para o mais recente
+    const sortedDaysAsc = Array.from(checkInsByDay.keys()).sort();
+
+    for (const dayKey of sortedDaysAsc) {
+      const [year, month, day] = dayKey.split('-').map(Number);
+      const dayDate = new Date(year, month - 1, day);
+      dayDate.setHours(0, 0, 0, 0);
+
+      if (lastDate === null) {
+        tempStreak = 1;
+        lastDate = dayDate;
+      } else {
+        const diffDays = Math.floor(
+          (dayDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24),
+        );
+        if (diffDays === 1) {
+          // Dia consecutivo
+          tempStreak++;
+        } else {
+          // Quebra na sequência
+          longestStreak = Math.max(longestStreak, tempStreak);
+          tempStreak = 1;
+        }
+        lastDate = dayDate;
+      }
+    }
+    longestStreak = Math.max(longestStreak, tempStreak);
+
+    return { currentStreak, longestStreak };
+  }
+
+  /**
+   * Retorna atividade semanal (últimos 7 dias)
+   */
+  async getWeeklyActivity(
+    userId: string,
+    unitId: string,
+  ): Promise<{
+    period: {
+      startDate: string;
+      endDate: string;
+    };
+    dailyActivity: Array<{
+      date: string;
+      dayOfWeek: string;
+      checkIns: number;
+      workoutsCompleted: number;
+      exercisesCompleted: number;
+      totalPoints: number;
+      activities: Array<{
+        type: string;
+        time: string;
+        points: number;
+        description: string;
+      }>;
+    }>;
+    summary: {
+      totalCheckIns: number;
+      totalWorkouts: number;
+      totalExercises: number;
+      totalPoints: number;
+      averagePointsPerDay: number;
+    };
+  }> {
+    // Calcular período (últimos 7 dias)
+    const endDate = new Date();
+    endDate.setHours(23, 59, 59, 999);
+    const startDate = new Date(endDate);
+    startDate.setDate(startDate.getDate() - 6);
+    startDate.setHours(0, 0, 0, 0);
+
+    // Buscar todas as transações do período
+    const transactions = await this.pointTransactionModel
+      .find({
+        userId,
+        unitId,
+        createdAt: {
+          $gte: startDate,
+          $lte: endDate,
+        },
+        sourceType: {
+          $in: ['CHECK_IN', 'WORKOUT_COMPLETION', 'EXERCISE_COMPLETION'],
+        },
+      })
+      .sort({ createdAt: 1 }) // Mais antiga primeiro
+      .exec();
+
+    // Mapear dias da semana
+    const dayNames = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
+
+    // Agrupar por dia
+    const dailyMap = new Map<
+      string,
+      {
+        date: string;
+        dayOfWeek: string;
+        checkIns: number;
+        workoutsCompleted: number;
+        exercisesCompleted: number;
+        totalPoints: number;
+        activities: Array<{
+          type: string;
+          time: string;
+          points: number;
+          description: string;
+        }>;
+      }
+    >();
+
+    // Inicializar todos os dias dos últimos 7 dias
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(startDate);
+      date.setDate(date.getDate() + i);
+      const dateKey = date.toISOString().split('T')[0];
+      const dayOfWeek = dayNames[date.getDay()];
+
+      dailyMap.set(dateKey, {
+        date: dateKey,
+        dayOfWeek,
+        checkIns: 0,
+        workoutsCompleted: 0,
+        exercisesCompleted: 0,
+        totalPoints: 0,
+        activities: [],
+      });
+    }
+
+    // Processar transações
+    transactions.forEach((transaction) => {
+      const date = new Date(transaction.createdAt!);
+      const dateKey = date.toISOString().split('T')[0];
+      const dayData = dailyMap.get(dateKey);
+
+      if (dayData) {
+        const time = date.toTimeString().substring(0, 5); // HH:mm
+
+        switch (transaction.sourceType) {
+          case 'CHECK_IN':
+            dayData.checkIns++;
+            break;
+          case 'WORKOUT_COMPLETION':
+            dayData.workoutsCompleted++;
+            break;
+          case 'EXERCISE_COMPLETION':
+            dayData.exercisesCompleted++;
+            break;
+        }
+
+        dayData.totalPoints += transaction.points;
+        dayData.activities.push({
+          type: transaction.sourceType,
+          time,
+          points: transaction.points,
+          description: transaction.description,
+        });
+      }
+    });
+
+    // Ordenar atividades por horário dentro de cada dia
+    dailyMap.forEach((dayData) => {
+      dayData.activities.sort((a, b) => a.time.localeCompare(b.time));
+    });
+
+    // Converter para array ordenado (mais recente primeiro)
+    const dailyActivity = Array.from(dailyMap.values()).reverse();
+
+    // Calcular resumo
+    const summary = {
+      totalCheckIns: dailyActivity.reduce((sum, day) => sum + day.checkIns, 0),
+      totalWorkouts: dailyActivity.reduce(
+        (sum, day) => sum + day.workoutsCompleted,
+        0,
+      ),
+      totalExercises: dailyActivity.reduce(
+        (sum, day) => sum + day.exercisesCompleted,
+        0,
+      ),
+      totalPoints: dailyActivity.reduce((sum, day) => sum + day.totalPoints, 0),
+      averagePointsPerDay:
+        dailyActivity.length > 0
+          ? Math.round(
+              (dailyActivity.reduce((sum, day) => sum + day.totalPoints, 0) /
+                dailyActivity.length) *
+                10,
+            ) / 10
+          : 0,
+    };
+
+    return {
+      period: {
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+      },
+      dailyActivity,
+      summary,
+    };
+  }
+
+  /**
    * Gera dados para compartilhamento de progresso
    */
   async generateShare(

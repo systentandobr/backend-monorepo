@@ -79,6 +79,9 @@ export class Student {
   @Prop({ required: true, index: true })
   unitId: string;
 
+  @Prop({ index: true, sparse: true })
+  userId?: string; // ID do usuário no sistema de autenticação (SYS-SEGURANÇA)
+
   @Prop({ required: true })
   name: string;
 
@@ -152,3 +155,4 @@ StudentSchema.index({ unitId: 1, 'subscription.status': 1 });
 StudentSchema.index({ unitId: 1, 'subscription.paymentStatus': 1 });
 StudentSchema.index({ unitId: 1, isActive: 1 });
 StudentSchema.index({ unitId: 1, createdAt: -1 });
+StudentSchema.index({ userId: 1 }, { unique: true, sparse: true }); // Um student por userId

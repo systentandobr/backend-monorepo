@@ -65,6 +65,35 @@ export class Lead {
   })
   status: LeadStatus;
 
+  @Prop({
+    type: String,
+    enum: ['student', 'franchise'],
+    index: true,
+  })
+  userType?: 'student' | 'franchise';
+
+  @Prop({
+    type: String,
+    enum: [
+      'gym',
+      'restaurant',
+      'delivery',
+      'retail',
+      'ecommerce',
+      'hybrid',
+      'solar_plant',
+    ],
+    index: true,
+  })
+  marketSegment?: string;
+
+  @Prop({ type: Object })
+  objectives?: {
+    primary?: string;
+    secondary?: string[];
+    interestedInFranchise?: boolean;
+  };
+
   @Prop({ type: Object })
   metadata?: {
     franchiseType?: string;
@@ -73,6 +102,9 @@ export class Lead {
     timeToStart?: string;
     chatbotSessionId?: string;
     conversationHistory?: any[];
+    selectedUnitName?: string;
+    preferredContactTime?: string;
+    howDidYouKnow?: string;
     [key: string]: any;
   };
 
@@ -120,3 +152,5 @@ LeadSchema.index({ unitId: 1, createdAt: -1 });
 LeadSchema.index({ email: 1 });
 LeadSchema.index({ phone: 1 });
 LeadSchema.index({ score: -1 });
+LeadSchema.index({ userType: 1, marketSegment: 1 });
+LeadSchema.index({ unitId: 1, userType: 1, marketSegment: 1 });

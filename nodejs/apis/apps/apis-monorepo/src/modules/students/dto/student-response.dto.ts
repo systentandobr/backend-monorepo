@@ -1,6 +1,7 @@
 export class StudentResponseDto {
   id: string;
   unitId: string;
+  userId?: string; // ID do usuário no sistema de autenticação
   name: string;
   email: string;
   phone?: string;

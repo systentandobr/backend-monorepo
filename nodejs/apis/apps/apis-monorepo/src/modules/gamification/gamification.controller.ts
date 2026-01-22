@@ -23,6 +23,9 @@ import {
   RankingPositionDto,
 } from './dto/gamification-response.dto';
 import { ShareResponseDto } from './dto/share-response.dto';
+import { CheckInHistoryQueryDto } from './dto/check-in-history-query.dto';
+import { CheckInHistoryResponseDto } from './dto/check-in-response.dto';
+import { WeeklyActivityResponseDto } from './dto/weekly-activity-response.dto';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import {
   CurrentUser,
@@ -81,6 +84,120 @@ export class GamificationController {
     return {
       success: true,
       data: ranking,
+      error: null,
+    };
+  }
+
+  @Get('users/:userId/check-ins')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Retorna o histórico de check-ins do usuário',
+    description:
+      'Retorna check-ins ordenados por data (mais recente primeiro) com cálculo de streaks',
+  })
+  @ApiParam({
+    name: 'userId',
+    description: 'ID do usuário',
+    type: String,
+  })
+  @ApiQuery({
+    name: 'startDate',
+    required: false,
+    type: String,
+    description: 'Data inicial (ISO 8601)',
+  })
+  @ApiQuery({
+    name: 'endDate',
+    required: false,
+    type: String,
+    description: 'Data final (ISO 8601)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Número máximo de resultados (padrão: 50)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Histórico de check-ins retornado com sucesso',
+    type: CheckInHistoryResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'Não autorizado' })
+  @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
+  async getCheckInHistory(
+    @Param('userId') userId: string,
+    @Query() query: CheckInHistoryQueryDto,
+    @CurrentUser() user: CurrentUserShape,
+  ): Promise<{
+    success: boolean;
+    data: CheckInHistoryResponseDto;
+    error: null;
+  }> {
+    const unitId = user.unitId || user.profile?.unitId;
+    if (!unitId) {
+      throw new Error('unitId não encontrado no contexto do usuário');
+    }
+
+    const startDate = query.startDate ? new Date(query.startDate) : undefined;
+    const endDate = query.endDate ? new Date(query.endDate) : undefined;
+    const limit = query.limit || 50;
+
+    const history = await this.gamificationService.getCheckInHistory(
+      userId,
+      unitId,
+      startDate,
+      endDate,
+      limit,
+    );
+
+    return {
+      success: true,
+      data: history,
+      error: null,
+    };
+  }
+
+  @Get('users/:userId/weekly-activity')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Retorna atividade semanal do usuário',
+    description:
+      'Retorna atividade dos últimos 7 dias agrupada por dia, incluindo check-ins, treinos e exercícios',
+  })
+  @ApiParam({
+    name: 'userId',
+    description: 'ID do usuário',
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Atividade semanal retornada com sucesso',
+    type: WeeklyActivityResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'Não autorizado' })
+  @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
+  async getWeeklyActivity(
+    @Param('userId') userId: string,
+    @CurrentUser() user: CurrentUserShape,
+  ): Promise<{
+    success: boolean;
+    data: WeeklyActivityResponseDto;
+    error: null;
+  }> {
+    const unitId = user.unitId || user.profile?.unitId;
+    if (!unitId) {
+      throw new Error('unitId não encontrado no contexto do usuário');
+    }
+
+    const activity = await this.gamificationService.getWeeklyActivity(
+      userId,
+      unitId,
+    );
+
+    return {
+      success: true,
+      data: activity,
       error: null,
     };
   }

@@ -80,6 +80,9 @@ export class LeadsService {
       ...createLeadDto,
       unitId,
       score,
+      userType: createLeadDto.userType,
+      marketSegment: createLeadDto.marketSegment,
+      objectives: createLeadDto.objectives,
       pipeline: {
         stage: 'new',
         stageHistory: [
@@ -889,6 +892,9 @@ export class LeadsService {
       unitId: lead.unitId,
       name: lead.name,
       email: lead.email,
+      userType: lead.userType,
+      marketSegment: lead.marketSegment,
+      objectives: lead.objectives,
       phone: lead.phone,
       city: lead.city,
       state: lead.state,

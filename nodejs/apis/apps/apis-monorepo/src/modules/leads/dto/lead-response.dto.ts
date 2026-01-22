@@ -10,6 +10,13 @@ export class LeadResponseDto {
   state?: string;
   source: LeadSource;
   status: LeadStatus;
+  userType?: 'student' | 'franchise';
+  marketSegment?: string;
+  objectives?: {
+    primary?: string;
+    secondary?: string[];
+    interestedInFranchise?: boolean;
+  };
   metadata?: Record<string, any>;
   tags: string[];
   notes: Array<{
