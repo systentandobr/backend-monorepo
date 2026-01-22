@@ -22,6 +22,7 @@ import {
   PointTransactionDocument,
 } from './schemas/point-transaction.schema';
 import { RankingQueryDto } from './dto/ranking-query.dto';
+import { WeeklyActivityResponseDto } from './dto/weekly-activity-response.dto';
 import {
   GamificationDataDto,
   RankingPositionDto,
@@ -402,33 +403,7 @@ export class GamificationService {
   async getWeeklyActivity(
     userId: string,
     unitId: string,
-  ): Promise<{
-    period: {
-      startDate: string;
-      endDate: string;
-    };
-    dailyActivity: Array<{
-      date: string;
-      dayOfWeek: string;
-      checkIns: number;
-      workoutsCompleted: number;
-      exercisesCompleted: number;
-      totalPoints: number;
-      activities: Array<{
-        type: string;
-        time: string;
-        points: number;
-        description: string;
-      }>;
-    }>;
-    summary: {
-      totalCheckIns: number;
-      totalWorkouts: number;
-      totalExercises: number;
-      totalPoints: number;
-      averagePointsPerDay: number;
-    };
-  }> {
+  ): Promise<WeeklyActivityResponseDto> {
     // Calcular período (últimos 7 dias)
     const endDate = new Date();
     endDate.setHours(23, 59, 59, 999);
@@ -466,7 +441,7 @@ export class GamificationService {
         exercisesCompleted: number;
         totalPoints: number;
         activities: Array<{
-          type: string;
+          type: 'CHECK_IN' | 'WORKOUT_COMPLETION' | 'EXERCISE_COMPLETION';
           time: string;
           points: number;
           description: string;
@@ -514,8 +489,17 @@ export class GamificationService {
         }
 
         dayData.totalPoints += transaction.points;
+        
+        // Garantir que o tipo seja um dos valores permitidos
+        const activityType: 'CHECK_IN' | 'WORKOUT_COMPLETION' | 'EXERCISE_COMPLETION' = 
+          transaction.sourceType === 'CHECK_IN' || 
+          transaction.sourceType === 'WORKOUT_COMPLETION' || 
+          transaction.sourceType === 'EXERCISE_COMPLETION'
+            ? transaction.sourceType
+            : 'CHECK_IN'; // Fallback (não deveria acontecer devido ao filtro)
+        
         dayData.activities.push({
-          type: transaction.sourceType,
+          type: activityType,
           time,
           points: transaction.points,
           description: transaction.description,
@@ -529,7 +513,21 @@ export class GamificationService {
     });
 
     // Converter para array ordenado (mais recente primeiro)
-    const dailyActivity = Array.from(dailyMap.values()).reverse();
+    // Garantir que o tipo está correto
+    const dailyActivity: Array<{
+      date: string;
+      dayOfWeek: string;
+      checkIns: number;
+      workoutsCompleted: number;
+      exercisesCompleted: number;
+      totalPoints: number;
+      activities: Array<{
+        type: 'CHECK_IN' | 'WORKOUT_COMPLETION' | 'EXERCISE_COMPLETION';
+        time: string;
+        points: number;
+        description: string;
+      }>;
+    }> = Array.from(dailyMap.values()).reverse();
 
     // Calcular resumo
     const summary = {
