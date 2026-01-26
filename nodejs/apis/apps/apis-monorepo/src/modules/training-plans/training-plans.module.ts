@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TrainingPlansController } from './training-plans.controller';
 import { TrainingPlansService } from './training-plans.service';
+import { TemplateLoaderService } from './templates/template-loader.service';
 import {
   TrainingPlan,
   TrainingPlanSchema,
@@ -14,7 +15,7 @@ import {
     ]),
   ],
   controllers: [TrainingPlansController],
-  providers: [TrainingPlansService],
-  exports: [TrainingPlansService],
+  providers: [TrainingPlansService, TemplateLoaderService],
+  exports: [TrainingPlansService, TemplateLoaderService],
 })
 export class TrainingPlansModule {}

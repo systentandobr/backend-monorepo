@@ -49,7 +49,7 @@ export class LeadsService {
       // Atualizar lead existente ao invés de criar duplicado
       const response = await this.update(
         existing._id.toString(),
-        createLeadDto,
+        { ...createLeadDto } as UpdateLeadDto,
         unitId,
       );
       // Enviar notificação sobre atualização de lead
@@ -95,7 +95,7 @@ export class LeadsService {
     });
 
     const saved = await lead.save();
-    const responseDto = this.toResponseDto(saved);
+    const responseDto = this.toResponseDto(saved) as unknown as LeadResponseDto;
 
     // Enviar notificação sobre novo lead
     this.notificationsService
@@ -164,7 +164,7 @@ export class LeadsService {
     const limit = filters.limit || 50;
     const skip = (page - 1) * limit;
 
-    const [data, total] = await Promise.all([
+    const [data, total]: [LeadDocument[], number] = await Promise.all([
       this.leadModel
         .find(query)
         .sort({ createdAt: -1 })

@@ -17,6 +17,8 @@ import { StudentFiltersDto } from './dto/student-filters.dto';
 import { StudentResponseDto } from './dto/student-response.dto';
 import { EnvironmentConfig } from '../../config/environment.config';
 import { CurrentUserShape } from '../../decorators/current-user.decorator';
+import { TrainingPlansService } from '../training-plans/training-plans.service';
+import { TemplateLoaderService } from '../training-plans/templates/template-loader.service';
 
 @Injectable()
 export class StudentsService {
@@ -26,6 +28,8 @@ export class StudentsService {
   constructor(
     @InjectModel(Student.name) private studentModel: Model<StudentDocument>,
     private readonly httpService: HttpService,
+    private readonly trainingPlansService: TrainingPlansService,
+    private readonly templateLoaderService: TemplateLoaderService,
   ) {}
 
   async create(
@@ -187,7 +191,55 @@ export class StudentsService {
     const saved = await student.save();
     this.logger.log(`✅ [StudentsService] Aluno criado com sucesso: ${saved._id.toString()}`);
     
+    // Criar plano de treino automaticamente após criar o estudante
+    await this.createDefaultTrainingPlan(saved, unitId);
+
     return this.toResponseDto(saved);
+  }
+
+  /**
+   * Cria um plano de treino padrão (template ABC) para o estudante recém-criado
+   */
+  private async createDefaultTrainingPlan(
+    student: StudentDocument,
+    unitId: string,
+  ): Promise<void> {
+    try {
+      this.logger.log(
+        `📋 [StudentsService] Criando plano de treino padrão para estudante: ${student._id.toString()}`,
+      );
+
+      // Buscar template baseado no gênero do estudante
+      const templateDto = this.templateLoaderService.getTemplateAsCreateDto(
+        student.gender,
+        student._id.toString(),
+        student.name,
+      );
+
+      if (!templateDto) {
+        this.logger.warn(
+          `⚠️ [StudentsService] Template não encontrado para criar plano padrão. Estudante: ${student._id.toString()}`,
+        );
+        return;
+      }
+
+      // Criar o plano de treino usando o template
+      const trainingPlan = await this.trainingPlansService.create(
+        templateDto,
+        unitId,
+      );
+
+      this.logger.log(
+        `✅ [StudentsService] Plano de treino criado com sucesso para estudante ${student._id.toString()}. Plano ID: ${trainingPlan.id}`,
+      );
+    } catch (error) {
+      // Logar erro mas não impedir a criação do estudante
+      this.logger.error(
+        `❌ [StudentsService] Erro ao criar plano de treino padrão para estudante ${student._id.toString()}:`,
+        error instanceof Error ? error.message : 'Erro desconhecido',
+      );
+      // Não lançar exceção para não impedir a criação do estudante
+    }
   }
 
   /**

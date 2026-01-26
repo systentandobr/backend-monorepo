@@ -1,0 +1,341 @@
+{
+  "templates": [
+    {
+      "name": "Plano ABC Iniciante - Masculino",
+      "description": "Plano de treino ABC para iniciantes do gênero masculino. Método ABC: A (Peito/Tríceps/Ombro), B (Costas/Bíceps), C (Pernas/Glúteos). Ideal para quem está começando na musculação.",
+      "targetGender": "male",
+      "objectives": [
+        "Desenvolver força e resistência muscular",
+        "Melhorar condicionamento físico",
+        "Aprender técnica correta dos exercícios",
+        "Estabelecer rotina de treino"
+      ],
+      "weeklySchedule": [
+        {
+          "dayOfWeek": 1,
+          "timeSlots": [
+            {
+              "startTime": "08:00",
+              "endTime": "09:00",
+              "activity": "Musculação - Treino A"
+            }
+          ],
+          "exercises": [
+            {
+              "name": "Supino reto",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Foco em técnica correta. Ajustar peso conforme capacidade"
+            },
+            {
+              "name": "Supino inclinado",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Banco inclinado a 45 graus"
+            },
+            {
+              "name": "Tríceps pulley",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Movimento controlado, sem balanço"
+            },
+            {
+              "name": "Tríceps testa",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Deitado no banco, movimento completo"
+            },
+            {
+              "name": "Desenvolvimento com halteres",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Sentado ou em pé, movimento controlado"
+            },
+            {
+              "name": "Elevação lateral",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Peso moderado, movimento amplo"
+            }
+          ]
+        },
+        {
+          "dayOfWeek": 3,
+          "timeSlots": [
+            {
+              "startTime": "08:00",
+              "endTime": "09:00",
+              "activity": "Musculação - Treino B"
+            }
+          ],
+          "exercises": [
+            {
+              "name": "Barra fixa ou puxada frontal",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Se não conseguir barra fixa, usar puxada frontal na máquina"
+            },
+            {
+              "name": "Remada curvada",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Costas retas, movimento completo"
+            },
+            {
+              "name": "Rosca direta",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Barra reta ou W, movimento controlado"
+            },
+            {
+              "name": "Rosca martelo",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Halteres, trabalha bíceps e antebraço"
+            },
+            {
+              "name": "Encolhimento",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Trapézio, movimento de elevação dos ombros"
+            }
+          ]
+        },
+        {
+          "dayOfWeek": 5,
+          "timeSlots": [
+            {
+              "startTime": "08:00",
+              "endTime": "09:00",
+              "activity": "Musculação - Treino C"
+            }
+          ],
+          "exercises": [
+            {
+              "name": "Agachamento livre",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Técnica correta é fundamental. Começar sem peso se necessário"
+            },
+            {
+              "name": "Leg press",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Movimento completo, joelhos alinhados"
+            },
+            {
+              "name": "Extensão de pernas",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Quadríceps, movimento controlado"
+            },
+            {
+              "name": "Flexão de pernas",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Posterior de coxa, movimento completo"
+            },
+            {
+              "name": "Panturrilha em pé",
+              "sets": 3,
+              "reps": "15-20",
+              "restTime": 60,
+              "notes": "Movimento completo de elevação"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Plano ABC Iniciante - Feminino",
+      "description": "Plano de treino ABC para iniciantes do gênero feminino. Método ABC: A (Peito/Tríceps/Ombro), B (Costas/Bíceps), C (Pernas/Glúteos). Foco em fortalecimento e definição muscular.",
+      "targetGender": "female",
+      "objectives": [
+        "Desenvolver força e resistência muscular",
+        "Melhorar condicionamento físico",
+        "Aprender técnica correta dos exercícios",
+        "Estabelecer rotina de treino",
+        "Fortalecer glúteos e pernas"
+      ],
+      "weeklySchedule": [
+        {
+          "dayOfWeek": 1,
+          "timeSlots": [
+            {
+              "startTime": "08:00",
+              "endTime": "09:00",
+              "activity": "Musculação - Treino A"
+            }
+          ],
+          "exercises": [
+            {
+              "name": "Supino reto",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Foco em técnica correta. Ajustar peso conforme capacidade"
+            },
+            {
+              "name": "Supino inclinado",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Banco inclinado a 45 graus"
+            },
+            {
+              "name": "Tríceps pulley",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Movimento controlado, sem balanço"
+            },
+            {
+              "name": "Tríceps testa",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Deitado no banco, movimento completo"
+            },
+            {
+              "name": "Desenvolvimento com halteres",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Sentado ou em pé, movimento controlado"
+            },
+            {
+              "name": "Elevação lateral",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Peso moderado, movimento amplo"
+            }
+          ]
+        },
+        {
+          "dayOfWeek": 3,
+          "timeSlots": [
+            {
+              "startTime": "08:00",
+              "endTime": "09:00",
+              "activity": "Musculação - Treino B"
+            }
+          ],
+          "exercises": [
+            {
+              "name": "Puxada frontal",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Máquina ou cabo, movimento controlado"
+            },
+            {
+              "name": "Remada curvada",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Costas retas, movimento completo"
+            },
+            {
+              "name": "Rosca direta",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Barra reta ou W, movimento controlado"
+            },
+            {
+              "name": "Rosca martelo",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Halteres, trabalha bíceps e antebraço"
+            },
+            {
+              "name": "Encolhimento",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Trapézio, movimento de elevação dos ombros"
+            }
+          ]
+        },
+        {
+          "dayOfWeek": 5,
+          "timeSlots": [
+            {
+              "startTime": "08:00",
+              "endTime": "09:00",
+              "activity": "Musculação - Treino C"
+            }
+          ],
+          "exercises": [
+            {
+              "name": "Agachamento livre",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Técnica correta é fundamental. Começar sem peso se necessário"
+            },
+            {
+              "name": "Leg press",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Movimento completo, joelhos alinhados"
+            },
+            {
+              "name": "Extensão de pernas",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Quadríceps, movimento controlado"
+            },
+            {
+              "name": "Flexão de pernas",
+              "sets": 3,
+              "reps": "10-12",
+              "restTime": 60,
+              "notes": "Posterior de coxa, movimento completo"
+            },
+            {
+              "name": "Elevação pélvica",
+              "sets": 3,
+              "reps": "12-15",
+              "restTime": 60,
+              "notes": "Foco em glúteos, movimento controlado"
+            },
+            {
+              "name": "Abdução de quadril",
+              "sets": 3,
+              "reps": "12-15",
+              "restTime": 60,
+              "notes": "Máquina ou cabo, trabalha glúteo médio"
+            },
+            {
+              "name": "Panturrilha em pé",
+              "sets": 3,
+              "reps": "15-20",
+              "restTime": 60,
+              "notes": "Movimento completo de elevação"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
