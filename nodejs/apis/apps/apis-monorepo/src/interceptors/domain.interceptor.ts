@@ -28,7 +28,7 @@ export class DomainInterceptor implements NestInterceptor {
         request.user.domain = domain;
       }
 
-      console.log(`🌐 [DomainInterceptor] Domain extraído: ${domain}`);
+      // console.log(`🌐 [DomainInterceptor] Domain extraído: ${domain}`);
     } else {
       console.warn(`⚠️ [DomainInterceptor] Domain não encontrado no usuário`);
     }

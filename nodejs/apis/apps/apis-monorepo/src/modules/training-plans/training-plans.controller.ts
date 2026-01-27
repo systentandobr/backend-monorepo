@@ -62,7 +62,7 @@ export class TrainingPlansController {
     @CurrentUser() user: CurrentUserShape,
     @Query('gender') gender?: string,
   ) {
-    const unitId = user.unitId || user.profile?.unitId;
+    const unitId = process.env.DEFAULT_UNIT_ID || '#BR#ALL#SYSTEM#0001';
     if (!unitId) {
       throw new BadRequestException(
         'unitId não encontrado no contexto do usuário',

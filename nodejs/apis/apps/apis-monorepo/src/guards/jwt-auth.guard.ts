@@ -31,22 +31,22 @@ export class JwtAuthGuard implements CanActivate {
     }
 
     try {
-      console.log(
+      /*console.log(
         `🔒 [JwtAuthGuard] Validando autenticação para ${request.method} ${request.url}`,
       );
-
+*/
       // Validar token usando SYS-SEGURANÇA com fallback local
       const validationResult =
         await this.jwtValidatorService.validateTokenWithFallback(token);
 
-      console.log(`📋 [JwtAuthGuard] Resultado da validação:`, {
+      /*console.log(`📋 [JwtAuthGuard] Resultado da validação:`, {
         isValid: validationResult.isValid,
         hasUser: !!validationResult.user,
         userId: validationResult.user?.id,
         username: validationResult.user?.username,
         email: validationResult.user?.email,
         profile: validationResult.user?.profile,
-      });
+      });*/
 
       if (!validationResult || !validationResult.isValid) {
         console.error(
@@ -95,7 +95,7 @@ export class JwtAuthGuard implements CanActivate {
         payload: validationResult.payload,
       };
 
-      console.log(
+      /*console.log(
         `✅ [JwtAuthGuard] Autenticação bem-sucedida para usuário: ${u.username || u.email || u.id}`,
       );
       console.log(`   UnitId: ${unitId || 'não informado'}`);
@@ -103,7 +103,7 @@ export class JwtAuthGuard implements CanActivate {
       console.log(
         `   Roles: ${(u.roles || []).map((r: any) => r.name || r).join(', ') || 'nenhum'}`,
       );
-
+*/
       return true;
     } catch (error: any) {
       console.error(`❌ [JwtAuthGuard] Erro na validação:`, {

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import {
   TrainingPlan,
   TrainingPlanDocument,
@@ -32,17 +32,47 @@ export class TrainingPlansService {
       createTrainingPlanDto.exercises &&
       createTrainingPlanDto.exercises.length > 0;
 
-    // Se há exercícios no nível raiz mas não dentro do schedule
-    let processedWeeklySchedule = weeklySchedule;
-    let exercisesToKeep: CreateTrainingPlanDto['exercises'] =
-      createTrainingPlanDto.exercises;
+    // Função auxiliar para converter exerciseId de string para ObjectId se necessário
+    const convertExerciseId = (exerciseId?: string): Types.ObjectId | undefined => {
+      if (!exerciseId) return undefined;
+      // Se já é um ObjectId válido (string de 24 caracteres hex), converter
+      if (Types.ObjectId.isValid(exerciseId)) {
+        return new Types.ObjectId(exerciseId);
+      }
+      return undefined;
+    };
 
+    // Processar exercícios convertendo exerciseId quando necessário
+    const processExercises = (
+      exercises?: CreateTrainingPlanDto['exercises'],
+    ) => {
+      if (!exercises) return undefined;
+      return exercises.map((ex) => ({
+        ...ex,
+        exerciseId: convertExerciseId(ex.exerciseId),
+      }));
+    };
+
+    // Processar exercícios convertendo exerciseId quando necessário
+    let processedWeeklySchedule = weeklySchedule.map((day) => ({
+      ...day,
+      exercises: processExercises(day.exercises),
+    }));
+    let exercisesToKeep = processExercises(createTrainingPlanDto.exercises);
+
+    // Se há exercícios no nível raiz mas não dentro do schedule
     if (hasExercisesAtRoot && !hasExercisesInSchedule) {
-      if (weeklySchedule.length > 0) {
+      if (processedWeeklySchedule.length > 0) {
         // Distribuir para o primeiro dia se houver schedule
-        processedWeeklySchedule = weeklySchedule.map((day, index) => ({
+        processedWeeklySchedule = processedWeeklySchedule.map((day, index) => ({
           ...day,
-          exercises: index === 0 ? createTrainingPlanDto.exercises || [] : [],
+          exercises:
+            index === 0
+              ? [
+                  ...(day.exercises || []),
+                  ...(exercisesToKeep || []),
+                ]
+              : day.exercises,
         }));
         // Não manter no nível raiz se já distribuiu para o schedule
         exercisesToKeep = [];
@@ -135,6 +165,27 @@ export class TrainingPlansService {
     updateTrainingPlanDto: UpdateTrainingPlanDto,
     unitId: string,
   ): Promise<TrainingPlanResponseDto> {
+    // Função auxiliar para converter exerciseId de string para ObjectId se necessário
+    const convertExerciseId = (exerciseId?: string): Types.ObjectId | undefined => {
+      if (!exerciseId) return undefined;
+      // Se já é um ObjectId válido (string de 24 caracteres hex), converter
+      if (Types.ObjectId.isValid(exerciseId)) {
+        return new Types.ObjectId(exerciseId);
+      }
+      return undefined;
+    };
+
+    // Processar exercícios convertendo exerciseId quando necessário
+    const processExercises = (
+      exercises?: UpdateTrainingPlanDto['exercises'],
+    ) => {
+      if (!exercises) return undefined;
+      return exercises.map((ex) => ({
+        ...ex,
+        exerciseId: convertExerciseId(ex.exerciseId),
+      }));
+    };
+
     const updateData: any = { ...updateTrainingPlanDto };
 
     // Processar exercícios se weeklySchedule ou exercises foram fornecidos
@@ -142,7 +193,10 @@ export class TrainingPlansService {
       updateTrainingPlanDto.weeklySchedule !== undefined ||
       updateTrainingPlanDto.exercises !== undefined
     ) {
-      const weeklySchedule = updateTrainingPlanDto.weeklySchedule || [];
+      const weeklySchedule = (updateTrainingPlanDto.weeklySchedule || []).map((day) => ({
+        ...day,
+        exercises: processExercises(day.exercises),
+      }));
       const hasExercisesInSchedule = weeklySchedule.some(
         (day) => day.exercises && day.exercises.length > 0,
       );
@@ -156,12 +210,14 @@ export class TrainingPlansService {
           // Distribuir para o primeiro dia se houver schedule
           updateData.weeklySchedule = weeklySchedule.map((day, index) => ({
             ...day,
-            exercises: index === 0 ? updateTrainingPlanDto.exercises || [] : [],
+            exercises: index === 0 ? processExercises(updateTrainingPlanDto.exercises) || [] : [],
           }));
           // Remover exercícios do nível raiz se já distribuiu para o schedule
           delete updateData.exercises;
+        } else {
+          // Se não houver schedule, manter exercícios no nível raiz (compatibilidade)
+          updateData.exercises = processExercises(updateTrainingPlanDto.exercises);
         }
-        // Se não houver schedule, manter exercícios no nível raiz (compatibilidade)
       } else if (hasExercisesInSchedule) {
         // Se há exercícios no schedule, remover do nível raiz
         updateData.weeklySchedule = weeklySchedule;
@@ -257,6 +313,40 @@ export class TrainingPlansService {
   private toResponseDto(
     trainingPlan: TrainingPlanDocument,
   ): TrainingPlanResponseDto {
+    // Converter exerciseId de ObjectId para string nos exercícios do weeklySchedule
+    const weeklySchedule = (trainingPlan.weeklySchedule || []).map((day) => ({
+      dayOfWeek: day.dayOfWeek,
+      timeSlots: day.timeSlots || [],
+      exercises: (day.exercises || []).map((ex) => ({
+        exerciseId: ex.exerciseId
+          ? typeof ex.exerciseId === 'string'
+            ? ex.exerciseId
+            : ex.exerciseId.toString()
+          : undefined,
+        name: ex.name,
+        sets: ex.sets,
+        reps: ex.reps,
+        weight: ex.weight,
+        restTime: ex.restTime,
+        notes: ex.notes,
+      })),
+    }));
+
+    // Converter exerciseId de ObjectId para string nos exercícios do nível raiz
+    const exercises = (trainingPlan.exercises || []).map((ex) => ({
+      exerciseId: ex.exerciseId
+        ? typeof ex.exerciseId === 'string'
+          ? ex.exerciseId
+          : ex.exerciseId.toString()
+        : undefined,
+      name: ex.name,
+      sets: ex.sets,
+      reps: ex.reps,
+      weight: ex.weight,
+      restTime: ex.restTime,
+      notes: ex.notes,
+    }));
+
     return {
       id: trainingPlan._id.toString(),
       unitId: trainingPlan.unitId,
@@ -264,8 +354,8 @@ export class TrainingPlansService {
       name: trainingPlan.name,
       description: trainingPlan.description,
       objectives: trainingPlan.objectives,
-      weeklySchedule: trainingPlan.weeklySchedule,
-      exercises: trainingPlan.exercises,
+      weeklySchedule,
+      exercises,
       startDate: trainingPlan.startDate,
       endDate: trainingPlan.endDate,
       status: trainingPlan.status,

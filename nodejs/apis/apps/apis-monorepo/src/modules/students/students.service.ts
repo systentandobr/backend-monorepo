@@ -210,7 +210,7 @@ export class StudentsService {
       );
 
       // Buscar template baseado no gênero do estudante
-      const templateDto = this.templateLoaderService.getTemplateAsCreateDto(
+      const templateDto = await this.templateLoaderService.getTemplateAsCreateDto(
         student.gender,
         student._id.toString(),
         student.name,

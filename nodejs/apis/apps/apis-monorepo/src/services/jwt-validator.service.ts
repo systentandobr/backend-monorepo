@@ -72,11 +72,11 @@ export class JwtValidatorService {
       const responseData = response.data as any;
 
       // Log da resposta completa para debug
-      console.log(
+      /*console.log(
         '📥 Resposta recebida do SYS-SEGURANÇA:',
         JSON.stringify(responseData, null, 2),
       );
-
+*/
       // O endpoint pode retornar diferentes formatos:
       // 1. { success: true, data: { isValid, user, payload, expiresAt } }
       // 2. { isValid, user, payload, expiresAt } (formato direto)
@@ -191,7 +191,7 @@ export class JwtValidatorService {
           },
         );
       }
-
+/*
       console.log('✅ Token validado com sucesso pelo SYS-SEGURANÇA');
       console.log(
         `   Usuário: ${validationResult.user.username || validationResult.user.email || validationResult.user.id}`,
@@ -206,7 +206,7 @@ export class JwtValidatorService {
         `   Roles (raw):`,
         JSON.stringify(validationResult.user.roles),
       );
-
+*/
       return validationResult;
     } catch (error: any) {
       // Log detalhado do erro para debug
@@ -328,11 +328,13 @@ export class JwtValidatorService {
   async validateTokenWithFallback(token: string): Promise<JwtValidationResult> {
     try {
       // Tentar validar com SYS-SEGURANÇA primeiro
-      console.log(
+      /*console.log(
         '🔄 [JwtValidatorService] Tentando validar token com SYS-SEGURANÇA...',
       );
       console.log('🔄 [JwtValidatorService] Token:', token);
+      */
       const result = await this.validateToken(token);
+      
       console.log(
         '✅ [JwtValidatorService] Validação com SYS-SEGURANÇA bem-sucedida',
       );

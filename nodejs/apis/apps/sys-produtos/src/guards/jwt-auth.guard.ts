@@ -29,10 +29,10 @@ export class JwtAuthGuard implements CanActivate {
     }
 
     try {
-      console.log(
+      /*console.log(
         `🔒 Validando autenticação para ${request.method} ${request.url}`,
       );
-
+*/
       const validationResult =
         await this.jwtValidatorService.validateTokenWithFallback(token);
 

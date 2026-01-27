@@ -1,7 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-import * as fs from 'fs';
-import * as path from 'path';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { CreateTrainingPlanDto } from '../dto/create-training-plan.dto';
+import { TrainingPlan, TrainingPlanDocument } from '../schemas/training-plan.schema';
 
 interface TemplateData {
   name: string;
@@ -33,66 +34,114 @@ interface TemplatesFile {
 export class TemplateLoaderService {
   private readonly logger = new Logger(TemplateLoaderService.name);
   private templates: TemplateData[] = [];
+  private templatesLoaded = false;
 
-  constructor() {
-    this.loadTemplates();
+  constructor(
+    @InjectModel(TrainingPlan.name)
+    private trainingPlanModel: Model<TrainingPlanDocument>,
+  ) {
+    // Carregar templates do MongoDB de forma assíncrona
+    this.loadTemplatesFromDatabase();
   }
 
   /**
-   * Carrega os templates do arquivo JSON
+   * Carrega os templates do MongoDB
    */
-  private loadTemplates(): void {
+  private async loadTemplatesFromDatabase(): Promise<void> {
     try {
-      // Tentar múltiplos caminhos possíveis
-      const possiblePaths = [
-        // Caminho quando compilado (produção) - __dirname aponta para dist/modules/training-plans/templates
-        path.join(__dirname, 'abc-beginner-templates.json'),
-        // Caminho em desenvolvimento (src)
-        path.join(
-          process.cwd(),
-          'src',
-          'modules',
-          'training-plans',
-          'templates',
-          'abc-beginner-templates.json',
-        ),
-        // Caminho alternativo em dist (caso __dirname não funcione)
-        path.join(
-          process.cwd(),
-          'dist',
-          'modules',
-          'training-plans',
-          'templates',
-          'abc-beginner-templates.json',
-        ),
-      ];
+      this.logger.log('🔍 Carregando templates do MongoDB...');
+      
+      // Buscar todos os templates no banco
+      const dbTemplates = await this.trainingPlanModel
+        .find({
+          isTemplate: true,
+        })
+        .exec();
 
-      let templatesPath: string | null = null;
-      for (const possiblePath of possiblePaths) {
-        if (fs.existsSync(possiblePath)) {
-          templatesPath = possiblePath;
-          break;
-        }
-      }
-
-      if (!templatesPath) {
-        throw new Error(
-          `Arquivo de templates não encontrado. Tentados: ${possiblePaths.join(', ')}`,
+      if (dbTemplates.length === 0) {
+        this.logger.warn(
+          '⚠️ Nenhum template encontrado no MongoDB. Execute o script de importação: npx ts-node -r tsconfig-paths/register src/modules/training-plans/scripts/import-templates.ts',
         );
+        this.templates = [];
+        this.templatesLoaded = true;
+        return;
       }
 
-      const fileContent = fs.readFileSync(templatesPath, 'utf-8');
-      const data: TemplatesFile = JSON.parse(fileContent);
-      this.templates = data.templates || [];
+      // Converter documentos do MongoDB para TemplateData
+      this.templates = dbTemplates.map((tp) => ({
+        name: tp.name,
+        description: tp.description || '',
+        targetGender: tp.targetGender || 'male',
+        objectives: tp.objectives || [],
+        weeklySchedule: (tp.weeklySchedule || []).map((day) => ({
+          dayOfWeek: day.dayOfWeek,
+          timeSlots: day.timeSlots || [],
+          exercises: (day.exercises || []).map((ex) => ({
+            name: ex.name,
+            sets: ex.sets,
+            reps: ex.reps,
+            restTime: ex.restTime,
+            notes: ex.notes,
+          })),
+        })),
+      }));
+
       this.logger.log(
-        `✅ Templates carregados: ${this.templates.length} templates encontrados de ${templatesPath}`,
+        `✅ Templates carregados do MongoDB: ${this.templates.length} templates encontrados`,
       );
+      
+      // Log dos gêneros disponíveis
+      const genders = this.templates.map((t) => t.targetGender).join(', ');
+      this.logger.log(`📋 Gêneros disponíveis nos templates: ${genders}`);
+      
+      this.templatesLoaded = true;
     } catch (error) {
       this.logger.error(
-        `❌ Erro ao carregar templates: ${error instanceof Error ? error.message : 'Erro desconhecido'}`,
+        `❌ Erro ao carregar templates do MongoDB: ${error instanceof Error ? error.message : 'Erro desconhecido'}`,
       );
+      if (error instanceof Error && error.stack) {
+        this.logger.error(`Stack trace: ${error.stack}`);
+      }
       this.templates = [];
+      this.templatesLoaded = true;
     }
+  }
+
+  /**
+   * Aguarda os templates serem carregados (para uso síncrono)
+   */
+  private async ensureTemplatesLoaded(): Promise<void> {
+    if (!this.templatesLoaded) {
+      // Aguardar até 5 segundos para os templates carregarem
+      const maxWait = 5000;
+      const startTime = Date.now();
+      while (!this.templatesLoaded && Date.now() - startTime < maxWait) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+    }
+  }
+
+
+  /**
+   * Normaliza o valor de gênero para garantir que seja válido
+   */
+  private normalizeGender(gender?: string | null): 'male' | 'female' | 'other' | undefined {
+    if (!gender) return undefined;
+    
+    const normalized = gender.toLowerCase().trim();
+    
+    // Corrigir valores incorretos comuns
+    if (normalized === 'mmale' || normalized === 'male') return 'male';
+    if (normalized === 'ffemale' || normalized === 'female') return 'female';
+    if (normalized === 'other') return 'other';
+    
+    // Se não for um valor válido, retornar undefined
+    if (!['male', 'female', 'other'].includes(normalized)) {
+      this.logger.warn(`⚠️ Gênero inválido recebido: "${gender}", normalizado para undefined`);
+      return undefined;
+    }
+    
+    return normalized as 'male' | 'female' | 'other';
   }
 
   /**
@@ -100,25 +149,48 @@ export class TemplateLoaderService {
    * @param gender Gênero do estudante ('male', 'female', 'other')
    * @returns Template correspondente ou null se não encontrado
    */
-  getTemplateByGender(
-    gender?: 'male' | 'female' | 'other',
-  ): TemplateData | null {
-    if (!gender) {
-      // Se não houver gênero, retornar template masculino como padrão
-      this.logger.warn(
-        '⚠️ Gênero não informado, usando template masculino como padrão',
-      );
-      return this.templates.find((t) => t.targetGender === 'male') || null;
+  async getTemplateByGender(
+    gender?: 'male' | 'female' | 'other' | string | null,
+  ): Promise<TemplateData | null> {
+    // Garantir que os templates foram carregados
+    await this.ensureTemplatesLoaded();
+    
+    // Verificar se há templates carregados
+    if (this.templates.length === 0) {
+      this.logger.error('❌ Nenhum template foi carregado. Execute o script de importação ou verifique o MongoDB.');
+      return null;
     }
 
-    const template = this.templates.find((t) => t.targetGender === gender);
+    // Normalizar o gênero
+    const normalizedGender = this.normalizeGender(gender);
+    
+    if (!normalizedGender) {
+      // Se não houver gênero válido, retornar template masculino como padrão
+      this.logger.warn(
+        `⚠️ Gênero não informado ou inválido (recebido: "${gender}"), usando template masculino como padrão`,
+      );
+      const defaultTemplate = this.templates.find((t) => t.targetGender === 'male');
+      if (!defaultTemplate) {
+        this.logger.error('❌ Template masculino padrão não encontrado');
+      }
+      return defaultTemplate || null;
+    }
+
+    this.logger.log(`🔍 Buscando template para gênero: ${normalizedGender}`);
+    const template = this.templates.find((t) => t.targetGender === normalizedGender);
+    
     if (!template) {
       this.logger.warn(
-        `⚠️ Template não encontrado para gênero ${gender}, usando template masculino como padrão`,
+        `⚠️ Template não encontrado para gênero ${normalizedGender}, usando template masculino como padrão`,
       );
-      return this.templates.find((t) => t.targetGender === 'male') || null;
+      const defaultTemplate = this.templates.find((t) => t.targetGender === 'male');
+      if (!defaultTemplate) {
+        this.logger.error('❌ Template masculino padrão não encontrado');
+      }
+      return defaultTemplate || null;
     }
 
+    this.logger.log(`✅ Template encontrado para gênero: ${normalizedGender}`);
     return template;
   }
 
@@ -167,22 +239,32 @@ export class TemplateLoaderService {
    * @param studentName Nome do estudante
    * @returns CreateTrainingPlanDto ou null se template não encontrado
    */
-  getTemplateAsCreateDto(
-    gender?: 'male' | 'female' | 'other',
+  async getTemplateAsCreateDto(
+    gender?: 'male' | 'female' | 'other' | string | null,
     studentId?: string,
     studentName?: string,
-  ): CreateTrainingPlanDto | null {
+  ): Promise<CreateTrainingPlanDto | null> {
     if (!studentId) {
       this.logger.error('❌ studentId é obrigatório para criar plano');
       return null;
     }
 
-    const template = this.getTemplateByGender(gender);
-    if (!template) {
-      this.logger.error('❌ Template não encontrado');
+    // Garantir que os templates foram carregados
+    await this.ensureTemplatesLoaded();
+
+    // Verificar se há templates carregados
+    if (this.templates.length === 0) {
+      this.logger.error('❌ Nenhum template foi carregado. Execute o script de importação ou verifique o MongoDB.');
       return null;
     }
 
+    const template = await this.getTemplateByGender(gender);
+    if (!template) {
+      this.logger.error(`❌ Template não encontrado. Templates disponíveis: ${this.templates.length}, Gêneros: ${this.templates.map(t => t.targetGender).join(', ')}`);
+      return null;
+    }
+
+    this.logger.log(`✅ Convertendo template "${template.name}" para CreateTrainingPlanDto`);
     return this.convertTemplateToCreateDto(template, studentId, studentName);
   }
 }

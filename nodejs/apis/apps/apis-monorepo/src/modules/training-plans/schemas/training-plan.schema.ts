@@ -18,10 +18,15 @@ const TimeSlotSchema = new MongooseSchema(
 );
 
 // Sub-schema para exercícios (definido antes de WeeklyScheduleSchema para evitar erro de inicialização)
+// exerciseId pode ser um ObjectId referenciando o catálogo de exercícios ou null para exercícios personalizados
 const ExerciseSchema = new MongooseSchema(
   {
-    exerciseId: { type: String },
-    name: { type: String, required: true },
+    exerciseId: { 
+      type: MongooseSchema.Types.ObjectId, 
+      ref: 'Exercise',
+      required: false 
+    }, // Referência ao catálogo de exercícios
+    name: { type: String, required: true }, // Nome do exercício (usado se exerciseId não estiver presente)
     sets: { type: Number, required: true },
     reps: { type: String, required: true }, // pode ser "10-12" ou "até a falha"
     weight: { type: Number },
@@ -82,7 +87,7 @@ export class TrainingPlan {
       activity: string;
     }[];
     exercises?: {
-      exerciseId?: string;
+      exerciseId?: Types.ObjectId | string; // Referência ao Exercise ou string para compatibilidade
       name: string;
       sets: number;
       reps: string;
@@ -94,7 +99,7 @@ export class TrainingPlan {
 
   @Prop({ type: [ExerciseSchema], default: [] })
   exercises: {
-    exerciseId?: string;
+    exerciseId?: Types.ObjectId | string; // Referência ao Exercise ou string para compatibilidade
     name: string;
     sets: number;
     reps: string;
