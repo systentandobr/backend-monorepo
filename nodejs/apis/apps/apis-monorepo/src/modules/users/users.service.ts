@@ -279,7 +279,7 @@ export class UsersService {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
             'x-api-key': EnvironmentConfig.sysSeguranca.apiKey,
-            'x-domain': 'viralkids-web',
+            'x-domain': 'systentando-web',
           },
           timeout: EnvironmentConfig.sysSeguranca.timeout,
         }),
@@ -550,7 +550,7 @@ export class UsersService {
 
       // Preparar payload para o SYS-SEGURANÇA
       // O SYS-SEGURANÇA espera firstName, lastName e campos de endereço separados
-      // NÃO incluir roles, permissions, isEmailVerified, isActive, unitId - esses campos não são permitidos no CreateUserDto
+      // NÃO incluir roles, permissions, isEmailVerified, isActive - esses campos não são permitidos no CreateUserDto
       // O unitId será atualizado após a criação do usuário através do endpoint PATCH /users/:id/unit
       const payload = {
         email: createUserDto.email,
@@ -569,6 +569,7 @@ export class UsersService {
         city: createUserDto.city,
         latitude: createUserDto.latitude,
         longitude: createUserDto.longitude,
+        unitId: createUserDto.unitId,
         domain: domain,
       };
 
@@ -639,7 +640,7 @@ export class UsersService {
 
       return createdUser;
     } catch (error: any) {
-      console.error('❌ [UsersService] Erro ao criar usuário:', {
+      console.error('❌ [UsersService::backend] Erro ao criar usuário:', {
         message: error.message,
         response: error.response?.data,
         status: error.response?.status,
