@@ -370,8 +370,8 @@ export class GamificationController {
   })
   @ApiResponse({ status: 401, description: 'Não autorizado' })
   async getTeamsRanking(
-    @Query('unitId') unitIdParam?: string,
     @CurrentUser() user: CurrentUserShape,
+    @Query('unitId') unitIdParam?: string,
   ): Promise<{
     success: boolean;
     data: any[];

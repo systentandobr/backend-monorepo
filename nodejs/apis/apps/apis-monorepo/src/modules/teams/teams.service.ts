@@ -17,6 +17,7 @@ import { SuggestTeamNameDto } from './dto/suggest-team-name.dto';
 import { StudentsService } from '../students/students.service';
 import { Student, StudentDocument } from '../students/schemas/student.schema';
 import { ExternalApisService } from '../external-apis/external-apis.service';
+import { GroqModel } from '../external-apis/dto/groq.dto';
 import { TrainingPlansService } from '../training-plans/training-plans.service';
 import { PointTransaction, PointTransactionDocument } from '../gamification/schemas/point-transaction.schema';
 
@@ -287,7 +288,7 @@ export class TeamsService {
         prompt,
         systemPrompt:
           'Você é um especialista em criar nomes motivacionais para times de academia. Seja criativo e inspirador.',
-        model: 'llama-3.1-8b-instant',
+        model: GroqModel.LLAMA_3_1_8B,
         maxTokens: 100,
       });
 
