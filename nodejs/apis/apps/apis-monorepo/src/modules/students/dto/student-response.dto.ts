@@ -38,6 +38,7 @@ export class StudentResponseDto {
     nextPaymentDate?: Date;
   };
   isActive: boolean;
+  teamId?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }

@@ -88,7 +88,7 @@ export class GamificationController {
     };
   }
 
-  @Get('users/:userId/check-ins')
+  @Get('students/:studentId/check-ins')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Retorna o histórico de check-ins do usuário',
@@ -96,7 +96,7 @@ export class GamificationController {
       'Retorna check-ins ordenados por data (mais recente primeiro) com cálculo de streaks',
   })
   @ApiParam({
-    name: 'userId',
+    name: 'studentId',
     description: 'ID do usuário',
     type: String,
   })
@@ -126,7 +126,7 @@ export class GamificationController {
   @ApiResponse({ status: 401, description: 'Não autorizado' })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
   async getCheckInHistory(
-    @Param('userId') userId: string,
+    @Param('studentId') studentId: string,
     @Query() query: CheckInHistoryQueryDto,
     @CurrentUser() user: CurrentUserShape,
   ): Promise<{
@@ -144,7 +144,7 @@ export class GamificationController {
     const limit = query.limit || 50;
 
     const history = await this.gamificationService.getCheckInHistory(
-      userId,
+      studentId,
       unitId,
       startDate,
       endDate,
@@ -158,7 +158,7 @@ export class GamificationController {
     };
   }
 
-  @Get('users/:userId/weekly-activity')
+  @Get('students/:studentId/weekly-activity')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Retorna atividade semanal do usuário',
@@ -166,7 +166,7 @@ export class GamificationController {
       'Retorna atividade dos últimos 7 dias agrupada por dia, incluindo check-ins, treinos e exercícios',
   })
   @ApiParam({
-    name: 'userId',
+    name: 'studentId',
     description: 'ID do usuário',
     type: String,
   })
@@ -178,7 +178,7 @@ export class GamificationController {
   @ApiResponse({ status: 401, description: 'Não autorizado' })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
   async getWeeklyActivity(
-    @Param('userId') userId: string,
+    @Param('studentId') studentId: string,
     @CurrentUser() user: CurrentUserShape,
   ): Promise<{
     success: boolean;
@@ -191,7 +191,7 @@ export class GamificationController {
     }
 
     const activity = await this.gamificationService.getWeeklyActivity(
-      userId,
+      studentId,
       unitId,
     );
 
@@ -202,7 +202,7 @@ export class GamificationController {
     };
   }
 
-  @Get('users/:userId')
+  @Get('students/:studentId')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Retorna os dados de gamificação do usuário',
@@ -210,7 +210,7 @@ export class GamificationController {
       'Retorna dados completos incluindo pontos, nível, XP, conquistas e posição no ranking',
   })
   @ApiParam({
-    name: 'userId',
+    name: 'studentId',
     description: 'ID do usuário',
     type: String,
   })
@@ -222,7 +222,7 @@ export class GamificationController {
   @ApiResponse({ status: 401, description: 'Não autorizado' })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
   async getUserData(
-    @Param('userId') userId: string,
+    @Param('studentId') studentId: string,
     @CurrentUser() user: CurrentUserShape,
     @Req() request: any,
   ): Promise<{
@@ -243,7 +243,7 @@ export class GamificationController {
     }
 
     const userData = await this.gamificationService.getUserData(
-      userId,
+      studentId,
       unitId,
       token,
     );
@@ -255,7 +255,7 @@ export class GamificationController {
     };
   }
 
-  @Post('users/:userId/share')
+  @Post('students/:studentId/share')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Gera uma imagem compartilhável do progresso do usuário',
@@ -263,7 +263,7 @@ export class GamificationController {
       'Gera dados para compartilhamento incluindo URL da imagem, texto e estatísticas',
   })
   @ApiParam({
-    name: 'userId',
+    name: 'studentId',
     description: 'ID do usuário',
     type: String,
   })
@@ -275,7 +275,7 @@ export class GamificationController {
   @ApiResponse({ status: 401, description: 'Não autorizado' })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
   async generateShare(
-    @Param('userId') userId: string,
+    @Param('studentId') studentId: string,
     @CurrentUser() user: CurrentUserShape,
     @Req() request: any,
   ): Promise<{
@@ -296,7 +296,7 @@ export class GamificationController {
     }
 
     const shareData = await this.gamificationService.generateShare(
-      userId,
+      studentId,
       unitId,
       token,
     );
@@ -304,6 +304,89 @@ export class GamificationController {
     return {
       success: true,
       data: shareData,
+      error: null,
+    };
+  }
+
+  @Get('teams/:teamId/metrics')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Retorna métricas de um time',
+    description:
+      'Retorna métricas agregadas do time (check-ins, treinos, pontos, etc.)',
+  })
+  @ApiParam({
+    name: 'teamId',
+    description: 'ID do time',
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Métricas retornadas com sucesso',
+  })
+  @ApiResponse({ status: 401, description: 'Não autorizado' })
+  @ApiResponse({ status: 404, description: 'Time não encontrado' })
+  async getTeamMetrics(
+    @Param('teamId') teamId: string,
+    @CurrentUser() user: CurrentUserShape,
+  ): Promise<{
+    success: boolean;
+    data: any;
+    error: null;
+  }> {
+    const unitId = user.unitId || user.profile?.unitId;
+    if (!unitId) {
+      throw new Error('unitId não encontrado no contexto do usuário');
+    }
+
+    const metrics = await this.gamificationService.getTeamMetrics(
+      teamId,
+      unitId,
+    );
+
+    return {
+      success: true,
+      data: metrics,
+      error: null,
+    };
+  }
+
+  @Get('teams/ranking')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Retorna ranking de times',
+    description:
+      'Retorna ranking de times ordenado por performance (check-ins, treinos, pontos)',
+  })
+  @ApiQuery({
+    name: 'unitId',
+    required: false,
+    type: String,
+    description: 'ID da unidade (usa unidade do usuário se não fornecido)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Ranking de times retornado com sucesso',
+  })
+  @ApiResponse({ status: 401, description: 'Não autorizado' })
+  async getTeamsRanking(
+    @Query('unitId') unitIdParam?: string,
+    @CurrentUser() user: CurrentUserShape,
+  ): Promise<{
+    success: boolean;
+    data: any[];
+    error: null;
+  }> {
+    const unitId = unitIdParam || user.unitId || user.profile?.unitId;
+    if (!unitId) {
+      throw new Error('unitId não encontrado no contexto do usuário');
+    }
+
+    const ranking = await this.gamificationService.getTeamsRanking(unitId);
+
+    return {
+      success: true,
+      data: ranking,
       error: null,
     };
   }

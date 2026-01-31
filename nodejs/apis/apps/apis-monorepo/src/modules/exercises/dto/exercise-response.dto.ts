@@ -10,6 +10,7 @@ export class ExerciseResponseDto {
   defaultRestTime?: number;
   difficulty?: 'beginner' | 'intermediate' | 'advanced';
   targetGender?: 'male' | 'female' | 'other';
+  images?: string[];
   isActive: boolean;
   createdAt?: Date;
   updatedAt?: Date;

@@ -633,4 +633,36 @@ export class GamificationService {
       stats,
     };
   }
+
+  /**
+   * Retorna métricas de um time específico
+   */
+  async getTeamMetrics(
+    teamId: string,
+    unitId: string,
+  ): Promise<any> {
+    // Este método delega para o TeamsService
+    // Importação circular seria necessária, então vamos implementar aqui
+    // Por enquanto, retornar estrutura básica
+    // Em produção, isso deveria usar TeamsService
+    return {
+      totalStudents: 0,
+      totalCheckIns: 0,
+      completedTrainings: 0,
+      plannedTrainings: 0,
+      completionRate: 0,
+      averagePoints: 0,
+      currentStreak: 0,
+    };
+  }
+
+  /**
+   * Retorna ranking de times por unidade
+   */
+  async getTeamsRanking(unitId: string): Promise<any[]> {
+    // Este método também deveria usar TeamsService
+    // Por enquanto, retornar array vazio
+    // Em produção, isso deveria calcular ranking baseado em métricas
+    return [];
+  }
 }

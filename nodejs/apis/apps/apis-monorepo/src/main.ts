@@ -116,6 +116,23 @@ async function bootstrap() {
     ...mongoOrigins,
   ];
 
+  // Configurar servir arquivos estáticos da pasta uploads ANTES do CORS
+  const expressApp = app.getHttpAdapter().getInstance();
+  const express = require('express');
+  const uploadsPath = join(process.cwd(), 'uploads');
+  
+  // Criar diretório uploads se não existir
+  if (!existsSync(uploadsPath)) {
+    mkdirSync(uploadsPath, { recursive: true });
+  }
+  
+  // Servir arquivos estáticos da pasta uploads (deve estar antes do CORS)
+  expressApp.use('/uploads', express.static(uploadsPath, {
+    maxAge: '1d', // Cache por 1 dia
+    etag: true,
+    lastModified: true,
+  }));
+
   // Configuração do CORS com função de callback para debug
   app.enableCors({
     origin: (origin, callback) => {
@@ -183,8 +200,12 @@ async function bootstrap() {
   });
 
   // Middleware adicional para garantir CORS e desabilitar cache em desenvolvimento
-  const expressApp = app.getHttpAdapter().getInstance();
   expressApp.use((req: any, res: any, next: any) => {
+    // Pular middleware para arquivos estáticos (já servidos pelo express.static)
+    if (req.path.startsWith('/uploads/')) {
+      return next();
+    }
+    
     const origin = req.headers.origin;
 
     if (origin) {

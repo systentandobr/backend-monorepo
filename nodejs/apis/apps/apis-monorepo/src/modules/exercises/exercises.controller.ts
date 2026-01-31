@@ -11,21 +11,26 @@ import {
   HttpStatus,
   BadRequestException,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ExercisesService } from './exercises.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
+import { GenerateExerciseImagesDto } from './dto/generate-images.dto';
 import { UnitScope } from '../../decorators/unit-scope.decorator';
 import {
   CurrentUser,
   CurrentUserShape,
 } from '../../decorators/current-user.decorator';
+import { NanoBananaService } from '../../services/nano-banana.service';
 
 @ApiTags('exercises')
 @Controller('exercises')
 @UnitScope()
 export class ExercisesController {
-  constructor(private readonly exercisesService: ExercisesService) {}
+  constructor(
+    private readonly exercisesService: ExercisesService,
+    private readonly nanoBananaService: NanoBananaService,
+  ) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -99,5 +104,75 @@ export class ExercisesController {
       );
     }
     return this.exercisesService.remove(id, unitId);
+  }
+
+  @Post('generate-images')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Gera imagens para um exercício usando IA' })
+  @ApiResponse({
+    status: 200,
+    description: 'Imagens geradas com sucesso',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        data: {
+          type: 'object',
+          properties: {
+            images: {
+              type: 'array',
+              items: { type: 'string' },
+              example: [
+                '/uploads/exercises/temp-123/image-0-abc123.png',
+                '/uploads/exercises/temp-123/image-1-def456.png',
+                '/uploads/exercises/temp-123/image-2-ghi789.png',
+              ],
+            },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Erro na validação ou geração de imagens',
+  })
+  async generateImages(
+    @Body() generateImagesDto: GenerateExerciseImagesDto,
+    @CurrentUser() user: CurrentUserShape,
+  ) {
+    const unitId = user.unitId || user.profile?.unitId;
+    if (!unitId) {
+      throw new BadRequestException(
+        'unitId não encontrado no contexto do usuário',
+      );
+    }
+
+    // Validar dados mínimos
+    if (!generateImagesDto.exerciseName || !generateImagesDto.muscleGroups || generateImagesDto.muscleGroups.length === 0) {
+      throw new BadRequestException(
+        'Nome do exercício e pelo menos um grupo muscular são obrigatórios',
+      );
+    }
+
+    try {
+      const images = await this.exercisesService.generateExerciseImages(
+        generateImagesDto.exerciseName,
+        generateImagesDto.description,
+        generateImagesDto.muscleGroups,
+        generateImagesDto.equipment,
+        generateImagesDto.targetGender || 'male',
+        this.nanoBananaService,
+      );
+
+      return {
+        success: true,
+        data: { images },
+      };
+    } catch (error: any) {
+      throw new BadRequestException(
+        `Erro ao gerar imagens: ${error.message}`,
+      );
+    }
   }
 }

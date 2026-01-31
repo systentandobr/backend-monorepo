@@ -48,6 +48,9 @@ export class Exercise {
   @Prop({ default: true })
   isActive: boolean;
 
+  @Prop({ type: [String] })
+  images?: string[]; // URLs das imagens do exercício
+
   @Prop({ type: Object })
   metadata?: Record<string, any>;
 }

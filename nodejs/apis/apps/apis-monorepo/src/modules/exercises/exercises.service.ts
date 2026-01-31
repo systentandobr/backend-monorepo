@@ -5,6 +5,9 @@ import { Exercise, ExerciseDocument } from './schemas/exercise.schema';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
 import { ExerciseResponseDto } from './dto/exercise-response.dto';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class ExercisesService {
@@ -119,6 +122,87 @@ export class ExercisesService {
     }
   }
 
+  /**
+   * Gera imagens para um exercício usando Nano Banana
+   */
+  async generateExerciseImages(
+    exerciseName: string,
+    description: string | undefined,
+    muscleGroups: string[],
+    equipment: string[] | undefined,
+    targetGender: 'male' | 'female' | 'other',
+    nanoBananaService: any, // NanoBananaService - será injetado
+  ): Promise<string[]> {
+    try {
+      // Gerar imagens usando Nano Banana
+      const imageBuffers = await nanoBananaService.generateExerciseImages(
+        exerciseName,
+        description,
+        muscleGroups,
+        equipment,
+        targetGender,
+      );
+
+      // Salvar imagens temporariamente (serão movidas quando o exercício for criado)
+      const tempId = `temp-${Date.now()}`;
+      const urls = await this.saveImageBuffers(imageBuffers, tempId);
+
+      return urls;
+    } catch (error: any) {
+      this.logger.error(`Erro ao gerar imagens: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Salva uma imagem em buffer e retorna a URL
+   */
+  async saveImageBuffer(
+    buffer: Buffer,
+    exerciseId: string,
+    imageIndex: number,
+  ): Promise<string> {
+    const uploadDir = path.join(
+      process.cwd(),
+      'uploads',
+      'exercises',
+      exerciseId || 'temp',
+    );
+
+    // Criar diretório se não existir
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    // Gerar nome único para a imagem
+    const hash = crypto.randomBytes(8).toString('hex');
+    const filename = `image-${imageIndex}-${hash}.png`;
+    const filePath = path.join(uploadDir, filename);
+
+    // Salvar arquivo
+    fs.writeFileSync(filePath, buffer);
+
+    // Retornar URL relativa (será servida estaticamente)
+    return `/uploads/exercises/${exerciseId || 'temp'}/${filename}`;
+  }
+
+  /**
+   * Salva múltiplas imagens e retorna URLs
+   */
+  async saveImageBuffers(
+    buffers: Buffer[],
+    exerciseId: string,
+  ): Promise<string[]> {
+    const urls: string[] = [];
+
+    for (let i = 0; i < buffers.length; i++) {
+      const url = await this.saveImageBuffer(buffers[i], exerciseId, i);
+      urls.push(url);
+    }
+
+    return urls;
+  }
+
   private toResponseDto(exercise: ExerciseDocument): ExerciseResponseDto {
     return {
       id: exercise._id.toString(),
@@ -132,6 +216,7 @@ export class ExercisesService {
       defaultRestTime: exercise.defaultRestTime,
       difficulty: exercise.difficulty,
       targetGender: exercise.targetGender,
+      images: exercise.images,
       isActive: exercise.isActive,
       createdAt: exercise.createdAt,
       updatedAt: exercise.updatedAt,

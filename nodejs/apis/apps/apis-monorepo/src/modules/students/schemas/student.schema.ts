@@ -143,6 +143,9 @@ export class Student {
   @Prop({ default: true })
   isActive: boolean;
 
+  @Prop({ index: true })
+  teamId?: string;
+
   @Prop({ type: Object })
   metadata?: Record<string, any>;
 }
@@ -156,3 +159,4 @@ StudentSchema.index({ unitId: 1, 'subscription.paymentStatus': 1 });
 StudentSchema.index({ unitId: 1, isActive: 1 });
 StudentSchema.index({ unitId: 1, createdAt: -1 });
 StudentSchema.index({ userId: 1 }, { unique: true, sparse: true }); // Um student por userId
+StudentSchema.index({ unitId: 1, teamId: 1 }); // Índice para queries por time

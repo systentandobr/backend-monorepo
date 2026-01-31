@@ -379,6 +379,7 @@ export class StudentsService {
       healthInfo: student.healthInfo,
       subscription: student.subscription,
       isActive: student.isActive,
+      teamId: student.teamId,
       createdAt: student.createdAt,
       updatedAt: student.updatedAt,
     };

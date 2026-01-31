@@ -30,6 +30,8 @@ import { ExercisesModule } from './modules/exercises/exercises.module';
 import { SolarModule } from './modules/solar/solar.module';
 import { BioimpedanceModule } from './modules/bioimpedance/bioimpedance.module';
 import { GamificationModule } from './modules/gamification/gamification.module';
+import { ExternalApisModule } from './modules/external-apis/external-apis.module';
+import { TeamsModule } from './modules/teams/teams.module';
 
 @Module({
   imports: [
@@ -60,6 +62,8 @@ import { GamificationModule } from './modules/gamification/gamification.module';
     SolarModule,
     BioimpedanceModule,
     GamificationModule,
+    ExternalApisModule,
+    TeamsModule,
   ],
   controllers: [AppController, DebugController, AuthPublicController],
   providers: [AppService],

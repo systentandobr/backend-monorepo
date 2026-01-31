@@ -49,6 +49,11 @@ export class CreateExerciseDto {
   targetGender?: 'male' | 'female' | 'other';
 
   @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  images?: string[];
+
+  @IsOptional()
   @IsBoolean()
   isActive?: boolean;
 }

@@ -107,4 +107,8 @@ export class CreateStudentDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+
+  @IsOptional()
+  @IsString()
+  teamId?: string;
 }

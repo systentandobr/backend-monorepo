@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ExercisesController } from './exercises.controller';
 import { ExercisesService } from './exercises.service';
 import { Exercise, ExerciseSchema } from './schemas/exercise.schema';
+import { NanoBananaService } from '../../services/nano-banana.service';
 
 @Module({
   imports: [
@@ -11,7 +12,7 @@ import { Exercise, ExerciseSchema } from './schemas/exercise.schema';
     ]),
   ],
   controllers: [ExercisesController],
-  providers: [ExercisesService],
+  providers: [ExercisesService, NanoBananaService],
   exports: [ExercisesService],
 })
 export class ExercisesModule {}
