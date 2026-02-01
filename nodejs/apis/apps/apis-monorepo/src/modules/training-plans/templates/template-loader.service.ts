@@ -17,6 +17,7 @@ interface TemplateData {
       activity: string;
     }[];
     exercises: {
+      exerciseId?: string;
       name: string;
       sets: number;
       reps: string;
@@ -79,6 +80,11 @@ export class TemplateLoaderService {
           dayOfWeek: day.dayOfWeek,
           timeSlots: day.timeSlots || [],
           exercises: (day.exercises || []).map((ex) => ({
+            exerciseId: ex.exerciseId
+              ? typeof ex.exerciseId === 'string'
+                ? ex.exerciseId
+                : ex.exerciseId.toString()
+              : undefined,
             name: ex.name,
             sets: ex.sets,
             reps: ex.reps,
@@ -234,11 +240,12 @@ export class TemplateLoaderService {
       ? `${template.name} - ${studentName}`
       : template.name;
 
-    // Mapear weeklySchedule preservando todos os dias
+    // Mapear weeklySchedule preservando todos os dias e exerciseId
     const weeklySchedule = template.weeklySchedule.map((day) => ({
       dayOfWeek: day.dayOfWeek,
       timeSlots: day.timeSlots || [],
       exercises: (day.exercises || []).map((ex) => ({
+        exerciseId: ex.exerciseId, // PRESERVAR exerciseId
         name: ex.name,
         sets: ex.sets,
         reps: ex.reps,
