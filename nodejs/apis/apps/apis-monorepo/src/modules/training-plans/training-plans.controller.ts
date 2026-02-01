@@ -71,6 +71,22 @@ export class TrainingPlansController {
     return this.trainingPlansService.findTemplates({ gender }, unitId);
   }
 
+  @Get('all')
+  listAllTrainingPlans(@Query() query: any) {
+    // Permite filtrar por qualquer campo usando query params
+    // Exemplo: /training-plans/all?status=active&isTemplate=true
+    const mongoQuery: any = {};
+    
+    // Converter query params para o formato MongoDB
+    if (query.status) mongoQuery.status = query.status;
+    if (query.isTemplate !== undefined) mongoQuery.isTemplate = query.isTemplate === 'true';
+    if (query.targetGender) mongoQuery.targetGender = query.targetGender;
+    if (query.studentId) mongoQuery.studentId = query.studentId;
+    if (query.unitId) mongoQuery.unitId = query.unitId;
+    
+    return this.trainingPlansService.listAllTrainingPlans(mongoQuery);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string, @CurrentUser() user: CurrentUserShape) {
     const unitId = user.unitId || user.profile?.unitId;

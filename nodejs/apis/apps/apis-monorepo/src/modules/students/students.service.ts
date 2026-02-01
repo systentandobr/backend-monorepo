@@ -206,7 +206,7 @@ export class StudentsService {
   ): Promise<void> {
     try {
       this.logger.log(
-        `📋 [StudentsService] Criando plano de treino padrão para estudante: ${student._id.toString()}`,
+        `📋 [StudentsService] Criando plano de treino padrão para estudante: ${student._id.toString()} (${student.name}), gênero: ${student.gender}`,
       );
 
       // Buscar template baseado no gênero do estudante
@@ -218,10 +218,17 @@ export class StudentsService {
 
       if (!templateDto) {
         this.logger.warn(
-          `⚠️ [StudentsService] Template não encontrado para criar plano padrão. Estudante: ${student._id.toString()}`,
+          `⚠️ [StudentsService] Template não encontrado para criar plano padrão. Estudante: ${student._id.toString()}, gênero: ${student.gender}`,
         );
         return;
       }
+
+      // Log para verificar quantos dias estão no templateDto antes de criar
+      const daysCount = templateDto.weeklySchedule?.length || 0;
+      const daysOfWeek = (templateDto.weeklySchedule || []).map(d => d.dayOfWeek).sort((a, b) => a - b);
+      this.logger.log(
+        `📋 [StudentsService] TemplateDto preparado com ${daysCount} dias na semana. Dias: [${daysOfWeek.join(', ')}]`,
+      );
 
       // Criar o plano de treino usando o template
       const trainingPlan = await this.trainingPlansService.create(
@@ -229,8 +236,10 @@ export class StudentsService {
         unitId,
       );
 
+      // Log final para verificar quantos dias foram salvos
+      const finalDaysCount = trainingPlan.weeklySchedule?.length || 0;
       this.logger.log(
-        `✅ [StudentsService] Plano de treino criado com sucesso para estudante ${student._id.toString()}. Plano ID: ${trainingPlan.id}`,
+        `✅ [StudentsService] Plano de treino criado com sucesso para estudante ${student._id.toString()}. Plano ID: ${trainingPlan.id}, ${finalDaysCount} dias na semana`,
       );
     } catch (error) {
       // Logar erro mas não impedir a criação do estudante
@@ -238,6 +247,9 @@ export class StudentsService {
         `❌ [StudentsService] Erro ao criar plano de treino padrão para estudante ${student._id.toString()}:`,
         error instanceof Error ? error.message : 'Erro desconhecido',
       );
+      if (error instanceof Error && error.stack) {
+        this.logger.error(`Stack trace: ${error.stack}`);
+      }
       // Não lançar exceção para não impedir a criação do estudante
     }
   }

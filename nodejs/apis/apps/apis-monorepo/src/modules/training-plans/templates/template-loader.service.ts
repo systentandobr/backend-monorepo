@@ -51,16 +51,22 @@ export class TemplateLoaderService {
     try {
       this.logger.log('🔍 Carregando templates do MongoDB...');
       
-      // Buscar todos os templates no banco
+      // Buscar templates do unitId padrão onde os templates são salvos
+      const defaultUnitId = process.env.DEFAULT_UNIT_ID || '#BR#ALL#SYSTEM#0001';
+      this.logger.log(`📍 Buscando templates com unitId: ${defaultUnitId}`);
+      
+      // Buscar todos os templates no banco filtrando por unitId
       const dbTemplates = await this.trainingPlanModel
         .find({
           isTemplate: true,
+          status: 'active',
+          unitId: defaultUnitId,
         })
         .exec();
 
       if (dbTemplates.length === 0) {
         this.logger.warn(
-          '⚠️ Nenhum template encontrado no MongoDB. Execute o script de importação: npx ts-node -r tsconfig-paths/register src/modules/training-plans/scripts/import-templates.ts',
+          `⚠️ Nenhum template encontrado no MongoDB com unitId: ${defaultUnitId}. Execute o script de importação: npx ts-node -r tsconfig-paths/register src/modules/training-plans/scripts/import-templates.ts`,
         );
         this.templates = [];
         this.templatesLoaded = true;
@@ -68,12 +74,8 @@ export class TemplateLoaderService {
       }
 
       // Converter documentos do MongoDB para TemplateData
-      this.templates = dbTemplates.map((tp) => ({
-        name: tp.name,
-        description: tp.description || '',
-        targetGender: tp.targetGender || 'male',
-        objectives: tp.objectives || [],
-        weeklySchedule: (tp.weeklySchedule || []).map((day) => ({
+      this.templates = dbTemplates.map((tp) => {
+        const weeklySchedule = (tp.weeklySchedule || []).map((day) => ({
           dayOfWeek: day.dayOfWeek,
           timeSlots: day.timeSlots || [],
           exercises: (day.exercises || []).map((ex) => ({
@@ -83,8 +85,23 @@ export class TemplateLoaderService {
             restTime: ex.restTime,
             notes: ex.notes,
           })),
-        })),
-      }));
+        }));
+
+        // Log para debug: verificar quantos dias foram carregados
+        const daysCount = weeklySchedule.length;
+        const daysOfWeek = weeklySchedule.map(d => d.dayOfWeek).sort((a, b) => a - b);
+        this.logger.log(
+          `📅 Template "${tp.name}" (${tp.targetGender}): ${daysCount} dias carregados. Dias: [${daysOfWeek.join(', ')}]`,
+        );
+
+        return {
+          name: tp.name,
+          description: tp.description || '',
+          targetGender: tp.targetGender || 'male',
+          objectives: tp.objectives || [],
+          weeklySchedule,
+        };
+      });
 
       this.logger.log(
         `✅ Templates carregados do MongoDB: ${this.templates.length} templates encontrados`,
@@ -93,6 +110,13 @@ export class TemplateLoaderService {
       // Log dos gêneros disponíveis
       const genders = this.templates.map((t) => t.targetGender).join(', ');
       this.logger.log(`📋 Gêneros disponíveis nos templates: ${genders}`);
+      
+      // Log detalhado de cada template
+      this.templates.forEach((template) => {
+        this.logger.log(
+          `📋 Template "${template.name}" (${template.targetGender}): ${template.weeklySchedule.length} dias na semana`,
+        );
+      });
       
       this.templatesLoaded = true;
     } catch (error) {
@@ -210,22 +234,32 @@ export class TemplateLoaderService {
       ? `${template.name} - ${studentName}`
       : template.name;
 
+    // Mapear weeklySchedule preservando todos os dias
+    const weeklySchedule = template.weeklySchedule.map((day) => ({
+      dayOfWeek: day.dayOfWeek,
+      timeSlots: day.timeSlots || [],
+      exercises: (day.exercises || []).map((ex) => ({
+        name: ex.name,
+        sets: ex.sets,
+        reps: ex.reps,
+        restTime: ex.restTime,
+        notes: ex.notes,
+      })),
+    }));
+
+    // Log para debug
+    const daysCount = weeklySchedule.length;
+    const daysOfWeek = weeklySchedule.map(d => d.dayOfWeek).sort((a, b) => a - b);
+    this.logger.log(
+      `🔄 Convertendo template "${template.name}" para CreateTrainingPlanDto: ${daysCount} dias na semana. Dias: [${daysOfWeek.join(', ')}]`,
+    );
+
     return {
       studentId,
       name: planName,
       description: template.description,
       objectives: template.objectives,
-      weeklySchedule: template.weeklySchedule.map((day) => ({
-        dayOfWeek: day.dayOfWeek,
-        timeSlots: day.timeSlots,
-        exercises: day.exercises.map((ex) => ({
-          name: ex.name,
-          sets: ex.sets,
-          reps: ex.reps,
-          restTime: ex.restTime,
-          notes: ex.notes,
-        })),
-      })),
+      weeklySchedule,
       startDate: new Date().toISOString().split('T')[0], // Data atual no formato YYYY-MM-DD
       status: 'active',
       isTemplate: false,
@@ -258,13 +292,28 @@ export class TemplateLoaderService {
       return null;
     }
 
+    this.logger.log(`🔍 Buscando template para gênero: ${gender}, studentId: ${studentId}`);
     const template = await this.getTemplateByGender(gender);
     if (!template) {
       this.logger.error(`❌ Template não encontrado. Templates disponíveis: ${this.templates.length}, Gêneros: ${this.templates.map(t => t.targetGender).join(', ')}`);
       return null;
     }
 
-    this.logger.log(`✅ Convertendo template "${template.name}" para CreateTrainingPlanDto`);
-    return this.convertTemplateToCreateDto(template, studentId, studentName);
+    this.logger.log(
+      `✅ Template encontrado: "${template.name}" (${template.targetGender}) com ${template.weeklySchedule.length} dias na semana`,
+    );
+    
+    const dto = this.convertTemplateToCreateDto(template, studentId, studentName);
+    
+    // Log final para confirmar que todos os dias foram preservados
+    if (dto.weeklySchedule) {
+      const daysCount = dto.weeklySchedule.length;
+      const daysOfWeek = dto.weeklySchedule.map(d => d.dayOfWeek).sort((a, b) => a - b);
+      this.logger.log(
+        `✅ CreateTrainingPlanDto criado com ${daysCount} dias na semana. Dias: [${daysOfWeek.join(', ')}]`,
+      );
+    }
+    
+    return dto;
   }
 }

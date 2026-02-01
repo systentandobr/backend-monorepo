@@ -25,6 +25,14 @@ export class TrainingPlansService {
     // Processar exercícios: se vierem no nível raiz mas não dentro do weeklySchedule,
     // distribuir para o primeiro dia ou manter no nível raiz para compatibilidade
     const weeklySchedule = createTrainingPlanDto.weeklySchedule || [];
+    
+    // Log para debug: verificar quantos dias estão sendo recebidos
+    const daysCount = weeklySchedule.length;
+    const daysOfWeek = weeklySchedule.map(d => d.dayOfWeek).sort((a, b) => a - b);
+    this.logger.log(
+      `📋 Criando plano de treino "${createTrainingPlanDto.name}": recebido ${daysCount} dias na semana. Dias: [${daysOfWeek.join(', ')}]`,
+    );
+    
     const hasExercisesInSchedule = weeklySchedule.some(
       (day) => day.exercises && day.exercises.length > 0,
     );
@@ -111,9 +119,39 @@ export class TrainingPlansService {
       trainingPlanData.isTemplate = false;
     }
 
+    // Log para debug: verificar quantos dias estão sendo salvos
+    const savedDaysCount = processedWeeklySchedule.length;
+    const savedDaysOfWeek = processedWeeklySchedule.map(d => d.dayOfWeek).sort((a, b) => a - b);
+    this.logger.log(
+      `💾 Salvando plano de treino "${createTrainingPlanDto.name}": ${savedDaysCount} dias na semana serão salvos. Dias: [${savedDaysOfWeek.join(', ')}]`,
+    );
+
     const trainingPlan = new this.trainingPlanModel(trainingPlanData);
     const saved = await trainingPlan.save();
+    
+    // Log final para confirmar quantos dias foram salvos
+    const finalDaysCount = saved.weeklySchedule?.length || 0;
+    const finalDaysOfWeek = (saved.weeklySchedule || []).map((d: any) => d.dayOfWeek).sort((a: number, b: number) => a - b);
+    this.logger.log(
+      `✅ Plano de treino "${createTrainingPlanDto.name}" salvo com sucesso: ${finalDaysCount} dias na semana. Dias: [${finalDaysOfWeek.join(', ')}]`,
+    );
+    
     return this.toResponseDto(saved);
+  }
+
+  /**
+   * Lista todos os dados da collection 'training_plans' usando MongoDB find
+   * @param query - Query opcional para filtrar os resultados (ex: { status: 'active' })
+   * @returns Array com todos os documentos encontrados convertidos para DTO
+   */
+  async listAllTrainingPlans(query: any = {}): Promise<TrainingPlanResponseDto[]> {
+    this.logger.log(`🔍 Listando todos os dados da collection 'training_plans' com query: ${JSON.stringify(query)}`);
+    
+    const data = await this.trainingPlanModel.find(query).sort({ createdAt: -1 }).exec();
+    
+    this.logger.log(`✅ Encontrados ${data.length} documentos na collection 'training_plans'`);
+    
+    return data.map((item) => this.toResponseDto(item));
   }
 
   async findAll(
