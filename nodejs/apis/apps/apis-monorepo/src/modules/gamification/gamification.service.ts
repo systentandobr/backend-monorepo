@@ -248,7 +248,7 @@ export class GamificationService {
   ): Promise<{
     checkIns: Array<{
       id: string;
-      userId: string;
+      studentId: string;
       date: string;
       points: number;
       unitId: string;
@@ -289,7 +289,7 @@ export class GamificationService {
     // Converter para formato de resposta
     const checkIns = transactions.map((transaction) => ({
       id: transaction._id.toString(),
-      userId: transaction.userId,
+      studentId: transaction.userId, // userId do schema mapeia para studentId no DTO
       date: transaction.createdAt!.toISOString(),
       points: transaction.points,
       unitId: transaction.unitId,
@@ -313,6 +313,89 @@ export class GamificationService {
       total,
       currentStreak,
       longestStreak,
+    };
+  }
+
+  /**
+   * Cria um novo check-in para o usuário
+   */
+  async createCheckIn(
+    userId: string,
+    unitId: string,
+    location?: { lat: number; lng: number },
+  ): Promise<{
+    id: string;
+    studentId: string;
+    date: string;
+    points: number;
+    unitId: string;
+    metadata?: any;
+  }> {
+    // Verificar se já existe check-in hoje
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const existingCheckIn = await this.pointTransactionModel
+      .findOne({
+        userId,
+        unitId,
+        sourceType: 'CHECK_IN',
+        createdAt: {
+          $gte: today,
+          $lt: tomorrow,
+        },
+      })
+      .exec();
+
+    if (existingCheckIn) {
+      throw new Error('Check-in já realizado hoje');
+    }
+
+    // Pontos por check-in (padrão: 10 pontos)
+    const checkInPoints = 10;
+
+    // Criar transação de pontos
+    const transaction = new this.pointTransactionModel({
+      userId,
+      unitId,
+      points: checkInPoints,
+      sourceType: 'CHECK_IN',
+      sourceId: `check-in-${Date.now()}`,
+      description: 'Check-in diário',
+      metadata: location
+        ? {
+            location: {
+              lat: location.lat,
+              lng: location.lng,
+            },
+          }
+        : undefined,
+    });
+
+    await transaction.save();
+
+    // Atualizar perfil de gamificação
+    const profile = await this.getOrCreateProfile(userId, unitId);
+    profile.totalPoints += checkInPoints;
+    profile.xp += checkInPoints;
+
+    // Recalcular nível
+    const { level, xpToNextLevel } = this.calculateLevel(profile.xp);
+    profile.level = level;
+    profile.xpToNextLevel = xpToNextLevel;
+
+    await profile.save();
+
+    // Retornar check-in criado no formato DTO
+    return {
+      id: transaction._id.toString(),
+      studentId: transaction.userId,
+      date: transaction.createdAt!.toISOString(),
+      points: transaction.points,
+      unitId: transaction.unitId,
+      metadata: transaction.metadata,
     };
   }
 
@@ -395,109 +478,6 @@ export class GamificationService {
     longestStreak = Math.max(longestStreak, tempStreak);
 
     return { currentStreak, longestStreak };
-  }
-
-  /**
-   * Cria um check-in para o usuário
-   */
-  async createCheckIn(
-    userId: string,
-    unitId: string,
-    location?: { lat: number; lng: number },
-  ): Promise<{
-    id: string;
-    studentId: string;
-    date: string;
-    points: number;
-    unitId: string;
-    metadata?: any;
-  }> {
-    // Verificar se já existe check-in hoje
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    const existingCheckIn = await this.pointTransactionModel
-      .findOne({
-        userId,
-        unitId,
-        sourceType: 'CHECK_IN',
-        createdAt: {
-          $gte: today,
-          $lt: tomorrow,
-        },
-      })
-      .exec();
-
-    if (existingCheckIn) {
-      throw new Error('Check-in já realizado hoje');
-    }
-
-    // Buscar todos os check-ins para calcular streak
-    const allCheckIns = await this.pointTransactionModel
-      .find({
-        userId,
-        unitId,
-        sourceType: 'CHECK_IN',
-      })
-      .sort({ createdAt: -1 })
-      .exec();
-
-    const { currentStreak } = this.calculateStreaks(allCheckIns);
-    const newStreak = currentStreak + 1;
-
-    // Calcular pontos baseado no streak
-    // Base: 10 pontos
-    // Bônus de 7 dias: +100 pontos
-    // Bônus de 30 dias: +500 pontos
-    let points = 10;
-    if (newStreak >= 30) {
-      points += 500; // Bônus mensal
-    } else if (newStreak >= 7) {
-      points += 100; // Bônus semanal
-    }
-
-    // Criar transação de pontos
-    const transaction = new this.pointTransactionModel({
-      userId,
-      unitId,
-      points,
-      sourceType: 'CHECK_IN',
-      sourceId: `check-in-${Date.now()}`,
-      description: `Check-in realizado${newStreak > 1 ? ` - Streak de ${newStreak} dias` : ''}`,
-      metadata: location
-        ? {
-            location: {
-              lat: location.lat,
-              lng: location.lng,
-            },
-          }
-        : undefined,
-    });
-
-    await transaction.save();
-
-    // Atualizar perfil de gamificação
-    const profile = await this.getOrCreateProfile(userId, unitId);
-    profile.totalPoints += points;
-    profile.xp += points;
-
-    // Recalcular nível
-    const { level, xpToNextLevel } = this.calculateLevel(profile.xp);
-    profile.level = level;
-    profile.xpToNextLevel = xpToNextLevel;
-
-    await profile.save();
-
-    return {
-      id: transaction._id.toString(),
-      studentId: transaction.userId,
-      date: transaction.createdAt!.toISOString(),
-      points: transaction.points,
-      unitId: transaction.unitId,
-      metadata: transaction.metadata,
-    };
   }
 
   /**
