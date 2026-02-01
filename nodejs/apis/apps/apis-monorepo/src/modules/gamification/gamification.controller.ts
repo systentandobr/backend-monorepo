@@ -4,10 +4,12 @@ import {
   Post,
   Param,
   Query,
+  Body,
   HttpCode,
   HttpStatus,
   UseGuards,
   Req,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -24,7 +26,11 @@ import {
 } from './dto/gamification-response.dto';
 import { ShareResponseDto } from './dto/share-response.dto';
 import { CheckInHistoryQueryDto } from './dto/check-in-history-query.dto';
-import { CheckInHistoryResponseDto } from './dto/check-in-response.dto';
+import {
+  CheckInHistoryResponseDto,
+  CheckInDto,
+} from './dto/check-in-response.dto';
+import { CheckInRequestDto } from './dto/check-in-request.dto';
 import { WeeklyActivityResponseDto } from './dto/weekly-activity-response.dto';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import {
@@ -156,6 +162,60 @@ export class GamificationController {
       data: history,
       error: null,
     };
+  }
+
+  @Post('students/:studentId/check-in')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: 'Cria um novo check-in para o usuário',
+    description:
+      'Registra um check-in e adiciona pontos de gamificação. Verifica se já existe check-in hoje para evitar duplicatas.',
+  })
+  @ApiParam({
+    name: 'studentId',
+    description: 'ID do usuário',
+    type: String,
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Check-in criado com sucesso',
+    type: CheckInDto,
+  })
+  @ApiResponse({ status: 400, description: 'Check-in já realizado hoje' })
+  @ApiResponse({ status: 401, description: 'Não autorizado' })
+  @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
+  async createCheckIn(
+    @Param('studentId') studentId: string,
+    @Body() body: CheckInRequestDto,
+    @CurrentUser() user: CurrentUserShape,
+  ): Promise<{
+    success: boolean;
+    data: CheckInDto;
+    error: null;
+  }> {
+    const unitId = user.unitId || user.profile?.unitId;
+    if (!unitId) {
+      throw new Error('unitId não encontrado no contexto do usuário');
+    }
+
+    try {
+      const checkIn = await this.gamificationService.createCheckIn(
+        studentId,
+        unitId,
+        body.location,
+      );
+
+      return {
+        success: true,
+        data: checkIn,
+        error: null,
+      };
+    } catch (error: any) {
+      if (error.message === 'Check-in já realizado hoje') {
+        throw new BadRequestException('Check-in já realizado hoje');
+      }
+      throw error;
+    }
   }
 
   @Get('students/:studentId/weekly-activity')

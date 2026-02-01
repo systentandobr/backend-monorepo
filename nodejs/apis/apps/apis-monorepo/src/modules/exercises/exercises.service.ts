@@ -45,48 +45,107 @@ export class ExercisesService {
     },
     unitId: string,
   ): Promise<ExerciseResponseDto[]> {
-    const query: any = { unitId, isActive: true };
+    const systemUnitId = process.env.DEFAULT_UNIT_ID || '#BR#ALL#SYSTEM#0001';
+    
+    // Primeiro busca exercícios da unidade do usuário
+    const userUnitQuery: any = {
+      unitId,
+      isActive: true,
+    };
 
-    // Filtro de busca por nome
+    // Aplicar filtros na query da unidade do usuário
     if (filters.search) {
-      query.name = { $regex: filters.search, $options: 'i' };
+      userUnitQuery.name = { $regex: filters.search, $options: 'i' };
     }
-
-    // Filtro por grupo muscular
     if (filters.muscleGroup) {
-      query.muscleGroups = { $in: [filters.muscleGroup] };
+      userUnitQuery.muscleGroups = { $in: [filters.muscleGroup] };
     }
-
-    // Filtro por equipamento
     if (filters.equipment) {
-      query.equipment = { $in: [filters.equipment] };
+      userUnitQuery.equipment = { $in: [filters.equipment] };
     }
-
-    // Filtro por dificuldade
     if (filters.difficulty) {
-      query.difficulty = filters.difficulty;
+      userUnitQuery.difficulty = filters.difficulty;
     }
-
-    // Filtro por gênero alvo
     if (filters.targetGender) {
-      query.$or = [
+      userUnitQuery.$or = [
         { targetGender: filters.targetGender },
         { targetGender: { $exists: false } },
         { targetGender: null },
       ];
     }
 
-    const exercises = await this.exerciseModel
-      .find(query)
+    const userExercises = await this.exerciseModel
+      .find(userUnitQuery)
       .sort({ name: 1 })
       .exec();
-    return exercises.map((exercise) => this.toResponseDto(exercise));
+
+    // Busca também pelos exercícios do sistema como fallback
+    // (os exercícios da unidade do usuário têm prioridade e serão retornados primeiro)
+    const systemQuery: any = {
+      unitId: systemUnitId,
+      isActive: true,
+    };
+
+    // Aplicar os mesmos filtros na query do sistema
+    if (filters.search) {
+      systemQuery.name = { $regex: filters.search, $options: 'i' };
+    }
+    if (filters.muscleGroup) {
+      systemQuery.muscleGroups = { $in: [filters.muscleGroup] };
+    }
+    if (filters.equipment) {
+      systemQuery.equipment = { $in: [filters.equipment] };
+    }
+    if (filters.difficulty) {
+      systemQuery.difficulty = filters.difficulty;
+    }
+    if (filters.targetGender) {
+      systemQuery.$or = [
+        { targetGender: filters.targetGender },
+        { targetGender: { $exists: false } },
+        { targetGender: null },
+      ];
+    }
+
+    const systemExercises = await this.exerciseModel
+      .find(systemQuery)
+      .sort({ name: 1 })
+      .exec();
+
+    // Combinar resultados: primeiro os da unidade do usuário, depois os do sistema
+    // Remover duplicatas baseado no _id
+    const exerciseMap = new Map<string, ExerciseDocument>();
+    
+    // Adicionar exercícios da unidade do usuário primeiro (prioridade)
+    userExercises.forEach(ex => {
+      exerciseMap.set(ex._id.toString(), ex);
+    });
+    
+    // Adicionar exercícios do sistema apenas se não existirem duplicatas
+    systemExercises.forEach(ex => {
+      if (!exerciseMap.has(ex._id.toString())) {
+        exerciseMap.set(ex._id.toString(), ex);
+      }
+    });
+
+    const allExercises = Array.from(exerciseMap.values());
+    return allExercises.map((exercise) => this.toResponseDto(exercise));
   }
 
   async findOne(id: string, unitId: string): Promise<ExerciseResponseDto> {
-    const exercise = await this.exerciseModel
+    // Primeiro tenta encontrar pela unidade do usuário
+    let exercise = await this.exerciseModel
       .findOne({ _id: id, unitId })
       .exec();
+
+    // Se não encontrou, tenta buscar pelos exercícios do sistema como fallback
+    if (!exercise) {
+      const systemUnitId = process.env.DEFAULT_UNIT_ID || '#BR#ALL#SYSTEM#0001';
+      exercise = await this.exerciseModel
+        .findOne({ _id: id, unitId: systemUnitId })
+        .exec();
+    }
+
     if (!exercise) {
       throw new NotFoundException(`Exercise with ID ${id} not found`);
     }

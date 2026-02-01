@@ -5,7 +5,7 @@ export class CheckInDto {
   id: string;
 
   @ApiProperty({ example: '507f1f77bcf86cd799439012' })
-  userId: string;
+  studentId: string;
 
   @ApiProperty({ example: '2023-10-15T08:30:00Z' })
   date: string;
