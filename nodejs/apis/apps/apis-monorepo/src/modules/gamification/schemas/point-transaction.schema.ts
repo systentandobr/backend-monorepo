@@ -55,5 +55,9 @@ export const PointTransactionSchema =
   SchemaFactory.createForClass(PointTransaction);
 
 // Índices para performance
+// Índice composto para consultas eficientes de check-ins por usuário/unidade/data
+PointTransactionSchema.index({ userId: 1, unitId: 1, createdAt: -1 });
 PointTransactionSchema.index({ userId: 1, createdAt: -1 });
 PointTransactionSchema.index({ unitId: 1, createdAt: -1 });
+// Índice para consultas de check-ins específicos (evitar duplicatas no mesmo dia)
+PointTransactionSchema.index({ userId: 1, unitId: 1, sourceType: 1, createdAt: -1 });

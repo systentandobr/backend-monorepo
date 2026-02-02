@@ -81,12 +81,12 @@ export class ReferralsService {
   async create(
     createReferralDto: CreateReferralDto,
     userId: string,
-    franchiseId: string,
+    franchiseId?: string,
   ): Promise<ReferralResponseDto> {
     // Validar campanha
     const campaign = await this.campaignsService.findOne(
       createReferralDto.campaignId,
-      franchiseId,
+      franchiseId || null,
     );
 
     if (campaign.status !== 'active') {

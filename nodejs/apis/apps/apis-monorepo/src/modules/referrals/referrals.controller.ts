@@ -34,8 +34,14 @@ export class ReferralsController {
     @CurrentUser() user: CurrentUserShape,
   ) {
     const franchiseId = user.unitId || user.profile?.unitId;
+    // TODO:  adicionar um fallback se não tiver o franchiseId, salvar o user.id  para indicar futuramente que o usuario indicou o sistema para novos possíveis Franquias ou Unidades ou Academias;    if (!franchiseId) {
     if (!franchiseId) {
-      throw new Error('unitId não encontrado no contexto do usuário');
+      // salvar o user.id  para indicar futuramente que o usuario indicou o sistema para novos possíveis Franquias ou Unidades ou Academias;
+      return this.referralsService.create(
+        createReferralDto,
+        user.id,
+        null,
+      );
     }
     return this.referralsService.create(
       createReferralDto,

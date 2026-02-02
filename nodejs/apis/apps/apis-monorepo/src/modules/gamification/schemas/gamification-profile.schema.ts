@@ -11,10 +11,10 @@ export type GamificationProfileDocument = GamificationProfile & Document & {
   collection: 'gamification_profiles',
 })
 export class GamificationProfile {
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   userId: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   unitId: string;
 
   @Prop({ required: true, default: 0 })
@@ -37,5 +37,7 @@ export const GamificationProfileSchema =
   SchemaFactory.createForClass(GamificationProfile);
 
 // Índices para performance
+// IMPORTANTE: Índice único composto - garante que um usuário só tenha um perfil por unidade
+// Remove qualquer índice único antigo apenas em userId que possa estar causando conflito
 GamificationProfileSchema.index({ userId: 1, unitId: 1 }, { unique: true });
 GamificationProfileSchema.index({ unitId: 1, totalPoints: -1, level: -1 });
