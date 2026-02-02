@@ -2,6 +2,8 @@ import {
   Injectable,
   NotFoundException,
   Logger,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -62,6 +64,7 @@ export class GamificationService {
     private readonly httpService: HttpService,
     private readonly franchisesService: FranchisesService,
     private readonly trainingPlansService: TrainingPlansService,
+    @Inject(forwardRef(() => TrainingExecutionsService))
     private readonly trainingExecutionsService: TrainingExecutionsService,
   ) {}
 

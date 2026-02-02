@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GamificationController } from './gamification.controller';
@@ -33,7 +33,7 @@ import { TrainingsModule } from '../trainings/trainings.module';
     UsersModule,
     FranchisesModule,
     TrainingPlansModule,
-    TrainingsModule,
+    forwardRef(() => TrainingsModule),
   ],
   controllers: [GamificationController],
   providers: [GamificationService],
