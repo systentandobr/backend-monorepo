@@ -357,16 +357,16 @@ async function bootstrap() {
   logger.log(
     `${clc.cyanBright('📚')} ${clc.green(
       'Stoplight Elements documentation available at:',
-    )} ${clc.yellow(`http://0.0.0.0:${port}/docs`)}`,
+    )} ${clc.yellow(`http://localhost:${port}/docs`)}`,
   );
 
   logger.log(
     `${clc.cyanBright('📖')} ${clc.green(
       'Swagger UI documentation available at:',
-    )} ${clc.yellow(`http://0.0.0.0:${port}/swagger`)}`,
+    )} ${clc.yellow(`http://localhost:${port}/swagger`)}`,
   );
 
-  await app.listen(port, '0.0.0.0');
+  await app.listen(port);
 }
 
 function setupStoplightElements(app: any, pkg: any) {

@@ -27,7 +27,7 @@ export class ReferralFraudResponseDto {
 export class ReferralResponseDto {
   id: string;
   campaignId: string;
-  franchiseId: string;
+  franchiseId?: string;
   referrerId: string;
   refereeId?: string;
   orderId?: string;

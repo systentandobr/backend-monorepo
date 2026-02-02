@@ -147,7 +147,7 @@ export class ReferralsService {
     // Criar indicação
     const referral = new this.referralModel({
       campaignId: new Types.ObjectId(createReferralDto.campaignId),
-      franchiseId: new Types.ObjectId(franchiseId),
+      franchiseId: franchiseId ? new Types.ObjectId(franchiseId) : undefined,
       referrerId: new Types.ObjectId(userId),
       referralCode,
       status: 'pending',
@@ -436,7 +436,7 @@ export class ReferralsService {
     return {
       id: referral._id.toString(),
       campaignId: referral.campaignId.toString(),
-      franchiseId: referral.franchiseId.toString(),
+      franchiseId: referral.franchiseId?.toString(),
       referrerId: referral.referrerId.toString(),
       refereeId: referral.refereeId?.toString(),
       orderId: referral.orderId?.toString(),

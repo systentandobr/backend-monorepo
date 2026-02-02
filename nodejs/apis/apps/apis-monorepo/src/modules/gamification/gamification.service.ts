@@ -492,7 +492,7 @@ export class GamificationService {
       userId,
       unitId,
       points: checkInPoints,
-      sourceType: 'CHECK_IN',
+      sourceType: 'CHECK_IN' as const,
       sourceId: `check-in-${Date.now()}`,
       description: 'Check-in diário',
       metadata: location

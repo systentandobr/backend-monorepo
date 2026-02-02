@@ -73,8 +73,8 @@ export class Referral {
   })
   campaignId: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'Franchise', required: true, index: true })
-  franchiseId: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'Franchise', required: false, index: true })
+  franchiseId?: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true, index: true })
   referrerId: Types.ObjectId; // quem indicou
