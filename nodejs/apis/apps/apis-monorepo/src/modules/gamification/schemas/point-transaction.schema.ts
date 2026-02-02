@@ -55,17 +55,6 @@ export class PointTransaction {
 export const PointTransactionSchema =
   SchemaFactory.createForClass(PointTransaction);
 
-// Garantir que o enum está correto no schema do Mongoose
-PointTransactionSchema.path('sourceType').enum([
-  'HABIT_COMPLETION',
-  'ROUTINE_COMPLETION',
-  'ACHIEVEMENT',
-  'BONUS',
-  'CHECK_IN',
-  'WORKOUT_COMPLETION',
-  'EXERCISE_COMPLETION',
-]);
-
 // Índices para performance
 // Índice composto para consultas eficientes de check-ins por usuário/unidade/data
 PointTransactionSchema.index({ userId: 1, unitId: 1, createdAt: -1 });
