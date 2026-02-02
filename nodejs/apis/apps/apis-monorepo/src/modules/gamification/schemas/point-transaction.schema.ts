@@ -6,19 +6,6 @@ export type PointTransactionDocument = PointTransaction & Document & {
   updatedAt?: Date;
 };
 
-// Constante compartilhada para os valores do enum sourceType
-export const SOURCE_TYPE_ENUM = [
-  'HABIT_COMPLETION',
-  'ROUTINE_COMPLETION',
-  'ACHIEVEMENT',
-  'BONUS',
-  'CHECK_IN',
-  'WORKOUT_COMPLETION',
-  'EXERCISE_COMPLETION',
-] as const;
-
-export type SourceType = (typeof SOURCE_TYPE_ENUM)[number];
-
 @Schema({
   timestamps: true,
   collection: 'point_transactions',
@@ -35,10 +22,25 @@ export class PointTransaction {
 
   @Prop({
     required: true,
-    enum: SOURCE_TYPE_ENUM,
     type: String,
+    enum: [
+      'HABIT_COMPLETION',
+      'ROUTINE_COMPLETION',
+      'ACHIEVEMENT',
+      'BONUS',
+      'CHECK_IN',
+      'WORKOUT_COMPLETION',
+      'EXERCISE_COMPLETION',
+    ],
   })
-  sourceType: SourceType;
+  sourceType:
+    | 'HABIT_COMPLETION'
+    | 'ROUTINE_COMPLETION'
+    | 'ACHIEVEMENT'
+    | 'BONUS'
+    | 'CHECK_IN'
+    | 'WORKOUT_COMPLETION'
+    | 'EXERCISE_COMPLETION';
 
   @Prop({ required: true })
   sourceId: string;
@@ -52,11 +54,6 @@ export class PointTransaction {
 
 export const PointTransactionSchema =
   SchemaFactory.createForClass(PointTransaction);
-
-// Garantir que o enum está aplicado corretamente no schema do Mongoose
-// Isso é necessário porque o Mongoose pode não aplicar corretamente o enum do decorator em alguns casos
-// Usamos type assertion porque o tipo do schema path não expõe o método enum diretamente
-(PointTransactionSchema.path('sourceType') as any).enum(SOURCE_TYPE_ENUM);
 
 // Índices para performance
 // Índice composto para consultas eficientes de check-ins por usuário/unidade/data
