@@ -96,6 +96,7 @@ async function bootstrap() {
     'https://*.viralkids.com.br', // Wildcard para subdomínios
     'https://*.tadevolta.com.br', // Wildcard para subdomínios
     'https://*.systentando.com', // Wildcard para subdomínios
+    'https://*.deacademias.com.br', // Wildcard para subdomínios
   ];
 
   // Buscar origens do MongoDB em produção
@@ -356,16 +357,16 @@ async function bootstrap() {
   logger.log(
     `${clc.cyanBright('📚')} ${clc.green(
       'Stoplight Elements documentation available at:',
-    )} ${clc.yellow(`http://localhost:${port}/docs`)}`,
+    )} ${clc.yellow(`http://0.0.0.0:${port}/docs`)}`,
   );
 
   logger.log(
     `${clc.cyanBright('📖')} ${clc.green(
       'Swagger UI documentation available at:',
-    )} ${clc.yellow(`http://localhost:${port}/swagger`)}`,
+    )} ${clc.yellow(`http://0.0.0.0:${port}/swagger`)}`,
   );
 
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
 }
 
 function setupStoplightElements(app: any, pkg: any) {

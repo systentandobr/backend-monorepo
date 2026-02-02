@@ -211,9 +211,8 @@ export class GamificationController {
         error: null,
       };
     } catch (error: any) {
-      if (error.message === 'Check-in já realizado hoje') {
-        throw new BadRequestException('Check-in já realizado hoje');
-      }
+      // As exceções customizadas já são BadRequestException com mensagens em português
+      // Apenas propagar o erro (já tem formato correto)
       throw error;
     }
   }

@@ -33,6 +33,11 @@ import { UsersService } from '../users/users.service';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { EnvironmentConfig } from '../../config/environment.config';
+import {
+  CheckInLocationError,
+  CheckInTrainingInProgressError,
+  CheckInAlreadyDoneError,
+} from './exceptions/check-in.exceptions';
 
 @Injectable()
 export class GamificationService {
@@ -76,18 +81,133 @@ export class GamificationService {
       .exec();
 
     if (!profile) {
-      profile = new this.gamificationProfileModel({
-        userId,
-        unitId,
-        totalPoints: 0,
-        level: 1,
-        xp: 0,
-        xpToNextLevel: 100,
-      });
-      await profile.save();
+      try {
+        profile = new this.gamificationProfileModel({
+          userId,
+          unitId,
+          totalPoints: 0,
+          level: 1,
+          xp: 0,
+          xpToNextLevel: 100,
+        });
+        await profile.save();
+      } catch (error: any) {
+        // Se der erro de duplicata (race condition), buscar novamente
+        if (error.code === 11000) {
+          this.logger.warn(
+            `Perfil duplicado detectado para userId: ${userId}, unitId: ${unitId}. Tentando buscar novamente.`,
+          );
+          profile = await this.gamificationProfileModel
+            .findOne({ userId, unitId })
+            .exec();
+          if (!profile) {
+            throw error;
+          }
+        } else {
+          throw error;
+        }
+      }
     }
 
     return profile;
+  }
+
+  /**
+   * Calcula distância entre duas coordenadas usando fórmula de Haversine
+   * @returns Distância em metros
+   */
+  private calculateDistance(
+    lat1: number,
+    lng1: number,
+    lat2: number,
+    lng2: number,
+  ): number {
+    const earthRadius = 6371000; // Raio da Terra em metros
+    const dLat = this.toRadians(lat2 - lat1);
+    const dLng = this.toRadians(lng2 - lng1);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(this.toRadians(lat1)) *
+        Math.cos(this.toRadians(lat2)) *
+        Math.sin(dLng / 2) *
+        Math.sin(dLng / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return earthRadius * c;
+  }
+
+  /**
+   * Converte graus para radianos
+   */
+  private toRadians(degrees: number): number {
+    return degrees * (Math.PI / 180);
+  }
+
+  /**
+   * Valida se a localização do usuário está dentro do raio permitido da unidade
+   * @param userLocation Localização do usuário
+   * @param unitId ID da unidade
+   * @param maxDistanceMeters Distância máxima permitida em metros (padrão: 200m)
+   */
+  private async validateLocation(
+    userLocation: { lat: number; lng: number },
+    unitId: string,
+    maxDistanceMeters: number = 200,
+  ): Promise<void> {
+    // TODO: Buscar coordenadas da unidade de um serviço de unidades/franquias
+    // Por enquanto, se não houver localização da unidade disponível,
+    // vamos permitir o check-in (validação será feita no frontend)
+    // Em produção, isso deve buscar de um serviço de unidades
+    this.logger.warn(
+      `Validação de localização não implementada completamente. UnitId: ${unitId}. Permitindo check-in.`,
+    );
+    // Se no futuro houver um serviço de unidades, buscar coordenadas aqui:
+    // const unit = await this.unitsService.getUnitById(unitId);
+    // if (!unit || !unit.location) {
+    //   throw new CheckInLocationError();
+    // }
+    // const distance = this.calculateDistance(
+    //   userLocation.lat,
+    //   userLocation.lng,
+    //   unit.location.lat,
+    //   unit.location.lng,
+    // );
+    // if (distance > maxDistanceMeters) {
+    //   throw new CheckInLocationError();
+    // }
+  }
+
+  /**
+   * Verifica se há treino em execução (exercícios não finalizados)
+   * @param userId ID do usuário
+   * @param unitId ID da unidade
+   */
+  private async hasTrainingInProgress(
+    userId: string,
+    unitId: string,
+  ): Promise<boolean> {
+    // TODO: Integrar com TrainingPlansService para verificar treinos ativos
+    // Por enquanto, retornar false (não bloquear check-in)
+    // Em produção, isso deve verificar se há um treino ativo com exercícios não finalizados
+    this.logger.warn(
+      `Verificação de treino em execução não implementada completamente. UserId: ${userId}, UnitId: ${unitId}. Permitindo check-in.`,
+    );
+    // Se no futuro houver integração com TrainingPlansService:
+    // const activePlans = await this.trainingPlansService.findActivePlans(userId, unitId);
+    // for (const plan of activePlans) {
+    //   const hasIncompleteExercises = plan.weeklySchedule.some(day =>
+    //     day.exercises.some(ex =>
+    //       ex.executedSets?.some(set => !set.completed) || 
+    //       !ex.executedSets || 
+    //       ex.executedSets.length < ex.sets
+    //     )
+    //   );
+    //   if (hasIncompleteExercises) {
+    //     return true;
+    //   }
+    // }
+    return false;
   }
 
   /**
@@ -350,7 +470,18 @@ export class GamificationService {
       .exec();
 
     if (existingCheckIn) {
-      throw new Error('Check-in já realizado hoje');
+      throw new CheckInAlreadyDoneError();
+    }
+
+    // Validar localização se fornecida
+    if (location) {
+      await this.validateLocation(location, unitId);
+    }
+
+    // Verificar se há treino em execução
+    const hasTraining = await this.hasTrainingInProgress(userId, unitId);
+    if (hasTraining) {
+      throw new CheckInTrainingInProgressError();
     }
 
     // Pontos por check-in (padrão: 10 pontos)
