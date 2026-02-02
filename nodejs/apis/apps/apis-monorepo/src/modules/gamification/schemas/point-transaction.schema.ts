@@ -55,7 +55,8 @@ export const PointTransactionSchema =
 
 // Garantir que o enum está aplicado corretamente no schema do Mongoose
 // Isso é necessário porque o Mongoose pode não aplicar corretamente o enum do decorator em alguns casos
-PointTransactionSchema.path('sourceType').enum(SOURCE_TYPE_ENUM);
+// Usamos type assertion porque o tipo do schema path não expõe o método enum diretamente
+(PointTransactionSchema.path('sourceType') as any).enum(SOURCE_TYPE_ENUM);
 
 // Índices para performance
 // Índice composto para consultas eficientes de check-ins por usuário/unidade/data
