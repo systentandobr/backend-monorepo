@@ -20,6 +20,8 @@ import {
 import {
   PointTransaction,
   PointTransactionDocument,
+  SOURCE_TYPE_ENUM,
+  SOURCE_TYPE,
 } from './schemas/point-transaction.schema';
 import { RankingQueryDto } from './dto/ranking-query.dto';
 import { WeeklyActivityResponseDto } from './dto/weekly-activity-response.dto';
@@ -38,6 +40,9 @@ import {
   CheckInTrainingInProgressError,
   CheckInAlreadyDoneError,
 } from './exceptions/check-in.exceptions';
+import { FranchisesService } from '../franchises/franchises.service';
+import { TrainingPlansService } from '../training-plans/training-plans.service';
+import { TrainingExecutionsService } from '../trainings/training-executions.service';
 
 @Injectable()
 export class GamificationService {
@@ -55,6 +60,9 @@ export class GamificationService {
     private pointTransactionModel: Model<PointTransactionDocument>,
     private readonly usersService: UsersService,
     private readonly httpService: HttpService,
+    private readonly franchisesService: FranchisesService,
+    private readonly trainingPlansService: TrainingPlansService,
+    private readonly trainingExecutionsService: TrainingExecutionsService,
   ) {}
 
   /**
@@ -155,27 +163,52 @@ export class GamificationService {
     unitId: string,
     maxDistanceMeters: number = 200,
   ): Promise<void> {
-    // TODO: Buscar coordenadas da unidade de um serviço de unidades/franquias
-    // Por enquanto, se não houver localização da unidade disponível,
-    // vamos permitir o check-in (validação será feita no frontend)
-    // Em produção, isso deve buscar de um serviço de unidades
-    this.logger.warn(
-      `Validação de localização não implementada completamente. UnitId: ${unitId}. Permitindo check-in.`,
-    );
-    // Se no futuro houver um serviço de unidades, buscar coordenadas aqui:
-    // const unit = await this.unitsService.getUnitById(unitId);
-    // if (!unit || !unit.location) {
-    //   throw new CheckInLocationError();
-    // }
-    // const distance = this.calculateDistance(
-    //   userLocation.lat,
-    //   userLocation.lng,
-    //   unit.location.lat,
-    //   unit.location.lng,
-    // );
-    // if (distance > maxDistanceMeters) {
-    //   throw new CheckInLocationError();
-    // }
+    try {
+      const franchise = await this.franchisesService.findByUnitId(unitId);
+      
+      if (!franchise || !franchise.location) {
+        this.logger.warn(
+          `Franquia não encontrada ou sem localização. UnitId: ${unitId}. Bloqueando check-in.`,
+        );
+        throw new CheckInLocationError();
+      }
+
+      // Verificar se é uma unidade física
+      if (franchise.location.type !== 'physical') {
+        this.logger.warn(
+          `Unidade não é física. UnitId: ${unitId}, Type: ${franchise.location.type}. Bloqueando check-in.`,
+        );
+        throw new CheckInLocationError();
+      }
+
+      // Calcular distância usando fórmula de Haversine
+      const distance = this.calculateDistance(
+        userLocation.lat,
+        userLocation.lng,
+        franchise.location.lat,
+        franchise.location.lng,
+      );
+
+      if (distance > maxDistanceMeters) {
+        this.logger.warn(
+          `Usuário fora do raio permitido. Distância: ${distance.toFixed(2)}m, Máximo: ${maxDistanceMeters}m. UnitId: ${unitId}.`,
+        );
+        throw new CheckInLocationError();
+      }
+
+      this.logger.log(
+        `Localização validada com sucesso. Distância: ${distance.toFixed(2)}m. UnitId: ${unitId}.`,
+      );
+    } catch (error) {
+      if (error instanceof CheckInLocationError) {
+        throw error;
+      }
+      this.logger.error(
+        `Erro ao validar localização. UnitId: ${unitId}.`,
+        error,
+      );
+      throw new CheckInLocationError();
+    }
   }
 
   /**
@@ -187,27 +220,90 @@ export class GamificationService {
     userId: string,
     unitId: string,
   ): Promise<boolean> {
-    // TODO: Integrar com TrainingPlansService para verificar treinos ativos
-    // Por enquanto, retornar false (não bloquear check-in)
-    // Em produção, isso deve verificar se há um treino ativo com exercícios não finalizados
-    this.logger.warn(
-      `Verificação de treino em execução não implementada completamente. UserId: ${userId}, UnitId: ${unitId}. Permitindo check-in.`,
-    );
-    // Se no futuro houver integração com TrainingPlansService:
-    // const activePlans = await this.trainingPlansService.findActivePlans(userId, unitId);
-    // for (const plan of activePlans) {
-    //   const hasIncompleteExercises = plan.weeklySchedule.some(day =>
-    //     day.exercises.some(ex =>
-    //       ex.executedSets?.some(set => !set.completed) || 
-    //       !ex.executedSets || 
-    //       ex.executedSets.length < ex.sets
-    //     )
-    //   );
-    //   if (hasIncompleteExercises) {
-    //     return true;
-    //   }
-    // }
-    return false;
+    try {
+      // Verificar se há CHECK_IN hoje sem WORKOUT_COMPLETION correspondente
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      const checkInToday = await this.pointTransactionModel
+        .findOne({
+          userId,
+          unitId,
+          sourceType: SOURCE_TYPE.CHECK_IN,
+          createdAt: {
+            $gte: today,
+            $lt: tomorrow,
+          },
+        })
+        .exec();
+
+      if (!checkInToday) {
+        // Não há CHECK_IN hoje, então não há treino em execução
+        return false;
+      }
+
+      // Verificar se existe WORKOUT_COMPLETION correspondente (mesmo dia)
+      const workoutCompletion = await this.pointTransactionModel
+        .findOne({
+          userId,
+          unitId,
+          sourceType: SOURCE_TYPE.WORKOUT_COMPLETION,
+          createdAt: {
+            $gte: today,
+            $lt: tomorrow,
+          },
+        })
+        .exec();
+
+      if (workoutCompletion) {
+        // Já existe WORKOUT_COMPLETION hoje, então o treino foi finalizado
+        return false;
+      }
+
+      // Há CHECK_IN aberto (sem WORKOUT_COMPLETION), verificar se há TrainingExecution em progresso
+      const activeTraining = await this.trainingExecutionsService.getActive(
+        userId,
+        unitId,
+      );
+
+      if (activeTraining) {
+        // Verificar se há exercícios incompletos na TrainingExecution
+        const hasIncompleteExercises = activeTraining.exercises.some((ex) => {
+          if (!ex.executedSets || ex.executedSets.length === 0) {
+            return true;
+          }
+
+          // Buscar o plano para saber quantas séries são esperadas
+          // Por enquanto, assumir que se há executedSets mas nem todos estão completos, está incompleto
+          const completedSets = ex.executedSets.filter(
+            (set) => set.completed === true,
+          ).length;
+          const totalSets = ex.executedSets.length;
+
+          // Se não há séries completas ou nem todas estão completas, está incompleto
+          return completedSets === 0 || completedSets < totalSets;
+        });
+
+        if (hasIncompleteExercises) {
+          this.logger.log(
+            `Treino em execução detectado. UserId: ${userId}, UnitId: ${unitId}, TrainingId: ${activeTraining.id}`,
+          );
+          return true;
+        }
+      }
+
+      // Não há TrainingExecution em progresso ou todos exercícios estão completos
+      return false;
+    } catch (error) {
+      this.logger.error(
+        `Erro ao verificar treino em execução. UserId: ${userId}, UnitId: ${unitId}.`,
+        error,
+      );
+      // Em caso de erro, não bloquear check-in (fail-open)
+      return false;
+    }
   }
 
   /**
@@ -382,7 +478,7 @@ export class GamificationService {
     const query: any = {
       userId,
       unitId,
-      sourceType: 'CHECK_IN',
+      sourceType: SOURCE_TYPE.CHECK_IN,
     };
 
     // Adicionar filtro de data se fornecido
@@ -421,7 +517,7 @@ export class GamificationService {
       .find({
         userId,
         unitId,
-        sourceType: 'CHECK_IN',
+        sourceType: SOURCE_TYPE.CHECK_IN,
       })
       .sort({ createdAt: -1 })
       .exec();
@@ -461,7 +557,7 @@ export class GamificationService {
       .findOne({
         userId,
         unitId,
-        sourceType: 'CHECK_IN',
+        sourceType: SOURCE_TYPE.CHECK_IN,
         createdAt: {
           $gte: today,
           $lt: tomorrow,
@@ -492,7 +588,7 @@ export class GamificationService {
       userId,
       unitId,
       points: checkInPoints,
-      sourceType: 'CHECK_IN' as const,
+      sourceType: SOURCE_TYPE.CHECK_IN,
       sourceId: `check-in-${Date.now()}`,
       description: 'Check-in diário',
       metadata: location
@@ -528,6 +624,158 @@ export class GamificationService {
       unitId: transaction.unitId,
       metadata: transaction.metadata,
     };
+  }
+
+  /**
+   * Cria PointTransaction com EXERCISE_COMPLETION quando um exercício é finalizado
+   */
+  async createExerciseCompletion(
+    userId: string,
+    unitId: string,
+    planId: string,
+    exerciseId: string,
+  ): Promise<void> {
+    // Pontos por exercício completo (padrão: 5 pontos)
+    const exercisePoints = 5;
+
+    const transaction = new this.pointTransactionModel({
+      userId,
+      unitId,
+      points: exercisePoints,
+      sourceType: SOURCE_TYPE.EXERCISE_COMPLETION,
+      sourceId: `exercise-${exerciseId}-${Date.now()}`,
+      description: 'Exercício completado',
+      metadata: {
+        planId,
+        exerciseId,
+      },
+    });
+
+    await transaction.save();
+
+    // Atualizar perfil de gamificação
+    const profile = await this.getOrCreateProfile(userId, unitId);
+    profile.totalPoints += exercisePoints;
+    profile.xp += exercisePoints;
+
+    const { level, xpToNextLevel } = this.calculateLevel(profile.xp);
+    profile.level = level;
+    profile.xpToNextLevel = xpToNextLevel;
+
+    await profile.save();
+  }
+
+  /**
+   * Cria PointTransaction com WORKOUT_COMPLETION quando um treino é completamente finalizado
+   */
+  async createWorkoutCompletion(
+    userId: string,
+    unitId: string,
+    planId: string,
+  ): Promise<void> {
+    // Verificar se já existe WORKOUT_COMPLETION hoje para este plano
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const existingWorkoutCompletion = await this.pointTransactionModel
+      .findOne({
+        userId,
+        unitId,
+        sourceType: SOURCE_TYPE.WORKOUT_COMPLETION,
+        'metadata.planId': planId,
+        createdAt: {
+          $gte: today,
+          $lt: tomorrow,
+        },
+      })
+      .exec();
+
+    if (existingWorkoutCompletion) {
+      // Já existe WORKOUT_COMPLETION hoje para este plano, não criar duplicado
+      this.logger.warn(
+        `WORKOUT_COMPLETION já existe hoje para userId: ${userId}, planId: ${planId}`,
+      );
+      return;
+    }
+
+    // Pontos por treino completo (padrão: 50 pontos)
+    const workoutPoints = 50;
+
+    const transaction = new this.pointTransactionModel({
+      userId,
+      unitId,
+      points: workoutPoints,
+      sourceType: SOURCE_TYPE.WORKOUT_COMPLETION,
+      sourceId: `workout-${planId}-${Date.now()}`,
+      description: 'Treino completado',
+      metadata: {
+        planId,
+      },
+    });
+
+    await transaction.save();
+
+    // Atualizar perfil de gamificação
+    const profile = await this.getOrCreateProfile(userId, unitId);
+    profile.totalPoints += workoutPoints;
+    profile.xp += workoutPoints;
+
+    const { level, xpToNextLevel } = this.calculateLevel(profile.xp);
+    profile.level = level;
+    profile.xpToNextLevel = xpToNextLevel;
+
+    await profile.save();
+  }
+
+  /**
+   * Busca CHECK_INs ativos (sem WORKOUT_COMPLETION correspondente) para uma unidade
+   * Usado para calcular ocupação em tempo real
+   * Agora verifica TrainingExecution completada ao invés de apenas WORKOUT_COMPLETION
+   */
+  async getActiveCheckIns(unitId: string): Promise<PointTransactionDocument[]> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    // Buscar todos os CHECK_INs de hoje para esta unidade
+    const checkInsToday = await this.pointTransactionModel
+      .find({
+        unitId,
+        sourceType: SOURCE_TYPE.CHECK_IN,
+        createdAt: {
+          $gte: today,
+          $lt: tomorrow,
+        },
+      })
+      .exec();
+
+    // Buscar todos os WORKOUT_COMPLETIONs de hoje para esta unidade
+    const workoutCompletionsToday = await this.pointTransactionModel
+      .find({
+        unitId,
+        sourceType: SOURCE_TYPE.WORKOUT_COMPLETION,
+        createdAt: {
+          $gte: today,
+          $lt: tomorrow,
+        },
+      })
+      .exec();
+
+    // Criar um Set de userIds que têm WORKOUT_COMPLETION hoje
+    const usersWithWorkoutCompletion = new Set(
+      workoutCompletionsToday.map((wc) => wc.userId),
+    );
+
+    // Filtrar CHECK_INs que não têm WORKOUT_COMPLETION correspondente
+    // Se há WORKOUT_COMPLETION, o CHECK_IN não está mais ativo
+    const activeCheckIns = checkInsToday.filter(
+      (checkIn) => !usersWithWorkoutCompletion.has(checkIn.userId),
+    );
+
+    return activeCheckIns;
   }
 
   /**
@@ -635,7 +883,11 @@ export class GamificationService {
           $lte: endDate,
         },
         sourceType: {
-          $in: ['CHECK_IN', 'WORKOUT_COMPLETION', 'EXERCISE_COMPLETION'],
+          $in: [
+            SOURCE_TYPE.CHECK_IN,
+            SOURCE_TYPE.WORKOUT_COMPLETION,
+            SOURCE_TYPE.EXERCISE_COMPLETION,
+          ],
         },
       })
       .sort({ createdAt: 1 }) // Mais antiga primeiro
@@ -691,13 +943,13 @@ export class GamificationService {
         const time = date.toTimeString().substring(0, 5); // HH:mm
 
         switch (transaction.sourceType) {
-          case 'CHECK_IN':
+          case SOURCE_TYPE.CHECK_IN:
             dayData.checkIns++;
             break;
-          case 'WORKOUT_COMPLETION':
+          case SOURCE_TYPE.WORKOUT_COMPLETION:
             dayData.workoutsCompleted++;
             break;
-          case 'EXERCISE_COMPLETION':
+          case SOURCE_TYPE.EXERCISE_COMPLETION:
             dayData.exercisesCompleted++;
             break;
         }
@@ -792,18 +1044,18 @@ export class GamificationService {
       .exec();
 
     const checkIns = transactions.filter(
-      (t) => t.sourceType === 'CHECK_IN',
+      (t) => t.sourceType === SOURCE_TYPE.CHECK_IN,
     ).length;
     const workouts = transactions.filter(
-      (t) => t.sourceType === 'WORKOUT_COMPLETION',
+      (t) => t.sourceType === SOURCE_TYPE.WORKOUT_COMPLETION,
     ).length;
     const exercises = transactions.filter(
-      (t) => t.sourceType === 'EXERCISE_COMPLETION',
+      (t) => t.sourceType === SOURCE_TYPE.EXERCISE_COMPLETION,
     ).length;
 
     // Calcular streak (simplificado - pode ser melhorado)
     const sortedTransactions = transactions
-      .filter((t) => t.sourceType === 'CHECK_IN')
+      .filter((t) => t.sourceType === SOURCE_TYPE.CHECK_IN)
       .sort((a, b) => b.createdAt!.getTime() - a.createdAt!.getTime());
 
     let currentStreak = 0;

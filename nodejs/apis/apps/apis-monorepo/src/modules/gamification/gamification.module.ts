@@ -17,6 +17,9 @@ import {
   PointTransactionSchema,
 } from './schemas/point-transaction.schema';
 import { UsersModule } from '../users/users.module';
+import { FranchisesModule } from '../franchises/franchises.module';
+import { TrainingPlansModule } from '../training-plans/training-plans.module';
+import { TrainingsModule } from '../trainings/trainings.module';
 
 @Module({
   imports: [
@@ -28,6 +31,9 @@ import { UsersModule } from '../users/users.module';
       { name: PointTransaction.name, schema: PointTransactionSchema },
     ]),
     UsersModule,
+    FranchisesModule,
+    TrainingPlansModule,
+    TrainingsModule,
   ],
   controllers: [GamificationController],
   providers: [GamificationService],

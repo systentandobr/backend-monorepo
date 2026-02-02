@@ -94,6 +94,15 @@ export class TrainingPlan {
       weight?: number;
       restTime?: number;
       notes?: string;
+      executedSets?: {
+        setNumber: number;
+        plannedReps: string;
+        executedReps?: number;
+        plannedWeight?: number;
+        executedWeight?: number;
+        completed?: boolean;
+        timestamp?: string;
+      }[];
     }[];
   }[];
 

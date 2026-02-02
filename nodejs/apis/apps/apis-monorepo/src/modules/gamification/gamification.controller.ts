@@ -410,6 +410,66 @@ export class GamificationController {
     };
   }
 
+  @Get('units/:unitId/occupancy')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Retorna CHECK_INs ativos para cálculo de ocupação',
+    description:
+      'Retorna CHECK_INs de hoje que não têm WORKOUT_COMPLETION correspondente (usuários treinando agora)',
+  })
+  @ApiParam({
+    name: 'unitId',
+    required: true,
+    type: String,
+    description: 'ID da unidade',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'CHECK_INs ativos retornados com sucesso',
+  })
+  async getUnitOccupancy(@Param('unitId') unitId: string) {
+    const activeCheckIns = await this.gamificationService.getActiveCheckIns(
+      unitId,
+    );
+
+    // Agrupar por hora
+    const checkInsByHour = new Map<number, number>();
+    activeCheckIns.forEach((checkIn) => {
+      const hour = checkIn.createdAt!.getHours();
+      checkInsByHour.set(hour, (checkInsByHour.get(hour) || 0) + 1);
+    });
+
+    // Criar array de horas (0-23) com contagem
+    const hourlyData = Array.from({ length: 24 }, (_, hour) => ({
+      hour,
+      checkInCount: checkInsByHour.get(hour) || 0,
+    }));
+
+    const currentHour = new Date().getHours();
+    const currentCount = checkInsByHour.get(currentHour) || 0;
+
+    // Calcular status baseado em quantidade atual (simplificado)
+    let currentStatus: 'NOT_BUSY' | 'MODERATELY_BUSY' | 'BUSY' | 'VERY_BUSY';
+    if (currentCount >= 20) {
+      currentStatus = 'VERY_BUSY';
+    } else if (currentCount >= 10) {
+      currentStatus = 'BUSY';
+    } else if (currentCount >= 5) {
+      currentStatus = 'MODERATELY_BUSY';
+    } else {
+      currentStatus = 'NOT_BUSY';
+    }
+
+    return {
+      unitId,
+      currentHour,
+      currentStatus,
+      currentCount,
+      hourlyData,
+      totalActive: activeCheckIns.length,
+    };
+  }
+
   @Get('teams/ranking')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
