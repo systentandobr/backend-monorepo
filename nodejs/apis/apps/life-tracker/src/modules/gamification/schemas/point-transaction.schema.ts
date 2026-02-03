@@ -13,12 +13,15 @@ export class PointTransaction {
 
   @Prop({
     required: true,
-    enum: ['HABIT_COMPLETION', 'ROUTINE_COMPLETION', 'ACHIEVEMENT', 'BONUS'],
+    enum: ['HABIT_COMPLETION', 'ROUTINE_COMPLETION', 'ACHIEVEMENT', 'BONUS', 'CHECK_IN', 'WORKOUT_COMPLETION', 'EXERCISE_COMPLETION'],
   })
   sourceType:
     | 'HABIT_COMPLETION'
     | 'ROUTINE_COMPLETION'
     | 'ACHIEVEMENT'
+    | 'CHECK_IN'
+    | 'WORKOUT_COMPLETION'
+    | 'EXERCISE_COMPLETION'
     | 'BONUS';
 
   @Prop({ required: true })

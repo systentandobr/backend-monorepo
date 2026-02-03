@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-// Constante com valores do enum para garantir consistência
 export const SOURCE_TYPE_ENUM = [
   'HABIT_COMPLETION',
   'ROUTINE_COMPLETION',
@@ -13,17 +12,6 @@ export const SOURCE_TYPE_ENUM = [
 ] as const;
 
 export type SourceType = typeof SOURCE_TYPE_ENUM[number];
-
-// Constantes nomeadas para facilitar uso
-export const SOURCE_TYPE = {
-  HABIT_COMPLETION: 'HABIT_COMPLETION',
-  ROUTINE_COMPLETION: 'ROUTINE_COMPLETION',
-  ACHIEVEMENT: 'ACHIEVEMENT',
-  BONUS: 'BONUS',
-  CHECK_IN: 'CHECK_IN',
-  WORKOUT_COMPLETION: 'WORKOUT_COMPLETION',
-  EXERCISE_COMPLETION: 'EXERCISE_COMPLETION',
-} as const;
 
 export type PointTransactionDocument = PointTransaction & Document & {
   createdAt?: Date;

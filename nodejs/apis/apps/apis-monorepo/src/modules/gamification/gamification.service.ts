@@ -23,7 +23,6 @@ import {
   PointTransaction,
   PointTransactionDocument,
   SOURCE_TYPE_ENUM,
-  SOURCE_TYPE,
 } from './schemas/point-transaction.schema';
 import { RankingQueryDto } from './dto/ranking-query.dto';
 import { WeeklyActivityResponseDto } from './dto/weekly-activity-response.dto';
@@ -35,7 +34,6 @@ import {
 import { ShareResponseDto, ShareStatsDto } from './dto/share-response.dto';
 import { UsersService } from '../users/users.service';
 import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
 import { EnvironmentConfig } from '../../config/environment.config';
 import {
   CheckInLocationError,
@@ -234,7 +232,7 @@ export class GamificationService {
         .findOne({
           userId,
           unitId,
-          sourceType: SOURCE_TYPE.CHECK_IN,
+          sourceType: SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('CHECK_IN')],
           createdAt: {
             $gte: today,
             $lt: tomorrow,
@@ -252,7 +250,7 @@ export class GamificationService {
         .findOne({
           userId,
           unitId,
-          sourceType: SOURCE_TYPE.WORKOUT_COMPLETION,
+          sourceType: SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('WORKOUT_COMPLETION')],
           createdAt: {
             $gte: today,
             $lt: tomorrow,
@@ -481,7 +479,7 @@ export class GamificationService {
     const query: any = {
       userId,
       unitId,
-      sourceType: SOURCE_TYPE.CHECK_IN,
+      sourceType: SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('CHECK_IN')],
     };
 
     // Adicionar filtro de data se fornecido
@@ -520,7 +518,7 @@ export class GamificationService {
       .find({
         userId,
         unitId,
-        sourceType: SOURCE_TYPE.CHECK_IN,
+        sourceType: SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('CHECK_IN')],
       })
       .sort({ createdAt: -1 })
       .exec();
@@ -560,7 +558,7 @@ export class GamificationService {
       .findOne({
         userId,
         unitId,
-        sourceType: SOURCE_TYPE.CHECK_IN,
+        sourceType: SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('CHECK_IN')],
         createdAt: {
           $gte: today,
           $lt: tomorrow,
@@ -591,7 +589,7 @@ export class GamificationService {
       userId,
       unitId,
       points: checkInPoints,
-      sourceType: SOURCE_TYPE.CHECK_IN,
+      sourceType: SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('CHECK_IN')],
       sourceId: `check-in-${Date.now()}`,
       description: 'Check-in diário',
       metadata: location
@@ -645,7 +643,7 @@ export class GamificationService {
       userId,
       unitId,
       points: exercisePoints,
-      sourceType: SOURCE_TYPE.EXERCISE_COMPLETION,
+      sourceType: SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('EXERCISE_COMPLETION')],
       sourceId: `exercise-${exerciseId}-${Date.now()}`,
       description: 'Exercício completado',
       metadata: {
@@ -686,7 +684,7 @@ export class GamificationService {
       .findOne({
         userId,
         unitId,
-        sourceType: SOURCE_TYPE.WORKOUT_COMPLETION,
+        sourceType: SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('WORKOUT_COMPLETION')],
         'metadata.planId': planId,
         createdAt: {
           $gte: today,
@@ -710,7 +708,7 @@ export class GamificationService {
       userId,
       unitId,
       points: workoutPoints,
-      sourceType: SOURCE_TYPE.WORKOUT_COMPLETION,
+      sourceType: SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('WORKOUT_COMPLETION')],
       sourceId: `workout-${planId}-${Date.now()}`,
       description: 'Treino completado',
       metadata: {
@@ -747,7 +745,7 @@ export class GamificationService {
     const checkInsToday = await this.pointTransactionModel
       .find({
         unitId,
-        sourceType: SOURCE_TYPE.CHECK_IN,
+        sourceType: SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('CHECK_IN')],
         createdAt: {
           $gte: today,
           $lt: tomorrow,
@@ -759,7 +757,7 @@ export class GamificationService {
     const workoutCompletionsToday = await this.pointTransactionModel
       .find({
         unitId,
-        sourceType: SOURCE_TYPE.WORKOUT_COMPLETION,
+        sourceType: SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('WORKOUT_COMPLETION')],
         createdAt: {
           $gte: today,
           $lt: tomorrow,
@@ -887,9 +885,9 @@ export class GamificationService {
         },
         sourceType: {
           $in: [
-            SOURCE_TYPE.CHECK_IN,
-            SOURCE_TYPE.WORKOUT_COMPLETION,
-            SOURCE_TYPE.EXERCISE_COMPLETION,
+            SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('CHECK_IN')],
+            SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('WORKOUT_COMPLETION')],
+            SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('EXERCISE_COMPLETION')],
           ],
         },
       })
@@ -946,13 +944,13 @@ export class GamificationService {
         const time = date.toTimeString().substring(0, 5); // HH:mm
 
         switch (transaction.sourceType) {
-          case SOURCE_TYPE.CHECK_IN:
+          case SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('CHECK_IN')]:
             dayData.checkIns++;
             break;
-          case SOURCE_TYPE.WORKOUT_COMPLETION:
+          case SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('WORKOUT_COMPLETION')]:
             dayData.workoutsCompleted++;
             break;
-          case SOURCE_TYPE.EXERCISE_COMPLETION:
+          case SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('EXERCISE_COMPLETION')]:
             dayData.exercisesCompleted++;
             break;
         }
@@ -1047,18 +1045,18 @@ export class GamificationService {
       .exec();
 
     const checkIns = transactions.filter(
-      (t) => t.sourceType === SOURCE_TYPE.CHECK_IN,
+      (t) => t.sourceType === SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('CHECK_IN')],
     ).length;
     const workouts = transactions.filter(
-      (t) => t.sourceType === SOURCE_TYPE.WORKOUT_COMPLETION,
+      (t) => t.sourceType === SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('WORKOUT_COMPLETION')],
     ).length;
     const exercises = transactions.filter(
-      (t) => t.sourceType === SOURCE_TYPE.EXERCISE_COMPLETION,
+      (t) => t.sourceType === SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('EXERCISE_COMPLETION')],
     ).length;
 
     // Calcular streak (simplificado - pode ser melhorado)
     const sortedTransactions = transactions
-      .filter((t) => t.sourceType === SOURCE_TYPE.CHECK_IN)
+      .filter((t) => t.sourceType === SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('CHECK_IN')])
       .sort((a, b) => b.createdAt!.getTime() - a.createdAt!.getTime());
 
     let currentStreak = 0;
