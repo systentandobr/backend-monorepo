@@ -36,8 +36,12 @@ export class GamificationProfile {
 export const GamificationProfileSchema =
   SchemaFactory.createForClass(GamificationProfile);
 
-// Índices para performance
 // IMPORTANTE: Índice único composto - garante que um usuário só tenha um perfil por unidade
-// Remove qualquer índice único antigo apenas em userId que possa estar causando conflito
+// Este índice substitui qualquer índice único antigo apenas em userId
 GamificationProfileSchema.index({ userId: 1, unitId: 1 }, { unique: true });
+
+// Índice composto para consultas ordenadas por data de criação
+GamificationProfileSchema.index({ userId: 1, unitId: 1, createdAt: -1 });
+
+// Índice para rankings e consultas por unidade
 GamificationProfileSchema.index({ unitId: 1, totalPoints: -1, level: -1 });
