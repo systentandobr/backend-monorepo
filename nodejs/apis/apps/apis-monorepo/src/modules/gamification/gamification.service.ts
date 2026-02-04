@@ -11,10 +11,7 @@ import {
   GamificationProfile,
   GamificationProfileDocument,
 } from './schemas/gamification-profile.schema';
-import {
-  Achievement,
-  AchievementDocument,
-} from './schemas/achievement.schema';
+import { Achievement, AchievementDocument } from './schemas/achievement.schema';
 import {
   UserAchievement,
   UserAchievementDocument,
@@ -64,7 +61,7 @@ export class GamificationService {
     private readonly trainingPlansService: TrainingPlansService,
     @Inject(forwardRef(() => TrainingExecutionsService))
     private readonly trainingExecutionsService: TrainingExecutionsService,
-  ) {}
+  ) { }
 
   /**
    * Calcula o nível baseado em XP
@@ -72,9 +69,17 @@ export class GamificationService {
    * XP necessário para próximo nível: (level + 1)^2 * 100 - xp atual
    */
   private calculateLevel(xp: number): { level: number; xpToNextLevel: number } {
-    const level = Math.floor(Math.sqrt(xp / 100)) + 1;
+    // Previne erros com valores NaN, negativos ou não-finitos
+    const safeXp = !Number.isFinite(xp) || xp < 0 ? 0 : xp;
+    const level = Math.floor(Math.sqrt(safeXp / 100)) + 1;
     const nextLevelXp = Math.pow(level, 2) * 100;
-    const xpToNextLevel = nextLevelXp - xp;
+
+    // Garante que xpToNextLevel também seja um número válido
+    let xpToNextLevel = nextLevelXp - safeXp;
+    if (!Number.isFinite(xpToNextLevel)) {
+      xpToNextLevel = 100; // Valor padrão se algo der errado no cálculo
+    }
+
     return { level, xpToNextLevel };
   }
 
@@ -103,13 +108,39 @@ export class GamificationService {
       } catch (error: any) {
         // Se der erro de duplicata (race condition), buscar novamente
         if (error.code === 11000) {
+          const isCompositeConflict = error.message.includes('userId_1_unitId_1');
+
+          if (!isCompositeConflict) {
+            this.logger.error(
+              `CONFLITO DE ÍNDICE LEGADO: O banco de dados ainda possui um índice único apenas em "userId". ` +
+              `Isso impede que o usuário ${userId} tenha perfis em diferentes unidades. ` +
+              `O sistema tentou remover este índice automaticamente via GamificationModule, mas pode ser necessária intervenção manual no MongoDB (dropIndex("userId_1")).`
+            );
+          }
+
           this.logger.warn(
-            `Perfil duplicado detectado para userId: ${userId}, unitId: ${unitId}. Tentando buscar novamente.`,
+            `Perfil duplicado ou conflito de índice para userId: ${userId}, unitId: ${unitId}. Tentando recuperar perfil existente...`,
           );
+
+          // Tentar buscar novamente (pode ter sido criado por outra thread ou ser o conflito mencionado acima)
           profile = await this.gamificationProfileModel
             .findOne({ userId, unitId })
             .exec();
+
           if (!profile) {
+            // Se ainda não encontramos por {userId, unitId}, mas deu 11000, 
+            // significa que o índice é apenas em userId e já existe um perfil em OUTRA unidade.
+            const existingInOtherUnit = await this.gamificationProfileModel
+              .findOne({ userId })
+              .exec();
+
+            if (existingInOtherUnit) {
+              this.logger.warn(
+                `Atenção: Usando perfil da unidade ${existingInOtherUnit.unitId} para o usuário ${userId} devido a restrição de índice único global.`,
+              );
+              return existingInOtherUnit as GamificationProfileDocument;
+            }
+
             throw error;
           }
         } else {
@@ -138,9 +169,9 @@ export class GamificationService {
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(this.toRadians(lat1)) *
-        Math.cos(this.toRadians(lat2)) *
-        Math.sin(dLng / 2) *
-        Math.sin(dLng / 2);
+      Math.cos(this.toRadians(lat2)) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return earthRadius * c;
@@ -166,7 +197,7 @@ export class GamificationService {
   ): Promise<void> {
     try {
       const franchise = await this.franchisesService.findByUnitId(unitId);
-      
+
       if (!franchise || !franchise.location) {
         this.logger.warn(
           `Franquia não encontrada ou sem localização. UnitId: ${unitId}. Bloqueando check-in.`,
@@ -250,7 +281,8 @@ export class GamificationService {
         .findOne({
           userId,
           unitId,
-          sourceType: SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('WORKOUT_COMPLETION')],
+          sourceType:
+            SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('WORKOUT_COMPLETION')],
           createdAt: {
             $gte: today,
             $lt: tomorrow,
@@ -427,19 +459,19 @@ export class GamificationService {
 
     const rankingPosition: RankingPositionDto | undefined = userRanking
       ? {
-          ...userRanking,
-          userName,
-          unitName,
-        }
+        ...userRanking,
+        userName,
+        unitName,
+      }
       : {
-          position: ranking.length + 1,
-          totalPoints: profile.totalPoints,
-          level: profile.level,
-          unitId: profile.unitId,
-          unitName,
-          userId: profile.userId,
-          userName,
-        };
+        position: ranking.length + 1,
+        totalPoints: profile.totalPoints,
+        level: profile.level,
+        unitId: profile.unitId,
+        unitName,
+        userId: profile.userId,
+        userName,
+      };
 
     return {
       userId: profile.userId,
@@ -594,11 +626,11 @@ export class GamificationService {
       description: 'Check-in diário',
       metadata: location
         ? {
-            location: {
-              lat: location.lat,
-              lng: location.lng,
-            },
-          }
+          location: {
+            lat: location.lat,
+            lng: location.lng,
+          },
+        }
         : undefined,
     });
 
@@ -606,6 +638,11 @@ export class GamificationService {
 
     // Atualizar perfil de gamificação
     const profile = await this.getOrCreateProfile(userId, unitId);
+
+    // Sanitização de valores antes de operações aritméticas
+    if (!Number.isFinite(profile.totalPoints)) profile.totalPoints = 0;
+    if (!Number.isFinite(profile.xp)) profile.xp = 0;
+
     profile.totalPoints += checkInPoints;
     profile.xp += checkInPoints;
 
@@ -643,7 +680,8 @@ export class GamificationService {
       userId,
       unitId,
       points: exercisePoints,
-      sourceType: SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('EXERCISE_COMPLETION')],
+      sourceType:
+        SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('EXERCISE_COMPLETION')],
       sourceId: `exercise-${exerciseId}-${Date.now()}`,
       description: 'Exercício completado',
       metadata: {
@@ -656,6 +694,11 @@ export class GamificationService {
 
     // Atualizar perfil de gamificação
     const profile = await this.getOrCreateProfile(userId, unitId);
+
+    // Sanitização de valores antes de operações aritméticas
+    if (!Number.isFinite(profile.totalPoints)) profile.totalPoints = 0;
+    if (!Number.isFinite(profile.xp)) profile.xp = 0;
+
     profile.totalPoints += exercisePoints;
     profile.xp += exercisePoints;
 
@@ -684,7 +727,8 @@ export class GamificationService {
       .findOne({
         userId,
         unitId,
-        sourceType: SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('WORKOUT_COMPLETION')],
+        sourceType:
+          SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('WORKOUT_COMPLETION')],
         'metadata.planId': planId,
         createdAt: {
           $gte: today,
@@ -708,7 +752,8 @@ export class GamificationService {
       userId,
       unitId,
       points: workoutPoints,
-      sourceType: SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('WORKOUT_COMPLETION')],
+      sourceType:
+        SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('WORKOUT_COMPLETION')],
       sourceId: `workout-${planId}-${Date.now()}`,
       description: 'Treino completado',
       metadata: {
@@ -720,6 +765,11 @@ export class GamificationService {
 
     // Atualizar perfil de gamificação
     const profile = await this.getOrCreateProfile(userId, unitId);
+
+    // Sanitização de valores antes de operações aritméticas
+    if (!Number.isFinite(profile.totalPoints)) profile.totalPoints = 0;
+    if (!Number.isFinite(profile.xp)) profile.xp = 0;
+
     profile.totalPoints += workoutPoints;
     profile.xp += workoutPoints;
 
@@ -757,7 +807,8 @@ export class GamificationService {
     const workoutCompletionsToday = await this.pointTransactionModel
       .find({
         unitId,
-        sourceType: SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('WORKOUT_COMPLETION')],
+        sourceType:
+          SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('WORKOUT_COMPLETION')],
         createdAt: {
           $gte: today,
           $lt: tomorrow,
@@ -782,9 +833,10 @@ export class GamificationService {
   /**
    * Calcula streaks (sequências consecutivas) de check-ins
    */
-  private calculateStreaks(
-    checkIns: PointTransactionDocument[],
-  ): { currentStreak: number; longestStreak: number } {
+  private calculateStreaks(checkIns: PointTransactionDocument[]): {
+    currentStreak: number;
+    longestStreak: number;
+  } {
     if (checkIns.length === 0) {
       return { currentStreak: 0, longestStreak: 0 };
     }
@@ -950,21 +1002,26 @@ export class GamificationService {
           case SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('WORKOUT_COMPLETION')]:
             dayData.workoutsCompleted++;
             break;
-          case SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('EXERCISE_COMPLETION')]:
+          case SOURCE_TYPE_ENUM[
+            SOURCE_TYPE_ENUM.indexOf('EXERCISE_COMPLETION')
+          ]:
             dayData.exercisesCompleted++;
             break;
         }
 
         dayData.totalPoints += transaction.points;
-        
+
         // Garantir que o tipo seja um dos valores permitidos
-        const activityType: 'CHECK_IN' | 'WORKOUT_COMPLETION' | 'EXERCISE_COMPLETION' = 
-          transaction.sourceType === 'CHECK_IN' || 
-          transaction.sourceType === 'WORKOUT_COMPLETION' || 
-          transaction.sourceType === 'EXERCISE_COMPLETION'
+        const activityType:
+          | 'CHECK_IN'
+          | 'WORKOUT_COMPLETION'
+          | 'EXERCISE_COMPLETION' =
+          transaction.sourceType === 'CHECK_IN' ||
+            transaction.sourceType === 'WORKOUT_COMPLETION' ||
+            transaction.sourceType === 'EXERCISE_COMPLETION'
             ? transaction.sourceType
             : 'CHECK_IN'; // Fallback (não deveria acontecer devido ao filtro)
-        
+
         dayData.activities.push({
           type: activityType,
           time,
@@ -1011,10 +1068,10 @@ export class GamificationService {
       averagePointsPerDay:
         dailyActivity.length > 0
           ? Math.round(
-              (dailyActivity.reduce((sum, day) => sum + day.totalPoints, 0) /
-                dailyActivity.length) *
-                10,
-            ) / 10
+            (dailyActivity.reduce((sum, day) => sum + day.totalPoints, 0) /
+              dailyActivity.length) *
+            10,
+          ) / 10
           : 0,
     };
 
@@ -1045,18 +1102,27 @@ export class GamificationService {
       .exec();
 
     const checkIns = transactions.filter(
-      (t) => t.sourceType === SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('CHECK_IN')],
+      (t) =>
+        t.sourceType === SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('CHECK_IN')],
     ).length;
     const workouts = transactions.filter(
-      (t) => t.sourceType === SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('WORKOUT_COMPLETION')],
+      (t) =>
+        t.sourceType ===
+        SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('WORKOUT_COMPLETION')],
     ).length;
     const exercises = transactions.filter(
-      (t) => t.sourceType === SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('EXERCISE_COMPLETION')],
+      (t) =>
+        t.sourceType ===
+        SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('EXERCISE_COMPLETION')],
     ).length;
 
     // Calcular streak (simplificado - pode ser melhorado)
     const sortedTransactions = transactions
-      .filter((t) => t.sourceType === SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('CHECK_IN')])
+      .filter(
+        (t) =>
+          t.sourceType ===
+          SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('CHECK_IN')],
+      )
       .sort((a, b) => b.createdAt!.getTime() - a.createdAt!.getTime());
 
     let currentStreak = 0;
@@ -1104,10 +1170,7 @@ export class GamificationService {
   /**
    * Retorna métricas de um time específico
    */
-  async getTeamMetrics(
-    teamId: string,
-    unitId: string,
-  ): Promise<any> {
+  async getTeamMetrics(teamId: string, unitId: string): Promise<any> {
     // Este método delega para o TeamsService
     // Importação circular seria necessária, então vamos implementar aqui
     // Por enquanto, retornar estrutura básica
