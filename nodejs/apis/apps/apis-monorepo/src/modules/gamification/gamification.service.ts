@@ -616,6 +616,16 @@ export class GamificationService {
     // Pontos por check-in (padrão: 10 pontos)
     const checkInPoints = 10;
 
+    // Metadados da transação
+    const metadata = location
+      ? {
+        location: {
+          lat: location.lat,
+          lng: location.lng,
+        },
+      }
+      : undefined;
+
     // Criar transação de pontos
     const transaction = new this.pointTransactionModel({
       userId,
@@ -624,14 +634,7 @@ export class GamificationService {
       sourceType: SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('CHECK_IN')],
       sourceId: `check-in-${Date.now()}`,
       description: 'Check-in diário',
-      metadata: location
-        ? {
-          location: {
-            lat: location.lat,
-            lng: location.lng,
-          },
-        }
-        : undefined,
+      metadata,
     });
 
     await transaction.save();
@@ -656,11 +659,11 @@ export class GamificationService {
     // Retornar check-in criado no formato DTO
     return {
       id: transaction._id.toString(),
-      studentId: transaction.userId,
+      studentId: userId,
       date: transaction.createdAt!.toISOString(),
-      points: transaction.points,
-      unitId: transaction.unitId,
-      metadata: transaction.metadata,
+      points: checkInPoints,
+      unitId: unitId,
+      metadata,
     };
   }
 

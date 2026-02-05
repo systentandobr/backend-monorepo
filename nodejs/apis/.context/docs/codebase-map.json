@@ -1,0 +1,2363 @@
+{
+  "version": "1.0.0",
+  "generated": "2026-02-05T11:50:50.109Z",
+  "stack": {
+    "primaryLanguage": "typescript",
+    "languages": [
+      "javascript",
+      "typescript",
+      "python",
+      "go"
+    ],
+    "frameworks": [
+      "nestjs"
+    ],
+    "buildTools": [
+      "docker"
+    ],
+    "testFrameworks": [],
+    "packageManager": "yarn",
+    "isMonorepo": false,
+    "hasDocker": true,
+    "hasCI": true
+  },
+  "structure": {
+    "totalFiles": 27604,
+    "topDirectories": [
+      {
+        "name": "apps",
+        "fileCount": 27531
+      },
+      {
+        "name": "assets",
+        "fileCount": 1
+      },
+      {
+        "name": "create-integrated-plan.js",
+        "fileCount": 1
+      },
+      {
+        "name": "Dockerfile",
+        "fileCount": 1
+      },
+      {
+        "name": "fly.toml",
+        "fileCount": 1
+      },
+      {
+        "name": "import-all-data.js",
+        "fileCount": 1
+      },
+      {
+        "name": "import-data.js",
+        "fileCount": 1
+      },
+      {
+        "name": "import-to-mongodb.sh",
+        "fileCount": 1
+      },
+      {
+        "name": "integrated-plan-output.json",
+        "fileCount": 1
+      },
+      {
+        "name": "libs",
+        "fileCount": 12
+      },
+      {
+        "name": "nest-cli.json",
+        "fileCount": 1
+      },
+      {
+        "name": "package.json",
+        "fileCount": 1
+      },
+      {
+        "name": "package.json.clean",
+        "fileCount": 1
+      },
+      {
+        "name": "pnpm-lock.yaml",
+        "fileCount": 1
+      },
+      {
+        "name": "projeto-ai-assistant",
+        "fileCount": 10
+      },
+      {
+        "name": "public",
+        "fileCount": 0
+      },
+      {
+        "name": "README_IMPORTACAO.md",
+        "fileCount": 1
+      },
+      {
+        "name": "README.md",
+        "fileCount": 1
+      },
+      {
+        "name": "simple-import.js",
+        "fileCount": 1
+      },
+      {
+        "name": "temp-gamification",
+        "fileCount": 3
+      },
+      {
+        "name": "tmp",
+        "fileCount": 0
+      },
+      {
+        "name": "tsconfig.build.json",
+        "fileCount": 1
+      },
+      {
+        "name": "tsconfig.json",
+        "fileCount": 1
+      },
+      {
+        "name": "uploads",
+        "fileCount": 30
+      },
+      {
+        "name": "yarn.lock",
+        "fileCount": 1
+      }
+    ],
+    "languageDistribution": [
+      {
+        "extension": ".js",
+        "count": 12747
+      },
+      {
+        "extension": ".ts",
+        "count": 5666
+      },
+      {
+        "extension": ".map",
+        "count": 5656
+      },
+      {
+        "extension": ".json",
+        "count": 1216
+      },
+      {
+        "extension": ".md",
+        "count": 1145
+      },
+      {
+        "extension": ".jst",
+        "count": 78
+      },
+      {
+        "extension": ".mjs",
+        "count": 76
+      },
+      {
+        "extension": ".txt",
+        "count": 50
+      },
+      {
+        "extension": ".cts",
+        "count": 50
+      },
+      {
+        "extension": ".cjs",
+        "count": 45
+      }
+    ]
+  },
+  "architecture": {
+    "layers": [
+      {
+        "name": "Controllers",
+        "description": "Request handling and routing",
+        "directories": [
+          "temp-gamification",
+          "apps\\sys-assistente-estudos\\src",
+          "apps\\apis-monorepo\\test",
+          "apps\\apis-monorepo\\src",
+          "apps\\sys-produtos\\src",
+          "apps\\notifications\\src",
+          "apps\\life-tracker\\src",
+          "apps\\sys-pagamentos\\src",
+          "apps\\sys-assistente-estudos\\src\\estatistica",
+          "apps\\sys-assistente-estudos\\src\\concurso",
+          "apps\\sys-assistente-estudos\\src\\question",
+          "apps\\sys-assistente-estudos\\src\\simulacao",
+          "apps\\apis-monorepo\\src\\decorators",
+          "apps\\apis-monorepo\\src\\interceptors",
+          "apps\\apis-monorepo\\src\\guards",
+          "apps\\apis-monorepo\\src\\utils",
+          "apps\\apis-monorepo\\src\\auth",
+          "apps\\apis-monorepo\\src\\config",
+          "apps\\sys-produtos\\src\\controllers",
+          "apps\\sys-assistente-estudos\\src\\concurso\\temaespecifico",
+          "apps\\sys-assistente-estudos\\src\\question\\handlers",
+          "apps\\apis-monorepo\\src\\modules\\subscriptions",
+          "apps\\apis-monorepo\\src\\modules\\rag-instructions",
+          "apps\\apis-monorepo\\src\\modules\\referrals",
+          "apps\\apis-monorepo\\src\\modules\\rewards",
+          "apps\\apis-monorepo\\src\\modules\\solar",
+          "apps\\apis-monorepo\\src\\modules\\training-plans",
+          "apps\\apis-monorepo\\src\\modules\\orders",
+          "apps\\apis-monorepo\\src\\modules\\users",
+          "apps\\apis-monorepo\\src\\modules\\customers",
+          "apps\\apis-monorepo\\src\\modules\\exercises",
+          "apps\\apis-monorepo\\src\\modules\\gamification",
+          "apps\\apis-monorepo\\src\\modules\\external-apis",
+          "apps\\apis-monorepo\\src\\modules\\trainings",
+          "apps\\apis-monorepo\\src\\modules\\franchises",
+          "apps\\apis-monorepo\\src\\modules\\franchise-tasks",
+          "apps\\apis-monorepo\\src\\modules\\settings",
+          "apps\\apis-monorepo\\src\\modules\\teams",
+          "apps\\apis-monorepo\\src\\modules\\task-templates",
+          "apps\\apis-monorepo\\src\\modules\\leads",
+          "apps\\apis-monorepo\\src\\modules\\students",
+          "apps\\apis-monorepo\\src\\modules\\referral-campaigns",
+          "apps\\apis-monorepo\\src\\modules\\bioimpedance",
+          "apps\\apis-monorepo\\src\\auth\\dto",
+          "apps\\life-tracker\\src\\modules\\gamification",
+          "apps\\life-tracker\\src\\modules\\habits",
+          "apps\\life-tracker\\src\\modules\\productivity",
+          "apps\\life-tracker\\src\\modules\\financial",
+          "apps\\life-tracker\\src\\modules\\analytics",
+          "apps\\life-tracker\\src\\modules\\routines",
+          "apps\\life-tracker\\src\\modules\\business",
+          "apps\\life-tracker\\src\\modules\\health",
+          "apps\\apis-monorepo\\src\\modules\\subscriptions\\dto",
+          "apps\\apis-monorepo\\src\\modules\\subscriptions\\schemas",
+          "apps\\apis-monorepo\\src\\modules\\rag-instructions\\dto",
+          "apps\\apis-monorepo\\src\\modules\\rag-instructions\\schemas",
+          "apps\\apis-monorepo\\src\\modules\\referrals\\schemas",
+          "apps\\apis-monorepo\\src\\modules\\rewards\\dto",
+          "apps\\apis-monorepo\\src\\modules\\referrals\\dto",
+          "apps\\apis-monorepo\\src\\modules\\rewards\\schemas",
+          "apps\\apis-monorepo\\src\\modules\\solar\\dto",
+          "apps\\apis-monorepo\\src\\modules\\solar\\schemas",
+          "apps\\apis-monorepo\\src\\modules\\training-plans\\dto",
+          "apps\\apis-monorepo\\src\\modules\\training-plans\\scripts",
+          "apps\\apis-monorepo\\src\\modules\\training-plans\\schemas",
+          "apps\\apis-monorepo\\src\\modules\\orders\\dto",
+          "apps\\apis-monorepo\\src\\modules\\orders\\schemas",
+          "apps\\apis-monorepo\\src\\modules\\customers\\dto",
+          "apps\\apis-monorepo\\src\\modules\\customers\\schemas",
+          "apps\\apis-monorepo\\src\\modules\\exercises\\dto",
+          "apps\\apis-monorepo\\src\\modules\\users\\dto",
+          "apps\\apis-monorepo\\src\\modules\\exercises\\schemas",
+          "apps\\apis-monorepo\\src\\modules\\gamification\\dto",
+          "apps\\apis-monorepo\\src\\modules\\gamification\\exceptions",
+          "apps\\apis-monorepo\\src\\modules\\gamification\\schemas",
+          "apps\\apis-monorepo\\src\\modules\\external-apis\\dto",
+          "apps\\apis-monorepo\\src\\modules\\trainings\\dto",
+          "apps\\apis-monorepo\\src\\modules\\trainings\\schemas",
+          "apps\\apis-monorepo\\src\\modules\\franchises\\dto",
+          "apps\\apis-monorepo\\src\\modules\\franchises\\scripts",
+          "apps\\apis-monorepo\\src\\modules\\franchises\\schemas",
+          "apps\\apis-monorepo\\src\\modules\\franchise-tasks\\dto",
+          "apps\\apis-monorepo\\src\\modules\\franchise-tasks\\schemas",
+          "apps\\apis-monorepo\\src\\modules\\settings\\dto",
+          "apps\\apis-monorepo\\src\\modules\\settings\\schemas",
+          "apps\\apis-monorepo\\src\\modules\\teams\\schemas",
+          "apps\\apis-monorepo\\src\\modules\\teams\\dto",
+          "apps\\apis-monorepo\\src\\modules\\task-templates\\dto",
+          "apps\\apis-monorepo\\src\\modules\\task-templates\\schemas",
+          "apps\\apis-monorepo\\src\\modules\\leads\\schemas",
+          "apps\\apis-monorepo\\src\\modules\\leads\\dto",
+          "apps\\apis-monorepo\\src\\modules\\students\\dto",
+          "apps\\apis-monorepo\\src\\modules\\students\\schemas",
+          "apps\\apis-monorepo\\src\\modules\\referral-campaigns\\dto",
+          "apps\\apis-monorepo\\src\\modules\\bioimpedance\\dto",
+          "apps\\apis-monorepo\\src\\modules\\referral-campaigns\\schemas",
+          "apps\\apis-monorepo\\src\\modules\\bioimpedance\\schemas"
+        ],
+        "symbolCount": 340,
+        "dependsOn": [
+          "Services",
+          "Repositories",
+          "Config",
+          "Models"
+        ]
+      },
+      {
+        "name": "Services",
+        "description": "Business logic and orchestration",
+        "directories": [
+          "temp-gamification",
+          "apps\\sys-assistente-estudos\\src",
+          "apps\\apis-monorepo\\src",
+          "apps\\sys-produtos\\src",
+          "apps\\notifications\\src",
+          "apps\\life-tracker\\src",
+          "apps\\sys-pagamentos\\src",
+          "apps\\sys-assistente-estudos\\src\\estatistica",
+          "libs\\utils\\src",
+          "apps\\sys-assistente-estudos\\src\\concurso",
+          "apps\\sys-assistente-estudos\\src\\question",
+          "apps\\sys-assistente-estudos\\src\\simulacao",
+          "apps\\apis-monorepo\\src\\services",
+          "apps\\sys-produtos\\src\\services",
+          "apps\\life-tracker\\src\\services",
+          "apps\\sys-assistente-estudos\\src\\concurso\\temaespecifico",
+          "apps\\apis-monorepo\\src\\modules\\subscriptions",
+          "apps\\apis-monorepo\\src\\modules\\rag-instructions",
+          "apps\\apis-monorepo\\src\\modules\\referrals",
+          "apps\\apis-monorepo\\src\\modules\\rewards",
+          "apps\\apis-monorepo\\src\\modules\\solar",
+          "apps\\apis-monorepo\\src\\modules\\training-plans",
+          "apps\\apis-monorepo\\src\\modules\\orders",
+          "apps\\apis-monorepo\\src\\modules\\users",
+          "apps\\apis-monorepo\\src\\modules\\customers",
+          "apps\\apis-monorepo\\src\\modules\\exercises",
+          "apps\\apis-monorepo\\src\\modules\\gamification",
+          "apps\\apis-monorepo\\src\\modules\\external-apis",
+          "apps\\apis-monorepo\\src\\modules\\trainings",
+          "apps\\apis-monorepo\\src\\modules\\franchises",
+          "apps\\apis-monorepo\\src\\modules\\franchise-tasks",
+          "apps\\apis-monorepo\\src\\modules\\settings",
+          "apps\\apis-monorepo\\src\\modules\\teams",
+          "apps\\apis-monorepo\\src\\modules\\task-templates",
+          "apps\\apis-monorepo\\src\\modules\\leads",
+          "apps\\apis-monorepo\\src\\modules\\students",
+          "apps\\apis-monorepo\\src\\modules\\referral-campaigns",
+          "apps\\apis-monorepo\\src\\modules\\bioimpedance",
+          "apps\\life-tracker\\src\\modules\\gamification",
+          "apps\\life-tracker\\src\\modules\\habits",
+          "apps\\life-tracker\\src\\modules\\productivity",
+          "apps\\life-tracker\\src\\modules\\financial",
+          "apps\\life-tracker\\src\\modules\\analytics",
+          "apps\\life-tracker\\src\\modules\\routines",
+          "apps\\life-tracker\\src\\modules\\business",
+          "apps\\life-tracker\\src\\modules\\health",
+          "apps\\apis-monorepo\\src\\modules\\rag-instructions\\services",
+          "apps\\apis-monorepo\\src\\modules\\training-plans\\templates"
+        ],
+        "symbolCount": 77,
+        "dependsOn": [
+          "Repositories",
+          "Models",
+          "Config"
+        ]
+      },
+      {
+        "name": "Utils",
+        "description": "Shared utilities and helpers",
+        "directories": [
+          "libs\\infra",
+          "libs\\utils\\src",
+          "libs\\utils\\src\\contantes",
+          "libs\\utils\\src\\validadores",
+          "libs\\utils\\src\\validadores\\adapters"
+        ],
+        "symbolCount": 7,
+        "dependsOn": []
+      },
+      {
+        "name": "Repositories",
+        "description": "Data access and persistence",
+        "directories": [
+          "apps\\sys-produtos\\src\\dto",
+          "libs\\shared\\data\\dtos",
+          "apps\\sys-assistente-estudos\\src\\estatistica\\repository",
+          "apps\\sys-assistente-estudos\\src\\question\\repository",
+          "apps\\sys-assistente-estudos\\src\\simulacao\\repository",
+          "."
+        ],
+        "symbolCount": 32,
+        "dependsOn": [
+          "Models"
+        ]
+      },
+      {
+        "name": "Models",
+        "description": "Data structures and domain objects",
+        "directories": [
+          "apps\\sys-produtos\\src\\schemas",
+          "apps\\sys-assistente-estudos\\src\\estatistica\\model",
+          "apps\\sys-assistente-estudos\\src\\concurso\\model",
+          "apps\\sys-assistente-estudos\\src\\question\\model",
+          "apps\\sys-assistente-estudos\\src\\simulacao\\model",
+          "apps\\sys-assistente-estudos\\src\\concurso\\temaespecifico\\model",
+          "apps\\life-tracker\\src\\modules\\gamification\\schemas",
+          "apps\\life-tracker\\src\\modules\\habits\\schemas",
+          "apps\\life-tracker\\src\\modules\\productivity\\schemas",
+          "apps\\life-tracker\\src\\modules\\financial\\schemas",
+          "apps\\life-tracker\\src\\modules\\analytics\\schemas",
+          "apps\\life-tracker\\src\\modules\\routines\\schemas",
+          "apps\\life-tracker\\src\\modules\\business\\schemas",
+          "apps\\life-tracker\\src\\modules\\health\\schemas"
+        ],
+        "symbolCount": 85,
+        "dependsOn": []
+      },
+      {
+        "name": "Config",
+        "description": "Configuration and constants",
+        "directories": [
+          "apps\\sys-produtos\\src\\config",
+          "apps\\notifications\\src\\types",
+          "apps\\life-tracker\\src\\config"
+        ],
+        "symbolCount": 4,
+        "dependsOn": []
+      }
+    ],
+    "patterns": [
+      {
+        "name": "Repository",
+        "confidence": 0.9,
+        "description": "Abstracts data access logic",
+        "occurrences": 4
+      },
+      {
+        "name": "Service Layer",
+        "confidence": 0.85,
+        "description": "Encapsulates business logic in service classes",
+        "occurrences": 62
+      },
+      {
+        "name": "Controller",
+        "confidence": 0.9,
+        "description": "Handles incoming requests and returns responses",
+        "occurrences": 54
+      },
+      {
+        "name": "Observer",
+        "confidence": 0.75,
+        "description": "Defines a subscription mechanism to notify multiple objects",
+        "occurrences": 1
+      }
+    ],
+    "entryPoints": [
+      "apps\\sys-assistente-estudos\\src\\main.ts",
+      "apps\\apis-monorepo\\src\\main.ts",
+      "apps\\sys-produtos\\src\\main.ts",
+      "apps\\life-tracker\\src\\main.ts",
+      "apps\\sys-pagamentos\\src\\main.ts",
+      "libs\\utils\\src\\index.ts",
+      "apps\\life-tracker\\src\\types\\index.ts",
+      "apps\\sys-assistente-estudos\\src\\question\\handlers\\index.ts",
+      "apps\\life-tracker\\src\\modules\\types\\index.ts"
+    ]
+  },
+  "symbols": {
+    "classes": [
+      {
+        "name": "Achievement",
+        "kind": "class",
+        "file": "apps\\apis-monorepo\\src\\modules\\gamification\\schemas\\achievement.schema.ts",
+        "line": 13,
+        "exported": true
+      },
+      {
+        "name": "Achievement",
+        "kind": "class",
+        "file": "apps\\life-tracker\\src\\modules\\gamification\\schemas\\achievement.schema.ts",
+        "line": 7,
+        "exported": true
+      },
+      {
+        "name": "AchievementDto",
+        "kind": "class",
+        "file": "apps\\apis-monorepo\\src\\modules\\gamification\\dto\\gamification-response.dto.ts",
+        "line": 3,
+        "exported": true
+      },
+      {
+        "name": "AchievementService",
+        "kind": "class",
+        "file": "apps\\life-tracker\\src\\modules\\gamification\\achievement.service.ts",
+        "line": 15,
+        "exported": true
+      },
+      {
+        "name": "ActivityDto",
+        "kind": "class",
+        "file": "apps\\apis-monorepo\\src\\modules\\gamification\\dto\\weekly-activity-response.dto.ts",
+        "line": 3,
+        "exported": true
+      },
+      {
+        "name": "AddressDto",
+        "kind": "class",
+        "file": "apps\\apis-monorepo\\src\\modules\\students\\dto\\create-student.dto.ts",
+        "line": 12,
+        "exported": true
+      },
+      {
+        "name": "AdjustStockDeltaDto",
+        "kind": "class",
+        "file": "apps\\sys-produtos\\src\\dto\\variant.dto.ts",
+        "line": 117,
+        "exported": true
+      },
+      {
+        "name": "AdjustStockDto",
+        "kind": "class",
+        "file": "apps\\sys-produtos\\src\\dto\\variant.dto.ts",
+        "line": 94,
+        "exported": true
+      },
+      {
+        "name": "AffiliateProductController",
+        "kind": "class",
+        "file": "apps\\sys-produtos\\src\\affiliate-product.controller.ts",
+        "line": 33,
+        "exported": true
+      },
+      {
+        "name": "AffiliateProductService",
+        "kind": "class",
+        "file": "apps\\sys-produtos\\src\\services\\affiliate-product.service.ts",
+        "line": 22,
+        "exported": true
+      },
+      {
+        "name": "AnalyticsController",
+        "kind": "class",
+        "file": "apps\\life-tracker\\src\\modules\\analytics\\analytics.controller.ts",
+        "line": 16,
+        "exported": true
+      },
+      {
+        "name": "AnalyticsData",
+        "kind": "class",
+        "file": "apps\\life-tracker\\src\\modules\\analytics\\schemas\\analytics-data.schema.ts",
+        "line": 7,
+        "exported": true
+      },
+      {
+        "name": "AnalyticsModule",
+        "kind": "class",
+        "file": "apps\\life-tracker\\src\\modules\\analytics\\analytics.module.ts",
+        "line": 20,
+        "exported": true
+      },
+      {
+        "name": "AnalyticsService",
+        "kind": "class",
+        "file": "apps\\life-tracker\\src\\modules\\analytics\\analytics.service.ts",
+        "line": 8,
+        "exported": true
+      },
+      {
+        "name": "AppController",
+        "kind": "class",
+        "file": "apps\\apis-monorepo\\src\\app.controller.ts",
+        "line": 7,
+        "exported": true
+      },
+      {
+        "name": "AppModule",
+        "kind": "class",
+        "file": "apps\\apis-monorepo\\src\\app.module.ts",
+        "line": 71,
+        "exported": true
+      },
+      {
+        "name": "AppService",
+        "kind": "class",
+        "file": "apps\\apis-monorepo\\src\\app.service.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "Asset",
+        "kind": "class",
+        "file": "apps\\life-tracker\\src\\modules\\financial\\schemas\\asset.schema.ts",
+        "line": 7,
+        "exported": true
+      },
+      {
+        "name": "AssetDto",
+        "kind": "class",
+        "file": "apps\\life-tracker\\src\\types\\dtos\\definitions.ts",
+        "line": 289,
+        "exported": true
+      },
+      {
+        "name": "AuthModule",
+        "kind": "class",
+        "file": "apps\\apis-monorepo\\src\\auth\\auth.module.ts",
+        "line": 19,
+        "exported": true
+      },
+      {
+        "name": "AuthPublicController",
+        "kind": "class",
+        "file": "apps\\apis-monorepo\\src\\auth\\auth-public.controller.ts",
+        "line": 22,
+        "exported": true
+      },
+      {
+        "name": "AuthSharedModule",
+        "kind": "class",
+        "file": "apps\\apis-monorepo\\src\\auth\\auth-shared.module.ts",
+        "line": 27,
+        "exported": true
+      },
+      {
+        "name": "BioimpedanceController",
+        "kind": "class",
+        "file": "apps\\apis-monorepo\\src\\modules\\bioimpedance\\bioimpedance.controller.ts",
+        "line": 34,
+        "exported": true
+      },
+      {
+        "name": "BioimpedanceMeasurement",
+        "kind": "class",
+        "file": "apps\\apis-monorepo\\src\\modules\\bioimpedance\\schemas\\bioimpedance-measurement.schema.ts",
+        "line": 14,
+        "exported": true
+      },
+      {
+        "name": "BioimpedanceModule",
+        "kind": "class",
+        "file": "apps\\apis-monorepo\\src\\modules\\bioimpedance\\bioimpedance.module.ts",
+        "line": 20,
+        "exported": true
+      },
+      {
+        "name": "BioimpedanceResponseDto",
+        "kind": "class",
+        "file": "apps\\apis-monorepo\\src\\modules\\bioimpedance\\dto\\bioimpedance-response.dto.ts",
+        "line": 3,
+        "exported": true
+      },
+      {
+        "name": "BioimpedanceService",
+        "kind": "class",
+        "file": "apps\\apis-monorepo\\src\\modules\\bioimpedance\\bioimpedance.service.ts",
+        "line": 19,
+        "exported": true
+      },
+      {
+        "name": "BusinessController",
+        "kind": "class",
+        "file": "apps\\life-tracker\\src\\modules\\business\\business.controller.ts",
+        "line": 8,
+        "exported": true
+      },
+      {
+        "name": "BusinessModule",
+        "kind": "class",
+        "file": "apps\\life-tracker\\src\\modules\\business\\business.module.ts",
+        "line": 25,
+        "exported": true
+      },
+      {
+        "name": "BusinessOpportunity",
+        "kind": "class",
+        "file": "apps\\life-tracker\\src\\modules\\business\\schemas\\business-opportunity.schema.ts",
+        "line": 7,
+        "exported": true
+      },
+      {
+        "name": "BusinessOpportunityDto",
+        "kind": "class",
+        "file": "apps\\life-tracker\\src\\types\\dtos\\definitions.ts",
+        "line": 340,
+        "exported": true
+      },
+      {
+        "name": "BusinessProject",
+        "kind": "class",
+        "file": "apps\\life-tracker\\src\\modules\\business\\schemas\\business-project.schema.ts",
+        "line": 7,
+        "exported": true
+      },
+      {
+        "name": "BusinessProjectDto",
+        "kind": "class",
+        "file": "apps\\life-tracker\\src\\types\\dtos\\definitions.ts",
+        "line": 363,
+        "exported": true
+      },
+      {
+        "name": "BusinessService",
+        "kind": "class",
+        "file": "apps\\life-tracker\\src\\modules\\business\\business.service.ts",
+        "line": 9,
+        "exported": true
+      },
+      {
+        "name": "CalculateTaxDto",
+        "kind": "class",
+        "file": "apps\\sys-produtos\\src\\controllers\\tax-calculation.controller.ts",
+        "line": 12,
+        "exported": true
+      },
+      {
+        "name": "CampaignFiltersDto",
+        "kind": "class",
+        "file": "apps\\apis-monorepo\\src\\modules\\referral-campaigns\\dto\\campaign-filters.dto.ts",
+        "line": 11,
+        "exported": true
+      },
+      {
+        "name": "CampaignMetricsResponseDto",
+        "kind": "class",
+        "file": "apps\\apis-monorepo\\src\\modules\\referral-campaigns\\dto\\campaign-response.dto.ts",
+        "line": 18,
+        "exported": true
+      },
+      {
+        "name": "CampaignRulesResponseDto",
+        "kind": "class",
+        "file": "apps\\apis-monorepo\\src\\modules\\referral-campaigns\\dto\\campaign-response.dto.ts",
+        "line": 8,
+        "exported": true
+      },
+      {
+        "name": "CampaignStatsResponseDto",
+        "kind": "class",
+        "file": "apps\\apis-monorepo\\src\\modules\\referral-campaigns\\dto\\campaign-response.dto.ts",
+        "line": 46,
+        "exported": true
+      },
+      {
+        "name": "CatalogController",
+        "kind": "class",
+        "file": "apps\\sys-produtos\\src\\controllers\\catalog.controller.ts",
+        "line": 33,
+        "exported": true
+      },
+      {
+        "name": "CatalogProductController",
+        "kind": "class",
+        "file": "apps\\sys-produtos\\src\\controllers\\catalog-product.controller.ts",
+        "line": 25,
+        "exported": true
+      },
+      {
+        "name": "CatalogProductService",
+        "kind": "class",
+        "file": "apps\\sys-produtos\\src\\services\\catalog-product.service.ts",
+        "line": 9,
+        "exported": true
+      },
+      {
+        "name": "CatalogService",
+        "kind": "class",
+        "file": "apps\\sys-produtos\\src\\services\\catalog.service.ts",
+        "line": 16,
+        "exported": true
+      },
+      {
+        "name": "Category",
+        "kind": "class",
+        "file": "apps\\life-tracker\\src\\modules\\habits\\schemas\\category.schema.ts",
+        "line": 7,
+        "exported": true
+      },
+      {
+        "name": "CategoryController",
+        "kind": "class",
+        "file": "apps\\sys-produtos\\src\\category.controller.ts",
+        "line": 29,
+        "exported": true
+      },
+      {
+        "name": "CategoryDto",
+        "kind": "class",
+        "file": "apps\\sys-produtos\\src\\dto\\produto-metadata.dto.ts",
+        "line": 31,
+        "exported": true
+      },
+      {
+        "name": "CategoryService",
+        "kind": "class",
+        "file": "apps\\sys-produtos\\src\\services\\category.service.ts",
+        "line": 17,
+        "exported": true
+      },
+      {
+        "name": "CheckInAlreadyDoneError",
+        "kind": "class",
+        "file": "apps\\apis-monorepo\\src\\modules\\gamification\\exceptions\\check-in.exceptions.ts",
+        "line": 23,
+        "exported": true
+      },
+      {
+        "name": "CheckInDto",
+        "kind": "class",
+        "file": "apps\\apis-monorepo\\src\\modules\\gamification\\dto\\check-in-response.dto.ts",
+        "line": 3,
+        "exported": true
+      },
+      {
+        "name": "CheckInHistoryQueryDto",
+        "kind": "class",
+        "file": "apps\\apis-monorepo\\src\\modules\\gamification\\dto\\check-in-history-query.dto.ts",
+        "line": 4,
+        "exported": true
+      }
+    ],
+    "interfaces": [
+      {
+        "name": "Achievement",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\modules\\types\\index.ts",
+        "line": 51,
+        "exported": true
+      },
+      {
+        "name": "AddAssetDto",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\modules\\financial\\financial.controller.ts",
+        "line": 19,
+        "exported": true
+      },
+      {
+        "name": "AddLossDto",
+        "kind": "interface",
+        "file": "apps\\sys-produtos\\src\\services\\ingredients.service.ts",
+        "line": 50,
+        "exported": true
+      },
+      {
+        "name": "AddPurchaseDto",
+        "kind": "interface",
+        "file": "apps\\sys-produtos\\src\\services\\ingredients.service.ts",
+        "line": 39,
+        "exported": true
+      },
+      {
+        "name": "AffiliateProduct",
+        "kind": "interface",
+        "file": "apps\\sys-produtos\\src\\schemas\\affiliate-product.schema.ts",
+        "line": 19,
+        "exported": true
+      },
+      {
+        "name": "ApiResponse",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\types\\index.ts",
+        "line": 302,
+        "exported": true
+      },
+      {
+        "name": "ApiResponse",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\modules\\types\\index.ts",
+        "line": 3,
+        "exported": true
+      },
+      {
+        "name": "Asset",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\types\\index.ts",
+        "line": 164,
+        "exported": true
+      },
+      {
+        "name": "BusinessOpportunity",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\types\\index.ts",
+        "line": 189,
+        "exported": true
+      },
+      {
+        "name": "BusinessProject",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\types\\index.ts",
+        "line": 200,
+        "exported": true
+      },
+      {
+        "name": "Catalog",
+        "kind": "interface",
+        "file": "apps\\sys-produtos\\src\\schemas\\catalog.schema.ts",
+        "line": 3,
+        "exported": true
+      },
+      {
+        "name": "Category",
+        "kind": "interface",
+        "file": "apps\\sys-produtos\\src\\schemas\\category.schema.ts",
+        "line": 3,
+        "exported": true
+      },
+      {
+        "name": "CreateGoalDto",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\modules\\financial\\financial.controller.ts",
+        "line": 31,
+        "exported": true
+      },
+      {
+        "name": "CreateIngredientDto",
+        "kind": "interface",
+        "file": "apps\\sys-produtos\\src\\services\\ingredients.service.ts",
+        "line": 16,
+        "exported": true
+      },
+      {
+        "name": "CrossModuleProgress",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\types\\index.ts",
+        "line": 319,
+        "exported": true
+      },
+      {
+        "name": "CurrentUserShape",
+        "kind": "interface",
+        "file": "apps\\apis-monorepo\\src\\decorators\\current-user.decorator.ts",
+        "line": 3,
+        "exported": true
+      },
+      {
+        "name": "CurrentUserShape",
+        "kind": "interface",
+        "file": "apps\\sys-produtos\\src\\decorators\\current-user.decorator.ts",
+        "line": 3,
+        "exported": true
+      },
+      {
+        "name": "DailyRoutine",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\types\\index.ts",
+        "line": 76,
+        "exported": true
+      },
+      {
+        "name": "DashboardSummary",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\types\\index.ts",
+        "line": 309,
+        "exported": true
+      },
+      {
+        "name": "DeviceInfo",
+        "kind": "interface",
+        "file": "apps\\sys-produtos\\src\\schemas\\navigation.schema.ts",
+        "line": 3,
+        "exported": true
+      },
+      {
+        "name": "DietParameters",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\types\\index.ts",
+        "line": 119,
+        "exported": true
+      },
+      {
+        "name": "DishComposition",
+        "kind": "interface",
+        "file": "apps\\sys-produtos\\src\\schemas\\product.schema.ts",
+        "line": 83,
+        "exported": true
+      },
+      {
+        "name": "DishIngredient",
+        "kind": "interface",
+        "file": "apps\\sys-produtos\\src\\schemas\\product.schema.ts",
+        "line": 77,
+        "exported": true
+      },
+      {
+        "name": "DocumentationConfig",
+        "kind": "interface",
+        "file": "apps\\apis-monorepo\\src\\config\\documentation.config.ts",
+        "line": 1,
+        "exported": true
+      },
+      {
+        "name": "Domain",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\types\\index.ts",
+        "line": 217,
+        "exported": true
+      },
+      {
+        "name": "DomainGoal",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\types\\index.ts",
+        "line": 23,
+        "exported": true
+      },
+      {
+        "name": "EmailConfig",
+        "kind": "interface",
+        "file": "apps\\notifications\\src\\types\\config.ts",
+        "line": 8,
+        "exported": true
+      },
+      {
+        "name": "EstatisticaDto",
+        "kind": "interface",
+        "file": "apps\\sys-assistente-estudos\\src\\estatistica\\model\\estatistica.dto.ts",
+        "line": 3,
+        "exported": true
+      },
+      {
+        "name": "FinancialGoal",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\types\\index.ts",
+        "line": 180,
+        "exported": true
+      },
+      {
+        "name": "Game",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\types\\index.ts",
+        "line": 58,
+        "exported": true
+      },
+      {
+        "name": "Game",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\modules\\types\\index.ts",
+        "line": 25,
+        "exported": true
+      },
+      {
+        "name": "GameBoard",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\types\\index.ts",
+        "line": 41,
+        "exported": true
+      },
+      {
+        "name": "GameBoard",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\modules\\types\\index.ts",
+        "line": 10,
+        "exported": true
+      },
+      {
+        "name": "Habit",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\types\\index.ts",
+        "line": 6,
+        "exported": true
+      },
+      {
+        "name": "HabitCompletedEvent",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\modules\\gamification\\listeners\\habit.listener.ts",
+        "line": 5,
+        "exported": true
+      },
+      {
+        "name": "IHttpResponse",
+        "kind": "interface",
+        "file": "libs\\infra\\IHttpResponse.ts",
+        "line": 1,
+        "exported": true
+      },
+      {
+        "name": "IntegratedGoal",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\types\\index.ts",
+        "line": 30,
+        "exported": true
+      },
+      {
+        "name": "IntegratedRoutine",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\types\\index.ts",
+        "line": 241,
+        "exported": true
+      },
+      {
+        "name": "JwtValidationResult",
+        "kind": "interface",
+        "file": "apps\\apis-monorepo\\src\\services\\jwt-validator.service.ts",
+        "line": 6,
+        "exported": true
+      },
+      {
+        "name": "JwtValidationResult",
+        "kind": "interface",
+        "file": "apps\\sys-produtos\\src\\services\\jwt-validator.service.ts",
+        "line": 5,
+        "exported": true
+      },
+      {
+        "name": "JwtValidationResult",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\services\\jwt-validator.service.ts",
+        "line": 6,
+        "exported": true
+      },
+      {
+        "name": "LatestLabs",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\types\\index.ts",
+        "line": 83,
+        "exported": true
+      },
+      {
+        "name": "LeaderboardEntry",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\modules\\types\\index.ts",
+        "line": 61,
+        "exported": true
+      },
+      {
+        "name": "LocationResponse",
+        "kind": "interface",
+        "file": "apps\\apis-monorepo\\src\\modules\\solar\\dto\\solar-project-response.dto.ts",
+        "line": 9,
+        "exported": true
+      },
+      {
+        "name": "LossRecord",
+        "kind": "interface",
+        "file": "apps\\sys-produtos\\src\\schemas\\ingredient.schema.ts",
+        "line": 28,
+        "exported": true
+      },
+      {
+        "name": "MarketDataRequestDto",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\modules\\financial\\financial.controller.ts",
+        "line": 46,
+        "exported": true
+      },
+      {
+        "name": "MealPlan",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\types\\index.ts",
+        "line": 65,
+        "exported": true
+      },
+      {
+        "name": "NavigationSession",
+        "kind": "interface",
+        "file": "apps\\sys-produtos\\src\\schemas\\navigation.schema.ts",
+        "line": 11,
+        "exported": true
+      },
+      {
+        "name": "NotificationPayload",
+        "kind": "interface",
+        "file": "apps\\notifications\\src\\types\\config.ts",
+        "line": 1,
+        "exported": true
+      },
+      {
+        "name": "PhosphorusTarget",
+        "kind": "interface",
+        "file": "apps\\life-tracker\\src\\types\\index.ts",
+        "line": 108,
+        "exported": true
+      }
+    ],
+    "functions": [
+      {
+        "name": "UnitScope",
+        "kind": "function",
+        "file": "apps\\apis-monorepo\\src\\decorators\\unit-scope.decorator.ts",
+        "line": 19,
+        "exported": true
+      },
+      {
+        "name": "bootstrap",
+        "kind": "function",
+        "file": "apps\\sys-assistente-estudos\\src\\main.ts",
+        "line": 4,
+        "exported": false
+      },
+      {
+        "name": "bootstrap",
+        "kind": "function",
+        "file": "apps\\apis-monorepo\\src\\main.ts",
+        "line": 74,
+        "exported": false
+      },
+      {
+        "name": "bootstrap",
+        "kind": "function",
+        "file": "apps\\sys-produtos\\src\\main.ts",
+        "line": 4,
+        "exported": false
+      },
+      {
+        "name": "bootstrap",
+        "kind": "function",
+        "file": "apps\\life-tracker\\src\\main.ts",
+        "line": 7,
+        "exported": false
+      },
+      {
+        "name": "bootstrap",
+        "kind": "function",
+        "file": "apps\\sys-pagamentos\\src\\main.ts",
+        "line": 4,
+        "exported": false
+      },
+      {
+        "name": "checkAPIHealth",
+        "kind": "function",
+        "file": "simple-import.js",
+        "line": 101,
+        "exported": false
+      },
+      {
+        "name": "createBusinessData",
+        "kind": "function",
+        "file": "import-data.js",
+        "line": 241,
+        "exported": false
+      },
+      {
+        "name": "createDailyRoutines",
+        "kind": "function",
+        "file": "import-data.js",
+        "line": 143,
+        "exported": false
+      },
+      {
+        "name": "createFinancialData",
+        "kind": "function",
+        "file": "import-data.js",
+        "line": 221,
+        "exported": false
+      },
+      {
+        "name": "createGameData",
+        "kind": "function",
+        "file": "import-data.js",
+        "line": 156,
+        "exported": false
+      },
+      {
+        "name": "createHabits",
+        "kind": "function",
+        "file": "import-data.js",
+        "line": 88,
+        "exported": false
+      },
+      {
+        "name": "createHealthData",
+        "kind": "function",
+        "file": "import-data.js",
+        "line": 191,
+        "exported": false
+      },
+      {
+        "name": "createIntegratedGoals",
+        "kind": "function",
+        "file": "import-data.js",
+        "line": 121,
+        "exported": false
+      },
+      {
+        "name": "createIntegratedPlan",
+        "kind": "function",
+        "file": "create-integrated-plan.js",
+        "line": 83,
+        "exported": false
+      },
+      {
+        "name": "createMealPlan",
+        "kind": "function",
+        "file": "import-data.js",
+        "line": 174,
+        "exported": false
+      },
+      {
+        "name": "createProductivityData",
+        "kind": "function",
+        "file": "import-data.js",
+        "line": 263,
+        "exported": false
+      },
+      {
+        "name": "error",
+        "kind": "function",
+        "file": "simple-import.js",
+        "line": 42,
+        "exported": false
+      },
+      {
+        "name": "error",
+        "kind": "function",
+        "file": "create-integrated-plan.js",
+        "line": 41,
+        "exported": false
+      },
+      {
+        "name": "error",
+        "kind": "function",
+        "file": "import-data.js",
+        "line": 41,
+        "exported": false
+      },
+      {
+        "name": "error",
+        "kind": "function",
+        "file": "import-all-data.js",
+        "line": 37,
+        "exported": false
+      },
+      {
+        "name": "generateStoplightHTML",
+        "kind": "function",
+        "file": "apps\\apis-monorepo\\src\\main.ts",
+        "line": 392,
+        "exported": false
+      },
+      {
+        "name": "getAllowedOriginsFromMongoDB",
+        "kind": "function",
+        "file": "apps\\apis-monorepo\\src\\main.ts",
+        "line": 15,
+        "exported": false,
+        "description": "Busca origens permitidas do MongoDB dinamicamente"
+      },
+      {
+        "name": "importAllData",
+        "kind": "function",
+        "file": "import-all-data.js",
+        "line": 52,
+        "exported": false
+      },
+      {
+        "name": "importData",
+        "kind": "function",
+        "file": "import-data.js",
+        "line": 277,
+        "exported": false
+      },
+      {
+        "name": "importTemplates",
+        "kind": "function",
+        "file": "apps\\apis-monorepo\\src\\modules\\training-plans\\scripts\\import-templates.ts",
+        "line": 203,
+        "exported": false
+      },
+      {
+        "name": "inferMuscleGroups",
+        "kind": "function",
+        "file": "apps\\apis-monorepo\\src\\modules\\training-plans\\scripts\\import-templates.ts",
+        "line": 160,
+        "exported": false,
+        "description": "Infere grupos musculares baseado no nome do exercício"
+      },
+      {
+        "name": "info",
+        "kind": "function",
+        "file": "simple-import.js",
+        "line": 47,
+        "exported": false
+      },
+      {
+        "name": "info",
+        "kind": "function",
+        "file": "create-integrated-plan.js",
+        "line": 46,
+        "exported": false
+      },
+      {
+        "name": "info",
+        "kind": "function",
+        "file": "import-data.js",
+        "line": 46,
+        "exported": false
+      },
+      {
+        "name": "info",
+        "kind": "function",
+        "file": "import-all-data.js",
+        "line": 42,
+        "exported": false
+      },
+      {
+        "name": "initializeGamification",
+        "kind": "function",
+        "file": "apps\\life-tracker\\scripts\\initialize-gamification.js",
+        "line": 57,
+        "exported": false
+      },
+      {
+        "name": "log",
+        "kind": "function",
+        "file": "simple-import.js",
+        "line": 32,
+        "exported": false
+      },
+      {
+        "name": "log",
+        "kind": "function",
+        "file": "create-integrated-plan.js",
+        "line": 31,
+        "exported": false
+      },
+      {
+        "name": "log",
+        "kind": "function",
+        "file": "import-data.js",
+        "line": 31,
+        "exported": false
+      },
+      {
+        "name": "log",
+        "kind": "function",
+        "file": "import-all-data.js",
+        "line": 27,
+        "exported": false
+      },
+      {
+        "name": "main",
+        "kind": "function",
+        "file": "simple-import.js",
+        "line": 241,
+        "exported": false
+      },
+      {
+        "name": "makeRequest",
+        "kind": "function",
+        "file": "simple-import.js",
+        "line": 52,
+        "exported": false
+      },
+      {
+        "name": "makeRequest",
+        "kind": "function",
+        "file": "create-integrated-plan.js",
+        "line": 51,
+        "exported": false
+      },
+      {
+        "name": "makeRequest",
+        "kind": "function",
+        "file": "import-data.js",
+        "line": 56,
+        "exported": false
+      },
+      {
+        "name": "matchesWildcardPattern",
+        "kind": "function",
+        "file": "apps\\apis-monorepo\\src\\main.ts",
+        "line": 62,
+        "exported": false,
+        "description": "Verifica se uma origem corresponde a um padrão com wildcard"
+      },
+      {
+        "name": "migrateMarketSegments",
+        "kind": "function",
+        "file": "apps\\apis-monorepo\\src\\modules\\franchises\\scripts\\migrate-market-segments.ts",
+        "line": 31,
+        "exported": false
+      },
+      {
+        "name": "processDataFile",
+        "kind": "function",
+        "file": "simple-import.js",
+        "line": 119,
+        "exported": false
+      },
+      {
+        "name": "saveProcessedData",
+        "kind": "function",
+        "file": "simple-import.js",
+        "line": 228,
+        "exported": false
+      },
+      {
+        "name": "setupStoplightElements",
+        "kind": "function",
+        "file": "apps\\apis-monorepo\\src\\main.ts",
+        "line": 372,
+        "exported": false
+      },
+      {
+        "name": "showDataSummary",
+        "kind": "function",
+        "file": "simple-import.js",
+        "line": 141,
+        "exported": false
+      },
+      {
+        "name": "showHelp",
+        "kind": "function",
+        "file": "import-all-data.js",
+        "line": 130,
+        "exported": false
+      },
+      {
+        "name": "success",
+        "kind": "function",
+        "file": "simple-import.js",
+        "line": 37,
+        "exported": false
+      },
+      {
+        "name": "success",
+        "kind": "function",
+        "file": "create-integrated-plan.js",
+        "line": 36,
+        "exported": false
+      },
+      {
+        "name": "success",
+        "kind": "function",
+        "file": "import-data.js",
+        "line": 36,
+        "exported": false
+      }
+    ],
+    "types": [
+      {
+        "name": "AchievementDocument",
+        "kind": "type",
+        "file": "apps\\apis-monorepo\\src\\modules\\gamification\\schemas\\achievement.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "AchievementDocument",
+        "kind": "type",
+        "file": "apps\\life-tracker\\src\\modules\\gamification\\schemas\\achievement.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "AffiliatePlatform",
+        "kind": "type",
+        "file": "apps\\sys-produtos\\src\\dto\\affiliate-product.dto.ts",
+        "line": 13,
+        "exported": true
+      },
+      {
+        "name": "AffiliatePlatform",
+        "kind": "type",
+        "file": "apps\\sys-produtos\\src\\schemas\\affiliate-product.schema.ts",
+        "line": 10,
+        "exported": true
+      },
+      {
+        "name": "AnalyticsDataDocument",
+        "kind": "type",
+        "file": "apps\\life-tracker\\src\\modules\\analytics\\schemas\\analytics-data.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "AssetDocument",
+        "kind": "type",
+        "file": "apps\\life-tracker\\src\\modules\\financial\\schemas\\asset.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "BioimpedanceMeasurementDocument",
+        "kind": "type",
+        "file": "apps\\apis-monorepo\\src\\modules\\bioimpedance\\schemas\\bioimpedance-measurement.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "BusinessOpportunityDocument",
+        "kind": "type",
+        "file": "apps\\life-tracker\\src\\modules\\business\\schemas\\business-opportunity.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "BusinessProjectDocument",
+        "kind": "type",
+        "file": "apps\\life-tracker\\src\\modules\\business\\schemas\\business-project.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "CategoryDocument",
+        "kind": "type",
+        "file": "apps\\life-tracker\\src\\modules\\habits\\schemas\\category.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "CustomerDocument",
+        "kind": "type",
+        "file": "apps\\apis-monorepo\\src\\modules\\customers\\schemas\\customer.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "DailyRoutineDocument",
+        "kind": "type",
+        "file": "apps\\life-tracker\\src\\modules\\routines\\schemas\\daily-routine.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "DietParametersDocument",
+        "kind": "type",
+        "file": "apps\\life-tracker\\src\\modules\\health\\schemas\\diet-parameters.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "DistributionContractDocument",
+        "kind": "type",
+        "file": "apps\\apis-monorepo\\src\\modules\\solar\\schemas\\solar-distribution.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "ExerciseDocument",
+        "kind": "type",
+        "file": "apps\\apis-monorepo\\src\\modules\\exercises\\schemas\\exercise.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "FinancialGoalDocument",
+        "kind": "type",
+        "file": "apps\\life-tracker\\src\\modules\\financial\\schemas\\financial-goal.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "FranchiseDocument",
+        "kind": "type",
+        "file": "apps\\apis-monorepo\\src\\modules\\franchises\\schemas\\franchise.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "FranchiseTaskDocument",
+        "kind": "type",
+        "file": "apps\\apis-monorepo\\src\\modules\\franchise-tasks\\schemas\\franchise-task.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "GameDocument",
+        "kind": "type",
+        "file": "apps\\life-tracker\\src\\modules\\gamification\\schemas\\game.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "GamificationProfileDocument",
+        "kind": "type",
+        "file": "apps\\apis-monorepo\\src\\modules\\gamification\\schemas\\gamification-profile.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "GamificationProfileDocument",
+        "kind": "type",
+        "file": "apps\\life-tracker\\src\\modules\\gamification\\schemas\\gamification-profile.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "HabitDocument",
+        "kind": "type",
+        "file": "apps\\life-tracker\\src\\modules\\habits\\schemas\\habit.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "HealthPlanDocument",
+        "kind": "type",
+        "file": "apps\\life-tracker\\src\\modules\\health\\schemas\\health-plan.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "IngredientDocument",
+        "kind": "type",
+        "file": "apps\\sys-produtos\\src\\schemas\\ingredient.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "IntegratedRoutineDocument",
+        "kind": "type",
+        "file": "apps\\life-tracker\\src\\modules\\routines\\schemas\\integrated-routine.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "LatestLabsDocument",
+        "kind": "type",
+        "file": "apps\\life-tracker\\src\\modules\\health\\schemas\\latest-labs.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "LeadDocument",
+        "kind": "type",
+        "file": "apps\\apis-monorepo\\src\\modules\\leads\\schemas\\lead.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "NavigationSessionStatus",
+        "kind": "type",
+        "file": "apps\\sys-produtos\\src\\schemas\\navigation.schema.ts",
+        "line": 9,
+        "exported": true
+      },
+      {
+        "name": "OrderDocument",
+        "kind": "type",
+        "file": "apps\\apis-monorepo\\src\\modules\\orders\\schemas\\order.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "PaymentDocument",
+        "kind": "type",
+        "file": "apps\\apis-monorepo\\src\\modules\\subscriptions\\schemas\\payment.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "PointTransactionDocument",
+        "kind": "type",
+        "file": "apps\\apis-monorepo\\src\\modules\\gamification\\schemas\\point-transaction.schema.ts",
+        "line": 16,
+        "exported": true
+      },
+      {
+        "name": "PointTransactionDocument",
+        "kind": "type",
+        "file": "apps\\life-tracker\\src\\modules\\gamification\\schemas\\point-transaction.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "PortfolioDocument",
+        "kind": "type",
+        "file": "apps\\life-tracker\\src\\modules\\financial\\schemas\\portfolio.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "ProcessingStatus",
+        "kind": "type",
+        "file": "apps\\sys-produtos\\src\\dto\\affiliate-product.dto.ts",
+        "line": 22,
+        "exported": true
+      },
+      {
+        "name": "ProcessingStatus",
+        "kind": "type",
+        "file": "apps\\sys-produtos\\src\\schemas\\affiliate-product.schema.ts",
+        "line": 3,
+        "exported": true
+      },
+      {
+        "name": "ProductivityGoalDocument",
+        "kind": "type",
+        "file": "apps\\life-tracker\\src\\modules\\productivity\\schemas\\productivity-goal.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "RagInstructionDocument",
+        "kind": "type",
+        "file": "apps\\apis-monorepo\\src\\modules\\rag-instructions\\schemas\\rag-instruction.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "RecipeDocument",
+        "kind": "type",
+        "file": "apps\\life-tracker\\src\\modules\\health\\schemas\\recipe.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "ReferralCampaignDocument",
+        "kind": "type",
+        "file": "apps\\apis-monorepo\\src\\modules\\referral-campaigns\\schemas\\referral-campaign.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "ReferralDocument",
+        "kind": "type",
+        "file": "apps\\apis-monorepo\\src\\modules\\referrals\\schemas\\referral.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "RewardDocument",
+        "kind": "type",
+        "file": "apps\\apis-monorepo\\src\\modules\\rewards\\schemas\\reward.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "RoutineDocument",
+        "kind": "type",
+        "file": "apps\\life-tracker\\src\\modules\\routines\\schemas\\routine.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "SettingDocument",
+        "kind": "type",
+        "file": "apps\\apis-monorepo\\src\\modules\\settings\\schemas\\setting.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "SolarEquipmentDocument",
+        "kind": "type",
+        "file": "apps\\apis-monorepo\\src\\modules\\solar\\schemas\\solar-equipment.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "SolarProductionDocument",
+        "kind": "type",
+        "file": "apps\\apis-monorepo\\src\\modules\\solar\\schemas\\solar-production.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "SolarProjectDocument",
+        "kind": "type",
+        "file": "apps\\apis-monorepo\\src\\modules\\solar\\schemas\\solar-project.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "SourceType",
+        "kind": "type",
+        "file": "apps\\apis-monorepo\\src\\modules\\gamification\\schemas\\point-transaction.schema.ts",
+        "line": 14,
+        "exported": true
+      },
+      {
+        "name": "StudentDocument",
+        "kind": "type",
+        "file": "apps\\apis-monorepo\\src\\modules\\students\\schemas\\student.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "SubscriptionPlanDocument",
+        "kind": "type",
+        "file": "apps\\apis-monorepo\\src\\modules\\subscriptions\\schemas\\subscription-plan.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "TaskTemplateDocument",
+        "kind": "type",
+        "file": "apps\\apis-monorepo\\src\\modules\\task-templates\\schemas\\task-template.schema.ts",
+        "line": 4,
+        "exported": true
+      }
+    ],
+    "enums": [
+      {
+        "name": "DiscountEvent",
+        "kind": "enum",
+        "file": "apps\\sys-produtos\\src\\schemas\\product.schema.ts",
+        "line": 8,
+        "exported": true
+      },
+      {
+        "name": "DiscountType",
+        "kind": "enum",
+        "file": "apps\\sys-produtos\\src\\schemas\\product.schema.ts",
+        "line": 14,
+        "exported": true
+      },
+      {
+        "name": "ErrorCode",
+        "kind": "enum",
+        "file": "libs\\utils\\src\\contantes\\ErrorNumber.ts",
+        "line": 1,
+        "exported": true
+      },
+      {
+        "name": "GroqModel",
+        "kind": "enum",
+        "file": "apps\\apis-monorepo\\src\\modules\\external-apis\\dto\\groq.dto.ts",
+        "line": 16,
+        "exported": true
+      },
+      {
+        "name": "IngredientUnit",
+        "kind": "enum",
+        "file": "apps\\sys-produtos\\src\\schemas\\ingredient.schema.ts",
+        "line": 6,
+        "exported": true
+      },
+      {
+        "name": "LeadSource",
+        "kind": "enum",
+        "file": "apps\\apis-monorepo\\src\\modules\\leads\\schemas\\lead.schema.ts",
+        "line": 19,
+        "exported": true
+      },
+      {
+        "name": "LeadStatus",
+        "kind": "enum",
+        "file": "apps\\apis-monorepo\\src\\modules\\leads\\schemas\\lead.schema.ts",
+        "line": 10,
+        "exported": true
+      },
+      {
+        "name": "ProductType",
+        "kind": "enum",
+        "file": "apps\\sys-produtos\\src\\schemas\\product.schema.ts",
+        "line": 72,
+        "exported": true
+      },
+      {
+        "name": "TimeOfDay",
+        "kind": "enum",
+        "file": "apps\\life-tracker\\src\\types\\dtos\\definitions.ts",
+        "line": 470,
+        "exported": true
+      }
+    ]
+  },
+  "publicAPI": [
+    {
+      "name": "Achievement",
+      "kind": "interface",
+      "file": "apps\\life-tracker\\src\\modules\\types\\index.ts",
+      "line": 51,
+      "exported": true
+    },
+    {
+      "name": "Achievement",
+      "kind": "class",
+      "file": "apps\\apis-monorepo\\src\\modules\\gamification\\schemas\\achievement.schema.ts",
+      "line": 13,
+      "exported": true
+    },
+    {
+      "name": "Achievement",
+      "kind": "class",
+      "file": "apps\\life-tracker\\src\\modules\\gamification\\schemas\\achievement.schema.ts",
+      "line": 7,
+      "exported": true
+    },
+    {
+      "name": "AchievementDocument",
+      "kind": "type",
+      "file": "apps\\apis-monorepo\\src\\modules\\gamification\\schemas\\achievement.schema.ts",
+      "line": 4,
+      "exported": true
+    },
+    {
+      "name": "AchievementDocument",
+      "kind": "type",
+      "file": "apps\\life-tracker\\src\\modules\\gamification\\schemas\\achievement.schema.ts",
+      "line": 4,
+      "exported": true
+    },
+    {
+      "name": "AchievementDto",
+      "kind": "class",
+      "file": "apps\\apis-monorepo\\src\\modules\\gamification\\dto\\gamification-response.dto.ts",
+      "line": 3,
+      "exported": true
+    },
+    {
+      "name": "AchievementService",
+      "kind": "class",
+      "file": "apps\\life-tracker\\src\\modules\\gamification\\achievement.service.ts",
+      "line": 15,
+      "exported": true
+    },
+    {
+      "name": "ActivityDto",
+      "kind": "class",
+      "file": "apps\\apis-monorepo\\src\\modules\\gamification\\dto\\weekly-activity-response.dto.ts",
+      "line": 3,
+      "exported": true
+    },
+    {
+      "name": "AddAssetDto",
+      "kind": "interface",
+      "file": "apps\\life-tracker\\src\\modules\\financial\\financial.controller.ts",
+      "line": 19,
+      "exported": true
+    },
+    {
+      "name": "AddLossDto",
+      "kind": "interface",
+      "file": "apps\\sys-produtos\\src\\services\\ingredients.service.ts",
+      "line": 50,
+      "exported": true
+    },
+    {
+      "name": "AddPurchaseDto",
+      "kind": "interface",
+      "file": "apps\\sys-produtos\\src\\services\\ingredients.service.ts",
+      "line": 39,
+      "exported": true
+    },
+    {
+      "name": "AddressDto",
+      "kind": "class",
+      "file": "apps\\apis-monorepo\\src\\modules\\students\\dto\\create-student.dto.ts",
+      "line": 12,
+      "exported": true
+    },
+    {
+      "name": "AdjustStockDeltaDto",
+      "kind": "class",
+      "file": "apps\\sys-produtos\\src\\dto\\variant.dto.ts",
+      "line": 117,
+      "exported": true
+    },
+    {
+      "name": "AdjustStockDto",
+      "kind": "class",
+      "file": "apps\\sys-produtos\\src\\dto\\variant.dto.ts",
+      "line": 94,
+      "exported": true
+    },
+    {
+      "name": "AffiliatePlatform",
+      "kind": "type",
+      "file": "apps\\sys-produtos\\src\\dto\\affiliate-product.dto.ts",
+      "line": 13,
+      "exported": true
+    },
+    {
+      "name": "AffiliatePlatform",
+      "kind": "type",
+      "file": "apps\\sys-produtos\\src\\schemas\\affiliate-product.schema.ts",
+      "line": 10,
+      "exported": true
+    },
+    {
+      "name": "AffiliateProduct",
+      "kind": "interface",
+      "file": "apps\\sys-produtos\\src\\schemas\\affiliate-product.schema.ts",
+      "line": 19,
+      "exported": true
+    },
+    {
+      "name": "AffiliateProductController",
+      "kind": "class",
+      "file": "apps\\sys-produtos\\src\\affiliate-product.controller.ts",
+      "line": 33,
+      "exported": true
+    },
+    {
+      "name": "AffiliateProductService",
+      "kind": "class",
+      "file": "apps\\sys-produtos\\src\\services\\affiliate-product.service.ts",
+      "line": 22,
+      "exported": true
+    },
+    {
+      "name": "AnalyticsController",
+      "kind": "class",
+      "file": "apps\\life-tracker\\src\\modules\\analytics\\analytics.controller.ts",
+      "line": 16,
+      "exported": true
+    },
+    {
+      "name": "AnalyticsData",
+      "kind": "class",
+      "file": "apps\\life-tracker\\src\\modules\\analytics\\schemas\\analytics-data.schema.ts",
+      "line": 7,
+      "exported": true
+    },
+    {
+      "name": "AnalyticsDataDocument",
+      "kind": "type",
+      "file": "apps\\life-tracker\\src\\modules\\analytics\\schemas\\analytics-data.schema.ts",
+      "line": 4,
+      "exported": true
+    },
+    {
+      "name": "AnalyticsModule",
+      "kind": "class",
+      "file": "apps\\life-tracker\\src\\modules\\analytics\\analytics.module.ts",
+      "line": 20,
+      "exported": true
+    },
+    {
+      "name": "AnalyticsService",
+      "kind": "class",
+      "file": "apps\\life-tracker\\src\\modules\\analytics\\analytics.service.ts",
+      "line": 8,
+      "exported": true
+    },
+    {
+      "name": "ApiResponse",
+      "kind": "interface",
+      "file": "apps\\life-tracker\\src\\types\\index.ts",
+      "line": 302,
+      "exported": true
+    },
+    {
+      "name": "ApiResponse",
+      "kind": "interface",
+      "file": "apps\\life-tracker\\src\\modules\\types\\index.ts",
+      "line": 3,
+      "exported": true
+    },
+    {
+      "name": "AppController",
+      "kind": "class",
+      "file": "apps\\apis-monorepo\\src\\app.controller.ts",
+      "line": 7,
+      "exported": true
+    },
+    {
+      "name": "AppModule",
+      "kind": "class",
+      "file": "apps\\apis-monorepo\\src\\app.module.ts",
+      "line": 71,
+      "exported": true
+    },
+    {
+      "name": "AppService",
+      "kind": "class",
+      "file": "apps\\apis-monorepo\\src\\app.service.ts",
+      "line": 4,
+      "exported": true
+    },
+    {
+      "name": "Asset",
+      "kind": "interface",
+      "file": "apps\\life-tracker\\src\\types\\index.ts",
+      "line": 164,
+      "exported": true
+    },
+    {
+      "name": "Asset",
+      "kind": "class",
+      "file": "apps\\life-tracker\\src\\modules\\financial\\schemas\\asset.schema.ts",
+      "line": 7,
+      "exported": true
+    },
+    {
+      "name": "AssetDocument",
+      "kind": "type",
+      "file": "apps\\life-tracker\\src\\modules\\financial\\schemas\\asset.schema.ts",
+      "line": 4,
+      "exported": true
+    },
+    {
+      "name": "AssetDto",
+      "kind": "class",
+      "file": "apps\\life-tracker\\src\\types\\dtos\\definitions.ts",
+      "line": 289,
+      "exported": true
+    },
+    {
+      "name": "AuthModule",
+      "kind": "class",
+      "file": "apps\\apis-monorepo\\src\\auth\\auth.module.ts",
+      "line": 19,
+      "exported": true
+    },
+    {
+      "name": "AuthPublicController",
+      "kind": "class",
+      "file": "apps\\apis-monorepo\\src\\auth\\auth-public.controller.ts",
+      "line": 22,
+      "exported": true
+    },
+    {
+      "name": "AuthSharedModule",
+      "kind": "class",
+      "file": "apps\\apis-monorepo\\src\\auth\\auth-shared.module.ts",
+      "line": 27,
+      "exported": true
+    },
+    {
+      "name": "BioimpedanceController",
+      "kind": "class",
+      "file": "apps\\apis-monorepo\\src\\modules\\bioimpedance\\bioimpedance.controller.ts",
+      "line": 34,
+      "exported": true
+    },
+    {
+      "name": "BioimpedanceMeasurement",
+      "kind": "class",
+      "file": "apps\\apis-monorepo\\src\\modules\\bioimpedance\\schemas\\bioimpedance-measurement.schema.ts",
+      "line": 14,
+      "exported": true
+    },
+    {
+      "name": "BioimpedanceMeasurementDocument",
+      "kind": "type",
+      "file": "apps\\apis-monorepo\\src\\modules\\bioimpedance\\schemas\\bioimpedance-measurement.schema.ts",
+      "line": 4,
+      "exported": true
+    },
+    {
+      "name": "BioimpedanceModule",
+      "kind": "class",
+      "file": "apps\\apis-monorepo\\src\\modules\\bioimpedance\\bioimpedance.module.ts",
+      "line": 20,
+      "exported": true
+    },
+    {
+      "name": "BioimpedanceResponseDto",
+      "kind": "class",
+      "file": "apps\\apis-monorepo\\src\\modules\\bioimpedance\\dto\\bioimpedance-response.dto.ts",
+      "line": 3,
+      "exported": true
+    },
+    {
+      "name": "BioimpedanceService",
+      "kind": "class",
+      "file": "apps\\apis-monorepo\\src\\modules\\bioimpedance\\bioimpedance.service.ts",
+      "line": 19,
+      "exported": true
+    },
+    {
+      "name": "BusinessController",
+      "kind": "class",
+      "file": "apps\\life-tracker\\src\\modules\\business\\business.controller.ts",
+      "line": 8,
+      "exported": true
+    },
+    {
+      "name": "BusinessModule",
+      "kind": "class",
+      "file": "apps\\life-tracker\\src\\modules\\business\\business.module.ts",
+      "line": 25,
+      "exported": true
+    },
+    {
+      "name": "BusinessOpportunity",
+      "kind": "interface",
+      "file": "apps\\life-tracker\\src\\types\\index.ts",
+      "line": 189,
+      "exported": true
+    },
+    {
+      "name": "BusinessOpportunity",
+      "kind": "class",
+      "file": "apps\\life-tracker\\src\\modules\\business\\schemas\\business-opportunity.schema.ts",
+      "line": 7,
+      "exported": true
+    },
+    {
+      "name": "BusinessOpportunityDocument",
+      "kind": "type",
+      "file": "apps\\life-tracker\\src\\modules\\business\\schemas\\business-opportunity.schema.ts",
+      "line": 4,
+      "exported": true
+    },
+    {
+      "name": "BusinessOpportunityDto",
+      "kind": "class",
+      "file": "apps\\life-tracker\\src\\types\\dtos\\definitions.ts",
+      "line": 340,
+      "exported": true
+    },
+    {
+      "name": "BusinessProject",
+      "kind": "interface",
+      "file": "apps\\life-tracker\\src\\types\\index.ts",
+      "line": 200,
+      "exported": true
+    },
+    {
+      "name": "BusinessProject",
+      "kind": "class",
+      "file": "apps\\life-tracker\\src\\modules\\business\\schemas\\business-project.schema.ts",
+      "line": 7,
+      "exported": true
+    }
+  ],
+  "dependencies": {
+    "mostImported": [
+      {
+        "file": "\\\\WSL.LOCALHOST\\UBUNTU\\home\\marcelio\\developing\\systentando\\backend-monorepo\\nodejs\\apis\\apps\\apis-monorepo\\src\\decorators\\current-user.decorator.ts",
+        "importedBy": 21
+      },
+      {
+        "file": "\\\\WSL.LOCALHOST\\UBUNTU\\home\\marcelio\\developing\\systentando\\backend-monorepo\\nodejs\\apis\\apps\\life-tracker\\src\\types/index.ts",
+        "importedBy": 16
+      },
+      {
+        "file": "\\\\WSL.LOCALHOST\\UBUNTU\\home\\marcelio\\developing\\systentando\\backend-monorepo\\nodejs\\apis\\apps\\apis-monorepo\\src\\decorators\\unit-scope.decorator.ts",
+        "importedBy": 13
+      },
+      {
+        "file": "\\\\WSL.LOCALHOST\\UBUNTU\\home\\marcelio\\developing\\systentando\\backend-monorepo\\nodejs\\apis\\apps\\sys-produtos\\src\\guards\\jwt-auth.guard.ts",
+        "importedBy": 10
+      },
+      {
+        "file": "\\\\WSL.LOCALHOST\\UBUNTU\\home\\marcelio\\developing\\systentando\\backend-monorepo\\nodejs\\apis\\apps\\apis-monorepo\\src\\guards\\jwt-auth.guard.ts",
+        "importedBy": 9
+      },
+      {
+        "file": "\\\\WSL.LOCALHOST\\UBUNTU\\home\\marcelio\\developing\\systentando\\backend-monorepo\\nodejs\\apis\\apps\\sys-produtos\\src\\decorators\\current-user.decorator.ts",
+        "importedBy": 8
+      },
+      {
+        "file": "\\\\WSL.LOCALHOST\\UBUNTU\\home\\marcelio\\developing\\systentando\\backend-monorepo\\nodejs\\apis\\apps\\sys-produtos\\src\\schemas\\product.schema.ts",
+        "importedBy": 8
+      },
+      {
+        "file": "\\\\WSL.LOCALHOST\\UBUNTU\\home\\marcelio\\developing\\systentando\\backend-monorepo\\nodejs\\apis\\apps\\sys-assistente-estudos\\src\\question\\model\\question.schema.ts",
+        "importedBy": 8
+      },
+      {
+        "file": "\\\\WSL.LOCALHOST\\UBUNTU\\home\\marcelio\\developing\\systentando\\backend-monorepo\\nodejs\\apis\\apps\\sys-produtos\\src\\dto\\create-produto.dto.ts",
+        "importedBy": 7
+      },
+      {
+        "file": "\\\\WSL.LOCALHOST\\UBUNTU\\home\\marcelio\\developing\\systentando\\backend-monorepo\\nodejs\\apis\\apps\\apis-monorepo\\src\\modules\\leads\\schemas\\lead.schema.ts",
+        "importedBy": 7
+      },
+      {
+        "file": "\\\\WSL.LOCALHOST\\UBUNTU\\home\\marcelio\\developing\\systentando\\backend-monorepo\\nodejs\\apis\\apps\\apis-monorepo\\src\\config\\environment.config.ts",
+        "importedBy": 6
+      },
+      {
+        "file": "\\\\WSL.LOCALHOST\\UBUNTU\\home\\marcelio\\developing\\systentando\\backend-monorepo\\nodejs\\apis\\apps\\sys-assistente-estudos\\src\\estatistica\\model\\estatistica.schema.ts",
+        "importedBy": 6
+      },
+      {
+        "file": "\\\\WSL.LOCALHOST\\UBUNTU\\home\\marcelio\\developing\\systentando\\backend-monorepo\\nodejs\\apis\\apps\\apis-monorepo\\src\\modules\\franchises\\schemas\\franchise.schema.ts",
+        "importedBy": 6
+      },
+      {
+        "file": "\\\\WSL.LOCALHOST\\UBUNTU\\home\\marcelio\\developing\\systentando\\backend-monorepo\\nodejs\\apis\\apps\\apis-monorepo\\src\\modules\\training-plans\\training-plans.module.ts",
+        "importedBy": 5
+      },
+      {
+        "file": "\\\\WSL.LOCALHOST\\UBUNTU\\home\\marcelio\\developing\\systentando\\backend-monorepo\\nodejs\\apis\\apps\\sys-produtos\\src\\sys-produtos.service.ts",
+        "importedBy": 5
+      },
+      {
+        "file": "\\\\WSL.LOCALHOST\\UBUNTU\\home\\marcelio\\developing\\systentando\\backend-monorepo\\nodejs\\apis\\apps\\notifications\\src\\notifications.service.ts",
+        "importedBy": 5
+      },
+      {
+        "file": "\\\\WSL.LOCALHOST\\UBUNTU\\home\\marcelio\\developing\\systentando\\backend-monorepo\\nodejs\\apis\\apps\\life-tracker\\src\\modules\\gamification\\gamification.module.ts",
+        "importedBy": 5
+      },
+      {
+        "file": "\\\\WSL.LOCALHOST\\UBUNTU\\home\\marcelio\\developing\\systentando\\backend-monorepo\\nodejs\\apis\\apps\\sys-assistente-estudos\\src\\question\\question.service.ts",
+        "importedBy": 5
+      },
+      {
+        "file": "\\\\WSL.LOCALHOST\\UBUNTU\\home\\marcelio\\developing\\systentando\\backend-monorepo\\nodejs\\apis\\apps\\sys-assistente-estudos\\src\\question\\model\\question.dto.ts",
+        "importedBy": 5
+      },
+      {
+        "file": "\\\\WSL.LOCALHOST\\UBUNTU\\home\\marcelio\\developing\\systentando\\backend-monorepo\\nodejs\\apis\\apps\\apis-monorepo\\src\\modules\\training-plans\\training-plans.service.ts",
+        "importedBy": 5
+      }
+    ]
+  },
+  "stats": {
+    "totalSymbols": 690,
+    "exportedSymbols": 611,
+    "analysisTimeMs": 5046
+  }
+}
