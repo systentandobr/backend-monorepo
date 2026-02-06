@@ -1,0 +1,3120 @@
+{
+  "version": "1.0.0",
+  "generated": "2026-02-06T00:56:47.076Z",
+  "stack": {
+    "primaryLanguage": "typescript",
+    "languages": [
+      "javascript",
+      "python",
+      "go",
+      "typescript"
+    ],
+    "frameworks": [],
+    "buildTools": [
+      "docker",
+      "docker-compose"
+    ],
+    "testFrameworks": [],
+    "packageManager": null,
+    "isMonorepo": false,
+    "hasDocker": true,
+    "hasCI": false
+  },
+  "structure": {
+    "totalFiles": 103457,
+    "topDirectories": [
+      {
+        "name": "_prompts",
+        "fileCount": 6
+      },
+      {
+        "name": "ANALISE_MIGRACAO.md",
+        "fileCount": 1
+      },
+      {
+        "name": "check-railway-dockerfile.sh",
+        "fileCount": 1
+      },
+      {
+        "name": "CORS_CONFIGURATION.md",
+        "fileCount": 1
+      },
+      {
+        "name": "debug-build.sh",
+        "fileCount": 1
+      },
+      {
+        "name": "debug-railway.sh",
+        "fileCount": 1
+      },
+      {
+        "name": "deploy",
+        "fileCount": 6
+      },
+      {
+        "name": "deploy-multi-service.sh",
+        "fileCount": 1
+      },
+      {
+        "name": "docker-compose.multi-service.yml",
+        "fileCount": 1
+      },
+      {
+        "name": "docker-compose.yml",
+        "fileCount": 1
+      },
+      {
+        "name": "Dockerfile",
+        "fileCount": 1
+      },
+      {
+        "name": "Dockerfile.advanced-debug",
+        "fileCount": 1
+      },
+      {
+        "name": "Dockerfile.bck",
+        "fileCount": 1
+      },
+      {
+        "name": "Dockerfile.railway",
+        "fileCount": 1
+      },
+      {
+        "name": "Dockerfile.railway.final",
+        "fileCount": 1
+      },
+      {
+        "name": "Dockerfile.railway.npm",
+        "fileCount": 1
+      },
+      {
+        "name": "Dockerfile.railway.tsc",
+        "fileCount": 1
+      },
+      {
+        "name": "Dockerfile.railway.yarn",
+        "fileCount": 1
+      },
+      {
+        "name": "docs",
+        "fileCount": 22
+      },
+      {
+        "name": "golang",
+        "fileCount": 127
+      },
+      {
+        "name": "IMPLEMENTACAO_HISTORICO_CONVERSAS.md",
+        "fileCount": 1
+      },
+      {
+        "name": "import-data.js",
+        "fileCount": 1
+      },
+      {
+        "name": "llms-full.txt",
+        "fileCount": 1
+      },
+      {
+        "name": "Makefile",
+        "fileCount": 1
+      },
+      {
+        "name": "memory",
+        "fileCount": 2
+      },
+      {
+        "name": "nginx",
+        "fileCount": 1
+      },
+      {
+        "name": "nodejs",
+        "fileCount": 69762
+      },
+      {
+        "name": "package.json",
+        "fileCount": 1
+      },
+      {
+        "name": "playground_fixed.py",
+        "fileCount": 1
+      },
+      {
+        "name": "python",
+        "fileCount": 33471
+      },
+      {
+        "name": "railway-golang",
+        "fileCount": 2
+      },
+      {
+        "name": "railway-multi-service-setup.md",
+        "fileCount": 1
+      },
+      {
+        "name": "railway-nodejs",
+        "fileCount": 2
+      },
+      {
+        "name": "railway-python",
+        "fileCount": 0
+      },
+      {
+        "name": "railway.toml",
+        "fileCount": 1
+      },
+      {
+        "name": "README_FRANCHISE_FORM.md",
+        "fileCount": 1
+      },
+      {
+        "name": "README-DEPLOY.md",
+        "fileCount": 1
+      },
+      {
+        "name": "README-MULTI-SERVICE.md",
+        "fileCount": 1
+      },
+      {
+        "name": "README.md",
+        "fileCount": 1
+      },
+      {
+        "name": "ROTEIRO_VIDEO_APRESENTACAO.md",
+        "fileCount": 1
+      },
+      {
+        "name": "scripts",
+        "fileCount": 18
+      },
+      {
+        "name": "start-with-debug.sh",
+        "fileCount": 1
+      },
+      {
+        "name": "templates",
+        "fileCount": 4
+      },
+      {
+        "name": "test-build-local.sh",
+        "fileCount": 1
+      },
+      {
+        "name": "test-cors.html",
+        "fileCount": 1
+      },
+      {
+        "name": "test-mongodb-build.sh",
+        "fileCount": 1
+      },
+      {
+        "name": "verify-dockerfile.sh",
+        "fileCount": 1
+      }
+    ],
+    "languageDistribution": [
+      {
+        "extension": ".js",
+        "count": 29520
+      },
+      {
+        "extension": ".ts",
+        "count": 18347
+      },
+      {
+        "extension": ".py",
+        "count": 12992
+      },
+      {
+        "extension": ".pyc",
+        "count": 12953
+      },
+      {
+        "extension": ".map",
+        "count": 11618
+      },
+      {
+        "extension": ".json",
+        "count": 3579
+      },
+      {
+        "extension": ".md",
+        "count": 3396
+      },
+      {
+        "extension": ".dat",
+        "count": 1094
+      },
+      {
+        "extension": ".pyi",
+        "count": 824
+      },
+      {
+        "extension": ".h",
+        "count": 642
+      }
+    ]
+  },
+  "architecture": {
+    "layers": [
+      {
+        "name": "Services",
+        "description": "Business logic and orchestration",
+        "directories": [
+          "nodejs/catalog-products/src",
+          "nodejs/apis/temp-gamification",
+          "nodejs/catalog-products/src/modules/tributos",
+          "nodejs/catalog-products/src/modules/pagamentos",
+          "nodejs/catalog-products/src/modules/fornecedores",
+          "nodejs/apis/libs/utils/src",
+          "nodejs/apis/apps/sys-produtos/src",
+          "nodejs/apis/apps/sys-pagamentos/src",
+          "nodejs/apis/apps/sys-assistente-estudos/src",
+          "nodejs/apis/apps/notifications/src",
+          "nodejs/apis/apps/apis-monorepo/src",
+          "nodejs/apis/apps/life-tracker/src",
+          "nodejs/catalog-products/src/modules/produtos/services",
+          "nodejs/catalog-products/src/modules/catalogos/services",
+          "nodejs/catalog-products/src/@shared/application/use-cases",
+          "nodejs/apis/apps/sys-produtos/src/services",
+          "nodejs/apis/apps/sys-assistente-estudos/src/simulacao",
+          "nodejs/apis/apps/sys-assistente-estudos/src/question",
+          "nodejs/apis/apps/sys-assistente-estudos/src/estatistica",
+          "nodejs/apis/apps/sys-assistente-estudos/src/concurso",
+          "nodejs/apis/apps/apis-monorepo/src/services",
+          "nodejs/apis/apps/life-tracker/src/services",
+          "nodejs/catalog-products/src/modules/produtos/application/use-cases",
+          "nodejs/catalog-products/src/modules/navegacao/application/use-cases",
+          "nodejs/apis/apps/sys-assistente-estudos/src/concurso/temaespecifico",
+          "nodejs/apis/apps/apis-monorepo/src/modules/users",
+          "nodejs/apis/apps/apis-monorepo/src/modules/trainings",
+          "nodejs/apis/apps/apis-monorepo/src/modules/training-plans",
+          "nodejs/apis/apps/apis-monorepo/src/modules/teams",
+          "nodejs/apis/apps/apis-monorepo/src/modules/task-templates",
+          "nodejs/apis/apps/apis-monorepo/src/modules/subscriptions",
+          "nodejs/apis/apps/apis-monorepo/src/modules/students",
+          "nodejs/apis/apps/apis-monorepo/src/modules/solar",
+          "nodejs/apis/apps/apis-monorepo/src/modules/settings",
+          "nodejs/apis/apps/apis-monorepo/src/modules/rewards",
+          "nodejs/apis/apps/apis-monorepo/src/modules/referrals",
+          "nodejs/apis/apps/apis-monorepo/src/modules/referral-campaigns",
+          "nodejs/apis/apps/apis-monorepo/src/modules/rag-instructions",
+          "nodejs/apis/apps/apis-monorepo/src/modules/orders",
+          "nodejs/apis/apps/apis-monorepo/src/modules/leads",
+          "nodejs/apis/apps/apis-monorepo/src/modules/gamification",
+          "nodejs/apis/apps/apis-monorepo/src/modules/franchises",
+          "nodejs/apis/apps/apis-monorepo/src/modules/franchise-tasks",
+          "nodejs/apis/apps/apis-monorepo/src/modules/external-apis",
+          "nodejs/apis/apps/apis-monorepo/src/modules/exercises",
+          "nodejs/apis/apps/apis-monorepo/src/modules/customers",
+          "nodejs/apis/apps/apis-monorepo/src/modules/bioimpedance",
+          "nodejs/apis/apps/life-tracker/src/modules/routines",
+          "nodejs/apis/apps/life-tracker/src/modules/productivity",
+          "nodejs/apis/apps/life-tracker/src/modules/health",
+          "nodejs/apis/apps/life-tracker/src/modules/habits",
+          "nodejs/apis/apps/life-tracker/src/modules/gamification",
+          "nodejs/apis/apps/life-tracker/src/modules/financial",
+          "nodejs/apis/apps/life-tracker/src/modules/business",
+          "nodejs/apis/apps/life-tracker/src/modules/analytics",
+          "nodejs/apis/apps/apis-monorepo/src/modules/training-plans/templates",
+          "nodejs/apis/apps/apis-monorepo/src/modules/rag-instructions/services",
+          "python/tadevolta/core",
+          "python/japediu/core",
+          "python/life-tracker/agent-onboarding/services",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/services",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/services/ups",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/services/timer_management",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/services/skill_messaging",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/services/reminder_management",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/services/proactive_events",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/services/monetization",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/services/lwa",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/services/list_management",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/services/game_engine",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/services/gadget_controller",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/services/endpoint_enumeration",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/services/directive",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/services/device_address",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/services/datastore",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/geolocation",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/services/datastore/v1",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/starlette",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/fastapi",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/prompt_toolkit/application"
+        ],
+        "symbolCount": 311,
+        "dependsOn": [
+          "Models",
+          "Controllers",
+          "Utils",
+          "Repositories"
+        ]
+      },
+      {
+        "name": "Controllers",
+        "description": "Request handling and routing",
+        "directories": [
+          "nodejs/catalog-products/src",
+          "nodejs/apis/temp-gamification",
+          "nodejs/apis/libs/infra",
+          "nodejs/catalog-products/src/modules/pagamentos",
+          "nodejs/catalog-products/src/modules/fornecedores",
+          "nodejs/apis/libs/utils/src",
+          "nodejs/apis/apps/sys-produtos/test",
+          "nodejs/apis/apps/sys-produtos/src",
+          "nodejs/apis/apps/sys-pagamentos/test",
+          "nodejs/apis/apps/sys-pagamentos/src",
+          "nodejs/apis/apps/sys-assistente-estudos/test",
+          "nodejs/apis/apps/sys-assistente-estudos/src",
+          "nodejs/apis/apps/notifications/src",
+          "nodejs/apis/apps/apis-monorepo/test",
+          "nodejs/apis/apps/apis-monorepo/src",
+          "nodejs/apis/apps/life-tracker/src",
+          "nodejs/catalog-products/src/modules/produtos/handlers",
+          "nodejs/catalog-products/src/modules/catalogos/handlers",
+          "nodejs/apis/libs/utils/src/validadores",
+          "nodejs/apis/libs/utils/src/contantes",
+          "nodejs/apis/libs/shared/data/dtos",
+          "nodejs/apis/apps/sys-produtos/src/schemas",
+          "nodejs/apis/apps/sys-produtos/src/middleware",
+          "nodejs/apis/apps/sys-produtos/src/guards",
+          "nodejs/apis/apps/sys-produtos/src/dto",
+          "nodejs/apis/apps/sys-produtos/src/decorators",
+          "nodejs/apis/apps/sys-produtos/src/controllers",
+          "nodejs/apis/apps/sys-produtos/src/config",
+          "nodejs/apis/apps/sys-assistente-estudos/src/simulacao",
+          "nodejs/apis/apps/sys-assistente-estudos/src/question",
+          "nodejs/apis/apps/sys-assistente-estudos/src/estatistica",
+          "nodejs/apis/apps/sys-assistente-estudos/src/concurso",
+          "nodejs/apis/apps/notifications/src/types",
+          "nodejs/apis/apps/apis-monorepo/src/utils",
+          "nodejs/apis/apps/apis-monorepo/src/interceptors",
+          "nodejs/apis/apps/apis-monorepo/src/guards",
+          "nodejs/apis/apps/apis-monorepo/src/decorators",
+          "nodejs/apis/apps/apis-monorepo/src/config",
+          "nodejs/apis/apps/apis-monorepo/src/auth",
+          "nodejs/apis/apps/life-tracker/tests/integration",
+          "nodejs/apis/apps/life-tracker/tests/contract",
+          "nodejs/apis/apps/life-tracker/src/types",
+          "nodejs/apis/apps/life-tracker/src/guards",
+          "nodejs/apis/apps/life-tracker/src/config",
+          "nodejs/catalog-products/src/modules/produtos/presentation/controllers",
+          "nodejs/catalog-products/src/modules/navegacao/presentation/controllers",
+          "nodejs/apis/libs/utils/src/validadores/adapters",
+          "nodejs/apis/apps/sys-assistente-estudos/src/simulacao/repository",
+          "nodejs/apis/apps/sys-assistente-estudos/src/simulacao/model",
+          "nodejs/apis/apps/sys-assistente-estudos/src/question/repository",
+          "nodejs/apis/apps/sys-assistente-estudos/src/question/model",
+          "nodejs/apis/apps/sys-assistente-estudos/src/question/handlers",
+          "nodejs/apis/apps/sys-assistente-estudos/src/estatistica/repository",
+          "nodejs/apis/apps/sys-assistente-estudos/src/estatistica/model",
+          "nodejs/apis/apps/sys-assistente-estudos/src/concurso/temaespecifico",
+          "nodejs/apis/apps/sys-assistente-estudos/src/concurso/model",
+          "nodejs/apis/apps/apis-monorepo/src/modules/users",
+          "nodejs/apis/apps/apis-monorepo/src/modules/trainings",
+          "nodejs/apis/apps/apis-monorepo/src/modules/training-plans",
+          "nodejs/apis/apps/apis-monorepo/src/modules/teams",
+          "nodejs/apis/apps/apis-monorepo/src/modules/task-templates",
+          "nodejs/apis/apps/apis-monorepo/src/modules/subscriptions",
+          "nodejs/apis/apps/apis-monorepo/src/modules/students",
+          "nodejs/apis/apps/apis-monorepo/src/modules/solar",
+          "nodejs/apis/apps/apis-monorepo/src/modules/settings",
+          "nodejs/apis/apps/apis-monorepo/src/modules/rewards",
+          "nodejs/apis/apps/apis-monorepo/src/modules/referrals",
+          "nodejs/apis/apps/apis-monorepo/src/modules/referral-campaigns",
+          "nodejs/apis/apps/apis-monorepo/src/modules/rag-instructions",
+          "nodejs/apis/apps/apis-monorepo/src/modules/orders",
+          "nodejs/apis/apps/apis-monorepo/src/modules/leads",
+          "nodejs/apis/apps/apis-monorepo/src/modules/gamification",
+          "nodejs/apis/apps/apis-monorepo/src/modules/franchises",
+          "nodejs/apis/apps/apis-monorepo/src/modules/franchise-tasks",
+          "nodejs/apis/apps/apis-monorepo/src/modules/external-apis",
+          "nodejs/apis/apps/apis-monorepo/src/modules/exercises",
+          "nodejs/apis/apps/apis-monorepo/src/modules/customers",
+          "nodejs/apis/apps/apis-monorepo/src/modules/bioimpedance",
+          "nodejs/apis/apps/apis-monorepo/src/auth/dto",
+          "nodejs/apis/apps/life-tracker/src/types/dtos",
+          "nodejs/apis/apps/life-tracker/src/modules/types",
+          "nodejs/apis/apps/life-tracker/src/modules/routines",
+          "nodejs/apis/apps/life-tracker/src/modules/productivity",
+          "nodejs/apis/apps/life-tracker/src/modules/health",
+          "nodejs/apis/apps/life-tracker/src/modules/habits",
+          "nodejs/apis/apps/life-tracker/src/modules/gamification",
+          "nodejs/apis/apps/life-tracker/src/modules/financial",
+          "nodejs/apis/apps/life-tracker/src/modules/business",
+          "nodejs/apis/apps/life-tracker/src/modules/analytics",
+          "nodejs/apis/apps/sys-assistente-estudos/src/concurso/temaespecifico/model",
+          "nodejs/apis/apps/apis-monorepo/src/modules/users/dto",
+          "nodejs/apis/apps/apis-monorepo/src/modules/trainings/schemas",
+          "nodejs/apis/apps/apis-monorepo/src/modules/trainings/dto",
+          "nodejs/apis/apps/apis-monorepo/src/modules/training-plans/scripts",
+          "nodejs/apis/apps/apis-monorepo/src/modules/training-plans/schemas",
+          "nodejs/apis/apps/apis-monorepo/src/modules/training-plans/dto",
+          "nodejs/apis/apps/apis-monorepo/src/modules/teams/schemas",
+          "nodejs/apis/apps/apis-monorepo/src/modules/teams/dto",
+          "nodejs/apis/apps/apis-monorepo/src/modules/task-templates/schemas",
+          "nodejs/apis/apps/apis-monorepo/src/modules/task-templates/dto",
+          "nodejs/apis/apps/apis-monorepo/src/modules/subscriptions/schemas",
+          "nodejs/apis/apps/apis-monorepo/src/modules/subscriptions/dto",
+          "nodejs/apis/apps/apis-monorepo/src/modules/students/schemas",
+          "nodejs/apis/apps/apis-monorepo/src/modules/students/dto",
+          "nodejs/apis/apps/apis-monorepo/src/modules/solar/schemas",
+          "nodejs/apis/apps/apis-monorepo/src/modules/solar/dto",
+          "nodejs/apis/apps/apis-monorepo/src/modules/settings/schemas",
+          "nodejs/apis/apps/apis-monorepo/src/modules/settings/dto",
+          "nodejs/apis/apps/apis-monorepo/src/modules/rewards/schemas",
+          "nodejs/apis/apps/apis-monorepo/src/modules/rewards/dto",
+          "nodejs/apis/apps/apis-monorepo/src/modules/referrals/schemas",
+          "nodejs/apis/apps/apis-monorepo/src/modules/referrals/dto",
+          "nodejs/apis/apps/apis-monorepo/src/modules/referral-campaigns/schemas",
+          "nodejs/apis/apps/apis-monorepo/src/modules/referral-campaigns/dto",
+          "nodejs/apis/apps/apis-monorepo/src/modules/rag-instructions/schemas",
+          "nodejs/apis/apps/apis-monorepo/src/modules/rag-instructions/dto",
+          "nodejs/apis/apps/apis-monorepo/src/modules/orders/schemas",
+          "nodejs/apis/apps/apis-monorepo/src/modules/orders/dto",
+          "nodejs/apis/apps/apis-monorepo/src/modules/leads/schemas",
+          "nodejs/apis/apps/apis-monorepo/src/modules/leads/dto",
+          "nodejs/apis/apps/apis-monorepo/src/modules/gamification/schemas",
+          "nodejs/apis/apps/apis-monorepo/src/modules/gamification/exceptions",
+          "nodejs/apis/apps/apis-monorepo/src/modules/gamification/dto",
+          "nodejs/apis/apps/apis-monorepo/src/modules/franchises/scripts",
+          "nodejs/apis/apps/apis-monorepo/src/modules/franchises/schemas",
+          "nodejs/apis/apps/apis-monorepo/src/modules/franchises/dto",
+          "nodejs/apis/apps/apis-monorepo/src/modules/franchise-tasks/schemas",
+          "nodejs/apis/apps/apis-monorepo/src/modules/franchise-tasks/dto",
+          "nodejs/apis/apps/apis-monorepo/src/modules/external-apis/dto",
+          "nodejs/apis/apps/apis-monorepo/src/modules/exercises/schemas",
+          "nodejs/apis/apps/apis-monorepo/src/modules/exercises/dto",
+          "nodejs/apis/apps/apis-monorepo/src/modules/customers/schemas",
+          "nodejs/apis/apps/apis-monorepo/src/modules/customers/dto",
+          "nodejs/apis/apps/apis-monorepo/src/modules/bioimpedance/schemas",
+          "nodejs/apis/apps/apis-monorepo/src/modules/bioimpedance/dto",
+          "nodejs/apis/apps/life-tracker/src/modules/routines/schemas",
+          "nodejs/apis/apps/life-tracker/src/modules/productivity/schemas",
+          "nodejs/apis/apps/life-tracker/src/modules/health/schemas",
+          "nodejs/apis/apps/life-tracker/src/modules/habits/schemas",
+          "nodejs/apis/apps/life-tracker/src/modules/gamification/schemas",
+          "nodejs/apis/apps/life-tracker/src/modules/gamification/listeners",
+          "nodejs/apis/apps/life-tracker/src/modules/financial/schemas",
+          "nodejs/apis/apps/life-tracker/src/modules/business/schemas",
+          "nodejs/apis/apps/life-tracker/src/modules/analytics/schemas",
+          "nodejs/apis",
+          "nodejs/catalog-products/scripts",
+          "nodejs/apis/apps/life-tracker/scripts",
+          "python/viralkids",
+          "python/tadevolta",
+          "python/meu-nutri",
+          "python/japediu",
+          "nodejs/apis/projeto-ai-assistant",
+          "python/life-tracker/agent-onboarding/routes",
+          "python/meu-nutri/deploy/alexa/requests",
+          "python/meu-nutri/deploy/alexa/charset_normalizer",
+          "python/meu-nutri/deploy/alexa/ask_sdk_core",
+          "python/meu-nutri/app/api/routers",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/playbackcontroller",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/game_engine",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/gadget_controller",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/custom_interface_controller",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/conversations",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/requests",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pymongo",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pyflakes",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pydantic",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/propcache",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/platformdirs",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/mypy",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/langchain",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/isort",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/huggingface_hub",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/httpx",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/httpcore",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/filelock",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/fastapi",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/dataclasses_json",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/charset_normalizer",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/aiohttp",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/_pytest",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/alexa/comms/messagingcontroller",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/websockets/sync",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/websockets/asyncio",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/watchdog/observers",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/sql",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/orm",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/event",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/utils",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/ndimage",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/_lib",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pyflakes/test",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/prompt_toolkit/layout",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pandas/tseries",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pandas/io",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pandas/core",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pandas/api"
+        ],
+        "symbolCount": 1085,
+        "dependsOn": [
+          "Repositories",
+          "Models"
+        ]
+      },
+      {
+        "name": "Utils",
+        "description": "Shared utilities and helpers",
+        "directories": [
+          "nodejs/catalog-products/src/utils",
+          "nodejs/catalog-products/src/modules/produtos/utils",
+          "python/meu-nutri/deploy/alexa/urllib3/contrib/emscripten",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/urllib3/contrib/emscripten",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/mkdocs/contrib/search",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/mkdocs/themes/readthedocs/js",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/mkdocs/themes/mkdocs/js",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/mkdocs/contrib/search/lunr-language",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/material/templates/assets/javascripts",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/mkdocs/contrib/search/templates/search",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/material/templates/assets/javascripts/workers",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/material/templates/assets/javascripts/lunr",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/material/templates/assets/javascripts/lunr/min",
+          "python/meu-nutri/app/circadian",
+          "python/meu-nutri/app/agent",
+          "python/life-tracker/agent-onboarding/utils",
+          "python/meu-nutri/deploy/alexa/urllib3",
+          "python/meu-nutri/deploy/alexa/requests",
+          "python/meu-nutri/deploy/alexa/dateutil",
+          "python/meu-nutri/deploy/alexa/charset_normalizer",
+          "python/meu-nutri/deploy/alexa/ask_sdk_runtime",
+          "python/meu-nutri/deploy/alexa/ask_sdk_core",
+          "python/meu-nutri/app/agent/tools",
+          "python/meu-nutri/deploy/alexa/urllib3/util",
+          "python/meu-nutri/deploy/alexa/urllib3/http2",
+          "python/meu-nutri/deploy/alexa/urllib3/contrib",
+          "python/meu-nutri/deploy/alexa/dateutil/zoneinfo",
+          "python/meu-nutri/deploy/alexa/dateutil/tz",
+          "python/meu-nutri/deploy/alexa/dateutil/parser",
+          "python/meu-nutri/deploy/alexa/ask_sdk_core/utils",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/yarl",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/yaml",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/websockets",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/wcwidth",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/watchfiles",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/watchdog",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/vine",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/uvloop",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/uvicorn",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/urllib3",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/typing_inspection",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/typer",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/tqdm",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/tomli",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/tokenizers",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/tiktoken_ext",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/tiktoken",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/tenacity",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/tavily",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/structlog",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/starlette",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sniffio",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/smmap",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/shellingham",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/setuptools",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/rich",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/requests",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/regex",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/redis",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pytz",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pythonjsonlogger",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pytest_cov",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pytest_asyncio",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pytest",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pymongo",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pymdownx",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pygments",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pyflakes",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pydantic_settings",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pydantic_core",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pydantic",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pyarrow",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/psycopg2",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/propcache",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/prompt_toolkit",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/prometheus_client",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pluggy",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/platformdirs",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pkg_resources",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pip",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pathspec",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pandas",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/paginate",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/packaging",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/overrides",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/openai",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/numpy",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/mypyc",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/multipart",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/mypy",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/multidict",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/motor",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/mongoengine",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/mkdocstrings",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/mkdocs_get_deps",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/mkdocs_autorefs",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/mkdocs",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/mergedeep",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/mdurl",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/materialx",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/material",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/marshmallow_sqlalchemy",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/marshmallow",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/markupsafe",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/markdown_it",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/markdown",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/mako",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/langsmith",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/langchain_openai",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/langchain_core",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/langchain_community",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/langchain_anthropic",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/langchain",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/lancedb",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/kombu",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/joblib",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/jiter",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/jinja2",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/isort",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/iniconfig",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/idna",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/huggingface_hub",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/httpx",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/httptools",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/httpcore",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/hf_xet",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/h11",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/groq",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/griffe",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/gridfs",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/greenlet",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/gitdb",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/git",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/fsspec",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/frozenlist",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/flake8",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/filelock",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/exceptiongroup",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/dotenv",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/docstring_parser",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/dns",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/distro",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/dateutil",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/colorama",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/click_repl",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/click_plugins",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/click_didyoumean",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/click",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/charset_normalizer",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/certifi",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/celery",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/bson",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/blib2to3",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/blackd",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/black",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/billiard",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/backrefs",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/backports",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/babel",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/attrs",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/attr",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/asyncpg",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/async_timeout",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/anyio",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/anthropic",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/annotated_types",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/amqp",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/alembic",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/aiosqlite",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/aiosignal",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/aiohttp",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/agno",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/_yaml",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/_pytest",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/_distutils_hack",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/websockets/sync",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/websockets/legacy",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/websockets/extensions",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/websockets/asyncio",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/watchdog/utils",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/watchdog/tricks",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/watchdog/observers",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/uvloop/includes",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/uvicorn/supervisors",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/uvicorn/protocols",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/uvicorn/middleware",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/uvicorn/loops",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/uvicorn/lifespan",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/urllib3/util",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/urllib3/http2",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/urllib3/contrib",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/tqdm/contrib",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/tokenizers/trainers",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/tokenizers/tools",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/tokenizers/processors",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/tokenizers/pre_tokenizers",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/tokenizers/normalizers",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/tokenizers/implementations",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/tokenizers/decoders",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/tenacity/asyncio",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/tavily/hybrid_rag",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/starlette/middleware",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/util",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/testing",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/sql",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/pool",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/orm",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/future",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/ext",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/event",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/engine",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/dialects",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/cyextension",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/connectors",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sniffio/_tests",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/smmap/test",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/utils",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/tree",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/tests",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/svm",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/semi_supervised",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/preprocessing",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/neural_network",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/neighbors",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/mixture",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/metrics",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/manifold",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/inspection",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/impute",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/gaussian_process",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/feature_selection",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/feature_extraction",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/externals",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/experimental",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/ensemble",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/decomposition",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/cross_decomposition",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/covariance",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/compose",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/cluster",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/_loss",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/_build_utils",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/__check_build",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/shellingham/posix",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/setuptools/extern",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/setuptools/command",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/setuptools/_vendor",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/setuptools/_distutils",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/stats",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/special",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/spatial",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/sparse",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/signal",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/optimize",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/odr",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/ndimage",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/misc",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/linalg",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/io",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/interpolate",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/integrate",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/fftpack",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/fft",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/differentiate",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/constants",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/cluster",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/_lib",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/redis/commands",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/redis/asyncio",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/redis/_parsers",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pymongo/synchronous",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pymongo/asynchronous",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pymdownx/blocks",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pygments/styles",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pygments/formatters",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pygments/filters",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pygments/lexers",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pyflakes/test",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pyflakes/scripts",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pydantic/v1",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pydantic/plugin",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pydantic/experimental",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pydantic/deprecated",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pydantic/_internal",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pyarrow/vendored",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pyarrow/tests",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pyarrow/parquet",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pyarrow/interchange",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/prompt_toolkit/widgets",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/prompt_toolkit/styles",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/prompt_toolkit/shortcuts",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/prompt_toolkit/output",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/prompt_toolkit/lexers",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/prompt_toolkit/layout",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/prompt_toolkit/key_binding",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/prompt_toolkit/input",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/prompt_toolkit/formatted_text",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/prompt_toolkit/filters",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/prompt_toolkit/eventloop",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/prompt_toolkit/contrib",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/prompt_toolkit/completion",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/prompt_toolkit/clipboard",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/prometheus_client/twisted",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/prometheus_client/openmetrics",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/prometheus_client/bridge",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pkg_resources/extern",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pkg_resources/_vendor",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pip/_vendor",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pip/_internal",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pathspec/patterns",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pandas/util",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pandas/tseries",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pandas/tests",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pandas/plotting",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pandas/io",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pandas/errors",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pandas/core",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pandas/compat",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pandas/arrays",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pandas/_testing",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pandas/_config",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pandas/_libs",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/openai/resources"
+        ],
+        "symbolCount": 24291,
+        "dependsOn": []
+      },
+      {
+        "name": "Repositories",
+        "description": "Data access and persistence",
+        "directories": [
+          "nodejs/catalog-products/src/@shared",
+          "nodejs/catalog-products/src/modules/produtos/repository",
+          "nodejs/catalog-products/src/modules/produtos/infrastructure/repositories",
+          "nodejs/catalog-products/src/modules/produtos/data/dtos",
+          "nodejs/catalog-products/src/modules/navegacao/infrastructure/repositories",
+          "nodejs/catalog-products/src/modules/fornecedores/repository/suppliers-repository",
+          "nodejs/catalog-products/src/modules/fornecedores/data/suppliers-entity",
+          "nodejs/catalog-products/src/modules/catalogos/repository/catalogs-repository",
+          "nodejs/catalog-products/src/modules/catalogos/data/catalogs-entity",
+          "nodejs/catalog-products/src/modules/fornecedores/data/dtos/suppliers-dto",
+          "nodejs/catalog-products/src/modules/catalogos/data/dtos/catalogs-dto",
+          ".",
+          "python/tadevolta/scripts",
+          "python/tadevolta/core",
+          "python/japediu/scripts",
+          "python/japediu/core",
+          "python/meu-nutri/app/db",
+          "python/meu-nutri/deploy/alexa/idna",
+          "python/life-tracker/agent-onboarding/core/tools",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/websockets",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/tzdata",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/starlette",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pymongo",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pydantic",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pyarrow",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/prompt_toolkit",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/packaging",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/langchain",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/idna",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/huggingface_hub",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/dns",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/dataclasses_json",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/babel",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/aiohttp",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/tzdata/zoneinfo",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/orm",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/utils",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/tests",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/preprocessing",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/datasets",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/stats",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/sparse",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/interpolate",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/datasets",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/constants",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pymongo/synchronous",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pymongo/asynchronous",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pygments/lexers",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pydantic/v1",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pydantic/_internal",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pyarrow/tests",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pyarrow/interchange"
+        ],
+        "symbolCount": 900,
+        "dependsOn": [
+          "Models",
+          "Utils"
+        ]
+      },
+      {
+        "name": "Models",
+        "description": "Data structures and domain objects",
+        "directories": [
+          "nodejs/catalog-products/src/@shared/domain/repositories",
+          "nodejs/catalog-products/src/@shared/domain/entities",
+          "nodejs/catalog-products/src/modules/produtos/domain/repositories",
+          "nodejs/catalog-products/src/modules/produtos/domain/entities",
+          "nodejs/catalog-products/src/modules/produtos/data/schemas",
+          "nodejs/catalog-products/src/modules/navegacao/infrastructure/schemas",
+          "nodejs/catalog-products/src/modules/navegacao/domain/repositories",
+          "nodejs/catalog-products/src/modules/navegacao/domain/entities",
+          "nodejs/catalog-products/src/modules/fornecedores/data/schemas",
+          "nodejs/catalog-products/src/modules/catalogos/data/schemas",
+          "python/meu-nutri/app/db",
+          "python/life-tracker/agent-onboarding/models",
+          "python/meu-nutri/deploy/alexa/requests",
+          "python/meu-nutri/deploy/alexa/charset_normalizer",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/ui",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/slu",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/events",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/er",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/dynamic_endpoints",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/dialog",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/canfulfill",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/authorization",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/slu/entityresolution",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/videoapp",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/viewport",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/tasks",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/system_unit",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/system",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/navigation",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/monetization",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/messaging",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/geolocation",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/game_engine",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/display",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/conversations",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/connections",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/automotive",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/audioplayer",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/applink",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/amazonpay",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/alexa",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/events/skillevents",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/er/dynamic",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/viewport/video",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/viewport/size",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/viewport/aplt",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/viewport/apl",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/navigation/assistance",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/monetization/v1",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/connections/v1",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/connections/requests",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/connections/entities",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/amazonpay/v1",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/amazonpay/response",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/amazonpay/request",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/amazonpay/model",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/alexa/smartvision",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/alexa/presentation",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/alexa/extension",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/alexa/experimentation",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/alexa/datastore",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/alexa/comms",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/alexa/advertisement",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/typer",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/tiktoken",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/starlette",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/requests",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pygments",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pydantic_core",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pydantic",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/openai",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/marshmallow_sqlalchemy",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/marshmallow",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/langsmith",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/langchain_anthropic",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/langchain",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/lancedb",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/httpx",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/httpcore",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/groq",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/charset_normalizer",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/anthropic",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/amazonpay/model/v1",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/amazonpay/model/response",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/amazonpay/model/request",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/alexa/smartvision/snapshotprovider",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/alexa/presentation/html",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/alexa/presentation/aplt",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/alexa/presentation/apla",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/alexa/presentation/apl",
+          "python/meu-nutri/deploy/alexa/ask_sdk_model/interfaces/alexa/datastore/packagemanager",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/tokenizers/models",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/testing",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/sql",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/model_selection",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/linear_model",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/feature_selection",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/odr",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pygments/lexers",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pydantic/v1",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pydantic/plugin",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pydantic/experimental",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pydantic/_internal",
+          "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pyarrow/tests"
+        ],
+        "symbolCount": 1123,
+        "dependsOn": [
+          "Repositories"
+        ]
+      },
+      {
+        "name": "Config",
+        "description": "Configuration and constants",
+        "directories": [
+          "python/meu-nutri",
+          "python/meu-nutri/deploy/alexa/charset_normalizer"
+        ],
+        "symbolCount": 5,
+        "dependsOn": []
+      },
+      {
+        "name": "Generators",
+        "description": "Content and object generation",
+        "directories": [
+          "python/life-tracker/agent-onboarding/core",
+          "python/meu-nutri/deploy/alexa/ask_sdk_runtime",
+          "python/meu-nutri/deploy/alexa/ask_sdk_core"
+        ],
+        "symbolCount": 4,
+        "dependsOn": []
+      },
+      {
+        "name": "Components",
+        "description": "UI components and views",
+        "directories": [
+          "python/meu-nutri/deploy/alexa/ask_sdk_runtime/view_resolvers",
+          "python/meu-nutri/deploy/alexa/ask_sdk_runtime/dispatch_components",
+          "python/meu-nutri/deploy/alexa/ask_sdk_core/view_resolvers",
+          "python/meu-nutri/deploy/alexa/ask_sdk_core/dispatch_components"
+        ],
+        "symbolCount": 27,
+        "dependsOn": []
+      }
+    ],
+    "patterns": [
+      {
+        "name": "Factory",
+        "confidence": 0.9,
+        "description": "Creates instances of related objects without specifying concrete classes",
+        "occurrences": 37
+      },
+      {
+        "name": "Singleton",
+        "confidence": 0.7,
+        "description": "Ensures a class has only one instance",
+        "occurrences": 34
+      },
+      {
+        "name": "Repository",
+        "confidence": 0.9,
+        "description": "Abstracts data access logic",
+        "occurrences": 14
+      },
+      {
+        "name": "Service Layer",
+        "confidence": 0.85,
+        "description": "Encapsulates business logic in service classes",
+        "occurrences": 86
+      },
+      {
+        "name": "Controller",
+        "confidence": 0.9,
+        "description": "Handles incoming requests and returns responses",
+        "occurrences": 69
+      },
+      {
+        "name": "Builder",
+        "confidence": 0.85,
+        "description": "Separates object construction from its representation",
+        "occurrences": 16
+      },
+      {
+        "name": "Observer",
+        "confidence": 0.75,
+        "description": "Defines a subscription mechanism to notify multiple objects",
+        "occurrences": 100
+      }
+    ],
+    "entryPoints": [
+      "nodejs/catalog-products/src/main.ts",
+      "nodejs/catalog-products/src/index.ts",
+      "nodejs/apis/libs/utils/src/index.ts",
+      "nodejs/apis/apps/sys-produtos/src/main.ts",
+      "nodejs/apis/apps/sys-pagamentos/src/main.ts",
+      "nodejs/apis/apps/sys-assistente-estudos/src/main.ts",
+      "nodejs/apis/apps/apis-monorepo/src/main.ts",
+      "nodejs/apis/apps/life-tracker/src/main.ts",
+      "nodejs/apis/apps/life-tracker/src/types/index.ts",
+      "nodejs/apis/apps/sys-assistente-estudos/src/question/handlers/index.ts",
+      "nodejs/apis/apps/life-tracker/src/modules/types/index.ts",
+      "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/mkdocs/contrib/search/templates/search/main.js"
+    ]
+  },
+  "symbols": {
+    "classes": [
+      {
+        "name": "AAA",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/interpolate/_bary_rational.py",
+        "line": 196,
+        "exported": true
+      },
+      {
+        "name": "ABAPLexer",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pygments/lexers/business.py",
+        "line": 242,
+        "exported": true
+      },
+      {
+        "name": "AbapStyle",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pygments/styles/abap.py",
+        "line": 19,
+        "exported": true
+      },
+      {
+        "name": "AbnfLexer",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pygments/lexers/grammar_notation.py",
+        "line": 66,
+        "exported": true
+      },
+      {
+        "name": "Abort",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/mkdocs/exceptions.py",
+        "line": 13,
+        "exported": true
+      },
+      {
+        "name": "Abort",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/click/exceptions.py",
+        "line": 294,
+        "exported": true
+      },
+      {
+        "name": "AbortHandshake",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/websockets/legacy/exceptions.py",
+        "line": 27,
+        "exported": true
+      },
+      {
+        "name": "AbsoluteConcatenation",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/dns/name.py",
+        "line": 106,
+        "exported": true
+      },
+      {
+        "name": "AbsoluteError",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/_loss/loss.py",
+        "line": 534,
+        "exported": true
+      },
+      {
+        "name": "AbstractAccessLogger",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/aiohttp/abc.py",
+        "line": 200,
+        "exported": true
+      },
+      {
+        "name": "AbstractArchiveFileSystem",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/fsspec/archive.py",
+        "line": 7,
+        "exported": true
+      },
+      {
+        "name": "AbstractAsyncStreamedFile",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/fsspec/asyn.py",
+        "line": 983,
+        "exported": true
+      },
+      {
+        "name": "AbstractBackoff",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/redis/backoff.py",
+        "line": 10,
+        "exported": true
+      },
+      {
+        "name": "AbstractBufferedFile",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/fsspec/spec.py",
+        "line": 1829,
+        "exported": true
+      },
+      {
+        "name": "AbstractChannel",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/amqp/abstract_channel.py",
+        "line": 20,
+        "exported": true
+      },
+      {
+        "name": "AbstractCollectionWriter",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/orm/writeonly.py",
+        "line": 495,
+        "exported": true
+      },
+      {
+        "name": "AbstractCommandsParser",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/redis/_parsers/commands.py",
+        "line": 10,
+        "exported": true
+      },
+      {
+        "name": "AbstractConnection",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/redis/connection.py",
+        "line": 126,
+        "exported": true
+      },
+      {
+        "name": "AbstractConnection",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/redis/asyncio/connection.py",
+        "line": 93,
+        "exported": true
+      },
+      {
+        "name": "AbstractConnectionPool",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/psycopg2/pool.py",
+        "line": 36,
+        "exported": true
+      },
+      {
+        "name": "AbstractCookieJar",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/aiohttp/abc.py",
+        "line": 143,
+        "exported": true
+      },
+      {
+        "name": "AbstractEntityRegistry",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/orm/path_registry.py",
+        "line": 664,
+        "exported": true
+      },
+      {
+        "name": "AbstractExceptionHandler",
+        "kind": "class",
+        "file": "python/meu-nutri/deploy/alexa/ask_sdk_runtime/dispatch_components/exception_components.py",
+        "line": 27,
+        "exported": true
+      },
+      {
+        "name": "AbstractExceptionHandler",
+        "kind": "class",
+        "file": "python/meu-nutri/deploy/alexa/ask_sdk_core/dispatch_components/exception_components.py",
+        "line": 33,
+        "exported": true
+      },
+      {
+        "name": "AbstractExceptionMapper",
+        "kind": "class",
+        "file": "python/meu-nutri/deploy/alexa/ask_sdk_runtime/dispatch_components/exception_components.py",
+        "line": 69,
+        "exported": true
+      },
+      {
+        "name": "AbstractFileSystem",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/fsspec/spec.py",
+        "line": 97,
+        "exported": true
+      },
+      {
+        "name": "AbstractHandlerAdapter",
+        "kind": "class",
+        "file": "python/meu-nutri/deploy/alexa/ask_sdk_runtime/dispatch_components/request_components.py",
+        "line": 370,
+        "exported": true
+      },
+      {
+        "name": "AbstractHolidayCalendar",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pandas/tseries/holiday.py",
+        "line": 388,
+        "exported": true
+      },
+      {
+        "name": "AbstractMatchInfo",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/aiohttp/abc.py",
+        "line": 60,
+        "exported": true
+      },
+      {
+        "name": "AbstractMethodError",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pandas/errors/__init__.py",
+        "line": 185,
+        "exported": true
+      },
+      {
+        "name": "AbstractORMCompileState",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/orm/context.py",
+        "line": 210,
+        "exported": true
+      },
+      {
+        "name": "AbstractPersistenceAdapter",
+        "kind": "class",
+        "file": "python/meu-nutri/deploy/alexa/ask_sdk_core/attributes_manager.py",
+        "line": 29,
+        "exported": true
+      },
+      {
+        "name": "AbstractRedis",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/redis/client.py",
+        "line": 77,
+        "exported": true
+      },
+      {
+        "name": "AbstractRedisCluster",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/redis/cluster.py",
+        "line": 201,
+        "exported": true
+      },
+      {
+        "name": "AbstractRelationshipLoader",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/orm/strategies.py",
+        "line": 577,
+        "exported": true
+      },
+      {
+        "name": "AbstractReporter",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/mypy/report.py",
+        "line": 98,
+        "exported": true
+      },
+      {
+        "name": "AbstractRequestDispatcher",
+        "kind": "class",
+        "file": "python/meu-nutri/deploy/alexa/ask_sdk_runtime/dispatch.py",
+        "line": 30,
+        "exported": true
+      },
+      {
+        "name": "AbstractRequestHandler",
+        "kind": "class",
+        "file": "python/meu-nutri/deploy/alexa/ask_sdk_runtime/dispatch_components/request_components.py",
+        "line": 27,
+        "exported": true
+      },
+      {
+        "name": "AbstractRequestHandler",
+        "kind": "class",
+        "file": "python/meu-nutri/deploy/alexa/ask_sdk_core/dispatch_components/request_components.py",
+        "line": 32,
+        "exported": true
+      },
+      {
+        "name": "AbstractRequestHandlerChain",
+        "kind": "class",
+        "file": "python/meu-nutri/deploy/alexa/ask_sdk_runtime/dispatch_components/request_components.py",
+        "line": 113,
+        "exported": true
+      },
+      {
+        "name": "AbstractRequestInterceptor",
+        "kind": "class",
+        "file": "python/meu-nutri/deploy/alexa/ask_sdk_runtime/dispatch_components/request_components.py",
+        "line": 67,
+        "exported": true
+      },
+      {
+        "name": "AbstractRequestInterceptor",
+        "kind": "class",
+        "file": "python/meu-nutri/deploy/alexa/ask_sdk_core/dispatch_components/request_components.py",
+        "line": 72,
+        "exported": true
+      },
+      {
+        "name": "AbstractRequestMapper",
+        "kind": "class",
+        "file": "python/meu-nutri/deploy/alexa/ask_sdk_runtime/dispatch_components/request_components.py",
+        "line": 255,
+        "exported": true
+      },
+      {
+        "name": "AbstractResolver",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/aiohttp/abc.py",
+        "line": 122,
+        "exported": true
+      },
+      {
+        "name": "AbstractResource",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/aiohttp/web_urldispatcher.py",
+        "line": 113,
+        "exported": true
+      },
+      {
+        "name": "AbstractResponseInterceptor",
+        "kind": "class",
+        "file": "python/meu-nutri/deploy/alexa/ask_sdk_runtime/dispatch_components/request_components.py",
+        "line": 88,
+        "exported": true
+      },
+      {
+        "name": "AbstractResponseInterceptor",
+        "kind": "class",
+        "file": "python/meu-nutri/deploy/alexa/ask_sdk_core/dispatch_components/request_components.py",
+        "line": 90,
+        "exported": true
+      },
+      {
+        "name": "AbstractRoute",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/aiohttp/web_urldispatcher.py",
+        "line": 160,
+        "exported": true
+      },
+      {
+        "name": "AbstractRouteDef",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/aiohttp/web_routedef.py",
+        "line": 49,
+        "exported": true
+      },
+      {
+        "name": "AbstractRouter",
+        "kind": "class",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/aiohttp/abc.py",
+        "line": 35,
+        "exported": true
+      }
+    ],
+    "interfaces": [
+      {
+        "name": "Achievement",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/types/index.ts",
+        "line": 51,
+        "exported": true
+      },
+      {
+        "name": "AddAssetDto",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/financial/financial.controller.ts",
+        "line": 19,
+        "exported": true
+      },
+      {
+        "name": "AddLossDto",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/sys-produtos/src/services/ingredients.service.ts",
+        "line": 50,
+        "exported": true
+      },
+      {
+        "name": "AddPurchaseDto",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/sys-produtos/src/services/ingredients.service.ts",
+        "line": 39,
+        "exported": true
+      },
+      {
+        "name": "Address",
+        "kind": "interface",
+        "file": "nodejs/catalog-products/src/@shared/domain/entities/base.entity.ts",
+        "line": 16,
+        "exported": true
+      },
+      {
+        "name": "AddressDto",
+        "kind": "interface",
+        "file": "nodejs/catalog-products/src/modules/produtos/data/dtos/products-dto.ts",
+        "line": 15,
+        "exported": true
+      },
+      {
+        "name": "AffiliateProduct",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/sys-produtos/src/schemas/affiliate-product.schema.ts",
+        "line": 19,
+        "exported": true
+      },
+      {
+        "name": "ApiResponse",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/life-tracker/src/types/index.ts",
+        "line": 302,
+        "exported": true
+      },
+      {
+        "name": "ApiResponse",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/types/index.ts",
+        "line": 3,
+        "exported": true
+      },
+      {
+        "name": "Asset",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/life-tracker/src/types/index.ts",
+        "line": 164,
+        "exported": true
+      },
+      {
+        "name": "BusinessOpportunity",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/life-tracker/src/types/index.ts",
+        "line": 189,
+        "exported": true
+      },
+      {
+        "name": "BusinessProject",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/life-tracker/src/types/index.ts",
+        "line": 200,
+        "exported": true
+      },
+      {
+        "name": "Catalog",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/sys-produtos/src/schemas/catalog.schema.ts",
+        "line": 3,
+        "exported": true
+      },
+      {
+        "name": "CatalogSchema",
+        "kind": "interface",
+        "file": "nodejs/catalog-products/src/modules/catalogos/data/catalogs-entity/catalogs-entity.ts",
+        "line": 1,
+        "exported": true
+      },
+      {
+        "name": "Category",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/sys-produtos/src/schemas/category.schema.ts",
+        "line": 3,
+        "exported": true
+      },
+      {
+        "name": "Contact",
+        "kind": "interface",
+        "file": "nodejs/catalog-products/src/@shared/domain/entities/base.entity.ts",
+        "line": 36,
+        "exported": true
+      },
+      {
+        "name": "ContactDto",
+        "kind": "interface",
+        "file": "nodejs/catalog-products/src/modules/produtos/data/dtos/products-dto.ts",
+        "line": 25,
+        "exported": true
+      },
+      {
+        "name": "CreateGoalDto",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/financial/financial.controller.ts",
+        "line": 31,
+        "exported": true
+      },
+      {
+        "name": "CreateIngredientDto",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/sys-produtos/src/services/ingredients.service.ts",
+        "line": 16,
+        "exported": true
+      },
+      {
+        "name": "CrossModuleProgress",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/life-tracker/src/types/index.ts",
+        "line": 319,
+        "exported": true
+      },
+      {
+        "name": "CurrentUserShape",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/sys-produtos/src/decorators/current-user.decorator.ts",
+        "line": 3,
+        "exported": true
+      },
+      {
+        "name": "CurrentUserShape",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/apis-monorepo/src/decorators/current-user.decorator.ts",
+        "line": 3,
+        "exported": true
+      },
+      {
+        "name": "DailyRoutine",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/life-tracker/src/types/index.ts",
+        "line": 76,
+        "exported": true
+      },
+      {
+        "name": "DashboardSummary",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/life-tracker/src/types/index.ts",
+        "line": 309,
+        "exported": true
+      },
+      {
+        "name": "DeviceInfo",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/sys-produtos/src/schemas/navigation.schema.ts",
+        "line": 3,
+        "exported": true
+      },
+      {
+        "name": "DeviceInfo",
+        "kind": "interface",
+        "file": "nodejs/catalog-products/src/modules/navegacao/domain/entities/navigation-session.entity.ts",
+        "line": 3,
+        "exported": true
+      },
+      {
+        "name": "DietParameters",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/life-tracker/src/types/index.ts",
+        "line": 119,
+        "exported": true
+      },
+      {
+        "name": "DishComposition",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/sys-produtos/src/schemas/product.schema.ts",
+        "line": 83,
+        "exported": true
+      },
+      {
+        "name": "DishIngredient",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/sys-produtos/src/schemas/product.schema.ts",
+        "line": 77,
+        "exported": true
+      },
+      {
+        "name": "DocumentationConfig",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/apis-monorepo/src/config/documentation.config.ts",
+        "line": 1,
+        "exported": true
+      },
+      {
+        "name": "Domain",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/life-tracker/src/types/index.ts",
+        "line": 217,
+        "exported": true
+      },
+      {
+        "name": "DomainGoal",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/life-tracker/src/types/index.ts",
+        "line": 23,
+        "exported": true
+      },
+      {
+        "name": "EmailConfig",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/notifications/src/types/config.ts",
+        "line": 8,
+        "exported": true
+      },
+      {
+        "name": "EstatisticaDto",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/sys-assistente-estudos/src/estatistica/model/estatistica.dto.ts",
+        "line": 3,
+        "exported": true
+      },
+      {
+        "name": "FinancialGoal",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/life-tracker/src/types/index.ts",
+        "line": 180,
+        "exported": true
+      },
+      {
+        "name": "FornecedoresDto",
+        "kind": "interface",
+        "file": "nodejs/catalog-products/src/modules/produtos/data/dtos/products-dto.ts",
+        "line": 51,
+        "exported": true
+      },
+      {
+        "name": "Franchise",
+        "kind": "interface",
+        "file": "nodejs/catalog-products/src/modules/produtos/domain/entities/franchise.entity.ts",
+        "line": 2,
+        "exported": true
+      },
+      {
+        "name": "FranqueadoDto",
+        "kind": "interface",
+        "file": "nodejs/catalog-products/src/modules/produtos/data/dtos/products-dto.ts",
+        "line": 63,
+        "exported": true
+      },
+      {
+        "name": "Game",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/life-tracker/src/types/index.ts",
+        "line": 58,
+        "exported": true
+      },
+      {
+        "name": "Game",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/types/index.ts",
+        "line": 25,
+        "exported": true
+      },
+      {
+        "name": "GameBoard",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/life-tracker/src/types/index.ts",
+        "line": 41,
+        "exported": true
+      },
+      {
+        "name": "GameBoard",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/types/index.ts",
+        "line": 10,
+        "exported": true
+      },
+      {
+        "name": "GetProductRequest",
+        "kind": "interface",
+        "file": "nodejs/catalog-products/src/modules/produtos/application/use-cases/get-product.use-case.ts",
+        "line": 6,
+        "exported": true
+      },
+      {
+        "name": "GetProductResponse",
+        "kind": "interface",
+        "file": "nodejs/catalog-products/src/modules/produtos/application/use-cases/get-product.use-case.ts",
+        "line": 10,
+        "exported": true
+      },
+      {
+        "name": "GetRelatedProductsRequest",
+        "kind": "interface",
+        "file": "nodejs/catalog-products/src/modules/produtos/application/use-cases/get-related-products.use-case.ts",
+        "line": 6,
+        "exported": true
+      },
+      {
+        "name": "GetRelatedProductsResponse",
+        "kind": "interface",
+        "file": "nodejs/catalog-products/src/modules/produtos/application/use-cases/get-related-products.use-case.ts",
+        "line": 11,
+        "exported": true
+      },
+      {
+        "name": "GetVisitedProductsRequest",
+        "kind": "interface",
+        "file": "nodejs/catalog-products/src/modules/navegacao/application/use-cases/get-visited-products.use-case.ts",
+        "line": 6,
+        "exported": true
+      },
+      {
+        "name": "GetVisitedProductsResponse",
+        "kind": "interface",
+        "file": "nodejs/catalog-products/src/modules/navegacao/application/use-cases/get-visited-products.use-case.ts",
+        "line": 11,
+        "exported": true
+      },
+      {
+        "name": "Habit",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/life-tracker/src/types/index.ts",
+        "line": 6,
+        "exported": true
+      },
+      {
+        "name": "HabitCompletedEvent",
+        "kind": "interface",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/gamification/listeners/habit.listener.ts",
+        "line": 5,
+        "exported": true
+      }
+    ],
+    "functions": [
+      {
+        "name": "abcd_normalize",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/signal/_lti_conversion.py",
+        "line": 149,
+        "exported": true
+      },
+      {
+        "name": "abs",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/stats/_distribution_infrastructure.py",
+        "line": 4932,
+        "exported": true
+      },
+      {
+        "name": "absolute_path",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/watchdog/observers/kqueue.py",
+        "line": 115,
+        "exported": true
+      },
+      {
+        "name": "absolutepath",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/_pytest/pathlib.py",
+        "line": 729,
+        "exported": true
+      },
+      {
+        "name": "accept_key",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/websockets/utils.py",
+        "line": 24,
+        "exported": true
+      },
+      {
+        "name": "accept_search",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/prompt_toolkit/search.py",
+        "line": 183,
+        "exported": true
+      },
+      {
+        "name": "accuracy_score",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/metrics/_classification.py",
+        "line": 153,
+        "exported": true
+      },
+      {
+        "name": "aclosing",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/prompt_toolkit/eventloop/async_generator.py",
+        "line": 23,
+        "exported": true
+      },
+      {
+        "name": "active_children",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/billiard/process.py",
+        "line": 61,
+        "exported": true
+      },
+      {
+        "name": "adapt_criterion_to_null",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/sql/util.py",
+        "line": 820,
+        "exported": true
+      },
+      {
+        "name": "adapt_ipaddress",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/psycopg2/_ipaddress.py",
+        "line": 89,
+        "exported": true
+      },
+      {
+        "name": "adapt_type",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/sql/type_api.py",
+        "line": 2304,
+        "exported": true
+      },
+      {
+        "name": "add_all_sources_to_changed",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/mypy/dmypy_server.py",
+        "line": 1036,
+        "exported": true
+      },
+      {
+        "name": "add_attribute_docstrings",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/docstring_parser/attrdoc.py",
+        "line": 104,
+        "exported": true
+      },
+      {
+        "name": "add_attributes",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pymdownx/emoji.py",
+        "line": 64,
+        "exported": true
+      },
+      {
+        "name": "add_catch_all_gitignore",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/mypy/build.py",
+        "line": 1179,
+        "exported": true
+      },
+      {
+        "name": "add_class",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/orm/clsregistry.py",
+        "line": 64,
+        "exported": true
+      },
+      {
+        "name": "add_class_tvars",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/mypy/checkmember.py",
+        "line": 1176,
+        "exported": true
+      },
+      {
+        "name": "add_cname",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/ghp_import.py",
+        "line": 167,
+        "exported": true
+      },
+      {
+        "name": "add_completion_class",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/click/shell_completion.py",
+        "line": 414,
+        "exported": true
+      },
+      {
+        "name": "add_constructor",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/yaml/__init__.py",
+        "line": 302,
+        "exported": true
+      },
+      {
+        "name": "add_dict_to_cookiejar",
+        "kind": "function",
+        "file": "python/meu-nutri/deploy/alexa/requests/utils.py",
+        "line": 478,
+        "exported": true
+      },
+      {
+        "name": "add_dict_to_cookiejar",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/requests/utils.py",
+        "line": 468,
+        "exported": true
+      },
+      {
+        "name": "add_doctest_imports",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pandas/conftest.py",
+        "line": 234,
+        "exported": true
+      },
+      {
+        "name": "add_dummy_feature",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/preprocessing/_data.py",
+        "line": 2363,
+        "exported": true
+      },
+      {
+        "name": "add_env_tag",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/yaml_env_tag.py",
+        "line": 39,
+        "exported": true
+      },
+      {
+        "name": "add_field_type_to_schema",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pydantic/v1/schema.py",
+        "line": 804,
+        "exported": true
+      },
+      {
+        "name": "add_file",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/ghp_import.py",
+        "line": 145,
+        "exported": true
+      },
+      {
+        "name": "add_fs",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pyarrow/conftest.py",
+        "line": 290,
+        "exported": true
+      },
+      {
+        "name": "add_funcarg_pseudo_fixture_def",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/_pytest/fixtures.py",
+        "line": 156,
+        "exported": true
+      },
+      {
+        "name": "add_implicit_resolver",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/yaml/__init__.py",
+        "line": 271,
+        "exported": true
+      },
+      {
+        "name": "add_knot",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/interpolate/_fitpack_repro.py",
+        "line": 68,
+        "exported": true
+      },
+      {
+        "name": "add_log_level",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/structlog/_log_levels.py",
+        "line": 51,
+        "exported": true
+      },
+      {
+        "name": "add_log_level_number",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/structlog/stdlib.py",
+        "line": 754,
+        "exported": true
+      },
+      {
+        "name": "add_logger_name",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/structlog/stdlib.py",
+        "line": 777,
+        "exported": true
+      },
+      {
+        "name": "add_luhn_digit",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pydantic/v1/_hypothesis_plugin.py",
+        "line": 122,
+        "exported": true
+      },
+      {
+        "name": "add_mapped_attribute",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/orm/decl_api.py",
+        "line": 975,
+        "exported": true
+      },
+      {
+        "name": "add_maybe_unlink_finalizer",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/joblib/_memmapping_reducer.py",
+        "line": 71,
+        "exported": true
+      },
+      {
+        "name": "add_metaclass",
+        "kind": "function",
+        "file": "python/meu-nutri/deploy/alexa/six.py",
+        "line": 885,
+        "exported": true
+      },
+      {
+        "name": "add_metaclass",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/six.py",
+        "line": 885,
+        "exported": true
+      },
+      {
+        "name": "add_method",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pydantic/mypy.py",
+        "line": 1272,
+        "exported": true
+      },
+      {
+        "name": "add_method",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pydantic/v1/mypy.py",
+        "line": 824,
+        "exported": true
+      },
+      {
+        "name": "add_move",
+        "kind": "function",
+        "file": "python/meu-nutri/deploy/alexa/six.py",
+        "line": 515,
+        "exported": true
+      },
+      {
+        "name": "add_move",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/six.py",
+        "line": 515,
+        "exported": true
+      },
+      {
+        "name": "add_multi_constructor",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/yaml/__init__.py",
+        "line": 315,
+        "exported": true
+      },
+      {
+        "name": "add_multi_representer",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/yaml/__init__.py",
+        "line": 338,
+        "exported": true
+      },
+      {
+        "name": "add_newdoc",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/special/_add_newdocs.py",
+        "line": 17,
+        "exported": true
+      },
+      {
+        "name": "add_nojekyll",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/ghp_import.py",
+        "line": 157,
+        "exported": true
+      },
+      {
+        "name": "add_note",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/lancedb/util.py",
+        "line": 359,
+        "exported": true
+      },
+      {
+        "name": "add_np",
+        "kind": "function",
+        "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/numpy/conftest.py",
+        "line": 114,
+        "exported": true
+      }
+    ],
+    "types": [
+      {
+        "name": "AchievementDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/apis-monorepo/src/modules/gamification/schemas/achievement.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "AchievementDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/gamification/schemas/achievement.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "AffiliatePlatform",
+        "kind": "type",
+        "file": "nodejs/apis/apps/sys-produtos/src/schemas/affiliate-product.schema.ts",
+        "line": 10,
+        "exported": true
+      },
+      {
+        "name": "AffiliatePlatform",
+        "kind": "type",
+        "file": "nodejs/apis/apps/sys-produtos/src/dto/affiliate-product.dto.ts",
+        "line": 13,
+        "exported": true
+      },
+      {
+        "name": "AnalyticsDataDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/analytics/schemas/analytics-data.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "AssetDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/financial/schemas/asset.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "BioimpedanceMeasurementDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/apis-monorepo/src/modules/bioimpedance/schemas/bioimpedance-measurement.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "BusinessOpportunityDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/business/schemas/business-opportunity.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "BusinessProjectDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/business/schemas/business-project.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "CatalogMongoDocument",
+        "kind": "type",
+        "file": "nodejs/catalog-products/src/modules/catalogos/data/schemas/CatalogSchema.ts",
+        "line": 5,
+        "exported": true
+      },
+      {
+        "name": "CategoryDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/habits/schemas/category.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "CustomerDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/apis-monorepo/src/modules/customers/schemas/customer.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "DailyRoutineDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/routines/schemas/daily-routine.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "DietParametersDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/health/schemas/diet-parameters.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "DistributionContractDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/apis-monorepo/src/modules/solar/schemas/solar-distribution.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "ExerciseDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/apis-monorepo/src/modules/exercises/schemas/exercise.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "FinancialGoalDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/financial/schemas/financial-goal.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "FranchiseDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/apis-monorepo/src/modules/franchises/schemas/franchise.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "FranchiseTaskDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/apis-monorepo/src/modules/franchise-tasks/schemas/franchise-task.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "GameDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/gamification/schemas/game.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "GamificationProfileDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/apis-monorepo/src/modules/gamification/schemas/gamification-profile.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "GamificationProfileDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/gamification/schemas/gamification-profile.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "HabitDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/habits/schemas/habit.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "HealthPlanDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/health/schemas/health-plan.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "IngredientDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/sys-produtos/src/schemas/ingredient.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "IntegratedRoutineDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/routines/schemas/integrated-routine.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "LatestLabsDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/health/schemas/latest-labs.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "LeadDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/apis-monorepo/src/modules/leads/schemas/lead.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "NavigationSessionMongoDocument",
+        "kind": "type",
+        "file": "nodejs/catalog-products/src/modules/navegacao/infrastructure/schemas/navigation-session.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "NavigationSessionStatus",
+        "kind": "type",
+        "file": "nodejs/apis/apps/sys-produtos/src/schemas/navigation.schema.ts",
+        "line": 9,
+        "exported": true
+      },
+      {
+        "name": "NavigationSessionStatus",
+        "kind": "type",
+        "file": "nodejs/catalog-products/src/modules/navegacao/domain/entities/navigation-session.entity.ts",
+        "line": 9,
+        "exported": true
+      },
+      {
+        "name": "OrderDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/apis-monorepo/src/modules/orders/schemas/order.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "PaymentDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/apis-monorepo/src/modules/subscriptions/schemas/payment.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "PointTransactionDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/apis-monorepo/src/modules/gamification/schemas/point-transaction.schema.ts",
+        "line": 16,
+        "exported": true
+      },
+      {
+        "name": "PointTransactionDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/gamification/schemas/point-transaction.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "PortfolioDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/financial/schemas/portfolio.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "ProcessingStatus",
+        "kind": "type",
+        "file": "nodejs/apis/apps/sys-produtos/src/schemas/affiliate-product.schema.ts",
+        "line": 3,
+        "exported": true
+      },
+      {
+        "name": "ProcessingStatus",
+        "kind": "type",
+        "file": "nodejs/apis/apps/sys-produtos/src/dto/affiliate-product.dto.ts",
+        "line": 22,
+        "exported": true
+      },
+      {
+        "name": "ProductivityGoalDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/productivity/schemas/productivity-goal.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "ProductMongoDocument",
+        "kind": "type",
+        "file": "nodejs/catalog-products/src/modules/produtos/data/schemas/ProductSchema.ts",
+        "line": 5,
+        "exported": true
+      },
+      {
+        "name": "RagInstructionDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/apis-monorepo/src/modules/rag-instructions/schemas/rag-instruction.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "RecipeDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/health/schemas/recipe.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "ReferralCampaignDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/apis-monorepo/src/modules/referral-campaigns/schemas/referral-campaign.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "ReferralDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/apis-monorepo/src/modules/referrals/schemas/referral.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "RewardDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/apis-monorepo/src/modules/rewards/schemas/reward.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "RoutineDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/life-tracker/src/modules/routines/schemas/routine.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "SearchHistoryMongoDocument",
+        "kind": "type",
+        "file": "nodejs/catalog-products/src/modules/navegacao/infrastructure/schemas/search-history.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "SettingDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/apis-monorepo/src/modules/settings/schemas/setting.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "SolarEquipmentDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/apis-monorepo/src/modules/solar/schemas/solar-equipment.schema.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "SolarProductionDocument",
+        "kind": "type",
+        "file": "nodejs/apis/apps/apis-monorepo/src/modules/solar/schemas/solar-production.schema.ts",
+        "line": 4,
+        "exported": true
+      }
+    ],
+    "enums": [
+      {
+        "name": "DiscountEvent",
+        "kind": "enum",
+        "file": "nodejs/apis/apps/sys-produtos/src/schemas/product.schema.ts",
+        "line": 8,
+        "exported": true
+      },
+      {
+        "name": "DiscountEvent",
+        "kind": "enum",
+        "file": "nodejs/catalog-products/src/modules/produtos/domain/entities/product.entity.ts",
+        "line": 20,
+        "exported": true
+      },
+      {
+        "name": "DiscountEvent",
+        "kind": "enum",
+        "file": "nodejs/catalog-products/src/modules/produtos/data/dtos/products-dto.ts",
+        "line": 4,
+        "exported": true
+      },
+      {
+        "name": "DiscountType",
+        "kind": "enum",
+        "file": "nodejs/apis/apps/sys-produtos/src/schemas/product.schema.ts",
+        "line": 14,
+        "exported": true
+      },
+      {
+        "name": "DiscountType",
+        "kind": "enum",
+        "file": "nodejs/catalog-products/src/modules/produtos/domain/entities/product.entity.ts",
+        "line": 26,
+        "exported": true
+      },
+      {
+        "name": "DiscountType",
+        "kind": "enum",
+        "file": "nodejs/catalog-products/src/modules/produtos/data/dtos/products-dto.ts",
+        "line": 10,
+        "exported": true
+      },
+      {
+        "name": "ErrorCode",
+        "kind": "enum",
+        "file": "nodejs/apis/libs/utils/src/contantes/ErrorNumber.ts",
+        "line": 1,
+        "exported": true
+      },
+      {
+        "name": "GroqModel",
+        "kind": "enum",
+        "file": "nodejs/apis/apps/apis-monorepo/src/modules/external-apis/dto/groq.dto.ts",
+        "line": 16,
+        "exported": true
+      },
+      {
+        "name": "IngredientUnit",
+        "kind": "enum",
+        "file": "nodejs/apis/apps/sys-produtos/src/schemas/ingredient.schema.ts",
+        "line": 6,
+        "exported": true
+      },
+      {
+        "name": "LeadSource",
+        "kind": "enum",
+        "file": "nodejs/apis/apps/apis-monorepo/src/modules/leads/schemas/lead.schema.ts",
+        "line": 19,
+        "exported": true
+      },
+      {
+        "name": "LeadStatus",
+        "kind": "enum",
+        "file": "nodejs/apis/apps/apis-monorepo/src/modules/leads/schemas/lead.schema.ts",
+        "line": 10,
+        "exported": true
+      },
+      {
+        "name": "ProductType",
+        "kind": "enum",
+        "file": "nodejs/apis/apps/sys-produtos/src/schemas/product.schema.ts",
+        "line": 72,
+        "exported": true
+      },
+      {
+        "name": "SortType",
+        "kind": "enum",
+        "file": "nodejs/catalog-products/src/@shared/IRepository.ts",
+        "line": 3,
+        "exported": true
+      },
+      {
+        "name": "TimeOfDay",
+        "kind": "enum",
+        "file": "nodejs/apis/apps/life-tracker/src/types/dtos/definitions.ts",
+        "line": 470,
+        "exported": true
+      }
+    ]
+  },
+  "publicAPI": [
+    {
+      "name": "AAA",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/interpolate/_bary_rational.py",
+      "line": 196,
+      "exported": true
+    },
+    {
+      "name": "ABAPLexer",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pygments/lexers/business.py",
+      "line": 242,
+      "exported": true
+    },
+    {
+      "name": "AbapStyle",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pygments/styles/abap.py",
+      "line": 19,
+      "exported": true
+    },
+    {
+      "name": "abcd_normalize",
+      "kind": "function",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/signal/_lti_conversion.py",
+      "line": 149,
+      "exported": true
+    },
+    {
+      "name": "AbnfLexer",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pygments/lexers/grammar_notation.py",
+      "line": 66,
+      "exported": true
+    },
+    {
+      "name": "Abort",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/mkdocs/exceptions.py",
+      "line": 13,
+      "exported": true
+    },
+    {
+      "name": "Abort",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/click/exceptions.py",
+      "line": 294,
+      "exported": true
+    },
+    {
+      "name": "AbortHandshake",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/websockets/legacy/exceptions.py",
+      "line": 27,
+      "exported": true
+    },
+    {
+      "name": "abs",
+      "kind": "function",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/stats/_distribution_infrastructure.py",
+      "line": 4932,
+      "exported": true
+    },
+    {
+      "name": "absolute_path",
+      "kind": "function",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/watchdog/observers/kqueue.py",
+      "line": 115,
+      "exported": true
+    },
+    {
+      "name": "AbsoluteConcatenation",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/dns/name.py",
+      "line": 106,
+      "exported": true
+    },
+    {
+      "name": "AbsoluteError",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn/_loss/loss.py",
+      "line": 534,
+      "exported": true
+    },
+    {
+      "name": "absolutepath",
+      "kind": "function",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/_pytest/pathlib.py",
+      "line": 729,
+      "exported": true
+    },
+    {
+      "name": "AbstractAccessLogger",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/aiohttp/abc.py",
+      "line": 200,
+      "exported": true
+    },
+    {
+      "name": "AbstractArchiveFileSystem",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/fsspec/archive.py",
+      "line": 7,
+      "exported": true
+    },
+    {
+      "name": "AbstractAsyncStreamedFile",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/fsspec/asyn.py",
+      "line": 983,
+      "exported": true
+    },
+    {
+      "name": "AbstractBackoff",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/redis/backoff.py",
+      "line": 10,
+      "exported": true
+    },
+    {
+      "name": "AbstractBufferedFile",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/fsspec/spec.py",
+      "line": 1829,
+      "exported": true
+    },
+    {
+      "name": "AbstractChannel",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/amqp/abstract_channel.py",
+      "line": 20,
+      "exported": true
+    },
+    {
+      "name": "AbstractCollectionWriter",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/orm/writeonly.py",
+      "line": 495,
+      "exported": true
+    },
+    {
+      "name": "AbstractCommandsParser",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/redis/_parsers/commands.py",
+      "line": 10,
+      "exported": true
+    },
+    {
+      "name": "AbstractConnection",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/redis/connection.py",
+      "line": 126,
+      "exported": true
+    },
+    {
+      "name": "AbstractConnection",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/redis/asyncio/connection.py",
+      "line": 93,
+      "exported": true
+    },
+    {
+      "name": "AbstractConnectionPool",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/psycopg2/pool.py",
+      "line": 36,
+      "exported": true
+    },
+    {
+      "name": "AbstractCookieJar",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/aiohttp/abc.py",
+      "line": 143,
+      "exported": true
+    },
+    {
+      "name": "AbstractEntityRegistry",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/orm/path_registry.py",
+      "line": 664,
+      "exported": true
+    },
+    {
+      "name": "AbstractExceptionHandler",
+      "kind": "class",
+      "file": "python/meu-nutri/deploy/alexa/ask_sdk_runtime/dispatch_components/exception_components.py",
+      "line": 27,
+      "exported": true
+    },
+    {
+      "name": "AbstractExceptionHandler",
+      "kind": "class",
+      "file": "python/meu-nutri/deploy/alexa/ask_sdk_core/dispatch_components/exception_components.py",
+      "line": 33,
+      "exported": true
+    },
+    {
+      "name": "AbstractExceptionMapper",
+      "kind": "class",
+      "file": "python/meu-nutri/deploy/alexa/ask_sdk_runtime/dispatch_components/exception_components.py",
+      "line": 69,
+      "exported": true
+    },
+    {
+      "name": "AbstractFileSystem",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/fsspec/spec.py",
+      "line": 97,
+      "exported": true
+    },
+    {
+      "name": "AbstractHandlerAdapter",
+      "kind": "class",
+      "file": "python/meu-nutri/deploy/alexa/ask_sdk_runtime/dispatch_components/request_components.py",
+      "line": 370,
+      "exported": true
+    },
+    {
+      "name": "AbstractHolidayCalendar",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pandas/tseries/holiday.py",
+      "line": 388,
+      "exported": true
+    },
+    {
+      "name": "AbstractMatchInfo",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/aiohttp/abc.py",
+      "line": 60,
+      "exported": true
+    },
+    {
+      "name": "AbstractMethodError",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pandas/errors/__init__.py",
+      "line": 185,
+      "exported": true
+    },
+    {
+      "name": "AbstractORMCompileState",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/orm/context.py",
+      "line": 210,
+      "exported": true
+    },
+    {
+      "name": "AbstractPersistenceAdapter",
+      "kind": "class",
+      "file": "python/meu-nutri/deploy/alexa/ask_sdk_core/attributes_manager.py",
+      "line": 29,
+      "exported": true
+    },
+    {
+      "name": "AbstractRedis",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/redis/client.py",
+      "line": 77,
+      "exported": true
+    },
+    {
+      "name": "AbstractRedisCluster",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/redis/cluster.py",
+      "line": 201,
+      "exported": true
+    },
+    {
+      "name": "AbstractRelationshipLoader",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/orm/strategies.py",
+      "line": 577,
+      "exported": true
+    },
+    {
+      "name": "AbstractReporter",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/mypy/report.py",
+      "line": 98,
+      "exported": true
+    },
+    {
+      "name": "AbstractRequestDispatcher",
+      "kind": "class",
+      "file": "python/meu-nutri/deploy/alexa/ask_sdk_runtime/dispatch.py",
+      "line": 30,
+      "exported": true
+    },
+    {
+      "name": "AbstractRequestHandler",
+      "kind": "class",
+      "file": "python/meu-nutri/deploy/alexa/ask_sdk_runtime/dispatch_components/request_components.py",
+      "line": 27,
+      "exported": true
+    },
+    {
+      "name": "AbstractRequestHandler",
+      "kind": "class",
+      "file": "python/meu-nutri/deploy/alexa/ask_sdk_core/dispatch_components/request_components.py",
+      "line": 32,
+      "exported": true
+    },
+    {
+      "name": "AbstractRequestHandlerChain",
+      "kind": "class",
+      "file": "python/meu-nutri/deploy/alexa/ask_sdk_runtime/dispatch_components/request_components.py",
+      "line": 113,
+      "exported": true
+    },
+    {
+      "name": "AbstractRequestInterceptor",
+      "kind": "class",
+      "file": "python/meu-nutri/deploy/alexa/ask_sdk_runtime/dispatch_components/request_components.py",
+      "line": 67,
+      "exported": true
+    },
+    {
+      "name": "AbstractRequestInterceptor",
+      "kind": "class",
+      "file": "python/meu-nutri/deploy/alexa/ask_sdk_core/dispatch_components/request_components.py",
+      "line": 72,
+      "exported": true
+    },
+    {
+      "name": "AbstractRequestMapper",
+      "kind": "class",
+      "file": "python/meu-nutri/deploy/alexa/ask_sdk_runtime/dispatch_components/request_components.py",
+      "line": 255,
+      "exported": true
+    },
+    {
+      "name": "AbstractResolver",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/aiohttp/abc.py",
+      "line": 122,
+      "exported": true
+    },
+    {
+      "name": "AbstractResource",
+      "kind": "class",
+      "file": "python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/aiohttp/web_urldispatcher.py",
+      "line": 113,
+      "exported": true
+    },
+    {
+      "name": "AbstractResponseInterceptor",
+      "kind": "class",
+      "file": "python/meu-nutri/deploy/alexa/ask_sdk_runtime/dispatch_components/request_components.py",
+      "line": 88,
+      "exported": true
+    }
+  ],
+  "dependencies": {
+    "mostImported": [
+      {
+        "file": "/home/marcelio/developing/systentando/backend-monorepo/python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy",
+        "importedBy": 263
+      },
+      {
+        "file": "/home/marcelio/developing/systentando/backend-monorepo/python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/orm",
+        "importedBy": 109
+      },
+      {
+        "file": "/home/marcelio/developing/systentando/backend-monorepo/python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/sql",
+        "importedBy": 76
+      },
+      {
+        "file": "/home/marcelio/developing/systentando/backend-monorepo/python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/billiard",
+        "importedBy": 51
+      },
+      {
+        "file": "/home/marcelio/developing/systentando/backend-monorepo/python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/asyncpg",
+        "importedBy": 25
+      },
+      {
+        "file": "/home/marcelio/developing/systentando/backend-monorepo/python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/ndimage",
+        "importedBy": 23
+      },
+      {
+        "file": "/home/marcelio/developing/systentando/backend-monorepo/nodejs/apis/apps/apis-monorepo/src/decorators/current-user.decorator.ts",
+        "importedBy": 21
+      },
+      {
+        "file": "/home/marcelio/developing/systentando/backend-monorepo/python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sqlalchemy/testing",
+        "importedBy": 21
+      },
+      {
+        "file": "/home/marcelio/developing/systentando/backend-monorepo/python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/stats",
+        "importedBy": 21
+      },
+      {
+        "file": "/home/marcelio/developing/systentando/backend-monorepo/python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/aiohttp",
+        "importedBy": 17
+      },
+      {
+        "file": "/home/marcelio/developing/systentando/backend-monorepo/nodejs/apis/apps/life-tracker/src/types/index.ts",
+        "importedBy": 16
+      },
+      {
+        "file": "/home/marcelio/developing/systentando/backend-monorepo/python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/pymdownx",
+        "importedBy": 16
+      },
+      {
+        "file": "/home/marcelio/developing/systentando/backend-monorepo/python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/sklearn",
+        "importedBy": 14
+      },
+      {
+        "file": "/home/marcelio/developing/systentando/backend-monorepo/nodejs/apis/apps/apis-monorepo/src/decorators/unit-scope.decorator.ts",
+        "importedBy": 13
+      },
+      {
+        "file": "/home/marcelio/developing/systentando/backend-monorepo/python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/huggingface_hub",
+        "importedBy": 13
+      },
+      {
+        "file": "/home/marcelio/developing/systentando/backend-monorepo/python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/interpolate",
+        "importedBy": 13
+      },
+      {
+        "file": "/home/marcelio/developing/systentando/backend-monorepo/python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/rich",
+        "importedBy": 12
+      },
+      {
+        "file": "/home/marcelio/developing/systentando/backend-monorepo/nodejs/apis/apps/sys-produtos/src/guards/jwt-auth.guard.ts",
+        "importedBy": 10
+      },
+      {
+        "file": "/home/marcelio/developing/systentando/backend-monorepo/python/life-tracker/agent-onboarding/venv/lib/python3.10/site-packages/scipy/special",
+        "importedBy": 10
+      },
+      {
+        "file": "/home/marcelio/developing/systentando/backend-monorepo/nodejs/catalog-products/src/modules/produtos/domain/entities/product.entity.ts",
+        "importedBy": 9
+      }
+    ]
+  },
+  "stats": {
+    "totalSymbols": 28164,
+    "exportedSymbols": 22118,
+    "analysisTimeMs": 36028
+  }
+}

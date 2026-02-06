@@ -8,6 +8,7 @@ import { ExerciseResponseDto } from './dto/exercise-response.dto';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
+import { Veo3Service } from '../../services/veo3.service';
 
 @Injectable()
 export class ExercisesService {
@@ -15,7 +16,7 @@ export class ExercisesService {
 
   constructor(
     @InjectModel(Exercise.name) private exerciseModel: Model<ExerciseDocument>,
-  ) {}
+  ) { }
 
   async create(
     createExerciseDto: CreateExerciseDto,
@@ -46,7 +47,7 @@ export class ExercisesService {
     unitId: string,
   ): Promise<ExerciseResponseDto[]> {
     const systemUnitId = process.env.DEFAULT_UNIT_ID || '#BR#ALL#SYSTEM#0001';
-    
+
     // Primeiro busca exercícios da unidade do usuário
     const userUnitQuery: any = {
       unitId,
@@ -115,12 +116,12 @@ export class ExercisesService {
     // Combinar resultados: primeiro os da unidade do usuário, depois os do sistema
     // Remover duplicatas baseado no _id
     const exerciseMap = new Map<string, ExerciseDocument>();
-    
+
     // Adicionar exercícios da unidade do usuário primeiro (prioridade)
     userExercises.forEach(ex => {
       exerciseMap.set(ex._id.toString(), ex);
     });
-    
+
     // Adicionar exercícios do sistema apenas se não existirem duplicatas
     systemExercises.forEach(ex => {
       if (!exerciseMap.has(ex._id.toString())) {
@@ -214,6 +215,148 @@ export class ExercisesService {
   }
 
   /**
+   * Gera um vídeo para um exercício usando Veo3
+   */
+  async generateExerciseVideo(
+    exerciseName: string,
+    description: string | undefined,
+    muscleGroups: string[],
+    equipment: string[] | undefined,
+    targetGender: 'male' | 'female' | 'other',
+    veo3Service: Veo3Service,
+  ): Promise<string> {
+    try {
+      const videoBuffer = await veo3Service.generateExerciseVideo(
+        exerciseName,
+        description,
+        muscleGroups,
+        equipment,
+        targetGender,
+      );
+
+      const tempId = `temp-video-${Date.now()}`;
+      const url = await this.saveVideoBuffer(videoBuffer, tempId);
+
+      return url;
+    } catch (error: any) {
+      this.logger.error(`Erro ao gerar vídeo: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Lista todas as mídias (imagens e vídeos) de exercícios de forma paginada
+   */
+  async findAllMedia(
+    unitId: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ items: any[]; total: number }> {
+    const uploadDir = path.join(process.cwd(), 'uploads', 'exercises');
+
+    if (!fs.existsSync(uploadDir)) {
+      return { items: [], total: 0 };
+    }
+
+    // Percorre recursivamente o diretório de uploads
+    const allFiles: any[] = [];
+    const folders = fs.readdirSync(uploadDir);
+
+    for (const folder of folders) {
+      const folderPath = path.join(uploadDir, folder);
+      if (fs.statSync(folderPath).isDirectory()) {
+        const files = fs.readdirSync(folderPath);
+        for (const file of files) {
+          const filePath = path.join(folderPath, file);
+          const stats = fs.statSync(filePath);
+
+          // Verificar se é imagem ou vídeo
+          const ext = path.extname(file).toLowerCase();
+          const type = ['.mp4', '.mov', '.avi'].includes(ext) ? 'video' : 'image';
+
+          allFiles.push({
+            exerciseId: folder,
+            filename: file,
+            type,
+            url: `/uploads/exercises/${folder}/${file}`,
+            size: stats.size,
+            createdAt: stats.birthtime,
+          });
+        }
+      }
+    }
+
+    // Ordenar por data de criação (mais recentes primeiro)
+    allFiles.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+    const total = allFiles.length;
+    const items = allFiles.slice((page - 1) * limit, page * limit);
+
+    return { items, total };
+  }
+
+  /**
+   * Prepara um stream para um arquivo de mídia
+   */
+  async getMediaStream(
+    exerciseId: string,
+    filename: string,
+  ): Promise<{ stream: fs.ReadStream; stats: fs.Stats; mimeType: string }> {
+    const filePath = path.join(process.cwd(), 'uploads', 'exercises', exerciseId, filename);
+
+    if (!fs.existsSync(filePath)) {
+      throw new NotFoundException('Arquivo de mídia não encontrado');
+    }
+
+    const stats = fs.statSync(filePath);
+    const ext = path.extname(filename).toLowerCase();
+    const mimeType = this.getMimeType(ext);
+
+    const stream = fs.createReadStream(filePath);
+    return { stream, stats, mimeType };
+  }
+
+  private getMimeType(ext: string): string {
+    const mimeTypes: { [key: string]: string } = {
+      '.png': 'image/png',
+      '.jpg': 'image/jpeg',
+      '.jpeg': 'image/jpeg',
+      '.gif': 'image/gif',
+      '.mp4': 'video/mp4',
+      '.mov': 'video/quicktime',
+      '.avi': 'video/x-msvideo',
+    };
+    return mimeTypes[ext] || 'application/octet-stream';
+  }
+
+  /**
+   * Salva um vídeo em buffer e retorna a URL
+   */
+  async saveVideoBuffer(
+    buffer: Buffer,
+    exerciseId: string,
+  ): Promise<string> {
+    const uploadDir = path.join(
+      process.cwd(),
+      'uploads',
+      'exercises',
+      exerciseId || 'temp',
+    );
+
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    const hash = crypto.randomBytes(8).toString('hex');
+    const filename = `video-${hash}.mp4`;
+    const filePath = path.join(uploadDir, filename);
+
+    fs.writeFileSync(filePath, buffer);
+
+    return `/uploads/exercises/${exerciseId || 'temp'}/${filename}`;
+  }
+
+  /**
    * Salva uma imagem em buffer e retorna a URL
    */
   async saveImageBuffer(
@@ -276,6 +419,7 @@ export class ExercisesService {
       difficulty: exercise.difficulty,
       targetGender: exercise.targetGender,
       images: exercise.images,
+      videoUrl: exercise.videoUrl,
       isActive: exercise.isActive,
       createdAt: exercise.createdAt,
       updatedAt: exercise.updatedAt,

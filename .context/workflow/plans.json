@@ -1,0 +1,14 @@
+{
+  "active": [
+    {
+      "slug": "backend-suppliers-api",
+      "path": "plans/backend-suppliers-api.md",
+      "title": "Implementação API de Fornecedores",
+      "summary": "Criar endpoint GET /suppliers/by-unit/{unitId} no backend monorepo. Implementar módulo de fornecedores baseado na estrutura de dados existente em fornecedores_outros-estados.json.",
+      "linkedAt": "2026-02-06T00:59:51.528Z",
+      "status": "active"
+    }
+  ],
+  "completed": [],
+  "primary": "backend-suppliers-api"
+}

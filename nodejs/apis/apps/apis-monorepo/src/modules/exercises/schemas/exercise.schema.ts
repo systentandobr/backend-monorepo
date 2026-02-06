@@ -51,6 +51,9 @@ export class Exercise {
   @Prop({ type: [String] })
   images?: string[]; // URLs das imagens do exercício
 
+  @Prop({ type: String })
+  videoUrl?: string;
+
   @Prop({ type: Object })
   metadata?: Record<string, any>;
 }

@@ -25,7 +25,7 @@ export class NanoBananaService {
    */
   private async loadBaseImage(gender: 'male' | 'female' | 'other'): Promise<Buffer> {
     const cacheKey = gender === 'other' ? 'male' : gender;
-    
+
     if (this.baseImageCache.has(cacheKey)) {
       return this.baseImageCache.get(cacheKey)!;
     }
@@ -34,7 +34,7 @@ export class NanoBananaService {
       // Tentar carregar do diretório de assets do frontend (via caminho relativo)
       // Ou usar imagens públicas se disponíveis
       const imageName = gender === 'female' ? 'athlete_female.png' : 'athlete_male.png';
-      
+
       // Caminhos possíveis para as imagens base
       const possiblePaths = [
         path.join(process.cwd(), '..', '..', '..', 'tadevolta-landing-page', 'src', 'assets', 'images', imageName),
@@ -86,8 +86,8 @@ export class NanoBananaService {
       );
     }
 
-    const retries = options?.retries || 3;
-    const timeout = options?.timeout || 30000;
+    const retries = options?.retries || 1;
+    const timeout = options?.timeout || 45000;
 
     for (let attempt = 1; attempt <= retries; attempt++) {
       try {
@@ -170,13 +170,13 @@ export class NanoBananaService {
 
     const prompts = [
       // Imagem 1 - Posição Inicial
-      `Um atleta ${genderText} em posição inicial do exercício "${exerciseName}", mostrando a postura correta antes de iniciar o movimento. Foco nos grupos musculares: ${muscleGroupsText}. Equipamento: ${equipmentText}.${description ? ` Descrição: ${description}` : ''} Estilo: ilustração técnica de exercício, fundo neutro, iluminação clara.`,
+      `Fotografia profissional de um atleta ${genderText} e deve ter a mesma aparência do personagem na imagem de referência.  na posição inicial perfeita do exercício "${exerciseName}". Foco técnico na postura inicial, alinhamento da coluna e posicionamento dos pés. Destacar ativação dos grupos musculares: ${muscleGroupsText}. Equipamento: ${equipmentText}.${description ? ` Notas de execução: ${description}` : ''} Estilo: High-end fitness photography, fundo de academia premium minimalista, iluminação dramática que realça a anatomia muscular, 4k resolution.`,
 
       // Imagem 2 - Meio do Movimento
-      `Um atleta ${genderText} executando o exercício "${exerciseName}" na fase intermediária do movimento, demonstrando a técnica correta. Foco nos grupos musculares: ${muscleGroupsText}. Equipamento: ${equipmentText}.${description ? ` Descrição: ${description}` : ''} Estilo: ilustração técnica de exercício, fundo neutro, iluminação clara.`,
+      `Fotografia profissional de um atleta ${genderText} e deve ter a mesma aparência do personagem na imagem de referência. executando a fase concêntrica máxima do exercício "${exerciseName}". Demonstrar a técnica de execução correta sob tensão. Foco visual intenso nos grupos musculares: ${muscleGroupsText}. Equipamento: ${equipmentText}.${description ? ` Notas de execução: ${description}` : ''} Estilo: High-end fitness photography, fundo de academia premium minimalista, iluminação de contorno (rim lighting) para destacar a forma, 4k resolution.`,
 
       // Imagem 3 - Posição Final
-      `Um atleta ${genderText} completando o exercício "${exerciseName}", mostrando a posição final e contração máxima. Foco nos grupos musculares: ${muscleGroupsText}. Equipamento: ${equipmentText}.${description ? ` Descrição: ${description}` : ''} Estilo: ilustração técnica de exercício, fundo neutro, iluminação clara.`,
+      `Fotografia profissional de um atleta ${genderText} e deve ter a mesma aparência do personagem na imagem de referência. na conclusão do exercício "${exerciseName}", demonstrando controle e contração máxima. Foco na finalização do movimento e estabilização. Grupos musculares alvo: ${muscleGroupsText}. Equipamento: ${equipmentText}.${description ? ` Notas de execução: ${description}` : ''} Estilo: High-end fitness photography, fundo de academia premium minimalista, cores vibrantes e saturadas, nitidez extrema, 4k resolution.`,
     ];
 
     const images: Buffer[] = [];
@@ -186,7 +186,7 @@ export class NanoBananaService {
         this.logger.log(`Gerando imagem ${i + 1}/3 para exercício: ${exerciseName}`);
         const image = await this.generateImage(prompts[i], baseImage.length > 0 ? baseImage : undefined);
         images.push(image);
-        
+
         // Pequeno delay entre gerações para evitar rate limit
         if (i < prompts.length - 1) {
           await new Promise((resolve) => setTimeout(resolve, 2000));

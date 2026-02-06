@@ -20,6 +20,7 @@
     "openapi:gen": "openapi-typescript openapi.json --output apps/apis-monorepo/src/contracts/schema.ts"
   },
   "dependencies": {
+    "@google/genai": "^1.40.0",
     "@google/generative-ai": "^0.24.1",
     "@nestjs/axios": "^4.0.1",
     "@nestjs/common": "^10.0.0",

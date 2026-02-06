@@ -11,6 +11,7 @@ export class ExerciseResponseDto {
   difficulty?: 'beginner' | 'intermediate' | 'advanced';
   targetGender?: 'male' | 'female' | 'other';
   images?: string[];
+  videoUrl?: string;
   isActive: boolean;
   createdAt?: Date;
   updatedAt?: Date;

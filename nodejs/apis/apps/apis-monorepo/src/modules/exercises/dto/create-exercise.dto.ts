@@ -54,6 +54,10 @@ export class CreateExerciseDto {
   images?: string[];
 
   @IsOptional()
+  @IsString()
+  videoUrl?: string;
+
+  @IsOptional()
   @IsBoolean()
   isActive?: boolean;
 }

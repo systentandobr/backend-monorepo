@@ -1,0 +1,21 @@
+project:
+  name: "init-ai-context"
+  scale: SMALL
+  started: "2026-02-05T11:56:27.724Z"
+  current_phase: P
+
+phases:
+  P:
+    status: in_progress
+    started_at: "2026-02-05T11:56:27.724Z"
+  R:
+    status: skipped
+    reason: "Not required for scale SMALL"
+  E:
+    status: pending
+  V:
+    status: pending
+  C:
+    status: skipped
+    reason: "Not required for scale SMALL"
+

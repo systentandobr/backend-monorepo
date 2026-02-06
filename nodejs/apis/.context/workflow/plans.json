@@ -1,4 +1,13 @@
 {
-  "active": [],
-  "completed": []
+  "active": [
+    {
+      "slug": "generate-veo3-videos-api",
+      "path": "plans/generate-veo3-videos-api.md",
+      "title": "Veo3 Video Generation and Media Streaming API",
+      "linkedAt": "2026-02-05T12:56:51.765Z",
+      "status": "active"
+    }
+  ],
+  "completed": [],
+  "primary": "generate-veo3-videos-api"
 }

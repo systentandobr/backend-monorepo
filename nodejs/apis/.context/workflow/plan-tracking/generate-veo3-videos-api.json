@@ -1,0 +1,28 @@
+{
+  "decisions": [
+    {
+      "title": "Dedicated Veo3Service Architecture",
+      "description": "Created a dedicated Veo3Service to separate responsibilities between image generation (NanoBanana) and video generation (Veo3), facilitating easier maintenance and scaling as the Gen-AI platform evolves.",
+      "phase": "P",
+      "alternatives": [
+        "Integrate Veo3 methods directly into NanoBananaService",
+        "Create a generic GenAiService for both images and videos"
+      ],
+      "status": "accepted",
+      "id": "dec-1770296217485",
+      "decidedAt": "2026-02-05T12:56:57.485Z"
+    },
+    {
+      "title": "Unified Paginated Media API",
+      "description": "Implemented a paginated /media endpoint that supports both images and videos, allowing easier discovery of all exercise assets in a single call while providing streaming capabilities for video playback.",
+      "phase": "P",
+      "alternatives": [
+        "Single endpoint for all media (images + videos)",
+        "Separate endpoints for images and videos"
+      ],
+      "status": "accepted",
+      "id": "dec-1770296222626",
+      "decidedAt": "2026-02-05T12:57:02.626Z"
+    }
+  ]
+}
