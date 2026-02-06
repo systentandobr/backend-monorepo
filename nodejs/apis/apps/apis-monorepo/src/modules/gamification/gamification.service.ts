@@ -490,7 +490,7 @@ export class GamificationService {
    */
   async getCheckInHistory(
     userId: string,
-    unitId: string,
+    unitId?: string,
     startDate?: Date,
     endDate?: Date,
     limit: number = 50,
@@ -510,9 +510,12 @@ export class GamificationService {
     // Construir query para check-ins
     const query: any = {
       userId,
-      unitId,
       sourceType: SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('CHECK_IN')],
     };
+
+    if (unitId) {
+      query.unitId = unitId;
+    }
 
     // Adicionar filtro de data se fornecido
     if (startDate || endDate) {
@@ -546,12 +549,17 @@ export class GamificationService {
     }));
 
     // Calcular streaks
+    const streakQuery: any = {
+      userId,
+      sourceType: SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('CHECK_IN')],
+    };
+
+    if (unitId) {
+      streakQuery.unitId = unitId;
+    }
+
     const allCheckIns = await this.pointTransactionModel
-      .find({
-        userId,
-        unitId,
-        sourceType: SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('CHECK_IN')],
-      })
+      .find(streakQuery)
       .sort({ createdAt: -1 })
       .exec();
 
@@ -920,7 +928,7 @@ export class GamificationService {
    */
   async getWeeklyActivity(
     userId: string,
-    unitId: string,
+    unitId?: string,
   ): Promise<WeeklyActivityResponseDto> {
     // Calcular período (últimos 7 dias)
     const endDate = new Date();
@@ -929,23 +937,28 @@ export class GamificationService {
     startDate.setDate(startDate.getDate() - 6);
     startDate.setHours(0, 0, 0, 0);
 
+    const query: any = {
+      userId,
+      createdAt: {
+        $gte: startDate,
+        $lte: endDate,
+      },
+      sourceType: {
+        $in: [
+          SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('CHECK_IN')],
+          SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('WORKOUT_COMPLETION')],
+          SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('EXERCISE_COMPLETION')],
+        ],
+      },
+    };
+
+    if (unitId) {
+      query.unitId = unitId;
+    }
+
     // Buscar todas as transações do período
     const transactions = await this.pointTransactionModel
-      .find({
-        userId,
-        unitId,
-        createdAt: {
-          $gte: startDate,
-          $lte: endDate,
-        },
-        sourceType: {
-          $in: [
-            SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('CHECK_IN')],
-            SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('WORKOUT_COMPLETION')],
-            SOURCE_TYPE_ENUM[SOURCE_TYPE_ENUM.indexOf('EXERCISE_COMPLETION')],
-          ],
-        },
-      })
+      .find(query)
       .sort({ createdAt: 1 }) // Mais antiga primeiro
       .exec();
 

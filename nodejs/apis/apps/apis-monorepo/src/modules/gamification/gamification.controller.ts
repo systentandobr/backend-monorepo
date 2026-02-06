@@ -41,7 +41,7 @@ import {
 @Controller('gamification')
 @UseGuards(JwtAuthGuard)
 export class GamificationController {
-  constructor(private readonly gamificationService: GamificationService) {}
+  constructor(private readonly gamificationService: GamificationService) { }
 
   @Get('ranking')
   @HttpCode(HttpStatus.OK)
@@ -140,17 +140,15 @@ export class GamificationController {
     error: null;
   }> {
     const unitId = user.unitId || user.profile?.unitId;
-    if (!unitId) {
-      throw new Error('unitId não encontrado no contexto do usuário');
-    }
-
+    // Opcional: só buscar por unidade se unitId estiver presente e não houver flag de busca global
+    // Para histórico de check-ins, faz mais sentido ser global por padrão se studentId for fornecido
     const startDate = query.startDate ? new Date(query.startDate) : undefined;
     const endDate = query.endDate ? new Date(query.endDate) : undefined;
     const limit = query.limit || 50;
 
     const history = await this.gamificationService.getCheckInHistory(
       studentId,
-      unitId,
+      undefined, // Buscar histórico global (remover restrição de unidade)
       startDate,
       endDate,
       limit,
@@ -244,13 +242,10 @@ export class GamificationController {
     error: null;
   }> {
     const unitId = user.unitId || user.profile?.unitId;
-    if (!unitId) {
-      throw new Error('unitId não encontrado no contexto do usuário');
-    }
 
     const activity = await this.gamificationService.getWeeklyActivity(
       studentId,
-      unitId,
+      unitId || undefined,
     );
 
     return {

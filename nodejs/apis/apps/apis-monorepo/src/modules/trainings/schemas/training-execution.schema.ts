@@ -17,6 +17,8 @@ const ExecutedSetSchema = new MongooseSchema(
     executedWeight: { type: Number },
     completed: { type: Boolean, default: false },
     timestamp: { type: String },
+    durationSeconds: { type: Number },
+    restDurationSeconds: { type: Number },
   },
   { _id: false },
 );
@@ -73,6 +75,8 @@ export class TrainingExecution {
       executedWeight?: number;
       completed?: boolean;
       timestamp?: string;
+      durationSeconds?: number;
+      restDurationSeconds?: number;
     }[];
   }[];
 

@@ -32,7 +32,7 @@ export class TrainingExecutionsService {
     private gamificationService: GamificationService,
     @Inject(forwardRef(() => TrainingPlansService))
     private trainingPlansService: TrainingPlansService,
-  ) {}
+  ) { }
 
   /**
    * Cria uma nova execução de treino
@@ -108,6 +108,8 @@ export class TrainingExecutionsService {
       executedWeight: set.executedWeight,
       completed: set.completed ?? false,
       timestamp: set.timestamp || new Date().toISOString(),
+      durationSeconds: set.durationSeconds,
+      restDurationSeconds: set.restDurationSeconds,
     }));
 
     if (exerciseIndex >= 0) {
@@ -361,6 +363,8 @@ export class TrainingExecutionsService {
           executedWeight: set.executedWeight,
           completed: set.completed,
           timestamp: set.timestamp,
+          durationSeconds: set.durationSeconds,
+          restDurationSeconds: set.restDurationSeconds,
         })),
       })),
       totalDurationSeconds: trainingExecution.totalDurationSeconds,

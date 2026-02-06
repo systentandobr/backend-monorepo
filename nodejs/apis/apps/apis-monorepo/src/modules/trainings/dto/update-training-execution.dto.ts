@@ -26,6 +26,14 @@ export class ExecutedSetDto {
   @IsOptional()
   @IsString()
   timestamp?: string;
+
+  @IsOptional()
+  @IsNumber()
+  durationSeconds?: number;
+
+  @IsOptional()
+  @IsNumber()
+  restDurationSeconds?: number;
 }
 
 export class UpdateExerciseExecutionDto {
