@@ -32,6 +32,7 @@ import { BioimpedanceModule } from './modules/bioimpedance/bioimpedance.module';
 import { GamificationModule } from './modules/gamification/gamification.module';
 import { ExternalApisModule } from './modules/external-apis/external-apis.module';
 import { TeamsModule } from './modules/teams/teams.module';
+import { SuppliersModule } from './modules/suppliers/suppliers.module';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { TeamsModule } from './modules/teams/teams.module';
     GamificationModule,
     ExternalApisModule,
     TeamsModule,
+    SuppliersModule,
   ],
   controllers: [AppController, DebugController, AuthPublicController],
   providers: [AppService],
