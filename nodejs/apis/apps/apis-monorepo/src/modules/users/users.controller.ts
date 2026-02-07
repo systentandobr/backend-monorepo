@@ -844,16 +844,12 @@ export class UsersController {
       })
       .filter(Boolean);
 
-    const adminRoles = ['admin', 'moderator', 'system', 'sistema'];
-    const isAdmin = adminRoles.some((role) => roleNames.includes(role));
+    const systemRoles = ['system', 'sistema'];
+    const isSystem = systemRoles.some((role) => roleNames.includes(role));
 
-    if (!isAdmin) {
+    if (!isSystem) {
       throw new HttpException(
-        {
-          message:
-            'Acesso negado. Apenas administradores podem atualizar roles e permissões de usuários.',
-          error: 'Forbidden',
-        },
+        { message: 'Apenas usuários do sistema podem alterar roles e permissões' },
         HttpStatus.FORBIDDEN,
       );
     }

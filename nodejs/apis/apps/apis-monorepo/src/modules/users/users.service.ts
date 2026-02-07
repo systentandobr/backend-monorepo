@@ -989,4 +989,89 @@ export class UsersService {
       );
     }
   }
+  /**
+   * Lista todas as roles disponíveis (Proxy para SYS-SEGURANÇA)
+   */
+  async getAvailableRoles(token: string): Promise<any> {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.sysSegurancaUrl}/api/v1/roles`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+            'x-api-key': EnvironmentConfig.sysSeguranca.apiKey,
+          },
+          timeout: EnvironmentConfig.sysSeguranca.timeout,
+        }),
+      );
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ [UsersService] Erro ao buscar roles:', error.message);
+      throw new HttpException(
+        error.response?.data || 'Erro ao buscar roles disponíveis',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /**
+   * Busca uma role por ID ou nome (Proxy para SYS-SEGURANÇA)
+   */
+  async getRoleById(idOrName: string, token: string): Promise<any> {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(
+          `${this.sysSegurancaUrl}/api/v1/roles/${idOrName}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+              'x-api-key': EnvironmentConfig.sysSeguranca.apiKey,
+            },
+            timeout: EnvironmentConfig.sysSeguranca.timeout,
+          },
+        ),
+      );
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ [UsersService] Erro ao buscar role:', error.message);
+      throw new HttpException(
+        error.response?.data || 'Erro ao buscar role específica',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /**
+   * Lista todas as permissões disponíveis (Proxy para SYS-SEGURANÇA)
+   */
+  async getAvailablePermissions(token: string): Promise<any> {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.sysSegurancaUrl}/api/v1/permissions`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+            'x-api-key': EnvironmentConfig.sysSeguranca.apiKey,
+          },
+          timeout: EnvironmentConfig.sysSeguranca.timeout,
+        }),
+      );
+      return response.data;
+    } catch (error: any) {
+      console.error(
+        '❌ [UsersService] Erro ao buscar permissões:',
+        error.message,
+      );
+      // Se der 404, retornamos vazio para o frontend usar o fallback estático
+      if (error.response?.status === 404) {
+        return { success: true, data: [] };
+      }
+
+      throw new HttpException(
+        error.response?.data || 'Erro ao buscar permissões disponíveis',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }

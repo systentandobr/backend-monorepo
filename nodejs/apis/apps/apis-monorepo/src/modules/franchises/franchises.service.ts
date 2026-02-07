@@ -33,7 +33,7 @@ export class FranchisesService {
     private franchiseModel: Model<FranchiseDocument>,
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
     @InjectModel(Customer.name) private customerModel: Model<CustomerDocument>,
-  ) {}
+  ) { }
 
   async create(
     createFranchiseDto: CreateFranchiseDto,
@@ -188,10 +188,15 @@ export class FranchisesService {
       query.unitId = userUnitId;
     }
 
+    // Remove o unitId do payload para evitar erro de duplicidade (E11000)
+    // Isso previne que a injeção automática do UnitIdInterceptor substitua o ID original
+    // pelo unitId do usuário que está realizando a edição (ex: admin).
+    const { ...updateData } = updateFranchiseDto;
+
     const franchise = await this.franchiseModel
       .findOneAndUpdate(
         query,
-        { ...updateFranchiseDto, updatedAt: new Date() },
+        { ...updateData, updatedAt: new Date() },
         { new: true },
       )
       .exec();
@@ -410,9 +415,9 @@ export class FranchisesService {
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(this.toRad(lat1)) *
-        Math.cos(this.toRad(lat2)) *
-        Math.sin(dLng / 2) *
-        Math.sin(dLng / 2);
+      Math.cos(this.toRad(lat2)) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   }
