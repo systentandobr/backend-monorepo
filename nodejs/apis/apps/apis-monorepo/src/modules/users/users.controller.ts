@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Patch,
+  Put,
   Body,
   Query,
   Param,
@@ -34,7 +35,7 @@ import { UpdateUserRolesDto } from './dto/update-user-roles.dto';
 @Controller('users')
 @UseGuards(JwtAuthGuard)
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -148,11 +149,11 @@ export class UsersController {
       domain: user.domain || user.profile?.domain,
       payload: user.payload
         ? {
-            ...user.payload,
-            sub: user.payload.user?.sub,
-            username: user.payload.user?.username,
-            roles: user.payload.user?.roles,
-          }
+          ...user.payload,
+          sub: user.payload.user?.sub,
+          username: user.payload.user?.username,
+          roles: user.payload.user?.roles,
+        }
         : undefined,
     });
 
@@ -635,9 +636,9 @@ export class UsersController {
 
     // Formatar resposta conforme especificação
     // A interface User tem: id, username, email, profile?, roles?, isActive
-    const statusValue: 'ACTIVE' | 'INACTIVE' | 'PENDING' | 'SUSPENDED' = 
+    const statusValue: 'ACTIVE' | 'INACTIVE' | 'PENDING' | 'SUSPENDED' =
       foundUser.isActive ? 'ACTIVE' : 'INACTIVE';
-    
+
     const profile = {
       id: foundUser.id || user.id,
       name:
@@ -691,6 +692,94 @@ export class UsersController {
     }
 
     return foundUser;
+  }
+
+  @Get(':id/roles')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Busca roles e permissões de um usuário',
+    description: 'Retorna os roles e permissões atuais de um usuário específico do mesmo domain',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID do usuário',
+    type: String,
+  })
+  @ApiResponse({ status: 200, description: 'Roles e permissões retornados com sucesso' })
+  @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
+  async getUserRoles(
+    @Param('id') id: string,
+    @CurrentUser() user: CurrentUserShape,
+    @Req() request: any,
+  ) {
+    const domain = user.domain || user.profile?.domain;
+
+    const authHeader = request.headers?.authorization || '';
+    const token = authHeader.replace('Bearer ', '');
+
+    if (!token) {
+      throw new Error('Token de autenticação não encontrado');
+    }
+
+    return await this.usersService.getUserRoles(id, token, domain);
+  }
+
+  @Put(':id/roles')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Substitui roles e permissões de um usuário',
+    description: 'Substitui completamente os roles e permissões de um usuário específico do mesmo domain.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID do usuário a ser atualizado',
+    type: String,
+  })
+  @ApiBody({ type: UpdateUserRolesDto })
+  @ApiResponse({ status: 200, description: 'Roles e permissões atualizados com sucesso' })
+  async putUserRoles(
+    @Param('id') id: string,
+    @Body() updateUserRolesDto: UpdateUserRolesDto,
+    @CurrentUser() user: CurrentUserShape,
+    @Req() request: any,
+  ) {
+    // Reutiliza a lógica de atualização, mas exposta via PUT conforme solicitado pelo frontend
+    return this.updateUserRoles(id, updateUserRolesDto, user, request);
+  }
+
+  @Patch(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Atualiza dados básicos de um usuário (ex: status)',
+    description: 'Atualiza informações gerais de um usuário, como o status de ativação.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID do usuário a ser atualizado',
+    type: String,
+  })
+  @ApiResponse({ status: 200, description: 'Usuário atualizado com sucesso' })
+  async updateUser(
+    @Param('id') id: string,
+    @Body() updateData: any,
+    @CurrentUser() user: CurrentUserShape,
+    @Req() request: any,
+  ) {
+    const domain = user.domain || user.profile?.domain;
+
+    const authHeader = request.headers?.authorization || '';
+    const token = authHeader.replace('Bearer ', '');
+
+    if (!token) {
+      throw new Error('Token de autenticação não encontrado');
+    }
+
+    console.log(`📋 [UsersController] Atualizando dados do usuário ${id}:`, updateData);
+
+    // Se no updateData vier 'status', podemos mapear para o que o SYS-SEGURANÇA espera
+    // No SYS-SEGURANÇA, a ativação costuma ser via um endpoint específico ou campo isActive
+    // Vamos implementar um método genérico no service se não existir
+    return await this.usersService.updateUser(id, updateData, token, domain);
   }
 
   @Patch(':id/roles')

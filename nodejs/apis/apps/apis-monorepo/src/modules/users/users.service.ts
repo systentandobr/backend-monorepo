@@ -436,7 +436,7 @@ export class UsersService {
         );
         throw new Error(
           responseData.message ||
-            'Default errorMessage ao buscar usuários por unitId',
+          'Default errorMessage ao buscar usuários por unitId',
         );
       }
 
@@ -512,6 +512,69 @@ export class UsersService {
       }
 
       throw new Error(`Erro ao buscar usuários por unitId: ${error.message}`);
+    }
+  }
+
+  /**
+   * Busca roles e permissões de um usuário específico do SYS-SEGURANÇA
+   */
+  async getUserRoles(
+    userId: string,
+    token: string,
+    domain?: string,
+  ): Promise<{ roles: string[]; permissions: string[] }> {
+    try {
+      console.log(
+        `🔍 [UsersService] Buscando roles e permissões do usuário ${userId}`,
+      );
+
+      const response = await firstValueFrom(
+        this.httpService.get(
+          `${this.sysSegurancaUrl}/api/v1/users/${userId}/roles`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+              'x-api-key': EnvironmentConfig.sysSeguranca.apiKey,
+              ...(domain ? { 'x-domain': domain } : {}),
+            },
+            timeout: EnvironmentConfig.sysSeguranca.timeout,
+          },
+        ),
+      );
+
+      const responseData = response.data;
+
+      if (responseData.success === false) {
+        console.error(
+          '❌ Resposta do SYS-SEGURANÇA indicou falha:',
+          responseData,
+        );
+        throw new Error(
+          responseData.message || 'Erro ao buscar roles do usuário',
+        );
+      }
+
+      // O SYS-SEGURANÇA retorna { roles: [], permissions: [] } ou no campo data
+      return responseData.data || responseData;
+    } catch (error: any) {
+      console.error('❌ [UsersService] Erro ao buscar roles do usuário:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+      });
+
+      if (error.response?.status === 404) {
+        throw new HttpException(
+          {
+            message: 'Usuário não encontrado ou endpoint indisponível',
+            error: 'Not Found',
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      throw new Error(`Erro ao buscar roles do usuário: ${error.message}`);
     }
   }
 
@@ -719,6 +782,67 @@ export class UsersService {
   }
 
   /**
+   * Atualiza dados básicos de um usuário no SYS-SEGURANÇA
+   */
+  async updateUser(
+    userId: string,
+    updateData: any,
+    token: string,
+    domain?: string,
+  ): Promise<User> {
+    try {
+      console.log(`🔄 [UsersService] Atualizando dados do usuário ${userId}:`, updateData);
+
+      // Mapear campos se necessário. Por exemplo, se vier 'status', o SYS-SEGURANÇA pode esperar 'isActive'
+      const payload = { ...updateData };
+      if (payload.status !== undefined) {
+        if (payload.status === 'active') payload.isActive = true;
+        else if (payload.status === 'inactive') payload.isActive = false;
+        // Se não for active/inactive, deixamos como está ou removemos se o backend não suportar
+      }
+
+      const response = await firstValueFrom(
+        this.httpService.patch(
+          `${this.sysSegurancaUrl}/api/v1/users/${userId}`,
+          payload,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+              'x-api-key': EnvironmentConfig.sysSeguranca.apiKey,
+              ...(domain ? { 'x-domain': domain } : {}),
+            },
+            timeout: EnvironmentConfig.sysSeguranca.timeout,
+          },
+        ),
+      );
+
+      const responseData = response.data;
+
+      if (responseData.success === false) {
+        throw new Error(responseData.message || 'Erro ao atualizar usuário');
+      }
+
+      return responseData.data || responseData.user || responseData;
+    } catch (error: any) {
+      console.error('❌ [UsersService] Erro ao atualizar usuário:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+      });
+
+      if (error.response?.status === 404) {
+        throw new HttpException(
+          { message: 'Usuário não encontrado', error: 'Not Found' },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      throw new Error(`Erro ao atualizar usuário: ${error.message}`);
+    }
+  }
+
+  /**
    * Atualiza roles e permissões de um usuário
    */
   async updateUserRoles(
@@ -771,7 +895,7 @@ export class UsersService {
         );
         throw new Error(
           responseData.message ||
-            'Erro ao atualizar roles e permissões do usuário',
+          'Erro ao atualizar roles e permissões do usuário',
         );
       }
 
