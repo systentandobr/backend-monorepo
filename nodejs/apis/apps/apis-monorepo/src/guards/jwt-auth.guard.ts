@@ -8,7 +8,7 @@ import { JwtValidatorService } from '../services/jwt-validator.service';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  constructor(private readonly jwtValidatorService: JwtValidatorService) {}
+  constructor(private readonly jwtValidatorService: JwtValidatorService) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -21,11 +21,10 @@ export class JwtAuthGuard implements CanActivate {
     const token = this.extractTokenFromHeader(request);
 
     if (!token) {
-      console.error('[JwtAuthGuard] Token não encontrado. Headers recebidos:', {
+      console.error('[JwtAuthGuard] Token de acesso não encontrado. Info:', {
         authorization: request.headers?.authorization ? 'Presente' : 'Ausente',
         method: request.method,
         url: request.url,
-        allHeaders: Object.keys(request.headers || {}),
       });
       throw new UnauthorizedException('Token de acesso não fornecido');
     }
@@ -121,7 +120,27 @@ export class JwtAuthGuard implements CanActivate {
   }
 
   private extractTokenFromHeader(request: any): string | undefined {
+    // 1. Tentar extrair do header Authorization
     const [type, token] = request.headers?.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
+    if (type === 'Bearer') return token;
+
+    // 2. Tentar extrair do query parameter 'token' (útil para <img> e <video>)
+    if (request.query?.token) {
+      return request.query.token as string;
+    }
+
+    // 3. Fallback: extração manual do URL (caso o query parser ainda não tenha rodado em Guards)
+    if (request.url && request.url.includes('token=')) {
+      try {
+        // Usamos uma base fictícia para parsear a URL relativa
+        const url = new URL(request.url, 'http://localhost');
+        const tokenFromUrl = url.searchParams.get('token');
+        if (tokenFromUrl) return tokenFromUrl;
+      } catch (e) {
+        // Silenciosamente falha e retorna undefined
+      }
+    }
+
+    return undefined;
   }
 }

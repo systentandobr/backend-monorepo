@@ -5,6 +5,7 @@ import { ExercisesService } from './exercises.service';
 import { Exercise, ExerciseSchema } from './schemas/exercise.schema';
 import { NanoBananaService } from '../../services/nano-banana.service';
 import { Veo3Service } from '../../services/veo3.service';
+import { S3Service } from '../../services/s3.service';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { Veo3Service } from '../../services/veo3.service';
     ]),
   ],
   controllers: [ExercisesController],
-  providers: [ExercisesService, NanoBananaService, Veo3Service],
+  providers: [ExercisesService, NanoBananaService, Veo3Service, S3Service],
   exports: [ExercisesService],
 })
 export class ExercisesModule { }

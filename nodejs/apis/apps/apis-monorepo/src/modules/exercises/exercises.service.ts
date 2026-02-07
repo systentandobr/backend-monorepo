@@ -9,6 +9,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
 import { Veo3Service } from '../../services/veo3.service';
+import { NanoBananaService } from '../../services/nano-banana.service';
+import { S3Service } from '../../services/s3.service';
 
 @Injectable()
 export class ExercisesService {
@@ -16,6 +18,7 @@ export class ExercisesService {
 
   constructor(
     @InjectModel(Exercise.name) private exerciseModel: Model<ExerciseDocument>,
+    private readonly s3Service: S3Service,
   ) { }
 
   async create(
@@ -191,7 +194,7 @@ export class ExercisesService {
     muscleGroups: string[],
     equipment: string[] | undefined,
     targetGender: 'male' | 'female' | 'other',
-    nanoBananaService: any, // NanoBananaService - será injetado
+    nanoBananaService: NanoBananaService, // NanoBananaService - será injetado
   ): Promise<string[]> {
     try {
       // Gerar imagens usando Nano Banana
@@ -278,7 +281,7 @@ export class ExercisesService {
             exerciseId: folder,
             filename: file,
             type,
-            url: `/uploads/exercises/${folder}/${file}`,
+            url: `/exercises/media/stream/${folder}/${file}`,
             size: stats.size,
             createdAt: stats.birthtime,
           });
@@ -296,24 +299,35 @@ export class ExercisesService {
   }
 
   /**
-   * Prepara um stream para um arquivo de mídia
+   * Prepara um stream para um arquivo de mídia do S3
    */
   async getMediaStream(
     exerciseId: string,
     filename: string,
-  ): Promise<{ stream: fs.ReadStream; stats: fs.Stats; mimeType: string }> {
-    const filePath = path.join(process.cwd(), 'uploads', 'exercises', exerciseId, filename);
+  ): Promise<{ stream: any; stats: { size: number }; mimeType: string }> {
+    const key = `exercises/${exerciseId}/${filename}`;
 
-    if (!fs.existsSync(filePath)) {
+    try {
+      const { stream, contentType, contentLength } = await this.s3Service.getObject(key);
+      return {
+        stream,
+        stats: { size: contentLength || 0 },
+        mimeType: contentType || 'application/octet-stream'
+      };
+    } catch (error) {
+      // Fallback para arquivo local (legado)
+      const filePath = path.join(process.cwd(), 'uploads', 'exercises', exerciseId, filename);
+      if (fs.existsSync(filePath)) {
+        const stats = fs.statSync(filePath);
+        const ext = path.extname(filename).toLowerCase();
+        const mimeType = this.getMimeType(ext);
+        const stream = fs.createReadStream(filePath);
+        return { stream, stats: { size: stats.size }, mimeType };
+      }
+
+      this.logger.error(`Erro ao buscar mídia do S3 ou local: ${error.message}`);
       throw new NotFoundException('Arquivo de mídia não encontrado');
     }
-
-    const stats = fs.statSync(filePath);
-    const ext = path.extname(filename).toLowerCase();
-    const mimeType = this.getMimeType(ext);
-
-    const stream = fs.createReadStream(filePath);
-    return { stream, stats, mimeType };
   }
 
   private getMimeType(ext: string): string {
@@ -330,62 +344,37 @@ export class ExercisesService {
   }
 
   /**
-   * Salva um vídeo em buffer e retorna a URL
+   * Salva um vídeo em buffer no S3 e retorna a URL
    */
   async saveVideoBuffer(
     buffer: Buffer,
     exerciseId: string,
   ): Promise<string> {
-    const uploadDir = path.join(
-      process.cwd(),
-      'uploads',
-      'exercises',
-      exerciseId || 'temp',
-    );
-
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-
     const hash = crypto.randomBytes(8).toString('hex');
     const filename = `video-${hash}.mp4`;
-    const filePath = path.join(uploadDir, filename);
+    const key = `exercises/${exerciseId || 'temp'}/${filename}`;
 
-    fs.writeFileSync(filePath, buffer);
+    await this.s3Service.uploadBuffer(buffer, key, 'video/mp4');
 
-    return `/uploads/exercises/${exerciseId || 'temp'}/${filename}`;
+    return `/exercises/media/stream/${exerciseId || 'temp'}/${filename}`;
   }
 
   /**
-   * Salva uma imagem em buffer e retorna a URL
+   * Salva uma imagem em buffer no S3 e retorna a URL
    */
   async saveImageBuffer(
     buffer: Buffer,
     exerciseId: string,
     imageIndex: number,
   ): Promise<string> {
-    const uploadDir = path.join(
-      process.cwd(),
-      'uploads',
-      'exercises',
-      exerciseId || 'temp',
-    );
-
-    // Criar diretório se não existir
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-
     // Gerar nome único para a imagem
     const hash = crypto.randomBytes(8).toString('hex');
     const filename = `image-${imageIndex}-${hash}.png`;
-    const filePath = path.join(uploadDir, filename);
+    const key = `exercises/${exerciseId || 'temp'}/${filename}`;
 
-    // Salvar arquivo
-    fs.writeFileSync(filePath, buffer);
+    await this.s3Service.uploadBuffer(buffer, key, 'image/png');
 
-    // Retornar URL relativa (será servida estaticamente)
-    return `/uploads/exercises/${exerciseId || 'temp'}/${filename}`;
+    return `/exercises/media/stream/${exerciseId || 'temp'}/${filename}`;
   }
 
   /**
