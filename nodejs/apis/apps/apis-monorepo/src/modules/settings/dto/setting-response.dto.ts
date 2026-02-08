@@ -45,6 +45,12 @@ export class SettingResponseDto {
     };
   };
   general?: Record<string, any>;
+  segments?: Array<{
+    segment: string;
+    notificationUrl?: string;
+    phone?: string;
+    notifications?: SettingResponseDto['notifications'];
+  }>;
   createdAt?: Date;
   updatedAt?: Date;
 }

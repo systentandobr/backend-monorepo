@@ -8,7 +8,7 @@ import { ApiResponse, ApiOperation, ApiBody } from '@nestjs/swagger';
  */
 @Controller('notifications')
 export class NotificationController {
-  constructor(private readonly notificationsService: NotificationsService) {}
+  constructor(private readonly notificationsService: NotificationsService) { }
 
   @Post('send')
   @ApiOperation({ summary: 'Send notification' })
@@ -62,6 +62,7 @@ export class NotificationController {
     telegram: boolean;
     discord: boolean;
     email: boolean;
+    whatsapp: boolean;
   }> {
     const unitId =
       payload.unitId ||
@@ -77,7 +78,7 @@ export class NotificationController {
     @Body() body: { leadId: string; unitId: string; name?: string },
   ) {
     const payload: NotificationPayload = {
-      title: '👋 Bem-vindo ao TaDeVolta!',
+      title: '👋 Bem-vindo!',
       message: `Olá ${body.name || 'Visitante'}, ficamos felizes com seu interesse. Em breve um consultor entrará em contato.`,
       type: 'info',
       metadata: {
@@ -95,14 +96,11 @@ export class NotificationController {
   async sendChatLink(
     @Body() body: { leadId: string; unitId: string; stage?: string },
   ) {
-    // Generate the chat URL (using the same logic as frontend for consistency, but server-side)
-    const baseUrl = 'https://chat.tadevolta.com.br';
-    const params = new URLSearchParams({
-      leadId: body.leadId,
-      unitId: body.unitId,
-      stage: body.stage || 'initial',
-    });
-    const chatUrl = `${baseUrl}/?${params.toString()}`;
+    const chatUrl = await this.notificationsService.getChatUrl(
+      body.leadId,
+      body.unitId,
+      body.stage,
+    );
 
     const payload: NotificationPayload = {
       title: '💬 Seu Link de Atendimento',

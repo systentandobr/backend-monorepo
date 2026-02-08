@@ -3,6 +3,7 @@ import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
 import { NotificationsService } from './notifications.service';
 import { SettingsModule } from '../../apis-monorepo/src/modules/settings/settings.module';
+import { LeadsModule } from '../../apis-monorepo/src/modules/leads/leads.module';
 
 @Module({
   imports: [
@@ -12,8 +13,9 @@ import { SettingsModule } from '../../apis-monorepo/src/modules/settings/setting
     }),
     ConfigModule,
     forwardRef(() => SettingsModule),
+    forwardRef(() => LeadsModule),
   ],
   providers: [NotificationsService],
   exports: [NotificationsService],
 })
-export class NotificationsModule {}
+export class NotificationsModule { }

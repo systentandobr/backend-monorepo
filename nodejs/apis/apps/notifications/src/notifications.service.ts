@@ -12,6 +12,7 @@ import { EmailConfig, NotificationPayload, ToReceivers } from './types/config';
 import * as nodemailerModule from 'nodemailer';
 import { Transporter } from 'nodemailer';
 import { SettingsService } from '../../apis-monorepo/src/modules/settings/settings.service';
+import { LeadsService } from '../../apis-monorepo/src/modules/leads/leads.service';
 
 // Resolver nodemailer de forma compatível
 const nodemailer = nodemailerModule.default || nodemailerModule;
@@ -23,6 +24,7 @@ export class NotificationsService {
   private readonly defaultTelegramChatId: string;
   private readonly defaultDiscordWebhookUrl: string;
   private readonly defaultEmailConfig: EmailConfig;
+  private readonly whatsappGatewayUrl: string;
 
   constructor(
     private readonly httpService: HttpService,
@@ -30,6 +32,9 @@ export class NotificationsService {
     @Optional()
     @Inject(forwardRef(() => SettingsService))
     private readonly settingsService?: SettingsService,
+    @Optional()
+    @Inject(forwardRef(() => LeadsService))
+    private readonly leadsService?: LeadsService,
   ) {
     // Configurações padrão de fallback (variáveis de ambiente)
     this.defaultTelegramBotToken =
@@ -45,70 +50,11 @@ export class NotificationsService {
       password: this.configService.get<string>('EMAIL_PASSWORD') || '',
       from: this.configService.get<string>('EMAIL_FROM') || '',
     };
+    this.whatsappGatewayUrl =
+      this.configService.get<string>('WHATSAPP_GATEWAY_URL') || '';
   }
 
-  /**
-   * Busca configurações de notificações para uma unidade
-   * Retorna configurações do banco se disponível, senão usa variáveis de ambiente
-   */
-  private async getNotificationConfig(unitId?: string): Promise<{
-    telegram?: { botToken?: string; chatId?: string; enabled?: boolean };
-    discord?: { webhookUrl?: string; enabled?: boolean };
-    email?: {
-      host?: string;
-      port?: number;
-      username?: string;
-      password?: string;
-      from?: string;
-      enabled?: boolean;
-    };
-  }> {
-    try {
-      // Busca configurações do banco
-      const settings =
-        await this.settingsService.getNotificationSettings(unitId);
-
-      if (settings) {
-        // Mescla configurações do banco com fallback para variáveis de ambiente
-        return {
-          telegram: {
-            botToken:
-              settings.telegram?.botToken || this.defaultTelegramBotToken,
-            chatId: settings.telegram?.chatId || this.defaultTelegramChatId,
-            enabled:
-              settings.telegram?.enabled !== false &&
-              !!(settings.telegram?.botToken || this.defaultTelegramBotToken) &&
-              !!(settings.telegram?.chatId || this.defaultTelegramChatId),
-          },
-          discord: {
-            webhookUrl:
-              settings.discord?.webhookUrl || this.defaultDiscordWebhookUrl,
-            enabled:
-              settings.discord?.enabled !== false &&
-              !!(settings.discord?.webhookUrl || this.defaultDiscordWebhookUrl),
-          },
-          email: {
-            host: settings.email?.host || this.defaultEmailConfig.host,
-            port: settings.email?.port || this.defaultEmailConfig.port,
-            username:
-              settings.email?.username || this.defaultEmailConfig.username,
-            password:
-              settings.email?.password || this.defaultEmailConfig.password,
-            from: settings.email?.from || this.defaultEmailConfig.from,
-            enabled:
-              settings.email?.enabled !== false &&
-              !!(settings.email?.host || this.defaultEmailConfig.host) &&
-              !!(settings.email?.username || this.defaultEmailConfig.username),
-          },
-        };
-      }
-    } catch (error) {
-      this.logger.warn(
-        `Erro ao buscar configurações do banco para unitId ${unitId}: ${error.message}`,
-      );
-    }
-
-    // Fallback para configurações padrão
+  private getDefaultConfig() {
     return {
       telegram: {
         botToken: this.defaultTelegramBotToken,
@@ -131,13 +77,139 @@ export class NotificationsService {
   }
 
   /**
+   * Busca configurações de notificações para uma unidade e opcionalmente para um segmento
+   * Retorna configurações do banco se disponível, senão usa variáveis de ambiente
+   */
+  private async getNotificationConfig(
+    unitId?: string,
+    segment?: string,
+  ): Promise<{
+    telegram?: { botToken?: string; chatId?: string; enabled?: boolean };
+    discord?: { webhookUrl?: string; enabled?: boolean };
+    email?: {
+      host?: string;
+      port?: number;
+      username?: string;
+      password?: string;
+      from?: string;
+      enabled?: boolean;
+    };
+  }> {
+    try {
+      if (!this.settingsService) {
+        return this.getDefaultConfig();
+      }
+
+      // Busca configurações completas da unidade
+      const settings = await this.settingsService.findByUnitId(unitId);
+
+      if (settings) {
+        // Obter configurações globais de notificações
+        const globalNotifications: any = settings.notifications || {};
+
+        // Se houver segmento, tentar buscar configurações específicas do segmento
+        let segmentConfig: any = null;
+        if (segment && settings.segments) {
+          segmentConfig = settings.segments.find(
+            (s: any) => s.segment?.toLowerCase() === segment.toLowerCase(),
+          );
+        }
+
+        const notifications = segmentConfig?.notifications || {};
+
+        // Mescla configurações (prioridade: segmento > banco global > fallback env)
+        return {
+          telegram: {
+            botToken:
+              notifications.telegram?.botToken ||
+              globalNotifications.telegram?.botToken ||
+              this.defaultTelegramBotToken,
+            chatId:
+              notifications.telegram?.chatId ||
+              globalNotifications.telegram?.chatId ||
+              this.defaultTelegramChatId,
+            enabled:
+              notifications.telegram?.enabled !== false &&
+              !!(
+                notifications.telegram?.botToken ||
+                globalNotifications.telegram?.botToken ||
+                this.defaultTelegramBotToken
+              ) &&
+              !!(
+                notifications.telegram?.chatId ||
+                globalNotifications.telegram?.chatId ||
+                this.defaultTelegramChatId
+              ),
+          },
+          discord: {
+            webhookUrl:
+              notifications.discord?.webhookUrl ||
+              globalNotifications.discord?.webhookUrl ||
+              this.defaultDiscordWebhookUrl,
+            enabled:
+              notifications.discord?.enabled !== false &&
+              !!(
+                notifications.discord?.webhookUrl ||
+                globalNotifications.discord?.webhookUrl ||
+                this.defaultDiscordWebhookUrl
+              ),
+          },
+          email: {
+            host:
+              notifications.email?.host ||
+              globalNotifications.email?.host ||
+              this.defaultEmailConfig.host,
+            port:
+              notifications.email?.port ||
+              globalNotifications.email?.port ||
+              this.defaultEmailConfig.port,
+            username:
+              notifications.email?.username ||
+              globalNotifications.email?.username ||
+              this.defaultEmailConfig.username,
+            password:
+              notifications.email?.password ||
+              globalNotifications.email?.password ||
+              this.defaultEmailConfig.password,
+            from:
+              notifications.email?.from ||
+              globalNotifications.email?.from ||
+              this.defaultEmailConfig.from,
+            enabled:
+              notifications.email?.enabled !== false &&
+              !!(
+                notifications.email?.host ||
+                globalNotifications.email?.host ||
+                this.defaultEmailConfig.host
+              ) &&
+              !!(
+                notifications.email?.username ||
+                globalNotifications.email?.username ||
+                this.defaultEmailConfig.username
+              ),
+          },
+        };
+      }
+    } catch (error) {
+      this.logger.warn(
+        `Erro ao buscar configurações do banco para unitId ${unitId}: ${error.message}`,
+      );
+    }
+
+    return this.getDefaultConfig();
+  }
+
+  /**
    * Envia notificação para Telegram
    */
   async sendTelegramNotification(
     payload: NotificationPayload,
     unitId?: string,
   ): Promise<boolean> {
-    const config = await this.getNotificationConfig(unitId);
+    const config = await this.getNotificationConfig(
+      unitId,
+      payload.metadata?.marketSegment || payload.metadata?.Segmento,
+    );
 
     if (
       !config.telegram?.enabled ||
@@ -149,16 +221,7 @@ export class NotificationsService {
     }
 
     try {
-      const emoji = this.getEmojiForType(payload.type);
-      let message = `${emoji} *${payload.title}*\n\n${payload.message}`;
-
-      if (payload.metadata) {
-        const metadataText = Object.entries(payload.metadata)
-          .map(([key, value]) => `*${key}:* ${value}`)
-          .join('\n');
-        message = `${message}\n\n${metadataText}`;
-      }
-
+      const message = this.formatPlainTextNotification(payload);
       const url = `https://api.telegram.org/bot${config.telegram.botToken}/sendMessage`;
 
       await firstValueFrom(
@@ -180,13 +243,99 @@ export class NotificationsService {
   }
 
   /**
+   * Envia notificação para WhatsApp
+   */
+  async sendWhatsAppNotification(
+    payload: NotificationPayload,
+    unitId?: string,
+  ): Promise<boolean> {
+    try {
+      // Tentar encontrar o telefone na metadata
+      const phone =
+        payload.metadata?.Telefone ||
+        payload.metadata?.phone ||
+        payload.metadata?.['Telefone Lead'];
+
+      if (!phone) {
+        this.logger.warn('Telefone não encontrado no payload para envio de WhatsApp');
+        return false;
+      }
+
+      return false; //TODO: implementar a API Oficial do whatsapp
+
+      // Limpar o número do telefone (manter apenas dígitos)
+      const cleanPhone = String(phone).replace(/\D/g, '');
+
+      // Garantir que o número tenha o formato internacional (ex: 55...)
+      let formattedPhone = cleanPhone;
+      if (cleanPhone.length <= 11) {
+        // Se for 10 ou 11 dígitos, assume que é Brasil e adiciona 55
+        formattedPhone = `55${cleanPhone}`;
+      }
+
+      const message = this.formatPlainTextNotification(payload);
+      const encodedMessage = encodeURIComponent(message);
+      const waLink = `https://wa.me/${formattedPhone}?text=${encodedMessage}`;
+
+      this.logger.log(`[WhatsApp] Link gerado: ${waLink}`);
+
+      // Se houver um gateway configurado, tenta enviar proativamente
+      if (this.whatsappGatewayUrl) {
+        try {
+          await firstValueFrom(
+            this.httpService.get(this.whatsappGatewayUrl, {
+              params: {
+                phone: formattedPhone,
+                message,
+              },
+            }),
+          );
+          this.logger.log('Notificação enviada via WhatsApp Gateway com sucesso');
+        } catch (error) {
+          this.logger.error(`Erro ao enviar via WhatsApp Gateway: ${error.message}`);
+          // Não falha o retorno aqui porque o link wa.me foi gerado de qualquer forma no log
+        }
+      }
+
+      return true;
+    } catch (error) {
+      this.logger.error(`Erro ao processar notificação de WhatsApp: ${error.message}`);
+      return false;
+    }
+  }
+
+  /**
+   * Formata uma notificação em texto simples (para canais como Telegram/WhatsApp)
+   */
+  private formatPlainTextNotification(payload: NotificationPayload): string {
+    const emoji = this.getEmojiForType(payload.type);
+    let message = `${emoji} *${payload.title}*\n\n${payload.message}`;
+
+    if (payload.metadata) {
+      const metadataText = Object.entries(payload.metadata)
+        .filter(([key]) => !['unitId', 'leadId'].includes(key)) // Ocultar IDs internos se desejado
+        .map(([key, value]) => `*${key}:* ${value}`)
+        .join('\n');
+
+      if (metadataText) {
+        message = `${message}\n\n${metadataText}`;
+      }
+    }
+
+    return message;
+  }
+
+  /**
    * Envia notificação para Discord
    */
   async sendDiscordNotification(
     payload: NotificationPayload,
     unitId?: string,
   ): Promise<boolean> {
-    const config = await this.getNotificationConfig(unitId);
+    const config = await this.getNotificationConfig(
+      unitId,
+      payload.metadata?.marketSegment || payload.metadata?.Segmento,
+    );
 
     if (!config.discord?.enabled || !config.discord?.webhookUrl) {
       this.logger.warn('Discord webhook URL não configurada');
@@ -202,10 +351,10 @@ export class NotificationsService {
         timestamp: new Date().toISOString(),
         fields: payload.metadata
           ? Object.entries(payload.metadata).map(([name, value]) => ({
-              name,
-              value: String(value),
-              inline: true,
-            }))
+            name,
+            value: String(value),
+            inline: true,
+          }))
           : [],
       };
 
@@ -236,11 +385,15 @@ export class NotificationsService {
     telegram: boolean;
     discord: boolean;
     email: boolean;
+    whatsapp: boolean;
   }> {
-    const [telegramResult, discordResult, emailResult] =
+    const [telegramResult, whatsappResult, discordResult, emailResult] =
       await Promise.allSettled([
         toSend?.sendToAdmins
           ? this.sendTelegramNotification(payload, unitId)
+          : Promise.resolve(false),
+        toSend?.sendToClients
+          ? this.sendWhatsAppNotification(payload, unitId)
           : Promise.resolve(false),
         toSend?.sendToAdmins
           ? this.sendDiscordNotification(payload, unitId)
@@ -256,6 +409,8 @@ export class NotificationsService {
       discord:
         discordResult.status === 'fulfilled' ? discordResult.value : false,
       email: emailResult.status === 'fulfilled' ? emailResult.value : false,
+      whatsapp:
+        whatsappResult.status === 'fulfilled' ? whatsappResult.value : false,
     };
   }
 
@@ -274,19 +429,19 @@ export class NotificationsService {
 
     const metadataHtml = payload.metadata
       ? Object.entries(payload.metadata)
-          .map(([key, value]) => {
-            const formattedKey = key
-              .replace(/([A-Z])/g, ' $1')
-              .replace(/^./, (str) => str.toUpperCase())
-              .trim();
-            return `
+        .map(([key, value]) => {
+          const formattedKey = key
+            .replace(/([A-Z])/g, ' $1')
+            .replace(/^./, (str) => str.toUpperCase())
+            .trim();
+          return `
             <tr>
               <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #374151; width: 40%;">${escapeHtml(formattedKey)}</td>
               <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280;">${escapeHtml(value)}</td>
             </tr>
             `;
-          })
-          .join('')
+        })
+        .join('')
       : '';
 
     return `
@@ -317,9 +472,8 @@ export class NotificationsService {
                     ${escapeHtml(payload.message)}
                   </p>
                   
-                  ${
-                    metadataHtml
-                      ? `
+                  ${metadataHtml
+        ? `
                   <div style="margin-top: 32px; border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden;">
                     <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f9fafb;">
                       <tr>
@@ -331,8 +485,8 @@ export class NotificationsService {
                     </table>
                   </div>
                   `
-                      : ''
-                  }
+        : ''
+      }
                 </td>
               </tr>
               
@@ -361,7 +515,10 @@ export class NotificationsService {
     payload: NotificationPayload,
     unitId?: string,
   ): Promise<boolean> {
-    const config = await this.getNotificationConfig(unitId);
+    const config = await this.getNotificationConfig(
+      unitId,
+      payload.metadata?.marketSegment || payload.metadata?.Segmento,
+    );
 
     if (
       !config.email?.enabled ||
@@ -396,15 +553,18 @@ export class NotificationsService {
       transporter = nodemailer.createTransport({
         host: config.email.host,
         port: config.email.port,
-        secure: false,
+        secure: config.email.port === 465,
         auth: {
           user: config.email.username,
           pass: config.email.password,
         },
+        tls: {
+          rejectUnauthorized: false,
+        },
       });
 
       const mailOptions = {
-        from: config.email.from,
+        from: config.email.from || config.email.username,
         to: payload.metadata?.Email,
         subject: payload.title,
         html: this.customHTMLMessage(payload),
@@ -412,15 +572,15 @@ export class NotificationsService {
           payload.message +
           (payload.metadata
             ? '\n\n' +
-              Object.entries(payload.metadata)
-                .map(([key, value]) => `${key}: ${value}`)
-                .join('\n')
+            Object.entries(payload.metadata)
+              .map(([key, value]) => `${key}: ${value}`)
+              .join('\n')
             : ''),
       };
 
       await transporter.sendMail(mailOptions);
 
-      this.logger.log('Notificação enviada para email com sucesso');
+      this.logger.log('Notificação enviada para email com sucesso: FROM: ' + config.email.from + ' TO: ' + payload.metadata?.Email);
       return true;
     } catch (error) {
       this.logger.error(
@@ -445,6 +605,7 @@ export class NotificationsService {
     source: string;
     score: number;
     unitId: string;
+    marketSegment?: string;
   }): Promise<void> {
     const payload: NotificationPayload = {
       title: '🎯 Novo Lead Capturado',
@@ -459,6 +620,8 @@ export class NotificationsService {
         Score: `${lead.score}/100`,
         'ID Lead': lead.id,
         'ID Unidade': lead.unitId,
+        marketSegment: lead.marketSegment,
+        Segmento: lead.marketSegment,
       },
     };
 
@@ -480,6 +643,7 @@ export class NotificationsService {
     source: string;
     score: number;
     unitId: string;
+    marketSegment?: string;
   }): Promise<void> {
     const payload: NotificationPayload = {
       title: '🎯 O Lead Atualizado',
@@ -494,6 +658,8 @@ export class NotificationsService {
         Score: `${lead.score}/100`,
         'ID Lead': lead.id,
         'ID Unidade': lead.unitId,
+        marketSegment: lead.marketSegment,
+        Segmento: lead.marketSegment,
       },
     };
 
@@ -512,6 +678,7 @@ export class NotificationsService {
     email: string;
     customerId: string;
     unitId: string;
+    marketSegment?: string;
   }): Promise<void> {
     const payload: NotificationPayload = {
       title: '✅ Lead Convertido em Cliente',
@@ -523,6 +690,8 @@ export class NotificationsService {
         'ID Lead': lead.id,
         'ID Cliente': lead.customerId,
         'ID Unidade': lead.unitId,
+        marketSegment: lead.marketSegment,
+        Segmento: lead.marketSegment,
       },
     };
 
@@ -541,6 +710,7 @@ export class NotificationsService {
     email: string;
     phone: string;
     unitId: string;
+    marketSegment?: string;
   }): Promise<void> {
     const payload: NotificationPayload = {
       title: '👤 Novo Cliente Cadastrado',
@@ -552,6 +722,8 @@ export class NotificationsService {
         Telefone: customer.phone,
         'ID Cliente': customer.id,
         'ID Unidade': customer.unitId,
+        marketSegment: customer.marketSegment,
+        Segmento: customer.marketSegment,
       },
     };
 
@@ -572,6 +744,7 @@ export class NotificationsService {
     unitId: string;
     chatUrl: string;
     mensagem: string;
+    marketSegment?: string;
   }): Promise<void> {
     const payload: NotificationPayload = {
       title: '💬 Nova Conversa Iniciada',
@@ -588,6 +761,8 @@ export class NotificationsService {
         'ID Unidade': conversation.unitId,
         'URL da Conversa': conversation.chatUrl,
         Mensagem: conversation.mensagem,
+        marketSegment: conversation.marketSegment,
+        Segmento: conversation.marketSegment,
       },
     };
 
@@ -624,6 +799,39 @@ export class NotificationsService {
       sendToAdmins: true,
       sendToClients: true,
     });
+  }
+
+  /**
+   * Gera a URL do chat baseada no segmento do lead
+   */
+  async getChatUrl(leadId: string, unitId: string, stage?: string): Promise<string> {
+    let baseUrl = 'https://chatbot.tadevolta.com.br';
+    let segment: string | undefined;
+
+    try {
+      if (this.leadsService) {
+        const lead = await this.leadsService.findOne(leadId, unitId);
+        segment = lead?.marketSegment;
+
+        if (segment && this.settingsService) {
+          const segmentSettings = await this.settingsService.getSegmentSettings(unitId, segment);
+          if (segmentSettings?.notificationUrl) {
+            baseUrl = segmentSettings.notificationUrl;
+            this.logger.log(`Usando URL personalizada para segmento ${segment}: ${baseUrl}`);
+          }
+        }
+      }
+    } catch (error) {
+      this.logger.warn(`Erro ao buscar segmento/settings para lead ${leadId}: ${error.message}`);
+    }
+
+    const params = new URLSearchParams({
+      leadId,
+      unitId,
+      stage: stage || 'initial',
+    });
+
+    return `${baseUrl}/?${params.toString()}`;
   }
 
   private getEmojiForType(type?: string): string {

@@ -18,7 +18,7 @@ export class SettingsService {
     @InjectModel(Setting.name) private settingModel: Model<SettingDocument>,
     @InjectModel(Franchise.name)
     private franchiseModel: Model<FranchiseDocument>,
-  ) {}
+  ) { }
 
   /**
    * Converte o documento do MongoDB para DTO de resposta
@@ -31,6 +31,7 @@ export class SettingsService {
       notifications: setting.notifications,
       franchise: setting.franchise,
       general: setting.general,
+      segments: setting.segments,
       createdAt: setting.createdAt,
       updatedAt: setting.updatedAt,
     };
@@ -149,19 +150,23 @@ export class SettingsService {
    * Busca configurações de notificações para uma unidade
    * Retorna null se não existir, permitindo fallback para variáveis de ambiente
    */
-  async getNotificationSettings(unitId: string): Promise<{
-    telegram?: { botToken?: string; chatId?: string; enabled?: boolean };
-    discord?: { webhookUrl?: string; enabled?: boolean };
-    email?: {
-      host?: string;
-      port?: number;
-      username?: string;
-      password?: string;
-      from?: string;
-      enabled?: boolean;
-    };
-  } | null> {
+  async getNotificationSettings(
+    unitId: string,
+  ): Promise<Setting['notifications'] | null> {
     const setting = await this.findByUnitId(unitId);
     return setting?.notifications || null;
+  }
+
+  /**
+   * Busca configurações de um segmento específico de uma unidade
+   */
+  async getSegmentSettings(
+    unitId: string,
+    segment: string,
+  ): Promise<Setting['segments'][0] | null | undefined> {
+    const setting = await this.findByUnitId(unitId);
+    if (!setting || !setting.segments) return null;
+
+    return setting.segments.find((s) => s.segment === segment);
   }
 }

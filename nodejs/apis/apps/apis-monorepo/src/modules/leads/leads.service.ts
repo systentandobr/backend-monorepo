@@ -33,7 +33,7 @@ export class LeadsService {
     @InjectModel(Lead.name) private leadModel: Model<LeadDocument>,
     @Inject(forwardRef(() => NotificationsService))
     private readonly notificationsService: NotificationsService,
-  ) {}
+  ) { }
 
   async create(
     createLeadDto: CreateLeadDto,
@@ -63,6 +63,7 @@ export class LeadsService {
           source: response.source,
           score: response.score,
           unitId: response.unitId,
+          marketSegment: response.marketSegment,
         })
         .catch((err) => {
           this.logger.error(
@@ -108,6 +109,7 @@ export class LeadsService {
         source: responseDto.source,
         score: responseDto.score,
         unitId: responseDto.unitId,
+        marketSegment: responseDto.marketSegment,
       })
       .catch((err) => {
         this.logger.error(
@@ -297,6 +299,7 @@ export class LeadsService {
         email: responseDto.email,
         customerId: responseDto.customerId!,
         unitId: responseDto.unitId,
+        marketSegment: responseDto.marketSegment,
       })
       .catch((err) => {
         this.logger.error(
@@ -518,14 +521,12 @@ export class LeadsService {
       // Usar session_id da resposta se disponível, senão usar o que foi gerado/buscado
       const finalSessionId = response?.data?.session_id || sessionId;
 
-      const params = new URLSearchParams({
-        leadId: leadId,
-        unitId: unitId,
-        stage: startStage,
-        sessionId: finalSessionId,
-      });
-
-      const chatUrl = `${baseUrl}/?${params.toString()}`;
+      // Gerar URL do chat via NotificationsService (que já lida com segmentos)
+      const chatUrl = await this.notificationsService.getChatUrl(
+        leadId,
+        unitId,
+        startStage,
+      );
 
       this.notificationsService
         .notifyNewConversation({
@@ -539,6 +540,7 @@ export class LeadsService {
           unitId: lead.unitId,
           chatUrl: chatUrl || '',
           mensagem: response?.data?.message || '',
+          marketSegment: lead.marketSegment,
         })
         .catch((err) => {
           this.logger.error(
@@ -586,7 +588,7 @@ export class LeadsService {
         runId: 'run1',
         hypothesisId: 'A',
       }),
-    }).catch(() => {});
+    }).catch(() => { });
     // #endregion
 
     const pythonApiUrl =
@@ -607,7 +609,7 @@ export class LeadsService {
         runId: 'run1',
         hypothesisId: 'C',
       }),
-    }).catch(() => {});
+    }).catch(() => { });
     // #endregion
 
     try {
@@ -637,7 +639,7 @@ export class LeadsService {
             hypothesisId: 'C',
           }),
         },
-      ).catch(() => {});
+      ).catch(() => { });
       // #endregion
 
       const response = await axios.get(requestUrl, {
@@ -666,7 +668,7 @@ export class LeadsService {
             hypothesisId: 'C',
           }),
         },
-      ).catch(() => {});
+      ).catch(() => { });
       // #endregion
 
       console.log('getConversations:: ', {
@@ -695,7 +697,7 @@ export class LeadsService {
             hypothesisId: 'B',
           }),
         },
-      ).catch(() => {});
+      ).catch(() => { });
       // #endregion
 
       // Para cada sessão, buscar histórico completo
@@ -717,7 +719,7 @@ export class LeadsService {
                 hypothesisId: 'B',
               }),
             },
-          ).catch(() => {});
+          ).catch(() => { });
           // #endregion
 
           try {
@@ -739,7 +741,7 @@ export class LeadsService {
                   hypothesisId: 'E',
                 }),
               },
-            ).catch(() => {});
+            ).catch(() => { });
             // #endregion
 
             const historyResponse = await axios.get(historyUrl, {
@@ -773,7 +775,7 @@ export class LeadsService {
                   hypothesisId: 'B',
                 }),
               },
-            ).catch(() => {});
+            ).catch(() => { });
             // #endregion
 
             return {
@@ -807,7 +809,7 @@ export class LeadsService {
                   hypothesisId: 'B',
                 }),
               },
-            ).catch(() => {});
+            ).catch(() => { });
             // #endregion
 
             this.logger.warn(
@@ -845,7 +847,7 @@ export class LeadsService {
             hypothesisId: 'D',
           }),
         },
-      ).catch(() => {});
+      ).catch(() => { });
       // #endregion
 
       return {
@@ -873,7 +875,7 @@ export class LeadsService {
             hypothesisId: 'B',
           }),
         },
-      ).catch(() => {});
+      ).catch(() => { });
       // #endregion
 
       this.logger.error(

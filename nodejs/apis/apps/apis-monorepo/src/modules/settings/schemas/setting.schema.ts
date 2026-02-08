@@ -76,6 +76,42 @@ export class Setting {
   // Outras configurações podem ser adicionadas aqui
   @Prop({ type: Object })
   general?: Record<string, any>;
+
+  // Configurações específicas por segmento de mercado
+  @Prop({
+    type: [
+      {
+        segment: { type: String, required: true },
+        notificationUrl: { type: String },
+        phone: { type: String },
+        notifications: {
+          telegram: {
+            botToken: { type: String },
+            chatId: { type: String },
+            enabled: { type: Boolean },
+          },
+          discord: {
+            webhookUrl: { type: String },
+            enabled: { type: Boolean },
+          },
+          email: {
+            host: { type: String },
+            port: { type: Number },
+            username: { type: String },
+            password: { type: String },
+            from: { type: String },
+            enabled: { type: Boolean },
+          },
+        },
+      },
+    ],
+  })
+  segments?: Array<{
+    segment: string;
+    notificationUrl?: string;
+    phone?: string;
+    notifications?: Setting['notifications'];
+  }>;
 }
 
 export const SettingSchema = SchemaFactory.createForClass(Setting);

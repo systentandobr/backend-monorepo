@@ -33,6 +33,7 @@ import { GamificationModule } from './modules/gamification/gamification.module';
 import { ExternalApisModule } from './modules/external-apis/external-apis.module';
 import { TeamsModule } from './modules/teams/teams.module';
 import { SuppliersModule } from './modules/suppliers/suppliers.module';
+import { SessionsModule } from './modules/sessions/sessions.module';
 
 @Module({
   imports: [
@@ -66,8 +67,9 @@ import { SuppliersModule } from './modules/suppliers/suppliers.module';
     ExternalApisModule,
     TeamsModule,
     SuppliersModule,
+    SessionsModule,
   ],
   controllers: [AppController, DebugController, AuthPublicController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

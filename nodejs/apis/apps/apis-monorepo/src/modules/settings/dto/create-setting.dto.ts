@@ -180,4 +180,27 @@ export class CreateSettingDto {
   @IsOptional()
   @IsObject()
   general?: Record<string, any>;
+
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => SegmentConfigDto)
+  segments?: SegmentConfigDto[];
+}
+
+class SegmentConfigDto {
+  @IsString()
+  segment: string;
+
+  @IsOptional()
+  @IsString()
+  notificationUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => NotificationsConfigDto)
+  notifications?: NotificationsConfigDto;
 }
